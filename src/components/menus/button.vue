@@ -504,15 +504,17 @@ onClickOutside(
     display: flex;
     align-items: center;
     justify-content: center;
+
+    --umo-button-font-size: 16px;
     .umo-button-icon,
     :deep(.umo-icon) {
-      font-size: 16px;
+      font-size: var(--umo-button-font-size);
     }
     .umo-button-icon-svg {
       display: flex;
       :deep(svg) {
-        width: 16px;
-        height: 16px;
+        width: var(--umo-button-font-size);
+        height: var(--umo-button-font-size);
       }
     }
     .umo-button-text {
@@ -584,5 +586,9 @@ onClickOutside(
 }
 :global(.umo-popup-content) {
   padding: var(--umo-popup-content-padding);
+}
+
+:deep(.umo-button) {
+  overflow: visible;
 }
 </style>

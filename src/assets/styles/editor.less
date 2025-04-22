@@ -62,9 +62,9 @@
             display: block;
             position: absolute;
             left: -8px;
-            top: -5px;
+            top: -2px;
             right: -8px;
-            bottom: -5px;
+            bottom: -2px;
             border-radius: var(--umo-radius);
             background: var(--umo-content-node-selected-background);
             pointer-events: none;
@@ -630,6 +630,17 @@
     }
     h6 {
       font-size: 0.85em;
+    }
+  }
+}
+
+
+.Tiptap-invisible-character  {
+  &.Tiptap-invisible-character--paragraph, &.Tiptap-invisible-character--break {
+    &:before {
+      content: '↵'; // ↵ ↩︎ ↩
+      color: #d6d5d5;
+      font-size: 12px;
     }
   }
 }

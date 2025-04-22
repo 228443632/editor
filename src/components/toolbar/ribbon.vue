@@ -1,5 +1,6 @@
 <template>
   <div class="umo-ribbon-menu">
+    <!-- 分类   -->
     <div v-if="menus.length > 1" class="umo-ribbon-tabs">
       <div
         v-for="item in menus"
@@ -11,6 +12,7 @@
         {{ item.label }}
       </div>
     </div>
+    <!-- 图标按钮   -->
     <toolbar-scrollable ref="scrollableRef" class="umo-scrollable-container">
       <div class="umo-ribbon-container">
         <template v-if="currentMenu === 'base'">
@@ -281,6 +283,7 @@ const changeMenu = async (menu: string) => {
 .umo-ribbon-tabs {
   padding: 10px 10px 0;
   display: flex;
+  justify-content: center;
   &-item {
     font-size: var(--umo-font-size-small);
     margin-right: 25px;
@@ -322,15 +325,17 @@ const changeMenu = async (menu: string) => {
 }
 .umo-scrollable-container {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   box-sizing: border-box;
 }
 .umo-ribbon-container {
   display: flex;
   height: 56px;
+  width: fit-content;
+  margin: 0 auto;
   flex-shrink: 0;
   .umo-virtual-group {
-    padding: 0 20px;
+    padding: 0 16px;
     border-left: solid 1px var(--umo-border-color-light);
     flex-shrink: 0;
     &:empty {

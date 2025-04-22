@@ -1,6 +1,5 @@
 <template>
   <menus-button
-    ico="color"
     :text="text || t('base.color')"
     menu-type="popup"
     popup-handle="arrow"
@@ -9,10 +8,14 @@
     @toggle-popup="togglePopup"
     @menu-click="colorChange(currentColor)"
   >
+    <icon name="color" class="" size="18"/>
     <div
-      class="umo-current-color"
+      :class="[
+        `umo-current-color`,
+        `umo-current-color--${_color || ''}`,
+      ]"
       :style="{
-        background: editor?.getAttributes('textStyle')?.color || currentColor,
+        color: _color || '#fff',
       }"
     ></div>
     <template #content>
@@ -43,7 +46,7 @@ const editor = inject('editor')
 
 let currentColor = $ref<string | undefined>()
 const colorChange = (color: string) => {
-  currentColor = color
+  currentColor = color || 'transparent'
   popupVisible.value = false
 
   if (props.modeless) {
@@ -57,13 +60,39 @@ const colorChange = (color: string) => {
     editor.value?.chain().focus().setColor(color).run()
   }
 }
+
+/**
+ * 颜色
+ */
+const _color = computed(() => {
+  return editor.value?.getAttributes('textStyle')?.color || currentColor
+})
+
 </script>
 
 <style lang="less" scoped>
 .umo-current-color {
-  width: 12px;
-  height: 2px;
   position: absolute;
-  margin: 0 0 -22px 2px;
+  width: var(--umo-button-font-size);
+  height: 5px;
+  border-radius: 2px;
+  margin: 0 0 -18px 0;
+  background: currentColor;
+}
+
+.umo-current-color--,
+.umo-current-color--transparent {
+  box-shadow: 0 0 0 1px #bfbfbf inset;
+  overflow: hidden;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 200%;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%) rotate(30deg);
+    background: red;
+  }
 }
 </style>

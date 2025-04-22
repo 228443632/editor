@@ -455,6 +455,21 @@ const ojbectSchema = new ObjectSchema({
         validate: 'boolean',
         required: false,
       },
+      showToc: {
+        merge: 'replace',
+        validate: 'boolean',
+        required: false,
+      },
+      showRightSlot: {
+        merge: 'replace',
+        validate: 'boolean',
+        required: false,
+      },
+      tocTabsOptions: {
+        required: false,
+        merge: 'replace',
+        validate: 'array',
+      },
       watermark: {
         required: false,
         merge: 'replace',

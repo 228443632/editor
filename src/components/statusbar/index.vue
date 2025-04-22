@@ -1,5 +1,6 @@
 <template>
   <div v-if="!page.preview?.enabled" class="umo-status-bar">
+   <!-- 左侧  -->
     <div class="umo-status-bar-left">
       <tooltip :content="page.showToc ? t('toc.hide') : t('toc.show')">
         <t-button
@@ -122,6 +123,8 @@
         </template>
       </t-popup>
     </div>
+
+    <!-- 右侧  -->
     <div class="umo-status-bar-right">
       <tooltip
         :content="
@@ -349,7 +352,8 @@ onMounted(() => {
 
 // 演示模式
 const togglePreview = () => {
-  page.value.showToc = false
+  // page.value.showToc = false
+  // page.value.showRightSlot = false
   page.value.preview ??= {}
   page.value.preview.enabled = !page.value.preview.enabled
 

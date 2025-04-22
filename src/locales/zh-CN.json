@@ -61,7 +61,7 @@
     "heading": {
       "text": "标题 {level}",
       "paragraph": "正文",
-      "tip": "设置标题，可依据标题生成大纲"
+      "tip": "设置标题，可依据标题生成目录"
     },
     "highlight": {
       "text": "高亮显示",
@@ -164,7 +164,7 @@
     "symbol": "特殊字符",
     "template": "模板",
     "textBox": "文本框",
-    "toc": "页面大纲",
+    "toc": "目录",
     "video": "视频",
     "web": {
       "text": "网页",
@@ -588,10 +588,10 @@
     "replaceAll": "全部替换"
   },
   "toc": {
-    "title": "页面大纲",
-    "show": "显示大纲",
-    "hide": "隐藏大纲",
-    "empty": "暂无页面大纲"
+    "title": "目录",
+    "show": "显示目录",
+    "hide": "隐藏目录",
+    "empty": "暂无页面目录"
   },
   "spellcheck": {
     "enable": "开启拼写检查",

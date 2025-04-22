@@ -1,5 +1,6 @@
 <template>
   <div v-if="$toolbar.show" class="umo-toolbar-container">
+    <!--  专业工具栏  -->
     <toolbar-ribbon
       v-if="$toolbar.mode === 'ribbon'"
       :menus="toolbarMenus"
@@ -14,6 +15,8 @@
         <slot :name="`toolbar_${item}`" v-bind="props" />
       </template>
     </toolbar-ribbon>
+
+    <!--  经典工具栏  -->
     <toolbar-classic
       v-if="$toolbar.mode === 'classic'"
       :menus="toolbarMenus"
@@ -239,6 +242,8 @@ const setContentFromCache = () => {
   user-select: none;
   border-bottom: solid 1px var(--umo-border-color);
   position: relative;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.25));
+  background: #fff;
 }
 .umo-toolbar-actions {
   padding: 6px 10px;

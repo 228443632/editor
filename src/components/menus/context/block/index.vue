@@ -96,8 +96,8 @@ const dropdownVisible = (visible: boolean) => {
   &-hander {
     position: absolute;
     display: flex;
-    right: -10px;
-    top: -5px;
+    right: calc(-10px * var(--editor-zoom-level));
+    top: calc(-0px * var(--editor-zoom-level));
     padding-right: 15px;
     @media print {
       display: none;

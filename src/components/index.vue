@@ -19,8 +19,17 @@
       :style="{
         height: options.height,
         zIndex: fullscreen ? options.fullscreenZIndex : 'unset',
+        '--layout-width': layoutSize.layoutWidth + 'px',
+        '--editor-width': layoutSize.editorWidth + 'px',
+        '--editor-left': layoutSize.editorLeft + 'px',
+        '--left-aside-width': layoutSize.leftAsideWidth + 'px',
+        '--left-aside-left': layoutSize.leftAsideLeft + 'px',
+        '--left-aside-gap': layoutSize.leftAsideGap + 'px',
+        '--right-aside-width': layoutSize.rightAsideWidth + 'px',
+        '--editor-zoom-level': page.zoomLevel / 100,
       }"
     >
+      <!--  头部   -->
       <header class="umo-toolbar">
         <toolbar
           :key="toolbarKey"
@@ -35,10 +44,17 @@
           </template>
         </toolbar>
       </header>
+
+      <!--  内容    -->
       <main class="umo-main">
         <container-page>
           <template #bubble_menu="slotProps">
             <slot name="bubble_menu" v-bind="slotProps" />
+          </template>
+
+          <!--  内容右侧  -->
+          <template #page-right>
+            <slot name="container-page-right"></slot>
           </template>
         </container-page>
       </main>
@@ -130,8 +146,32 @@ const printing = ref(false)
 const fullscreen = ref(false)
 const exportFile = ref({ pdf: false, image: false })
 const uploadFileMap = ref(new Map())
+const layoutSize = ref({
+  /** 布局宽度 */
+  layoutWidth: undefined,
+
+  /** 编辑器宽度*/
+  editorWidth: undefined,
+
+  /** 编辑器左侧距离*/
+  editorLeft: undefined,
+
+  /** 左侧边栏宽度*/
+  leftAsideWidth: 286,
+
+  /** 左侧距离左侧距离*/
+  leftAsideLeft: undefined,
+
+  /** 左侧边栏与左侧边栏之间的间隔 */
+  leftAsideGap: 24,
+
+  /** 右侧宽度 */
+  rightAsideWidth: 280,
+})
 // const bookmark = ref(false)
 const destroyed = ref(false)
+const tocActive = ref('dir') // 目录选中值
+
 provide('container', container)
 provide('options', options)
 provide('editor', editor)
@@ -147,6 +187,8 @@ provide('exportFile', exportFile)
 provide('uploadFileMap', uploadFileMap)
 // provide('bookmark', bookmark)
 provide('destroyed', destroyed)
+provide('layoutSize', layoutSize)
+provide('tocActive', tocActive)
 
 watch(
   () => options.value.page,
@@ -169,7 +211,7 @@ watch(
       showBreakMarks,
       showBookmark,
       showLineNumber: false,
-      showToc: false,
+      showToc: true,
       zoomLevel: 100,
       autoWidth: false,
       preview: {
@@ -968,6 +1010,8 @@ defineExpose({
   setLocale,
   setTheme,
   getPage: () => page.value,
+  /** feat: 新增*/
+  page,
   getContent,
   getImage,
   getText,
@@ -1023,6 +1067,7 @@ defineExpose({
   --td-text-color-primary: var(--umo-text-color);
   --td-text-color-disabled: var(--umo-text-color-disabled);
   width: 100%;
+  min-width: 1440px;
   height: 100%;
   min-height: 400px;
   display: flex;
@@ -1046,6 +1091,15 @@ defineExpose({
       }
     }
     .umo-toolbar {
+      display: none;
+    }
+
+    .umo-zoomable-container {
+      padding: 0;
+    }
+
+    .umo-toc-container,
+    .umo-page-right-slot {
       display: none;
     }
   }

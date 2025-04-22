@@ -60,6 +60,7 @@ import TextBox from './text-box'
 import Toc from './toc'
 import typeWriter from './type-writer'
 import Video from './video'
+import { BackgroundColor } from '@weiruo/tiptap-extension-background-color'
 
 export const getDefaultExtensions = ({
   container,
@@ -74,12 +75,12 @@ export const getDefaultExtensions = ({
 
   const extensions = [
     StarterKit.configure({
-      bold: false,
-      bulletList: false,
-      orderedList: false,
-      codeBlock: false,
-      horizontalRule: false,
-      dropcursor: false,
+      // bold: false,
+      // bulletList: false,
+      // orderedList: false,
+      // codeBlock: false,
+      // horizontalRule: false,
+      // dropcursor: false,
     }),
     Placeholder.configure({
       placeholder: () => String(l(doc?.placeholder ?? '')),
@@ -124,7 +125,10 @@ export const getDefaultExtensions = ({
       searchResultClass: 'umo-search-result',
     }),
     Link,
-    Image,
+    Image.configure({
+      allowBase64: true,
+      inline: true,
+    }),
     Video,
     Audio,
     File,
@@ -199,6 +203,8 @@ export const getDefaultExtensions = ({
     }),
     Echarts,
     typeWriter,
+
+    BackgroundColor,
   ]
 
   return extensions

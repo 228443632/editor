@@ -254,7 +254,7 @@ const toggoleMenu = async (menu: string) => {
 
 <style lang="less" scoped>
 .umo-scrollable-container {
-  padding: 10px;
+  padding: 10px 12px;
 }
 .umo-classic-menu {
   display: flex;

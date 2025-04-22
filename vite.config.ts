@@ -10,6 +10,7 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 
 import pkg from './package.json'
 import copyright from './src/utils/copyright'
+const IS_PRO = process.env.NODE_ENV === 'production'
 
 // Plugin configurations
 const vuePlugins = {
@@ -71,6 +72,7 @@ const buildConfig = {
 }
 
 const cssConfig = {
+  devSourcemap: !IS_PRO,
   preprocessorOptions: {
     less: {
       modifyVars: { '@prefix': 'umo' },

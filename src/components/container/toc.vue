@@ -1,12 +1,35 @@
 <template>
   <div class="umo-toc-container">
-    <div class="umo-toc-title">
-      <icon class="icon-toc" name="toc" /> {{ t('toc.title') }}
-      <div class="umo-dialog__close" @click="$emit('close')">
-        <icon name="close" />
+    <section>
+      <div class="umo-toc-title">
+        <span
+          v-for="(item, index) in _tabOptions"
+          :key="index"
+          :class="[
+            `umo-toc-title__item`,
+            tocActive == item.value && `is-active`,
+          ]"
+          @click="tocActive = item.value"
+        >
+          <template v-if="item.value == 'dir'">
+            <slot :name="`toc-title-${item.value}`" v-bind="item">
+              {{ item.label }}
+            </slot>
+          </template>
+
+          <template v-else>
+            <slot :name="`toc-title-${item.value}`" v-bind="item">
+              {{ item.label }}
+            </slot>
+          </template>
+        </span>
+        <div class="umo-dialog__close" @click="$emit('close')">
+          <icon name="close" size="16" />
+        </div>
       </div>
-    </div>
-    <div class="umo-toc-content umo-scrollbar">
+    </section>
+
+    <div v-show="tocActive == `dir`" class="umo-toc-content umo-scrollbar">
       <t-tree
         class="umo-toc-tree"
         :data="tocTreeData"
@@ -22,7 +45,11 @@
         @active="headingActive"
       />
     </div>
-    <div class="umo-toc-resize-handle" @mousedown="startResize"></div>
+    <div
+      v-if="false"
+      class="umo-toc-resize-handle"
+      @mousedown="startResize"
+    ></div>
   </div>
 </template>
 
@@ -31,6 +58,7 @@ import { TextSelection } from '@tiptap/pm/state'
 
 const container = inject('container')
 const editor = inject('editor')
+const page = inject('page')
 
 defineEmits(['close'])
 
@@ -42,6 +70,7 @@ interface TocItem {
 let tocTreeData = $ref([])
 let watchTreeData: TocItem[] = [] // 可视化监听数据
 const buildTocTree = (tocArray: Record<string, any>[]): TocItem[] => {
+  if (!Array.isArray(tocArray)) return []
   const root: TocItem[] = []
   const stack: TocItem[] = []
   for (const item of tocArray) {
@@ -67,6 +96,8 @@ const buildTocTree = (tocArray: Record<string, any>[]): TocItem[] => {
   }
   return root
 }
+
+const tocActive = inject('tocActive')
 
 const throttleTocTreeData = (toc: any) =>
   useThrottleFn(() => {
@@ -152,15 +183,31 @@ const stopResize = () => {
   umoPageContainer.removeEventListener('mousemove', resize)
   umoPageContainer.removeEventListener('mouseup', stopResize)
 }
+
+const _tabOptions = computed(() => {
+  return [
+    {
+      label: t('toc.title'),
+      value: 'dir',
+    },
+    ...(page.value?.tocTabsOptions || []),
+  ]
+})
 </script>
 
 <style lang="less" scoped>
 .umo-toc-container {
-  background-color: var(--umo-color-white);
+  padding-top: var(--padding-top);
+  padding-left: 10px;
+  //left: var(--left-aside-left);
+  //background-color: var(--umo-color-white);
+  background: transparent;
   border-right: solid 1px var(--umo-border-color);
-  width: 320px;
+  width: var(--left-aside-width);
   box-sizing: border-box;
+  height: 100%;
   display: flex;
+  flex: none;
   flex-direction: column;
   position: relative;
   .umo-toc-resize-handle {
@@ -177,18 +224,48 @@ const stopResize = () => {
     }
   }
   .umo-toc-title {
-    border-bottom: solid 1px var(--umo-border-color-light);
+    //border-bottom: solid 1px var(--umo-border-color-light);
     display: flex;
     align-items: center;
+    font-size: 13px;
     position: relative;
-    padding: 10px 15px;
+    padding: 0px 4px 6px;
+    gap: 14px;
+    .umo-toc-title__item {
+      color: #9ea5b1;
+      font-weight: normal;
+      cursor: pointer;
+      position: relative;
+      display: inline-block;
+      &:after {
+        content: '';
+        --left: 2px;
+        width: calc(100% - 2 * var(--left));
+        display: block;
+        height: 3px;
+        border-radius: 2px;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+        position: absolute;
+        background-color: currentColor;
+        bottom: -6px;
+        left: var(--left);
+      }
+      &.is-active {
+        color: #333;
+        font-weight: bold;
+        &:after {
+          transform: scaleX(1);
+        }
+      }
+    }
     .icon-toc {
       margin-right: 5px;
       font-size: 20px;
     }
     .umo-dialog__close {
       position: absolute;
-      right: 15px;
+      right: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -199,12 +276,15 @@ const stopResize = () => {
     display: flex;
     padding: 10px;
     flex-direction: column;
+    overflow: auto scroll;
     .umo-toc-tree {
-      --td-comp-size-m: 28px;
-      --td-comp-paddingLR-xs: 8px;
+      --td-comp-size-m: 22px;
+      --td-comp-paddingLR-xs: 4px;
       --td-comp-margin-xs: 0;
-      --td-brand-color-light: var(--umo-button-hover-background);
+      --td-brand-color-light: #e2e4ea;
+      --td-comp-paddingTB-xxs: 0;
       user-select: none;
+      font-size: 12px;
       :deep(.umo-tree__empty) {
         height: 60px;
         font-size: 12px;
@@ -217,6 +297,15 @@ const stopResize = () => {
       :deep(.umo-is-active) {
         font-weight: 400;
         color: var(--umo-primary-color);
+      }
+      :deep {
+        .umo-tree__item + .umo-tree__item {
+          margin-top: 2px;
+        }
+
+        .umo-tree__icon {
+          --td-font-size-body-medium: 12px;
+        }
       }
     }
   }

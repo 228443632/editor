@@ -1,10 +1,17 @@
 <template>
   <div class="umo-page-container">
+    <!-- 左侧目录   -->
     <container-toc
       v-if="pageOptions.showToc"
       @close="pageOptions.showToc = false"
-    />
-    <div class="umo-zoomable-container umo-scrollbar">
+    >
+    </container-toc>
+
+    <!--  中间内容  -->
+    <div
+      ref="zoomableContainerRef"
+      class="umo-zoomable-container umo-scrollbar"
+    >
       <div
         class="umo-zoomable-content"
         :style="{
@@ -43,7 +50,7 @@
               style="width: var(--umo-page-margin-right)"
             ></div>
           </div>
-          <div class="umo-page-node-content">
+          <div class="umo-page-node-content" ref="umoPageNodeContentRef">
             <editor>
               <template #bubble_menu="props">
                 <slot name="bubble_menu" v-bind="props" />
@@ -64,6 +71,12 @@
         </t-watermark>
       </div>
     </div>
+
+    <!--  右侧   -->
+    <div class="umo-page-right-slot" v-if="pageOptions.showRightSlot">
+      <slot name="page-right"></slot>
+    </div>
+
     <t-image-viewer
       v-model:visible="imageViewer.visible"
       v-model:index="currentImageIndex"
@@ -82,11 +95,21 @@
 </template>
 
 <script setup lang="ts">
+import { useElementSize } from '@vueuse/core'
+
 import type { WatermarkOption } from '@/types'
+
+import type Editor from '../editor/index.vue'
 
 const container = inject('container')
 const imageViewer = inject('imageViewer')
 const pageOptions = inject('page')
+const layoutSize = inject('layoutSize')
+
+const umoPageNodeContentRef = ref<InstanceType<typeof Editor>>()
+const zoomableContainerRef = ref<HTMLHtmlElement>() // 缩放容器
+const { width: editorContainerWidth } = useElementSize(zoomableContainerRef)
+const { width: editorWidth } = useElementSize(umoPageNodeContentRef)
 
 // 页面大小
 const pageSize = $computed(() => {
@@ -125,6 +148,18 @@ watch(
   },
   { immediate: true, deep: true },
 )
+
+watch([editorContainerWidth, editorWidth], () => {
+  layoutSize.value.editorLeft =
+    (editorContainerWidth.value - editorWidth.value) / 2
+
+  layoutSize.value.leftAsideLeft =
+    layoutSize.value.editorLeft -
+    layoutSize.value.leftAsideGap -
+    layoutSize.value.leftAsideWidth
+
+  console.log('layoutSize.value.leftSideLeft', layoutSize.value.leftSideLeft)
+})
 
 // FIXME:
 const editorInstance = inject('editor')
@@ -193,20 +228,24 @@ watch(
   height: 100%;
   display: flex;
   position: relative;
+  --padding-top: 16px;
+  --padding-left: 50px;
 }
 
 .umo-zoomable-container {
   flex: 1;
-  padding: 20px 50px;
+  padding: var(--padding-top) var(--padding-left);
   scroll-behavior: smooth;
   .umo-zoomable-content {
     margin: 0 auto;
-    box-shadow:
-      rgba(0, 0, 0, 0.06) 0px 0px 10px 0px,
-      rgba(0, 0, 0, 0.04) 0px 0px 0px 1px;
+    //box-shadow:
+    //  rgba(0, 0, 0, 0.06) 0px 0px 10px 0px,
+    //  rgba(0, 0, 0, 0.04) 0px 0px 0px 1px;
+    box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
+    position: relative;
+    //left: var(--editor-left);
     .umo-page-content {
       transform-origin: 0 0;
-      box-sizing: border-box;
       display: flex;
       position: relative;
       box-sizing: border-box;
@@ -214,7 +253,6 @@ watch(
       width: var(--umo-page-width);
       min-height: var(--umo-page-height);
       overflow: visible !important;
-      display: flex;
       flex-direction: column;
       [contenteditable] {
         outline: none;
@@ -254,7 +292,7 @@ watch(
     display: block;
     height: 1cm;
     width: 1cm;
-    border: solid 1px rgba(0, 0, 0, 0.08);
+    border: solid 1px #ccc;
   }
 
   &.corner-tl::after {
@@ -306,5 +344,12 @@ watch(
       color: var(--umo-primary-color);
     }
   }
+}
+
+.umo-page-right-slot {
+  flex: none;
+  width: clamp(var(--right-aside-width), 30%, 400px);
+  border-left: solid 1px var(--umo-border-color);
+  background: #fff;
 }
 </style>
