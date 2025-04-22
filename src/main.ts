@@ -1,4 +1,5 @@
 import type { UmoEditorOptions } from '@/types'
+import 'virtual:uno.css'
 
 import App from './app.vue'
 import { useUmoEditor } from './components'

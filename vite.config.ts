@@ -7,6 +7,7 @@ import VueMacros from 'unplugin-vue-macros/vite'
 import { defineConfig } from 'vite'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import tsConfigPaths from 'vite-tsconfig-paths'
+import UnoCSS from 'unocss/vite'
 
 import pkg from './package.json'
 import copyright from './src/utils/copyright'
@@ -86,6 +87,7 @@ export default defineConfig({
   plugins: [
     tsConfigPaths(),
     ReactivityTransform(),
+    UnoCSS(),
     ...Object.values(vuePlugins),
   ],
   css: cssConfig,

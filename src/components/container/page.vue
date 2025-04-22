@@ -73,8 +73,12 @@
     </div>
 
     <!--  右侧   -->
-    <div class="umo-page-right-slot" v-if="pageOptions.showRightSlot">
-      <slot name="page-right"></slot>
+    <div
+      :class="[`umo-page-right-slot`, pageOptions.showRightSlot && `is-show`]"
+    >
+      <section v-show="pageOptions.showRightSlot">
+        <slot name="page-right"></slot>
+      </section>
     </div>
 
     <t-image-viewer
@@ -150,6 +154,7 @@ watch(
 )
 
 watch([editorContainerWidth, editorWidth], () => {
+  layoutSize.value.editorWidth = editorWidth.value
   layoutSize.value.editorLeft =
     (editorContainerWidth.value - editorWidth.value) / 2
 
@@ -348,8 +353,24 @@ watch(
 
 .umo-page-right-slot {
   flex: none;
-  width: clamp(var(--right-aside-width), 30%, 400px);
+  //display: grid;
+  //grid-template-columns: 0fr;
+  width: 0;
+  height: 100%;
   border-left: solid 1px var(--umo-border-color);
+  transition: width 0.3s ease-out;
   background: #fff;
+
+  &.is-show {
+    //grid-template-columns: 1fr;
+    width: clamp(
+      var(--right-aside-width),
+      calc(
+        var(--layout-width) - var(--left-aside-width) - var(--padding-left) *
+          2 - var(--editor-width)
+      ),
+      400px
+    );
+  }
 }
 </style>

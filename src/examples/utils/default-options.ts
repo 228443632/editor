@@ -44,7 +44,7 @@ export const defaultOptions = {
     showBreakMarks: true,
     showBookmark: true,
     showToc: true,
-    showRightSlot: true, // 是否展示右侧
+    showRightSlot: false, // 是否展示右侧
     tocTabsOptions: [], // toc选项
     watermark: {
       type: 'compact',
@@ -53,7 +53,7 @@ export const defaultOptions = {
       fontSize: 16,
       fontFamily: 'SimSun',
       fontWeight: 'normal',
-      text: '紧急',
+      text: '',
     },
   },
   /** 文档配置，详见文档配置。 */

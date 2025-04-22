@@ -9,6 +9,7 @@
     <div
       :id="container.substr(1)"
       class="umo-editor-container"
+      ref="layoutUmoEditorContainerRef"
       :class="{
         'toolbar-classic': isRecord($toolbar) && $toolbar.mode === 'classic',
         'toolbar-ribbon': isRecord($toolbar) && $toolbar.mode === 'ribbon',
@@ -48,6 +49,7 @@
       <!--  内容    -->
       <main class="umo-main">
         <container-page>
+          <!--  气泡插槽    -->
           <template #bubble_menu="slotProps">
             <slot name="bubble_menu" v-bind="slotProps" />
           </template>
@@ -81,6 +83,7 @@ import type {
 } from 'tdesign-vue-next'
 import enConfig from 'tdesign-vue-next/esm/locale/en_US'
 import cnConfig from 'tdesign-vue-next/esm/locale/zh_CN'
+import { useElementSize } from '@vueuse/core'
 
 import { getSelectionNode, getSelectionText } from '@/extensions/selection'
 import { i18n } from '@/i18n'
@@ -130,6 +133,9 @@ const emits = defineEmits([
   'destroy',
   'menuChange',
 ])
+
+const layoutUmoEditorContainerRef = ref<HTMLHtmlElement>()
+const { width: layoutWidth } = useElementSize(layoutUmoEditorContainerRef)
 
 // state Setup
 const container = $ref(`#umo-editor-${shortId(4)}`)
@@ -190,6 +196,10 @@ provide('destroyed', destroyed)
 provide('layoutSize', layoutSize)
 provide('tocActive', tocActive)
 
+watch(layoutWidth, (val: number) => {
+  layoutSize.value.layoutWidth = val
+})
+
 watch(
   () => options.value.page,
   ({
@@ -201,6 +211,7 @@ watch(
     showBookmark,
   }: PageOption) => {
     page.value = {
+      ...options.value.page,
       size: options.value.dicts?.pageSizes.find(
         (item: { default: boolean }) => item.default,
       ),

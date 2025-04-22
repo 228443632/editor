@@ -79,11 +79,9 @@
             <menus-toolbar-base-import-word />
             <menus-toolbar-base-markdown v-if="!disableItem('markdown')" />
             <menus-toolbar-base-search-replace />
-          </div>
-          <div class="umo-virtual-group">
             <menus-toolbar-base-print v-if="!disableItem('print')" />
           </div>
-          <div class="virtual-group is-slot">
+          <div class="virtual-group is-slot umo-virtual-group">
             <slot name="toolbar_base" toolbar-mode="ribbon" />
           </div>
         </template>

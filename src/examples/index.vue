@@ -2,7 +2,16 @@
   <div class="examples">
     <div class="box">
       <umo-editor ref="editorRef" v-bind="options">
-        <template #container-page-right>23242</template>
+
+      <!-- 基础工具   -->
+        <template #toolbar_base>
+          <ParamsLib></ParamsLib>
+        </template>
+
+        <!--  内容右侧  -->
+        <template #container-page-right>
+          <RightParamsLib></RightParamsLib>
+        </template>
       </umo-editor>
     </div>
     <!-- <div class="box">
@@ -13,6 +22,8 @@
 
 <script setup lang="ts">
 import { shortId } from '@/utils/short-id'
+import ParamsLib from './toolbar/base/ParamsLib.vue'
+import RightParamsLib from './components/RightParamsLib.vue'
 
 import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/examples/utils/object-util'
@@ -38,7 +49,6 @@ const options = $ref(
     { ...defaultOptions },
     {
       toolbar: {
-        ...defaultOptions.toolbar,
         // defaultMode: 'classic',
         // menus: ['base'],
         // disableMenuItems: [''],
@@ -48,7 +58,11 @@ const options = $ref(
         content: localStorage.getItem('document.content') ?? '<p>测试文档</p>',
       },
       page: {
+        showRightSlot: false,
         showBookmark: true,
+        watermark: {
+          text: '开发环境' + window.location.href,
+        }
       },
       templates,
       cdnUrl: 'https://cdn.umodoc.com',
