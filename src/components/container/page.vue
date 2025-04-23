@@ -5,6 +5,9 @@
       v-if="pageOptions.showToc"
       @close="pageOptions.showToc = false"
     >
+      <template v-for="(_, key) in $slots" #[key]="scoped" :key="key">
+        <slot v-bind="scoped || {}" :name="key" />
+      </template>
     </container-toc>
 
     <!--  中间内容  -->

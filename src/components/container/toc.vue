@@ -45,6 +45,11 @@
         @active="headingActive"
       />
     </div>
+
+    <template v-for="(item, index) in _tabOptions" :key="index">
+      <slot :name="`toc-content-${item.value}`" v-bind="item"> </slot>
+    </template>
+
     <div
       v-if="false"
       class="umo-toc-resize-handle"

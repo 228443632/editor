@@ -95,6 +95,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': `${process.cwd()}/src`,
+      '@root/': `${process.cwd()}/`,
     },
   },
 })

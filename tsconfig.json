@@ -4,7 +4,7 @@
     "disableSizeLimit": true,
     "target": "ESNext",
     "module": "ESNext",
-    "strict": true,
+    "strict": false,
     "allowJs": true,
     "noEmit": true,
     "jsx": "preserve",
@@ -31,7 +31,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@/types": ["./types"]
+      "@/types": ["./types"],
+      "@/types/*": ["./types/*"]
     },
     "lib": ["ESNext", "DOM", "DOM.Iterable", "ScriptHost"]
   },

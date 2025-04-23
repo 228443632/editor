@@ -6,21 +6,45 @@
 <!--setup-->
 <script setup lang="ts">
 const { proxy } = getCurrentInstance()
+import type { Node } from 'prosemirror-model'
 
 const props = defineProps({})
 const emit = defineEmits({})
 
 /* 状态 */
 const page = inject('page')
+const editor = inject('editor')
+const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
+
 const paramsConfig = ref([
   {
     label: '文本',
-    children: [{ label: '普通文本', value: 'title', icon: 'params-comp-text' }],
+    children: [
+      {
+        label: '普通文本',
+        value: 'compText',
+        icon: 'params-comp-text',
+        click() {
+          const compTexts = __compNodeList__.value.filter(
+            (item: { node: Node }) => {
+              return item.node.type.name == 'compText'
+            },
+          )
+          editor.value
+            .chain()
+            .focus()
+            .setCompText({
+              placeholder: `普通文本${compTexts.length + 1}`,
+            })
+            .run()
+        },
+      },
+    ],
   },
   {
     label: '其他',
     children: [
-      { label: '动态表格', value: 'title', icon: 'params-comp-table' },
+      { label: '动态表格', value: 'compTable', icon: 'params-comp-table' },
     ],
   },
 ])
@@ -31,6 +55,13 @@ const paramsConfig = ref([
  */
 function onClose() {
   page.value.showRightSlot = false
+}
+
+/**
+ * 获取html
+ */
+function onGetHtml() {
+  console.log(editor.value.getHTML())
 }
 
 /* 计算 */
@@ -49,6 +80,9 @@ defineExpose({
 <!--render-->
 <template>
   <div class="umo-pr-container">
+    <t-button @click="onGetHtml" :block="false" class="!w-[fit-content]"
+      >获取HTML</t-button
+    >
     <div class="umo-pr-title">
       参数库
 
@@ -67,9 +101,10 @@ defineExpose({
 
         <ul class="flex gap-12px !mt-8px">
           <li
-            class="umo-pr-group__item"
             v-for="(cItem, cIndex) in item.children"
             :key="cIndex"
+            class="umo-pr-group__item"
+            @click="() => cItem.click?.(cItem)"
           >
             <icon size="16" :name="cItem.icon"></icon>
             <span class="ml-4px">{{ cItem.label }}</span>

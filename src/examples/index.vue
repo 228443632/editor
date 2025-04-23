@@ -3,9 +3,14 @@
     <div class="box">
       <umo-editor ref="editorRef" v-bind="options">
 
-      <!-- 基础工具   -->
+        <!-- 基础工具   -->
         <template #toolbar_base>
           <ParamsLib></ParamsLib>
+        </template>
+
+        <!--  TOC 内容  -->
+        <template #toc-content-params>
+          <TocContentParams></TocContentParams>
         </template>
 
         <!--  内容右侧  -->
@@ -24,9 +29,13 @@
 import { shortId } from '@/utils/short-id'
 import ParamsLib from './toolbar/base/ParamsLib.vue'
 import RightParamsLib from './components/RightParamsLib.vue'
+import TocContentParams from './components/TocContentParams.vue'
 
 import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/examples/utils/object-util'
+
+// extension
+import extensions from './extensions'
 
 const editorRef = $ref(null)
 const templates = [
@@ -44,10 +53,14 @@ const templates = [
   },
 ]
 
+const nodeList = ref([])
+provide('__compNodeList__', nodeList)
+
 const options = $ref(
   shallowMergeWithArrayOverride(
     { ...defaultOptions },
     {
+      extensions,
       toolbar: {
         // defaultMode: 'classic',
         // menus: ['base'],
@@ -56,13 +69,17 @@ const options = $ref(
       document: {
         title: '测试文档',
         content: localStorage.getItem('document.content') ?? '<p>测试文档</p>',
+        // content: '<p>2234243测试文档</p>',
       },
       page: {
-        showRightSlot: false,
-        showBookmark: true,
+        showRightSlot: true,
+        showBookmark: false,
         watermark: {
-          text: '开发环境' + window.location.href,
-        }
+          text: '开发环境' + '127.0.0.1',
+        },
+        tocTabsOptions: [
+          {label: '参数', value: 'params'}
+        ]
       },
       templates,
       cdnUrl: 'https://cdn.umodoc.com',
@@ -75,29 +92,6 @@ const options = $ref(
         //   'audio/*',
         // ],
       },
-      ai: {
-        assistant: {
-          enabled: true,
-          async onMessage() {
-            return await Promise.resolve('<p>AI助手测试</p>')
-          },
-        },
-      },
-      user: {
-        id: 'umoeditor',
-        label: 'Umo Editor',
-        avatar: 'https://tdesign.gtimg.com/site/avatar.jpg',
-      },
-      users: [
-        { id: 'umodoc', label: 'Umo Team' },
-        { id: 'Cassielxd', label: 'Cassielxd' },
-        { id: 'Goldziher', label: "Na'aman Hirschfeld" },
-        { id: 'SerRashin', label: 'SerRashin' },
-        { id: 'ChenErik', label: 'ChenErik' },
-        { id: 'china-wangxu', label: 'china-wangxu' },
-        { id: 'Sherman Xu', label: 'xuzhenjun130' },
-        { id: 'testuser', label: '测试用户' },
-      ],
       async onSave(
         content: string,
         page: number,
@@ -113,7 +107,7 @@ const options = $ref(
             } else {
               reject(new Error('操作失败'))
             }
-          }, 2000)
+          }, 1000)
         })
       },
       async onFileUpload(file: File & { url?: string }) {

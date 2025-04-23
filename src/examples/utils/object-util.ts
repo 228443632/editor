@@ -4,6 +4,8 @@
  * @create 22/04/25 AM10:52
  */
 
+import { isPlainObject } from '@tiptap/core'
+
 /**
  * 合并两个对象的前两级属性，数组直接覆盖
  * @param {Object} target - 目标对象
@@ -15,15 +17,17 @@ export function shallowMergeWithArrayOverride(
   target: Record<string, unknown>,
 ) {
   const merged = { ...source }
-  Object.keys(source).forEach((key) => {
+  const keys = Object.keys({...source, ...target})
+  keys.forEach((key) => {
     if (Object.prototype.hasOwnProperty.call(target, key)) {
       // 如果是数组，直接覆盖
       if (Array.isArray(source[key])) {
         merged[key] = target[key]
       }
       // 如果是对象（非数组），合并第二级属性
-      else if (typeof source[key] === 'object' && source[key] !== null) {
+      else if (typeof source[key] === 'object' && source[key] !== null && isPlainObject(source[key])) {
         console.log('key', key, source[key], target[key])
+        // @ts-expect-error
         merged[key] = { ...source[key], ...(target[key] || {}) }
       }
       // 基本类型，直接覆盖

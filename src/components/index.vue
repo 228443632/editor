@@ -49,6 +49,10 @@
       <!--  内容    -->
       <main class="umo-main">
         <container-page>
+          <template v-for="(_, key) in _slots" #[key]="scoped" :key="key">
+            <slot v-bind="scoped || {}" :name="key" />
+          </template>
+
           <!--  气泡插槽    -->
           <template #bubble_menu="slotProps">
             <slot name="bubble_menu" v-bind="slotProps" />
@@ -100,6 +104,7 @@ import { getOpitons } from '@/utils/options'
 import { shortId } from '@/utils/short-id'
 
 import ruConfig from '../locales/tdesign/ru-RU'
+import { omit } from 'sf-utils2'
 
 const { toBlob, toJpeg, toPng } = domToImage
 
@@ -136,6 +141,10 @@ const emits = defineEmits([
 
 const layoutUmoEditorContainerRef = ref<HTMLHtmlElement>()
 const { width: layoutWidth } = useElementSize(layoutUmoEditorContainerRef)
+const slots = useSlots()
+const _slots = computed(() => {
+  return omit(slots, ['bubble_menu', 'page-right'])
+})
 
 // state Setup
 const container = $ref(`#umo-editor-${shortId(4)}`)

@@ -71,7 +71,7 @@ export const defaultOptions = {
     enableBlockMenu: true,
     readOnly: false,
     autofocus: true,
-    characterLimit: -1,
+    characterLimit: 2 ** 20,
     typographyRules: {},
     // https://prosemirror.net/docs/ref/#view.EditorProps
     editorProps: {},
