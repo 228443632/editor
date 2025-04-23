@@ -137,6 +137,9 @@ const headingActive = (value: any) => {
   const pageHeader = pageContainer?.querySelector(
     '.umo-page-node-header',
   ) as HTMLElement
+  if (!nodeElement || !pageContainer || !pageHeader) {
+    return
+  }
   pageContainer.scrollTo({
     top: nodeElement.offsetTop + pageHeader.offsetHeight,
   })

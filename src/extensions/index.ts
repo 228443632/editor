@@ -6,7 +6,6 @@ import Dropcursor from '@tiptap/extension-dropcursor'
 import Focus from '@tiptap/extension-focus'
 import FontFamily from '@tiptap/extension-font-family'
 import Highlight from '@tiptap/extension-highlight'
-import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
@@ -45,6 +44,7 @@ import Iframe from './iframe'
 import Image from './image'
 import Indent from './indent'
 import LineHeight from './line-height'
+import Link from './link'
 import Margin from './margin'
 import Mention from './mention'
 import getUsersSuggestion from './mention/suggestion'
@@ -180,12 +180,24 @@ export const getDefaultExtensions = ({
     FileHandler.configure({
       allowedMimeTypes: file?.allowedMimeTypes,
       onPaste(editor: Editor, files: any) {
+        //记录 已有位置
+        const pageContainer = document.querySelector(
+          `${container} .umo-zoomable-container`,
+        ) as HTMLElement
+        const scrollTop = pageContainer?.scrollTop || 0
         for (const file of files) {
           editor.commands.insertFile({
             file,
             uploadFileMap: uploadFileMap.value,
             autoType: true,
           })
+        }
+        // 恢复滚动位置
+        if (pageContainer) {
+          // 使用 setTimeout 确保 DOM 更新完成后再恢复滚动位置
+          setTimeout(() => {
+            pageContainer.scrollTop = scrollTop
+          }, 0)
         }
       },
       onDrop: (editor: Editor, files: any, pos: number) => {
