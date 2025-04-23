@@ -31,7 +31,7 @@ export default Node.create({
     return {
       /** 唯一标识 */
       nodeId: {
-        default: simpleUUID(),
+        default: '',
       },
 
       /** 占位 */

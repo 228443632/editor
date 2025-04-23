@@ -6,6 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
+import { simpleUUID } from '@/utils/short-id'
 
 const { proxy } = getCurrentInstance()
 
@@ -13,6 +14,10 @@ const props = defineProps({
   ...nodeViewProps,
 })
 const emit = defineEmits({})
+const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
+
+console.log('__globalBizState__', __globalBizState__)
+
 
 /* 状态 */
 
@@ -20,6 +25,7 @@ const emit = defineEmits({})
 
 function onSelectNode() {
   props.editor.commands.setNodeSelection(props.getPos())
+  __globalBizState__.value.nodeActive = props.node
 }
 
 /* 计算 */
@@ -28,7 +34,12 @@ function onSelectNode() {
 
 /* 周期 */
 onMounted(() => {
-  console.log('props', props, props.getPos())
+  console.log('props', props, props.getPos(), props.updateAttributes)
+  window.requestAnimationFrame(() => {
+    props.updateAttributes({
+      nodeId: simpleUUID()
+    })
+  })
 })
 
 /* 暴露 */

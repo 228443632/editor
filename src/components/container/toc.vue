@@ -29,7 +29,7 @@
       </div>
     </section>
 
-    <div v-show="tocActive == `dir`" class="umo-toc-content umo-scrollbar">
+    <div v-show="tocActive == `dir`" class="umo-toc-content umo-scrollbar umo-toc-content--dir">
       <t-tree
         class="umo-toc-tree"
         :data="tocTreeData"
@@ -47,7 +47,9 @@
     </div>
 
     <template v-for="(item, index) in _tabOptions" :key="index">
-      <slot :name="`toc-content-${item.value}`" v-bind="item"> </slot>
+      <div class="umo-toc-content umo-scrollbar" v-show="tocActive == item.value">
+        <slot :name="`toc-content-${item.value}`" v-bind="item"> </slot>
+      </div>
     </template>
 
     <div
@@ -279,9 +281,11 @@ const _tabOptions = computed(() => {
   .umo-toc-content {
     flex: 1;
     display: flex;
-    padding: 10px;
     flex-direction: column;
     overflow: auto scroll;
+    &.umo-toc-content--dir {
+      padding: 10px;
+    }
     .umo-toc-tree {
       --td-comp-size-m: 22px;
       --td-comp-paddingLR-xs: 4px;

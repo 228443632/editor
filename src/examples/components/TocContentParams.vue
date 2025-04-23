@@ -5,9 +5,10 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import useEditorEvent from '@/composables/useEditorEvent'
-import { debounce } from 'sf-utils2'
 import type { Node } from 'prosemirror-model'
+import { debounce } from 'sf-utils2'
+
+import useEditorEvent from '@/composables/useEditorEvent'
 
 const { proxy } = getCurrentInstance()
 
@@ -22,6 +23,8 @@ const tocActive = inject('tocActive')
 tocActive.value = 'params'
 const { addListenerEvent } = useEditorEvent(editor)
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
+const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
+const rootRef = ref<HTMLHtmlElement>()
 
 const compIconMap = {
   /**
@@ -47,14 +50,15 @@ function updateContentList() {
     compText: 1,
   }
 
-  __compNodeList__.value = []
+  const tempCompNodeList = []
   editor.value?.state.doc.descendants((node: Node, pos: number) => {
     if (nameMap[node.type.name]) {
-      console.log(node.attrs.nodeId)
+      // console.log(node.attrs.nodeId)
       const icon = compIconMap[node.type.name]?.icon
-      __compNodeList__.value.push({ node, pos, icon })
+      tempCompNodeList.push({ node, pos, icon })
     }
   })
+  __compNodeList__.value = tempCompNodeList
 }
 
 const debounceUpdateContentList = debounce(updateContentList, 100)
@@ -64,14 +68,13 @@ const debounceUpdateContentList = debounce(updateContentList, 100)
  * @param item
  */
 function onChooseItem(item: { node: Node; pos: number }) {
-  requestAnimationFrame(() => {
-    console.log('item.pos', item.pos)
-    editor.value.chain().focus().setNodeSelection(item.pos).run()
-    const dom = editor.value.view.nodeDOM(item.pos)
-    if (dom) {
-      dom.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    }
-  })
+  __globalBizState__.value.nodeActive = item.node
+  console.log('item.pos', item.pos)
+  editor.value.chain().focus().setNodeSelection(item.pos).run()
+  const dom = editor.value.view.nodeDOM(item.pos)
+  if (dom) {
+    dom.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  }
 }
 
 /**
@@ -81,20 +84,45 @@ function onDelItem(item: { node: Node; pos: number }) {
   editor.value
     .chain()
     .focus()
-    .deleteRange(item.pos, item.pos + item.node.nodeSize)
+    .deleteRange({ from: item.pos, to: item.pos + item.node.nodeSize })
     .run() // 先选中节点
 }
 
 /* 计算 */
 
+const _nodeActiveNodeId = computed(
+  () => __globalBizState__.value.nodeActive?.attrs?.nodeId,
+)
+
 /* 监听 */
+watch(__compNodeList__, (newVal) => {
+  const paramsTab = page.value.tocTabsOptions.find(
+    (item) => item.value == 'params',
+  )
+  console.log('paramsTab', paramsTab)
+  paramsTab.label = ['参数', newVal.length ? `(${newVal.length})` : '']
+    .filter(Boolean)
+    .join(' ')
+})
+
+watch(_nodeActiveNodeId, () => {
+  nextTick(() => {
+    const activeNodeDom = rootRef.value.querySelector(
+      `.umo-toc-params__item.is-active`,
+    )
+    if (activeNodeDom)
+      activeNodeDom.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      })
+  })
+})
 
 /* 周期 */
 onMounted(() => {
   // editor.value.$nodes.querySelectorAll('')
   addListenerEvent('update', ({ editor }) => {
     // The selection has changed.
-    console.log('selectionUpdate')
     debounceUpdateContentList()
   })
 
@@ -111,22 +139,27 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div class="umo-toc-params">
+  <div ref="rootRef" class="umo-toc-params">
     <ul>
       <li
         v-for="item in __compNodeList__"
         :key="item.node.attrs?.nodeId"
-        class="flex items-center"
+        :class="[
+          `flex items-center umo-toc-params__item`,
+          _nodeActiveNodeId &&
+            _nodeActiveNodeId == item.node.attrs?.nodeId &&
+            'is-active',
+        ]"
         @click="onChooseItem(item)"
       >
-        <icon :name="item.icon" class="text-[#999]"></icon>
-        <span class="flex flex-1 items-center ml-4px">{{
+        <icon :name="item.icon" class="text-[#999]" size="14px"></icon>
+        <span class="flex flex-1 items-center ml-4px umo-toc-params__text">{{
           item.node.attrs?.placeholder
         }}</span>
         <icon
-          @click="onDelItem(item)"
           name="close-circle-filled"
-          class="flex-none invisible umo-toc-params__close-icon text-[#666]"
+          class="flex-none invisible umo-toc-params__close-icon text-[#9398A6]"
+          @click.stop="onDelItem(item)"
         ></icon>
       </li>
     </ul>
@@ -136,7 +169,7 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 .umo-toc-params {
-  padding: 16px 0;
+  padding: 10px 0;
   ul {
     padding: 0 16px 0 0;
     li {
@@ -144,15 +177,29 @@ defineExpose({
       cursor: pointer;
       font-size: 13px;
       margin-bottom: 2px;
-      min-height: 36px;
-      padding: 10px 10px;
+      min-height: 28px;
+      padding: 4px 10px;
       text-align: left;
       width: 100%;
-      transition: background-color 0.3s;
+      & + li {
+        margin-top: 4px;
+      }
+      &.is-active {
+        background: #d4d3d4;
+      }
       &:hover {
         background-color: #f8f8f8;
         .umo-toc-params__close-icon {
           visibility: visible;
+        }
+      }
+      .umo-toc-params__text {
+        position: relative;
+        &:after {
+          content: '*';
+          color: var(--umo-error-color);
+          font-size: 13px;
+          margin-left: 2px;
         }
       }
     }
