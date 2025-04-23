@@ -44,6 +44,12 @@
         var(--umo-page-margin-bottom)
     );
     float: left;
+    caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
+
+    &.caret--is-dragging {
+      caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
+    }
+
     > * {
       position: relative;
       z-index: 1;

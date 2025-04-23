@@ -16,9 +16,6 @@ const props = defineProps({
 const emit = defineEmits({})
 const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
 
-console.log('__globalBizState__', __globalBizState__)
-
-
 /* 状态 */
 
 /* 方法 */
@@ -34,7 +31,7 @@ function onSelectNode() {
 
 /* 周期 */
 onMounted(() => {
-  console.log('props', props, props.getPos(), props.updateAttributes)
+  // console.log('props', props, props.getPos(), props.updateAttributes)
   window.requestAnimationFrame(() => {
     props.updateAttributes({
       nodeId: simpleUUID()
@@ -52,16 +49,10 @@ defineExpose({
 <template>
   <node-view-wrapper
     as="span"
-    class="form-comp--text is-inline-block size--inline-flex-center"
+    class="form-comp--text is-inline-block"
     contenteditable="false"
     :data-placeholder="props.HTMLAttributes?.placeholder"
     @click="onSelectNode"
-    style="
-      min-width: 140px;
-      min-height: 24px;
-      text-align: left;
-      justify-content: left;
-    "
   >
   </node-view-wrapper>
 </template>
@@ -71,7 +62,9 @@ defineExpose({
 .form-comp--text {
   position: relative;
   box-sizing: border-box;
-  //transition: all 0.3s;
+  min-width: 140px;
+  min-height: 24px;
+  text-align: left;
   border: 1px solid transparent;
   border-bottom: 1px solid #CDD0D8;
   padding: 0 2px;

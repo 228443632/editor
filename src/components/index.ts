@@ -1,4 +1,5 @@
 import 'virtual:svg-icons-register'
+import 'virtual:uno.css'
 
 import UmoEditor from './index.vue'
 import UmoMenuButton from './menus/button.vue'

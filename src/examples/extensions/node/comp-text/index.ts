@@ -42,14 +42,22 @@ export default Node.create({
       /** 字段名称 */
       fieldName: {
         default: 'name',
-      }
+      },
 
-      // /**
-      //  * 组件名称
-      //  */
-      // dataCompIs: {
-      //   default: 'text',
-      // },
+      /** 是否参数组件 */
+      isCompParams: {
+        default: true,
+      },
+
+      /** 备注，填写说明 */
+      desc: {
+        default: ''
+      },
+
+      /** 默认值 */
+      defaultValue: {
+        default: ''
+      }
     }
   },
 

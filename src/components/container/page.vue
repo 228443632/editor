@@ -24,6 +24,7 @@
       >
         <t-watermark
           class="umo-page-content"
+          ref="pageContentRef"
           :alpha="pageOptions.watermark.alpha"
           v-bind="watermarkOptions"
           :watermark-content="pageOptions.watermark"
@@ -102,19 +103,22 @@
 </template>
 
 <script setup lang="ts">
-import { useElementSize } from '@vueuse/core'
+import { useElementSize, unrefElement } from '@vueuse/core'
 
 import type { WatermarkOption } from '@/types'
 
 import type Editor from '../editor/index.vue'
+import {type Watermark} from 'tdesign-vue-next'
 
 const container = inject('container')
 const imageViewer = inject('imageViewer')
 const pageOptions = inject('page')
 const layoutSize = inject('layoutSize')
+const layoutDom = inject('layoutDom')
 
 const umoPageNodeContentRef = ref<InstanceType<typeof Editor>>()
 const zoomableContainerRef = ref<HTMLHtmlElement>() // 缩放容器
+const pageContentRef = ref<InstanceType<typeof Watermark>>() // editor 容器包裹的div
 const { width: editorContainerWidth } = useElementSize(zoomableContainerRef)
 const { width: editorWidth } = useElementSize(umoPageNodeContentRef)
 
@@ -155,6 +159,10 @@ watch(
   },
   { immediate: true, deep: true },
 )
+
+watch(pageContentRef, () => {
+  layoutDom.value.pageContent = unrefElement(pageContentRef)
+})
 
 watch([editorContainerWidth, editorWidth], () => {
   layoutSize.value.editorWidth = editorWidth.value

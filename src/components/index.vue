@@ -183,6 +183,10 @@ const layoutSize = ref({
   /** 右侧宽度 */
   rightAsideWidth: 280,
 })
+const layoutDom = ref({
+  /** 页面内容容器 */
+  pageContent: undefined
+})
 // const bookmark = ref(false)
 const destroyed = ref(false)
 const tocActive = ref('dir') // 目录选中值
@@ -203,6 +207,7 @@ provide('uploadFileMap', uploadFileMap)
 // provide('bookmark', bookmark)
 provide('destroyed', destroyed)
 provide('layoutSize', layoutSize)
+provide('layoutDom', layoutDom)
 provide('tocActive', tocActive)
 
 watch(layoutWidth, (val: number) => {
@@ -1074,6 +1079,9 @@ defineExpose({
   useMessage(type: string, pramas: MessageOptions) {
     return useMessage(type, { attach: container, ...pramas })
   },
+  // feat
+  layoutDom,
+  layoutSize
 })
 </script>
 

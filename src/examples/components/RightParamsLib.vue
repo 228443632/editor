@@ -5,8 +5,12 @@
  -->
 <!--setup-->
 <script setup lang="ts">
+import { parseJsonNoError } from 'sf-utils2'
+
 const { proxy } = getCurrentInstance()
 import type { Node } from 'prosemirror-model'
+import { useEventListener } from '@vueuse/core'
+import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extension-drag-params'
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -14,7 +18,9 @@ const emit = defineEmits({})
 /* 状态 */
 const page = inject('page')
 const editor = inject('editor')
+const layoutDom = inject('layoutDom')
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
+const isDragging = ref(false)
 
 const paramsConfig = ref([
   {
@@ -24,12 +30,14 @@ const paramsConfig = ref([
         label: '普通文本',
         value: 'compText',
         icon: 'params-comp-text',
+        draggable: 'true',
+        get compTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == 'compText'
+          })
+        },
         click() {
-          const compTexts = __compNodeList__.value.filter(
-            (item: { node: Node }) => {
-              return item.node.type.name == 'compText'
-            },
-          )
+          const compTexts = this.compTexts
           editor.value
             .chain()
             .focus()
@@ -64,12 +72,88 @@ function onGetHtml() {
   console.log(editor.value.getHTML())
 }
 
+const dragMethod = {
+  /**
+   * 拖动的参数节点，是dom节点
+   */
+  dragNodeDom: undefined,
+
+  /**
+   * 拖拽开始
+   * @param cItem
+   * @param e
+   */
+  dragStart(cItem, e: DragEvent) {
+    isDragging.value = true
+
+    const nodeData = {
+      ...cItem,
+      type: cItem.value,
+      isCompParams: true,
+      attrs: {
+        placeholder: `普通文本${cItem.compTexts.length + 1}`,
+      },
+    } as IDragNodeParamsNode
+
+    // isCompParams 是自定义的参数节点
+    e.dataTransfer?.setData('text/plain', JSON.stringify(nodeData))
+    e.dataTransfer.effectAllowed = 'move'
+
+    // 设置透明度
+    const targetNode = e.target as HTMLElement
+     targetNode.classList.add('is-dragging')
+    dragMethod.dragNodeDom = targetNode
+    e.dataTransfer.setDragImage(
+      targetNode,
+      -targetNode.offsetWidth,
+      -targetNode.offsetHeight - 24,
+    )
+
+    // 设置光标颜色
+    const viewDom = editor.value.view.dom
+    viewDom.classList.add('caret--is-dragging')
+  },
+
+  dragenter() {
+    const dropzone = layoutDom.value.pageContent as HTMLHtmlElement
+    if (isDragging.value) {
+      dropzone.classList.add('umo-page-content--dragging')
+    }
+  },
+
+  dragend(e: DragEvent) {
+    const dropzone = layoutDom.value.pageContent as HTMLHtmlElement
+    isDragging.value = false
+
+    // 移除
+    dropzone.classList.remove('umo-page-content--dragging')
+
+    // 移除设置光标颜色
+    const viewDom = editor.value.view.dom
+    viewDom.classList.remove('caret--is-dragging')
+
+    // 释放引用 oc
+    dragMethod.dragNodeDom.classList.remove('is-dragging')
+    dragMethod.dragNodeDom = null
+  },
+
+  dragover(e: DragEvent) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move' // 设置为移动操作
+  },
+}
+
 /* 计算 */
 
 /* 监听 */
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  const target = ref<HTMLHtmlElement>(editor.value.view.dom)
+
+  useEventListener(target, 'dragover', dragMethod.dragover)
+  useEventListener(target, 'dragenter', dragMethod.dragenter)
+})
 
 /* 暴露 */
 defineExpose({
@@ -80,9 +164,15 @@ defineExpose({
 <!--render-->
 <template>
   <div class="umo-pr-container">
-    <t-button @click="onGetHtml" :block="false" class="!w-[fit-content]"
-      >获取HTML</t-button
-    >
+    <div class="px-16px">
+      <t-button
+        @click="onGetHtml"
+        :block="false"
+        size="small"
+        class="!w-[fit-content]"
+        >获取HTML</t-button
+      >
+    </div>
     <div class="umo-pr-title">
       参数库
 
@@ -104,7 +194,10 @@ defineExpose({
             v-for="(cItem, cIndex) in item.children"
             :key="cIndex"
             class="umo-pr-group__item"
+            v-bind="cItem"
             @click="() => cItem.click?.(cItem)"
+            @dragstart="(event) => dragMethod.dragStart(cItem, event)"
+            @dragend="dragMethod.dragend"
           >
             <icon size="16" :name="cItem.icon"></icon>
             <span class="ml-4px">{{ cItem.label }}</span>
@@ -172,11 +265,24 @@ defineExpose({
       border: 1px solid #e1e4eb;
       border-radius: 4px;
       cursor: pointer;
+      &.is-dragging {
+        cursor: grabbing;
+        border-style: dashed;
+        box-sizing: 0px 6px 16px -8px rgba(0, 0, 0, 0.08);
+      }
+      &[draggable] {
+        cursor: grab;
+      }
       &:hover {
         color: var(--umo-primary-color);
         border-color: currentColor;
       }
     }
   }
+}
+</style>
+<style lang="less">
+.umo-page-content--dragging {
+  outline: 2px dashed var(--umo-primary-color);
 }
 </style>
