@@ -49,11 +49,6 @@
       <!--  内容    -->
       <main class="umo-main">
         <container-page>
-          <template v-for="(_, key) in _slots" #[key]="scoped" :key="key">
-            <slot v-bind="scoped || {}" :name="key" />
-          </template>
-
-          <!--  气泡插槽    -->
           <template #bubble_menu="slotProps">
             <slot name="bubble_menu" v-bind="slotProps" />
           </template>
@@ -223,6 +218,8 @@ watch(
     watermark,
     showBreakMarks,
     showBookmark,
+    showLineNumber,
+    showToc,
   }: PageOption) => {
     page.value = {
       ...options.value.page,
@@ -235,8 +232,10 @@ watch(
       watermark,
       showBreakMarks,
       showBookmark,
-      showLineNumber: false,
-      showToc: true,
+      // showLineNumber: false,
+      // showToc: true,
+      showLineNumber,
+      showToc,
       zoomLevel: 100,
       autoWidth: false,
       preview: {
@@ -1095,7 +1094,6 @@ defineExpose({
   --td-text-color-primary: var(--umo-text-color);
   --td-text-color-disabled: var(--umo-text-color-disabled);
   width: 100%;
-  min-width: 1440px;
   height: 100%;
   min-height: 400px;
   display: flex;
