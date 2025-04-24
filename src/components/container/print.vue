@@ -66,6 +66,22 @@ const defaultLineHeight = $computed(
 
 const getIframeCode = () => {
   const { orientation, size, margin, background } = page.value
+
+  // const fragment = document.createDocumentFragment()
+  // fragment.append(getContentHtml())
+
+  const body = getContentHtml()
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(body, 'text/html')
+
+  const editorDom = doc.querySelector(
+    '.tiptap.ProseMirror.umo-editor',
+  ) as HTMLHtmlElement
+
+  editorDom.innerHTML = editor.value.getHTML()
+
+  console.log(doc, doc.body.innerHTML)
+
   /* eslint-disable */
   return `
     <!DOCTYPE html>
@@ -92,7 +108,7 @@ const getIframeCode = () => {
         overflow: hidden;
       }
       @page {
-        size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm; 
+        size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
         padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
         margin: 0;
       }
@@ -105,13 +121,13 @@ const getIframeCode = () => {
       }
       </style>
     </head>
-    <body class="is-print">
+    <body class="is-print preview">
       <div id="sprite-plyr" style="display: none;">
       ${getPlyrSprite()}
       </div>
       <div class="umo-editor-container" style="line-height: ${defaultLineHeight};" aria-expanded="false">
         <div class="tiptap umo-editor" translate="no">
-          ${getContentHtml()}
+          ${doc.body.innerHTML}
         </div>
       </div>
       <script>
@@ -135,26 +151,36 @@ const getIframeCode = () => {
 }
 
 const printPage = () => {
+  const key = `umo-print-page#read`
+  const isRead = localStorage[key]
   editor.value?.commands.blur()
   iframeCode = getIframeCode()
 
-  const dialog = useConfirm({
-    attach: container,
-    theme: 'info',
-    header: printing.value ? t('print.title') : t('export.pdf.title'),
-    body: printing.value ? t('print.message') : t('export.pdf.message'),
-    confirmBtn: printing.value ? t('print.confirm') : t('export.pdf.confirm'),
-    onConfirm() {
-      dialog.destroy()
-      setTimeout(() => {
-        iframeRef?.contentWindow?.print()
-      }, 300)
-    },
-    onClosed() {
-      printing.value = false
-      exportFile.value.pdf = false
-    },
-  })
+  if (isRead != '10') {
+    const dialog = useConfirm({
+      attach: container,
+      theme: 'info',
+      header: printing.value ? t('print.title') : t('export.pdf.title'),
+      body: printing.value ? t('print.message') : t('export.pdf.message'),
+      confirmBtn: printing.value ? t('print.confirm') : t('export.pdf.confirm'),
+      onConfirm() {
+        localStorage[key] = '10'
+        dialog.destroy()
+        setTimeout(() => {
+          iframeRef?.contentWindow?.print()
+        }, 300)
+      },
+      onClosed() {
+        printing.value = false
+        exportFile.value.pdf = false
+      },
+    })
+  } else {
+    // 已读
+    setTimeout(() => {
+      iframeRef?.contentWindow?.print()
+    }, 300)
+  }
 }
 
 watch(

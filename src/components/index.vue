@@ -791,7 +791,7 @@ const getImage = async (format: 'blob' | 'jpeg' | 'png' = 'blob') => {
   const { zoomLevel } = page.value
   try {
     page.value.zoomLevel = 100
-    const node = document.querySelector(`${container} .umo-page-content`)
+    const node = document.querySelector(`${container} .umo-page-content`) as HTMLElement
     if (format === 'blob') {
       return await toBlob(node)
     }

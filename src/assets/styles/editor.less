@@ -655,3 +655,16 @@
     }
   }
 }
+
+/** 预览 */
+body.preview {
+  .Tiptap-invisible-character {
+    &.Tiptap-invisible-character--paragraph,
+    &.Tiptap-invisible-character--break {
+      &:before {
+        content: ''; // ↵ ↩︎ ↩
+        display: none;
+      }
+    }
+  }
+}

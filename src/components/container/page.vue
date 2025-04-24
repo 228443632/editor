@@ -108,7 +108,7 @@ import { useElementSize, unrefElement } from '@vueuse/core'
 import type { WatermarkOption } from '@/types'
 
 import type Editor from '../editor/index.vue'
-import {type Watermark} from 'tdesign-vue-next'
+import { type Watermark } from 'tdesign-vue-next'
 
 const container = inject('container')
 const imageViewer = inject('imageViewer')
@@ -173,7 +173,6 @@ watch([editorContainerWidth, editorWidth], () => {
     layoutSize.value.editorLeft -
     layoutSize.value.leftAsideGap -
     layoutSize.value.leftAsideWidth
-
 })
 
 // FIXME:
@@ -381,6 +380,15 @@ watch(
       ),
       400px
     );
+  }
+}
+</style>
+
+<style lang="less">
+body.preview {
+  div.umo-zoomable-content.umo-zoomable-content {
+    box-shadow: none;
+    pointer-events: none;
   }
 }
 </style>

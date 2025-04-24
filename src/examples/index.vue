@@ -172,6 +172,7 @@ console.log('options', options)
 
 onMounted(() => {
   console.log('editorRef', editorRef)
+  // @ts-expect-error
   window.editor = editorRef
   setTimeout(() => (options.page.showRightSlot = true), 500)
 })

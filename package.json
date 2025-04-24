@@ -135,7 +135,13 @@
     "vue-i18n": "^10.0.0",
     "y-prosemirror": "^1.2.15",
     "y-protocols": "^1.0.6",
-    "yjs": "^13.6.23"
+    "yjs": "^13.6.23",
+    "@shared/base": "1.4.0-beta.1",
+    "@shared/directives": "1.4.0-beta.1",
+    "@shared/hooks": "1.4.0-beta.1",
+    "@shared/style": "1.4.0-beta.1",
+    "@shared/svg": "1.4.0-beta.1",
+    "@shared/utils": "1.4.0-beta.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",

@@ -4,10 +4,10 @@
     :attach="container"
     :prevent-scroll-through="false"
     placement="center"
-    draggable
-    dialog-class-name="is-draggable"
+    :dialog-class-name="[_draggable && 'is-draggable']"
     destroy-on-close
     v-bind="$attrs"
+    :draggable="_draggable"
     :dialog-style="{
       left: `${dialogLeft}px`,
       top: `${dialogTop}px`,
@@ -46,7 +46,7 @@ const startX = ref(0)
 const startY = ref(0)
 
 const startDrag = (e) => {
-  if (!attrs.draggable) return
+  if (!_draggable.value) return
   if (e.target.classList.contains('umo-dialog')) {
     isDragging.value = true
     startX.value = e.clientX - dialogLeft.value
@@ -68,6 +68,8 @@ const stopDrag = () => {
   document.removeEventListener('mousemove', handleDrag)
   document.removeEventListener('mouseup', stopDrag)
 }
+
+const _draggable = computed(() => attrs.draggable ?? true)
 
 watch(
   () => props.visible,

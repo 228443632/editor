@@ -5,17 +5,23 @@
  -->
 <!--setup-->
 <script setup lang="ts">
+import { commonUtil } from '@/examples/utils/common-util'
+
 const { proxy } = getCurrentInstance()
 import { useEventListener } from '@vueuse/core'
 import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extension-drag-params'
 import type { Node } from 'prosemirror-model'
+import { cssUtil } from '@/examples/utils/css-util'
+import type { Editor } from '@tiptap/core'
+import { blobSaveAs } from 'sf-utils2'
 
 const props = defineProps({})
 const emit = defineEmits({})
 
 /* 状态 */
 const page = inject('page')
-const editor = inject('editor')
+const editor = inject('editor') as Ref<Editor>
+
 const layoutDom = inject('layoutDom')
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const isDragging = ref(false)
@@ -60,10 +66,47 @@ const paramsConfig = ref([
         label: '获取HTML',
         value: 'compText',
         icon: '',
-        click() {
-          onGetHtml()
+        async click() {
+          useMessage('loading', { content: '正在导出中', closeBtn: true })
+          // const body = onGetHtml()
+          const body = (
+            document.querySelector(
+              '.umo-zoomable-container.umo-scrollbar',
+            ) as HTMLElement
+          ).outerHTML
+          const css = await cssUtil.getCssAll()
+          // const css = cssUtil.getAllCSSRules()
+          const html = commonUtil.trimSpace(`
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umo Editor</title>
+    <style>
+      ${css}
+    </style>
+    <style>
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+      }
+    </style>
+  </head>
+  <body class="preview">
+    <div id="app">
+      ${body}
+    </div>
+   </body>
+ </html>
+        `)
+          MessagePlugin.closeAll()
+          console.log('html', html)
+          blobSaveAs(new Blob([html], { type: 'text/html' }), '合同模版.html')
           useMessage('info', {
-            content: '获取html代码成功，请查看控制台日志！',
+            // content: '获取html代码成功，请查看控制台日志！',
+            content: '导出成功！',
           })
         },
       },
@@ -83,7 +126,7 @@ function onClose() {
  * 获取html
  */
 function onGetHtml() {
-  console.log(editor.value.getHTML())
+  return editor.value.getHTML()
 }
 
 const dragMethod = {

@@ -59,7 +59,7 @@ export const whitespace = {
   newLine: '\n',
 
   // 回车符 (Carriage Return)
-  carriageReturn: '\r'
+  carriageReturn: '\r',
 }
 
 /**
@@ -114,10 +114,17 @@ export const commonUtil = {
       '\u200B', // 零宽度空格
       '\u200C', // 零宽度非连接符
       '\u200D', // 零宽度连接符
-      '\uFEFF' // 字节顺序标记 (BOM)
+      '\uFEFF', // 字节顺序标记 (BOM)
     ]
 
     // 检查字符是否在零宽度字符列表中
     return zeroWidthChars.includes(char)
-  }
+  },
+
+  /**
+   * 去除换行空格
+   **/
+  trimSpace(str: string) {
+    return str.replace(/\n+\s*/g, '')
+  },
 }
