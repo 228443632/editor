@@ -91,7 +91,9 @@ export interface DocumentOptions {
   enableSpellcheck?: boolean
   enableMarkdown?: boolean
   enableBubbleMenu?: boolean
+  isShowBubbleMenu?: boolean
   enableBlockMenu?: boolean
+  isShowBlockMenu?: boolean
   // enableComment?: boolean
   readOnly?: boolean
   autofocus?: 'start' | 'end' | 'all' | number | boolean | null

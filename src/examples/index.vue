@@ -29,10 +29,14 @@ import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/examples/utils/object-util'
 
 import { Plugin } from 'prosemirror-state'
+// import type { Node as TNode } from 'prosemirror-model'
 
 // extension
 import extensions from './extensions'
-import { type EditorView } from 'prosemirror-view'
+import type { Editor } from '@tiptap/vue-3'
+import { debounce } from 'sf-utils2'
+// import type { Editor } from '@tiptap/core'
+// import { type EditorView } from 'prosemirror-view'
 
 console.log('extensions', extensions)
 
@@ -50,6 +54,19 @@ provide('__globalBizState__', globalBizState)
 const disableDropPlugin = new Plugin({
   props: {},
 })
+
+function selectionChange({ editor }: { editor: Editor })  {
+  console.log('editor.state.selectio', editor.state.selection)
+  const node = editor.state.doc.nodeAt(editor.state.selection.anchor)
+  // const node = editor.state.selection.$anchor.parent
+  if (node?.attrs.isCompParams) {
+    options.document.isShowBubbleMenu = false
+  } else {
+    options.document.isShowBubbleMenu = true
+  }
+  console.log('node', node)
+}
+const debounceSelectionChange = debounce(selectionChange, 100)
 
 const options = $ref(
   shallowMergeWithArrayOverride(
@@ -159,6 +176,9 @@ const options = $ref(
       onFileDelete(id: string, url: string) {
         console.log(id, url)
       },
+
+      /** 事件 */
+      'onChanged:selection': debounceSelectionChange
     },
   ),
 )

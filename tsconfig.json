@@ -6,6 +6,7 @@
     "module": "ESNext",
     "strict": false,
     "allowJs": true,
+    "strictNullChecks": false,
     "noEmit": true,
     "jsx": "preserve",
     "moduleResolution": "bundler",

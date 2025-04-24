@@ -1,12 +1,18 @@
 <template>
   <bubble-menu
-    class="umo-editor-bubble-menu"
-    :class="{ assistant }"
+    :class="{
+      assistant,
+      'umo-editor-bubble-menu': true,
+    }"
     :editor="editor!"
     :tippy-options="tippyOpitons"
   >
     <menus-bubble-menus
-      v-if="options?.document?.enableBubbleMenu && !assistant"
+      v-if="
+        options?.document?.enableBubbleMenu &&
+        options?.document?.isShowBubbleMenu &&
+        !assistant
+      "
     >
       <template #bubble_menu="props">
         <slot name="bubble_menu" v-bind="props" />
@@ -68,6 +74,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+
+  //&.umo-editor-bubble-menu--hidden {
+  //  display: none;
+  //}
 
   &:not(.assistant) {
     padding: 8px 10px;

@@ -5,12 +5,10 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import { parseJsonNoError } from 'sf-utils2'
-
 const { proxy } = getCurrentInstance()
-import type { Node } from 'prosemirror-model'
 import { useEventListener } from '@vueuse/core'
 import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extension-drag-params'
+import type { Node } from 'prosemirror-model'
 
 const props = defineProps({})
 const emit = defineEmits({})

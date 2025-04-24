@@ -32,6 +32,8 @@ const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
 const rootRef = ref<HTMLHtmlElement>()
 const vueDraggableRef = ref<UseDraggableReturn>()
 
+// const editorAction = inject('editorAction') as Ref<Record<string, any>>
+
 const compIconMap = {
   /**
    * 普通文本
@@ -82,7 +84,11 @@ const vueDraggableAttrs = ref({
 
     const stop = watch(__compNodeList__, () => {
       requestAnimationFrame(() => {
-        onChooseItem(__compNodeList__.value.find(item => item.node.attrs?.nodeId == originNodeId))
+        onChooseItem(
+          __compNodeList__.value.find(
+            (item) => item.node.attrs?.nodeId == originNodeId,
+          ),
+        )
         stop()
       })
     })
@@ -119,7 +125,6 @@ const debounceUpdateContentList = debounce(updateContentList, 100)
  */
 function onChooseItem(item: { node: Node; pos: number }) {
   __globalBizState__.value.nodeActive = item.node
-  console.log('item.pos', item.pos)
   editor.value.chain().focus().setNodeSelection(item.pos).run()
   const dom = editor.value.view.nodeDOM(item.pos)
   if (dom) {

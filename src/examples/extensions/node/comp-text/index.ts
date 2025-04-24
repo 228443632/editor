@@ -1,8 +1,7 @@
 import { mergeAttributes, Node, VueNodeViewRenderer } from '@tiptap/vue-3'
 
 import NodeView from './NodeView.vue'
-import type { Editor } from '@tiptap/core'
-import type { Node as TNode } from 'prosemirror-model'
+// import type { Editor } from '@tiptap/core'
 import { ReplaceStep } from 'prosemirror-transform'
 import { simpleUUID } from '@/utils/short-id'
 

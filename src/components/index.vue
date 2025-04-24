@@ -8,8 +8,8 @@
   >
     <div
       :id="container.substr(1)"
-      class="umo-editor-container"
       ref="layoutUmoEditorContainerRef"
+      class="umo-editor-container"
       :class="{
         'toolbar-classic': isRecord($toolbar) && $toolbar.mode === 'classic',
         'toolbar-ribbon': isRecord($toolbar) && $toolbar.mode === 'ribbon',
@@ -49,6 +49,11 @@
       <!--  内容    -->
       <main class="umo-main">
         <container-page>
+          <template v-for="(_, key) in _slots" #[key]="scoped" :key="key">
+            <slot v-bind="scoped || {}" :name="key" />
+          </template>
+
+          <!--  气泡插槽    -->
           <template #bubble_menu="slotProps">
             <slot name="bubble_menu" v-bind="slotProps" />
           </template>
@@ -180,7 +185,7 @@ const layoutSize = ref({
 })
 const layoutDom = ref({
   /** 页面内容容器 */
-  pageContent: undefined
+  pageContent: undefined,
 })
 // const bookmark = ref(false)
 const destroyed = ref(false)
@@ -786,9 +791,7 @@ const getImage = async (format: 'blob' | 'jpeg' | 'png' = 'blob') => {
   const { zoomLevel } = page.value
   try {
     page.value.zoomLevel = 100
-    const node = document.querySelector(
-      `${container} .umo-page-content`,
-    ) as HTMLElement
+    const node = document.querySelector(`${container} .umo-page-content`)
     if (format === 'blob') {
       return await toBlob(node)
     }
@@ -976,6 +979,20 @@ const getContentExcerpt = (charLimit = 100, more = ' ...') => {
   return text?.substring(0, charLimit) + more
 }
 
+/**
+ * 设置悬浮菜单显示
+ * @param isShow
+ */
+function setBubbleMenuShow(isShow = true) {
+  options.value.document ||= {}
+  options.value.document.enableBubbleMenu = isShow
+}
+provide(
+  'editorAction',
+  ref({
+    setBubbleMenuShow,
+  }),
+)
 // Hotkeys Setup
 watch(
   () => editor.value,
@@ -1080,7 +1097,7 @@ defineExpose({
   },
   // feat
   layoutDom,
-  layoutSize
+  layoutSize,
 })
 </script>
 

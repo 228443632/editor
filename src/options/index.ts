@@ -84,7 +84,9 @@ const defaultOptions: UmoEditorOptions = {
     enableSpellcheck: true,
     enableMarkdown: true,
     enableBubbleMenu: true,
+    isShowBubbleMenu: true,
     enableBlockMenu: true,
+    isShowBlockMenu: true,
     readOnly: false,
     autofocus: true,
     characterLimit: 0,
@@ -373,6 +375,7 @@ const ojbectSchema = new ObjectSchema({
               'Key "toolbar": Key "menus" should at least contain "base".',
             )
           }
+          // @ts-expect-error
           if (!value.every((item) => defaultMenus?.includes(item))) {
             throw new Error(
               `Key "toolbar": Key "menus" the array items of toolbar.menus must contain only one or multiple of ${JSON.stringify(defaultMenus)}.`,
@@ -458,11 +461,6 @@ const ojbectSchema = new ObjectSchema({
         required: false,
       },
       showLineNumber: {
-        merge: 'replace',
-        validate: 'boolean',
-        required: false,
-      },
-      showToc: {
         merge: 'replace',
         validate: 'boolean',
         required: false,
@@ -601,11 +599,34 @@ const ojbectSchema = new ObjectSchema({
         validate: 'boolean',
         required: false,
       },
+      isShowBlockMenu: {
+        merge: 'replace',
+        validate: 'boolean',
+        required: false,
+      },
+      isShowBubbleMenu: {
+        merge: 'replace',
+        validate: 'boolean',
+        required: false,
+      },
       enableBlockMenu: {
         merge: 'replace',
         validate: 'boolean',
         required: false,
       },
+      /* feat */
+      // bubbleMenuProps: {
+      //   merge: 'replace',
+      //   validate: 'object',
+      //   required: false,
+      //   schema: {
+      //     shouldShow: {
+      //       merge: 'replace',
+      //       validate: 'object?',
+      //       required: false,
+      //     },
+      //   },
+      // },
       readOnly: {
         merge: 'replace',
         validate: 'boolean',

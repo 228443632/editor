@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 
-import eslintJS from '@eslint/js'
 import { FlatCompat } from '@eslint/eslintrc'
+import eslintJS from '@eslint/js'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import eslintPluginSimpleImportSort from 'eslint-plugin-simple-import-sort'
 import eslintPluginUnusedImports from 'eslint-plugin-unused-imports'
@@ -99,6 +99,7 @@ export default [
       '@typescript-eslint/array-type': ['error', { default: 'array' }],
       '@typescript-eslint/consistent-indexed-object-style': 'error',
       '@typescript-eslint/consistent-type-definitions': 'warn',
+      '@typescript-eslint/eqeqeq': 'off',
       '@typescript-eslint/naming-convention': [
         'error',
         {
@@ -125,7 +126,7 @@ export default [
       '@typescript-eslint/no-redundant-type-constituents': 'warn',
       '@typescript-eslint/no-require-imports': 'warn',
       '@typescript-eslint/no-this-alias': 'error',
-      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
       '@typescript-eslint/no-unnecessary-condition': 'off',
       '@typescript-eslint/no-unnecessary-qualifier': 'warn',
       '@typescript-eslint/no-unnecessary-type-arguments': 'error',
@@ -149,8 +150,10 @@ export default [
       '@typescript-eslint/switch-exhaustiveness-check': 'warn',
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/prefer-promise-reject-errors': 'off',
-      'simple-import-sort/exports': 'error',
-      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'off',
+      'simple-import-sort/imports': 'off',
+      eqeqeq: 'off',
+      'prefer-destructuring': 'off',
       'unused-imports/no-unused-imports': 'error',
       'vue/multi-word-component-names': 'off',
       'vue/no-v-html': 'off',
