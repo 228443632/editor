@@ -6,7 +6,12 @@
 <!--setup-->
 <script setup lang="ts">
 import type { Node } from 'prosemirror-model'
-import { debounce } from 'sf-utils2'
+import { debounce, deepClone } from 'sf-utils2'
+import {
+  type DraggableEvent,
+  type UseDraggableReturn,
+  VueDraggable,
+} from 'vue-draggable-plus'
 
 import useEditorEvent from '@/composables/useEditorEvent'
 
@@ -25,6 +30,7 @@ const { addListenerEvent } = useEditorEvent(editor)
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
 const rootRef = ref<HTMLHtmlElement>()
+const vueDraggableRef = ref<UseDraggableReturn>()
 
 const compIconMap = {
   /**
@@ -40,6 +46,50 @@ const compIconMap = {
     icon: 'params-comp-table',
   },
 }
+
+let compNodeListIdsClone = []
+const vueDraggableAttrs = ref({
+  animation: 150,
+  ghostClass: 'ghost',
+  onStart() {
+    compNodeListIdsClone = deepClone(
+      __compNodeList__.value.map((item) => item.node.attrs?.nodeId),
+    )
+  },
+  onUpdate(event: DraggableEvent) {
+    const { oldIndex, newIndex } = event
+    console.log(`交换位置22：${oldIndex} ↔ ${newIndex}`)
+    const originNodeId = compNodeListIdsClone[oldIndex]
+    const nowNodeId = compNodeListIdsClone[newIndex]
+
+    let originNodeObj, nowNodeObj
+    __compNodeList__.value.some((item) => {
+      if (originNodeId == item.node.attrs?.nodeId) {
+        originNodeObj = item
+      } else if (nowNodeId == item.node.attrs?.nodeId) {
+        nowNodeObj = item
+      }
+      return originNodeObj && nowNodeObj
+    })
+
+    editor.value
+      .chain()
+      .focus()
+      .swapNodes(originNodeObj.pos, nowNodeObj.pos)
+      .run()
+
+    compNodeListIdsClone = []
+
+    const stop = watch(__compNodeList__, () => {
+      requestAnimationFrame(() => {
+        onChooseItem(__compNodeList__.value.find(item => item.node.attrs?.nodeId == originNodeId))
+        stop()
+      })
+    })
+  },
+  onEnd() {},
+  tag: 'ul',
+})
 
 /* 方法 */
 
@@ -127,8 +177,6 @@ onMounted(() => {
   })
 
   debounceUpdateContentList()
-
-  console.log('nodeList', __compNodeList__)
 })
 
 /* 暴露 */
@@ -140,19 +188,30 @@ defineExpose({
 <!--render-->
 <template>
   <div ref="rootRef" class="umo-toc-params">
-    <ul>
+    <VueDraggable
+      v-if="__compNodeList__.length"
+      ref="vueDraggableRef"
+      v-model="__compNodeList__"
+      v-bind="vueDraggableAttrs"
+      handle=".umo-toc-params__handle"
+    >
       <li
         v-for="item in __compNodeList__"
         :key="item.node.attrs?.nodeId"
         :class="[
-          `flex items-center umo-toc-params__item`,
+          `flex items-center umo-toc-params__item cursor-move`,
           _nodeActiveNodeId &&
             _nodeActiveNodeId == item.node.attrs?.nodeId &&
             'is-active',
         ]"
         @click="onChooseItem(item)"
       >
-        <icon :name="item.icon" class="text-[#999]" size="14px"></icon>
+        <icon
+          name="toc-drag"
+          class="text-[#000] umo-toc-params__handle"
+          size="16px"
+        ></icon>
+        <icon :name="item.icon" class="text-[#999] ml-6px" size="14px"></icon>
         <span class="flex flex-1 items-center ml-4px umo-toc-params__text">{{
           item.node.attrs?.placeholder
         }}</span>
@@ -162,7 +221,11 @@ defineExpose({
           @click.stop="onDelItem(item)"
         ></icon>
       </li>
-    </ul>
+    </VueDraggable>
+
+    <div v-else class="flex items-center justify-center text-12px min-h-60px">
+      <div class="text-[var(--umo-text-color-light)]">暂无参数数据</div>
+    </div>
   </div>
 </template>
 
@@ -171,24 +234,31 @@ defineExpose({
 .umo-toc-params {
   padding: 10px 0;
   ul {
-    padding: 0 16px 0 0;
+    padding: 0 8px 0 0;
     li {
       border-radius: 4px;
       cursor: pointer;
       font-size: 13px;
       margin-bottom: 2px;
       min-height: 28px;
-      padding: 4px 10px;
+      padding: 4px 10px 4px 4px;
       text-align: left;
       width: 100%;
       & + li {
         margin-top: 4px;
       }
+      &.ghost {
+        background-color: #ddd;
+        border-bottom: 1px solid #333;
+        border-radius: 4px 4px 0 0;
+        //opacity: 0.5;
+      }
       &.is-active {
         background: #d4d3d4;
       }
       &:hover {
-        background-color: #f8f8f8;
+        //background-color: #f8f8f8;
+        background: #d4d3d4;
         .umo-toc-params__close-icon {
           visibility: visible;
         }

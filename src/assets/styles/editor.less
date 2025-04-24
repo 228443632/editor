@@ -119,11 +119,13 @@
       line-height: 1;
     }
     &:first-child {
-      > *:not(table) {
+      > *:not(table, .is-inline-block, span) {
         display: none;
       }
 
-      &::after {
+      //&:only-child.is-editor-empty::after,
+      //&::after {
+      &:has(.Tiptap-invisible-character:first-child)::after {
         color: var(--umo-content-placeholder-color);
         content: attr(data-placeholder);
         pointer-events: none;
@@ -643,9 +645,9 @@
   }
 }
 
-
-.Tiptap-invisible-character  {
-  &.Tiptap-invisible-character--paragraph, &.Tiptap-invisible-character--break {
+.Tiptap-invisible-character {
+  &.Tiptap-invisible-character--paragraph,
+  &.Tiptap-invisible-character--break {
     &:before {
       content: '↵'; // ↵ ↩︎ ↩
       color: #d6d5d5;

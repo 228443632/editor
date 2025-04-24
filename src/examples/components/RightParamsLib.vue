@@ -101,7 +101,7 @@ const dragMethod = {
 
     // 设置透明度
     const targetNode = e.target as HTMLElement
-     targetNode.classList.add('is-dragging')
+    targetNode.classList.add('is-dragging')
     dragMethod.dragNodeDom = targetNode
     e.dataTransfer.setDragImage(
       targetNode,
@@ -265,10 +265,12 @@ defineExpose({
       border: 1px solid #e1e4eb;
       border-radius: 4px;
       cursor: pointer;
+      @primary-color: #2d49d1;
       &.is-dragging {
         cursor: grabbing;
         border-style: dashed;
         box-sizing: 0px 6px 16px -8px rgba(0, 0, 0, 0.08);
+        background-color: rgba(@primary-color, 0.12);
       }
       &[draggable] {
         cursor: grab;

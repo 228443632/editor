@@ -89,6 +89,10 @@
   border: none;
   border-radius: var(--umo-radius);
   color: var(--umo-text-color);
+  &__header-content.umo-dialog__header-content {
+    display: flex;
+    align-items: center;
+  }
   &__mask {
     position: absolute !important;
   }
@@ -115,7 +119,7 @@
     }
   }
   &:not(.umo-dialog__fullscreen):not(.t-dialog__fullscreen) {
-    padding: 22px 25px 25px;
+    padding: 22px 25px 22px;
   }
   &__fullscreen {
     border-radius: 0;
@@ -254,4 +258,12 @@
   &__list {
     position: absolute;
   }
+}
+
+.umo-form {
+  .umo-form__item,
+  .t-umo-form__item{
+    //--td-comp-margin-xxl: 16px;
+  }
+
 }

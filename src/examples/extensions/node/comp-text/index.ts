@@ -1,6 +1,9 @@
 import { mergeAttributes, Node, VueNodeViewRenderer } from '@tiptap/vue-3'
 
 import NodeView from './NodeView.vue'
+import type { Editor } from '@tiptap/core'
+import type { Node as TNode } from 'prosemirror-model'
+import { ReplaceStep } from 'prosemirror-transform'
 import { simpleUUID } from '@/utils/short-id'
 
 type TSetCompOptions = {
@@ -16,11 +19,17 @@ declare module '@tiptap/core' {
     setComp: {
       setComp: (options: TSetCompOptions) => ReturnType
     }
+
+    swapNodes: {
+      swapNodes: (pos1: number, pos2: number) => ReturnType
+    }
   }
 }
 
+export const NAME = 'compText'
+
 export default Node.create({
-  name: 'compText',
+  name: NAME,
   group: 'inline',
   content: 'text*', // 允许包含文本内容
   inline: true, // 关键：标记为行内元素[4](@ref)
@@ -29,9 +38,15 @@ export default Node.create({
 
   addAttributes() {
     return {
+      /** 组件名称*/
+      name: {
+        default: NAME,
+        parseHTML: () => NAME,
+      },
       /** 唯一标识 */
       nodeId: {
-        default: '',
+        default: undefined,
+        parseHTML: (element) => element.getAttribute('nodeid') ?? simpleUUID(),
       },
 
       /** 占位 */
@@ -51,13 +66,13 @@ export default Node.create({
 
       /** 备注，填写说明 */
       desc: {
-        default: ''
+        default: '',
       },
 
       /** 默认值 */
       defaultValue: {
-        default: ''
-      }
+        default: '',
+      },
     }
   },
 
@@ -70,13 +85,12 @@ export default Node.create({
     return [
       'span',
       mergeAttributes(HTMLAttributes, {
-        'data-comp-is': 'text',
-        'data-placeholder': HTMLAttributes.placeholder
+        'data-placeholder': HTMLAttributes.placeholder,
       }),
       [
         'text', // 占位符
         { class: 'hidden' },
-        `\${${HTMLAttributes?.fieldName}}`
+        `\${${HTMLAttributes?.fieldName}}`,
       ],
     ]
   },
@@ -104,6 +118,48 @@ export default Node.create({
             type: options.type,
             attrs: options.attrs,
           })
+        },
+
+      /**
+       * 交换节点位置
+       * @param pos1
+       * @param pos2
+       */
+      swapNodes:
+        (pos1, pos2) =>
+        ({  tr, state }) => {
+          const node1 = state.doc.nodeAt(pos1)
+          const node2 = state.doc.nodeAt(pos2)
+
+          if (!node1 || !node2) return false
+
+          // 计算节点尺寸差异
+          const sizeDiff = node1.nodeSize - node2.nodeSize
+
+          // 动态调整 pos2（避免重叠或越界）
+          let adjustedPos2 = pos2
+          if (pos1 < pos2) {
+            adjustedPos2 += sizeDiff // 如果 node1 比 node2 大，pos2 需向后偏移
+          } else {
+            adjustedPos2 -= sizeDiff // 反向交换时向前偏移
+          }
+
+          // 原子化交换（使用 ReplaceStep 保证事务一致性）
+          tr.step(
+            new ReplaceStep(
+              pos1,
+              pos1 + node1.nodeSize,
+              state.doc.slice(pos2, pos2 + node2.nodeSize),
+            ),
+          ).step(
+            new ReplaceStep(
+              adjustedPos2,
+              adjustedPos2 + node2.nodeSize,
+              state.doc.slice(pos1, pos1 + node1.nodeSize),
+            ),
+          )
+
+          return true
         },
     }
   },
@@ -135,3 +191,4 @@ export default Node.create({
   //   ]
   // },
 })
+

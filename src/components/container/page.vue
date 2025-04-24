@@ -245,7 +245,7 @@ watch(
   display: flex;
   position: relative;
   --padding-top: 16px;
-  --padding-left: 50px;
+  --padding-left: 16px;
 }
 
 .umo-zoomable-container {
@@ -378,7 +378,7 @@ watch(
       var(--right-aside-width),
       calc(
         var(--layout-width) - var(--left-aside-width) - var(--padding-left) *
-          2 - var(--editor-width)
+          2 - var(--editor-width) - 8px
       ),
       400px
     );
