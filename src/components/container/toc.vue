@@ -29,7 +29,10 @@
       </div>
     </section>
 
-    <div v-show="tocActive == `dir`" class="umo-toc-content umo-scrollbar umo-toc-content--dir">
+    <div
+      v-show="tocActive == `dir`"
+      class="umo-toc-content umo-scrollbar umo-toc-content--dir umo-toc-content--active"
+    >
       <t-tree
         class="umo-toc-tree"
         :data="tocTreeData"
@@ -37,17 +40,27 @@
           label: 'textContent',
           value: 'id',
         }"
+        ref="tTreeRef"
+        draggable
         :empty="t('toc.empty')"
         :transition="false"
         activable
         hover
         expand-all
         @active="headingActive"
+        @drop="onHandleDrop"
+        :allowDrop="allowDrop"
       />
     </div>
 
-    <template v-for="(item, index) in _tabOptions" :key="index">
-      <div class="umo-toc-content umo-scrollbar" v-show="tocActive == item.value">
+    <template v-for="item in _tabOptions.slice(1)" :key="item.value">
+      <div
+        v-show="tocActive == item.value"
+        :class="[
+          `umo-toc-content umo-scrollbar`,
+          !tocActive == item.value && 'umo-toc-content--active',
+        ]"
+      >
         <slot :name="`toc-content-${item.value}`" v-bind="item"> </slot>
       </div>
     </template>
@@ -62,9 +75,13 @@
 
 <script setup lang="ts">
 import { TextSelection } from '@tiptap/pm/state'
+import { type Tree } from 'tdesign-vue-next'
+import type { Editor } from '@tiptap/vue-3'
+import { tiptapUtil } from '@/examples/utils/tiptap-util'
+// import { type Ref } from 'vue'
 
 const container = inject('container')
-const editor = inject('editor')
+const editor = inject('editor') as Ref<Editor>
 const page = inject('page')
 
 defineEmits(['close'])
@@ -73,8 +90,10 @@ interface TocItem {
   [key: string]: any
   children?: TocItem[]
 }
+const tTreeRef = ref<InstanceType<typeof Tree>>()
 // 最终可视化数据
 let tocTreeData = $ref([])
+let tocTreeDataObj$id = {}
 let watchTreeData: TocItem[] = [] // 可视化监听数据
 const buildTocTree = (tocArray: Record<string, any>[]): TocItem[] => {
   if (!Array.isArray(tocArray)) return []
@@ -85,7 +104,8 @@ const buildTocTree = (tocArray: Record<string, any>[]): TocItem[] => {
   }
   for (const item of tocArray) {
     const node: TocItem = {
-      textContent: item.textContent,
+      // textContent: item.textContent.replace(/\$\{[^}]+\}/g, ''),
+      textContent: item.dom.textContent,
       level: item.originalLevel,
       id: item.id,
       actived: false, // item.isActive,
@@ -107,15 +127,68 @@ const buildTocTree = (tocArray: Record<string, any>[]): TocItem[] => {
   return root
 }
 
+/**
+ * 是否允许拖拽
+ */
+function allowDrop(dropContext) {
+  const { dragNode, dropNode, dropPosition } = dropContext
+  if (getParentValue(dragNode) !== getParentValue(dropNode)) {
+    useMessage('warning', {
+      content: '目录拖拽只允许同级节点交换',
+    })
+    return false
+  }
+
+  if (dropPosition === 0) {
+    useMessage('warning', {
+      content: '目录拖拽只允许同级嵌套节点交换',
+    })
+    return false
+  }
+
+  const headings = editor.value.$nodes('heading')
+  const headingsObj$id = {}
+  headings.forEach((heading) => {
+    headingsObj$id[heading.node.attrs.id] = heading
+  })
+  const dragNodeData = headingsObj$id[dragNode.value]
+  const dropNodeData = headingsObj$id[dropNode.value]
+  if (!dragNodeData || !dropNodeData)
+    return useMessage('error', {
+      content: '目录拖拽失败',
+    })
+  tiptapUtil.swapBlocksAtPos(editor.value, dragNodeData.pos, dropNodeData.pos)
+  return true
+
+  function getParentValue(node) {
+    return node?.[`__tdesign_tree-node__`]?.parent?.value
+  }
+}
+
+/**
+ * 拖拽事件
+ */
+function onHandleDrop() {}
+
 const tocActive = inject('tocActive')
 
 const throttleTocTreeData = (toc: any) =>
   useThrottleFn(() => {
+    // console.log('throttleTocTreeData', toc)
     // 每次都监听 但不是每次发生变化，重复赋值导致toc数据双击生效
     const curTocTreeData = buildTocTree(toc)
     if (JSON.stringify(watchTreeData) !== JSON.stringify(curTocTreeData)) {
       watchTreeData = curTocTreeData
       tocTreeData = JSON.parse(JSON.stringify(curTocTreeData))
+    }
+
+    tocTreeDataObj$id = {}
+    if (Array.isArray(toc) && toc.length > 0) {
+      toc.forEach((item) => {
+        if (item.id) {
+          tocTreeDataObj$id[item.id] = item
+        }
+      })
     }
   }, 200)()
 
@@ -298,6 +371,7 @@ const _tabOptions = computed(() => {
       --td-comp-margin-xs: 0;
       --td-brand-color-light: #e2e4ea;
       --td-comp-paddingTB-xxs: 0;
+      --td-bg-color-container-hover: #d4d3d4;
       user-select: none;
       font-size: 12px;
       :deep(.umo-tree__empty) {
@@ -309,13 +383,29 @@ const _tabOptions = computed(() => {
         justify-content: center;
         color: var(--umo-text-color-light);
       }
-      :deep(.umo-is-active) {
-        font-weight: 400;
-        color: var(--umo-primary-color);
-      }
       :deep {
         .umo-tree__item + .umo-tree__item {
           margin-top: 2px;
+        }
+
+        //.umo-tree__line {
+        //  --color: var(--td-bg-color-container-hover);
+        //}
+
+        .umo-tree__item {
+          &:before {
+            background-color: var(--td-bg-color-container-hover);
+          }
+          &.umo-is-active {
+            background-clip: content-box;
+            background-color: var(--td-brand-color-light);
+            font-weight: 400;
+            color: var(--umo-primary-color);
+            .umo-tree__label {
+              color: var(--umo-primary-color);
+              background-color: transparent;
+            }
+          }
         }
 
         .umo-tree__icon {

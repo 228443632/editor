@@ -28,7 +28,7 @@ const paramsConfig = ref([
         label: '普通文本',
         value: 'compText',
         icon: 'params-comp-text',
-        draggable: 'true',
+        draggable: true,
         get compTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == 'compText'
@@ -51,6 +51,22 @@ const paramsConfig = ref([
     label: '其他',
     children: [
       { label: '动态表格', value: 'compTable', icon: 'params-comp-table' },
+    ],
+  },
+  {
+    label: '测试',
+    children: [
+      {
+        label: '获取HTML',
+        value: 'compText',
+        icon: '',
+        click() {
+          onGetHtml()
+          useMessage('info', {
+            content: '获取html代码成功，请查看控制台日志！',
+          })
+        },
+      },
     ],
   },
 ])
@@ -162,15 +178,6 @@ defineExpose({
 <!--render-->
 <template>
   <div class="umo-pr-container">
-    <div class="px-16px">
-      <t-button
-        @click="onGetHtml"
-        :block="false"
-        size="small"
-        class="!w-[fit-content]"
-        >获取HTML</t-button
-      >
-    </div>
     <div class="umo-pr-title">
       参数库
 

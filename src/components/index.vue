@@ -875,13 +875,16 @@ const saveContent = async (showMessage = true) => {
   if (options.value.document?.readOnly) {
     return
   }
+  const commonMsgOption = {
+    placement: 'top',
+    offset: [0, 0],
+  } as any
   try {
     useMessage('loading', {
+      ...commonMsgOption,
       attach: container,
       content: t('save.saving'),
-      placement: 'bottom',
       closeBtn: true,
-      offset: [0, -20],
     })
     const success = await options.value?.onSave?.(
       {
@@ -895,10 +898,9 @@ const saveContent = async (showMessage = true) => {
     if (!success) {
       MessagePlugin.closeAll()
       useMessage('error', {
+        ...commonMsgOption,
         attach: container,
         content: t('save.failed'),
-        placement: 'bottom',
-        offset: [0, -20],
       })
       return
     }
@@ -906,11 +908,10 @@ const saveContent = async (showMessage = true) => {
     if (showMessage) {
       MessagePlugin.closeAll()
       useMessage('success', {
+        ...commonMsgOption,
         attach: container,
         content:
           success === false || success === true ? t('save.success') : success,
-        placement: 'bottom',
-        offset: [0, -20],
       })
     }
     const time = useTimestamp({ offset: 0 })

@@ -1,6 +1,6 @@
-@import 'tdesign-vue-next/esm/_common/style/web/_global.less';
-@import 'tdesign-vue-next/esm/_common/style/web/theme/_index.less';
-@import 'tdesign-vue-next/esm/_common/style/web/components/time-picker/_index.less';
+@import 'tdesign-vue-next/esm/common/style/web/_global.less';
+@import 'tdesign-vue-next/esm/common/style/web/theme/_index.less';
+@import 'tdesign-vue-next/esm/common/style/web/components/time-picker/_index.less';
 
 .umo-popup {
   --td-radius-medium: var(--umo-radius);
@@ -89,6 +89,9 @@
   border: none;
   border-radius: var(--umo-radius);
   color: var(--umo-text-color);
+  &.is-draggable {
+    cursor: move;
+  }
   &__header-content.umo-dialog__header-content {
     display: flex;
     align-items: center;
@@ -129,6 +132,7 @@
   }
   &__header {
     background: none;
+    cursor: default;
     &-content {
       display: flex;
       font-size: 18px;
@@ -156,12 +160,14 @@
     }
   }
   &__body {
+    cursor: default;
     &--fullscreen {
       flex: 1;
       padding: 0;
     }
   }
   &__footer {
+    cursor: default;
     padding-top: 5px;
     &--fullscreen {
       padding: 15px;

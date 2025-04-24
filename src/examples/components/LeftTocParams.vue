@@ -14,6 +14,7 @@ import {
 } from 'vue-draggable-plus'
 
 import useEditorEvent from '@/composables/useEditorEvent'
+import { tiptapUtil } from '@/examples/utils/tiptap-util'
 
 const { proxy } = getCurrentInstance()
 
@@ -23,9 +24,10 @@ const emit = defineEmits({})
 /* 状态 */
 const page = inject('page')
 const editor = inject('editor')
-const tocActive = inject('tocActive')
+// const tocActive = inject('tocActive')
 
-tocActive.value = 'params'
+// TODO
+// tocActive.value = 'dir'
 const { addListenerEvent } = useEditorEvent(editor)
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
@@ -55,7 +57,7 @@ const vueDraggableAttrs = ref({
   ghostClass: 'ghost',
   onStart() {
     compNodeListIdsClone = deepClone(
-      __compNodeList__.value.map((item) => item.node.attrs?.nodeId),
+      __compNodeList__.value.map((item) => item.node.attrs?.['data-id']),
     )
   },
   onUpdate(event: DraggableEvent) {
@@ -66,19 +68,23 @@ const vueDraggableAttrs = ref({
 
     let originNodeObj, nowNodeObj
     __compNodeList__.value.some((item) => {
-      if (originNodeId == item.node.attrs?.nodeId) {
+      if (originNodeId == item.node.attrs?.['data-id']) {
         originNodeObj = item
-      } else if (nowNodeId == item.node.attrs?.nodeId) {
+      } else if (nowNodeId == item.node.attrs?.['data-id']) {
         nowNodeObj = item
       }
       return originNodeObj && nowNodeObj
     })
 
-    editor.value
-      .chain()
-      .focus()
-      .swapNodes(originNodeObj.pos, nowNodeObj.pos)
-      .run()
+    if (!originNodeObj || !nowNodeObj) return
+
+    editor.value.chain().focus().run()
+
+    tiptapUtil.swapInlineByNode(
+      editor.value,
+      originNodeObj.node,
+      nowNodeObj.node,
+    )
 
     compNodeListIdsClone = []
 
@@ -86,7 +92,7 @@ const vueDraggableAttrs = ref({
       requestAnimationFrame(() => {
         onChooseItem(
           __compNodeList__.value.find(
-            (item) => item.node.attrs?.nodeId == originNodeId,
+            (item) => item.node.attrs?.['data-id'] == originNodeId,
           ),
         )
         stop()
@@ -109,7 +115,7 @@ function updateContentList() {
   const tempCompNodeList = []
   editor.value?.state.doc.descendants((node: Node, pos: number) => {
     if (nameMap[node.type.name]) {
-      // console.log(node.attrs.nodeId)
+      // console.log(node.attrs.['data-id'])
       const icon = compIconMap[node.type.name]?.icon
       tempCompNodeList.push({ node, pos, icon })
     }
@@ -146,7 +152,7 @@ function onDelItem(item: { node: Node; pos: number }) {
 /* 计算 */
 
 const _nodeActiveNodeId = computed(
-  () => __globalBizState__.value.nodeActive?.attrs?.nodeId,
+  () => __globalBizState__.value.nodeActive?.attrs?.['data-id'],
 )
 
 /* 监听 */
@@ -154,7 +160,6 @@ watch(__compNodeList__, (newVal) => {
   const paramsTab = page.value.tocTabsOptions.find(
     (item) => item.value == 'params',
   )
-  console.log('paramsTab', paramsTab)
   paramsTab.label = ['参数', newVal.length ? `(${newVal.length})` : '']
     .filter(Boolean)
     .join(' ')
@@ -202,11 +207,11 @@ defineExpose({
     >
       <li
         v-for="item in __compNodeList__"
-        :key="item.node.attrs?.nodeId"
+        :key="item.node.attrs?.['data-id']"
         :class="[
           `flex items-center umo-toc-params__item cursor-move`,
           _nodeActiveNodeId &&
-            _nodeActiveNodeId == item.node.attrs?.nodeId &&
+            _nodeActiveNodeId == item.node.attrs?.['data-id'] &&
             'is-active',
         ]"
         @click="onChooseItem(item)"
@@ -254,7 +259,7 @@ defineExpose({
       }
       &.ghost {
         background-color: #ddd;
-        border-bottom: 1px solid #333;
+        border-bottom: 2px solid var(--umo-primary-color);
         border-radius: 4px 4px 0 0;
         //opacity: 0.5;
       }

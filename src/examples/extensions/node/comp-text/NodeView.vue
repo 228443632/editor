@@ -76,9 +76,9 @@ function setBubbleMenuShow(isShow = true) {
 onMounted(() => {
   // console.log('props', props, props.getPos(), props.updateAttributes)
   window.requestAnimationFrame(() => {
-    if (!props.node.attrs?.nodeId) {
+    if (!props.node.attrs?.['data-id']) {
       props.updateAttributes({
-        nodeId: simpleUUID()
+        'data-id': simpleUUID(),
       })
     }
   })

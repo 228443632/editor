@@ -174,7 +174,6 @@ watch([editorContainerWidth, editorWidth], () => {
     layoutSize.value.leftAsideGap -
     layoutSize.value.leftAsideWidth
 
-  console.log('layoutSize.value.leftSideLeft', layoutSize.value.leftSideLeft)
 })
 
 // FIXME:

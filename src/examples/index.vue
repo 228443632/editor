@@ -8,7 +8,7 @@
 
       <!--  TOC 内容  -->
       <template #toc-content-params>
-        <TocContentParams></TocContentParams>
+        <LeftTocParams></LeftTocParams>
       </template>
 
       <!--  内容右侧  -->
@@ -23,22 +23,21 @@
 import { shortId } from '@/utils/short-id'
 import ParamsLib from './toolbar/base/ParamsLib.vue'
 import RightParamsLib from './components/RightParamsLib.vue'
-import TocContentParams from './components/TocContentParams.vue'
+import LeftTocParams from './components/LeftTocParams.vue'
 
 import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/examples/utils/object-util'
 
-import { Plugin } from 'prosemirror-state'
-// import type { Node as TNode } from 'prosemirror-model'
-
 // extension
 import extensions from './extensions'
-import type { Editor } from '@tiptap/vue-3'
 import { debounce } from 'sf-utils2'
+
+// types
+import type { Editor } from '@tiptap/vue-3'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
-
-console.log('extensions', extensions)
+// import type { Node as TNode } from 'prosemirror-model'
+// import { Plugin } from 'prosemirror-state'
 
 const editorRef = $ref(null)
 
@@ -51,12 +50,7 @@ const globalBizState = ref({
 provide('__compNodeList__', nodeList)
 provide('__globalBizState__', globalBizState)
 
-const disableDropPlugin = new Plugin({
-  props: {},
-})
-
-function selectionChange({ editor }: { editor: Editor })  {
-  console.log('editor.state.selectio', editor.state.selection)
+function selectionChange({ editor }: { editor: Editor }) {
   const node = editor.state.doc.nodeAt(editor.state.selection.anchor)
   // const node = editor.state.selection.$anchor.parent
   if (node?.attrs.isCompParams) {
@@ -64,7 +58,6 @@ function selectionChange({ editor }: { editor: Editor })  {
   } else {
     options.document.isShowBubbleMenu = true
   }
-  console.log('node', node)
 }
 const debounceSelectionChange = debounce(selectionChange, 100)
 
@@ -81,7 +74,7 @@ const options = $ref(
       document: {
         title: '合同低码平台',
         content:
-          // localStorage.getItem('document.content') ??
+          localStorage.getItem('document.content') ??
           '<p data-id="a99806c5f14e13b90a1d">2234243测试文档<span nodeid="1e7968a2c380aeffc764" placeholder="普通文本2" fieldname="name" data-comp-is="text" data-placeholder="普通文本2"><text class="hidden">${name}</text></span><span nodeid="16cd3c0a1b5a9c7de8bb" placeholder="普通文本3" fieldname="name" data-comp-is="text" data-placeholder="普通文本3"><text class="hidden">${name}</text></span><span nodeid="950efc7c23640bc1bbc2" placeholder="普通文本1" fieldname="name" data-comp-is="text" data-placeholder="普通文本1"><text class="hidden">${name}</text></span>234242年什么饭呢什么饭</p><p data-id="743f142b2d58fdc6b4b5"></p><p data-id="bc646db6aa0ab9037534"><span nodeid="ffd8f1a92c8488a6fb86" placeholder="普通文本4" fieldname="name" data-comp-is="text" data-placeholder="普通文本4"><text class="hidden">${name}</text></span></p><p data-id="ec6f114f38aca3358143"><span nodeid="af11fbfc77290caa3abf" placeholder="普通文本5" fieldname="name" data-comp-is="text" data-placeholder="普通文本5"><text class="hidden">${name}</text></span></p><p data-id="7db73bd16aef3fa686a1"><span nodeid="2ed5df2171b11787c09e" placeholder="普通文本6" fieldname="name" data-comp-is="text" data-placeholder="普通文本6"><text class="hidden">${name}</text></span></p><p data-id="8bca669eed645608107e"><span nodeid="a11035760e718c5a3ff3" placeholder="普通文本7" fieldname="name" data-comp-is="text" data-placeholder="普通文本7"><text class="hidden">${name}</text></span></p><p data-id="6dc6277f048703eab075"><span nodeid="f1f4c3710d75f4cf9d25" placeholder="普通文本8" fieldname="name" data-comp-is="text" data-placeholder="普通文本8"><text class="hidden">${name}</text></span></p><p data-id="ccb715ba53fd77ce00ea"><span nodeid="6b61e84782a475d42f75" placeholder="普通文本9" fieldname="name" data-comp-is="text" data-placeholder="普通文本9"><text class="hidden">${name}</text></span></p><p data-id="85c6b78fc00a78537b7d"><span nodeid="afd276ba5bab2f449a34" placeholder="普通文本10" fieldname="name" data-comp-is="text" data-placeholder="普通文本10"><text class="hidden">${name}</text></span></p><p data-id="e5a161ec0041024d2a02"><span nodeid="744f64615d9cca1461bf" placeholder="普通文本11" fieldname="name" data-comp-is="text" data-placeholder="普通文本11"><text class="hidden">${name}</text></span></p><p data-id="66ab3ba5bbbd47b48017"><span nodeid="444217019d0aa55b86a5" placeholder="普通文本12" fieldname="name" data-comp-is="text" data-placeholder="普通文本12"><text class="hidden">${name}</text></span></p><p data-id="49486046f563ffc32daf"><span nodeid="c631a8c034f171796f33" placeholder="普通文本13" fieldname="name" data-comp-is="text" data-placeholder="普通文本13"><text class="hidden">${name}</text></span></p>',
         /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
         editorProps: {
@@ -95,7 +88,7 @@ const options = $ref(
         },
       },
       page: {
-        showRightSlot: true,
+        showRightSlot: false,
         showBookmark: false,
         watermark: {
           text: '开发环境' + '127.0.0.1',
@@ -117,21 +110,13 @@ const options = $ref(
       /**
        * 富文本内容保存
        * @param content
-       * @param page
-       * @param document
        */
-      async onSave(
-        content: string,
-        page: number,
-        document: { content: string },
-      ) {
-        console.log('document', document, content)
-        localStorage.setItem('document.content', document.content)
+      async onSave(content) {
+        localStorage.setItem('document.content', content?.html)
         return new Promise((resolve, reject) => {
           setTimeout(() => {
             const success = true
             if (success) {
-              console.log('onSave', { content, page, document })
               resolve('操作成功')
             } else {
               reject(new Error('操作失败'))
@@ -178,7 +163,7 @@ const options = $ref(
       },
 
       /** 事件 */
-      'onChanged:selection': debounceSelectionChange
+      'onChanged:selection': debounceSelectionChange,
     },
   ),
 )
@@ -188,6 +173,7 @@ console.log('options', options)
 onMounted(() => {
   console.log('editorRef', editorRef)
   window.editor = editorRef
+  setTimeout(() => (options.page.showRightSlot = true), 500)
 })
 </script>
 
