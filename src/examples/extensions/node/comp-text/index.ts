@@ -93,7 +93,7 @@ export default Node.create({
       [
         'text', // 占位符
         { class: 'hidden' },
-        `\${${HTMLAttributes?.fieldName}}`,
+        `\${{${HTMLAttributes?.fieldName || ''}}}`,
       ],
     ]
   },

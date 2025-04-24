@@ -13,7 +13,9 @@ import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extens
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/examples/utils/css-util'
 import type { Editor } from '@tiptap/core'
-import { blobSaveAs } from 'sf-utils2'
+import { arrayToObj, blobSaveAs, deepClone } from 'sf-utils2'
+import FillFormParamsAE from './FillFormParamsAE.vue'
+import { uniq } from 'unocss' // 表单数据填充
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -25,6 +27,7 @@ const editor = inject('editor') as Ref<Editor>
 const layoutDom = inject('layoutDom')
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const isDragging = ref(false)
+const fillFormParamsAERef = ref<InstanceType<typeof FillFormParamsAE>>()
 
 const paramsConfig = ref([
   {
@@ -56,7 +59,14 @@ const paramsConfig = ref([
   {
     label: '其他',
     children: [
-      { label: '动态表格', value: 'compTable', icon: 'params-comp-table' },
+      {
+        label: '动态表格',
+        value: 'compTable',
+        icon: 'params-comp-table',
+        click() {
+          useMessage('warning', { content: '动态表格暂未开发！' })
+        },
+      },
     ],
   },
   {
@@ -64,8 +74,8 @@ const paramsConfig = ref([
     children: [
       {
         label: '获取HTML',
-        value: 'compText',
-        icon: '',
+        value: '1002',
+        icon: 'edit',
         async click() {
           useMessage('loading', { content: '正在导出中', closeBtn: true })
           // const body = onGetHtml()
@@ -107,6 +117,40 @@ const paramsConfig = ref([
           useMessage('info', {
             // content: '获取html代码成功，请查看控制台日志！',
             content: '导出成功！',
+          })
+        },
+      },
+      {
+        label: '模拟数据填充',
+        value: '模拟数据填充',
+        icon: 'edit',
+        click() {
+          fillFormParamsAERef.value.visible.dialog = true
+          nextTick(() => {
+            const data = deepClone(
+              __compNodeList__.value.map((item) => ({
+                ...item.node?.attrs,
+                typeName: '普通文本',
+              })),
+            )
+            fillFormParamsAERef.value.tableInfo.data = data
+            const dataObj$FieldName = arrayToObj(data, 'fieldName', {
+              valueType: 'array',
+            })
+            const configString = Object.keys(dataObj$FieldName)
+              .map((key, index, list) => {
+                const comment = (dataObj$FieldName[key] || [])
+                  .map((cItem) => cItem.placeholder)
+                  .join('，')
+                const dot = index == list.length - 1 ? '' : ','
+                return `  ${key}: ''${dot} // ${comment}`
+              })
+              .join('\n')
+            fillFormParamsAERef.value.formData.configValue = [
+              `{`,
+              configString,
+              '}',
+            ].join('\n')
           })
         },
       },
@@ -253,6 +297,9 @@ defineExpose({
         </ul>
       </section>
     </div>
+
+    <!-- 元素表单填充 -->
+    <FillFormParamsAE ref="fillFormParamsAERef"></FillFormParamsAE>
   </div>
 </template>
 

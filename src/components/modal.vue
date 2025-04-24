@@ -17,8 +17,26 @@
     <template #header>
       <icon v-if="$attrs.icon" :name="$attrs.icon as string" :size="iconSize" />
       <span>{{ $attrs.header }}</span>
+      <!--      <span v-if="!attrs.mode || attrs.mode == 'modal'" class="flex-none">-->
+      <!--        <icon-->
+      <!--          v-if="isFullscreen"-->
+      <!--          name="full-screen-exit"-->
+      <!--          @click="isFullscreen = !isFullscreen"-->
+      <!--        ></icon>-->
+      <!--        <icon-->
+      <!--          v-else-->
+      <!--          name="full-screen"-->
+      <!--          @click="isFullscreen = !isFullscreen"-->
+      <!--        ></icon>-->
+      <!--      </span>-->
     </template>
     <slot />
+    <template #footer>
+      <slot name="footer">
+        <t-button theme="default" @click="$emit('close')">取消</t-button>
+        <t-button @click="$emit('confirm')">确定</t-button>
+      </slot>
+    </template>
   </t-dialog>
 </template>
 
@@ -44,6 +62,8 @@ const dialogTop = ref(0)
 const isDragging = ref(false)
 const startX = ref(0)
 const startY = ref(0)
+
+// const isFullscreen = ref(false)
 
 const startDrag = (e) => {
   if (!_draggable.value) return

@@ -123,7 +123,7 @@ defineExpose({
         </t-form-item>
 
         <t-form-item
-          label="key值"
+          label="后台映射字段名"
           name="fieldName"
           required-mark
           :rules="[{ required: true, message: '必填', type: 'error' }]"
