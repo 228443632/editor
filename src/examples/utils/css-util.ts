@@ -61,9 +61,9 @@ export const cssUtil = {
    * 获取所有的css
    */
   async getCssAll() {
-    if (process.env.NODE_ENV === 'production') {
-      return ''
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //   return ''
+    // }
     const cssRes = await Promise.all([
       cssUtil.getExternalCSS(),
       cssUtil.getAllCSSRules(),

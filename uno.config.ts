@@ -9,7 +9,7 @@ import {
   presetUno,
   // presetAttributify,
   transformerDirectives,
-  transformerVariantGroup
+  transformerVariantGroup,
 } from 'unocss'
 
 // import { PACKAGES_PATH } from '@internal/scripts/utils'
@@ -20,7 +20,7 @@ import { presetLegacyCompat } from '@unocss/preset-legacy-compat'
 export default defineConfig({
   presets: [
     presetLegacyCompat(),
-    presetUno()
+    presetUno(),
     // 支持css class属性化
     // presetAttributify(),
   ],
@@ -29,15 +29,15 @@ export default defineConfig({
       include: [
         // the default
         /\.(vue|[jt]sx|html)($|\?)/,
-        'src/**/*.{jsx,vue,tsx}'
+        'src/**/*.{jsx,vue,tsx}',
         // `${PACKAGES_PATH}/base/**/*.{jsx,vue,tsx}`,
         // `${PACKAGES_PATH}/hooks/**/*.{jsx,vue,tsx}`,
         // `${PACKAGES_PATH}/utils/**/*.{jsx,vue,tsx}`,
         // `${PACKAGES_PATH}/svg/**/*.{jsx,vue,tsx}`
-      ]
+      ],
       // exclude files
       // exclude: ['node_modules']
-    }
+    },
   },
   /**
    * 自定义快捷语句
@@ -47,11 +47,11 @@ export default defineConfig({
   transformers: [
     // 启用 @apply 功能
     transformerDirectives({
-      enforce: 'pre'
+      enforce: 'pre',
     }),
     // 启用 () 分组功能
     // 支持css class组合，eg: `<div class="hover:(bg-gray-400 font-medium) font-(light mono)">测试 unocss</div>`
-    transformerVariantGroup({})
+    transformerVariantGroup({}),
   ],
   theme: {
     colors: {
@@ -65,7 +65,7 @@ export default defineConfig({
         500: '#2D49D1',
         DEFAULT: '#2D49D1',
         600: '#2842BC',
-        700: '#22379D'
+        700: '#22379D',
       },
       // 中性色
       gray: {
@@ -77,7 +77,7 @@ export default defineConfig({
         500: '#999999',
         DEFAULT: '#999999',
         600: '#666666',
-        700: '#333333'
+        700: '#333333',
       },
       // 蓝色
       blue: {
@@ -89,7 +89,7 @@ export default defineConfig({
         500: '#3074E8',
         DEFAULT: '#3074E8',
         600: '#2B68D0',
-        700: '#2457AE'
+        700: '#2457AE',
       },
       // 绿色
       green: {
@@ -101,7 +101,7 @@ export default defineConfig({
         500: '#00A7A9',
         DEFAULT: '#00A7A9',
         600: '#009698',
-        700: '#007D7F'
+        700: '#007D7F',
       },
       // 橙色
       orange: {
@@ -113,7 +113,7 @@ export default defineConfig({
         500: '#F07704',
         DEFAULT: '#F07704',
         600: '#D86B04',
-        700: '#B45903'
+        700: '#B45903',
       },
       // 红色
       red: {
@@ -125,7 +125,7 @@ export default defineConfig({
         500: '#E00427',
         DEFAULT: '#E00427',
         600: '#C90423',
-        700: '#A8031D'
+        700: '#A8031D',
       },
       // 青色
       cyan: {
@@ -137,7 +137,7 @@ export default defineConfig({
         500: '#29A4DE',
         DEFAULT: '#29A4DE',
         600: '#2593C7',
-        700: '#1F7BA6'
+        700: '#1F7BA6',
       },
       // 紫色
       purple: {
@@ -149,7 +149,7 @@ export default defineConfig({
         500: '#8543D0',
         DEFAULT: '#8543D0',
         600: '#773CBB',
-        700: '#64329C'
+        700: '#64329C',
       },
       // 黄色
       yellow: {
@@ -161,7 +161,7 @@ export default defineConfig({
         500: '#EEB01E',
         DEFAULT: '#EEB01E',
         600: '#D69E1B',
-        700: '#B28416'
+        700: '#B28416',
       },
       // 粉色
       pink: {
@@ -173,7 +173,7 @@ export default defineConfig({
         500: '#D93E8E',
         DEFAULT: '#D93E8E',
         600: '#C3387F',
-        700: '#A32E6A'
+        700: '#A32E6A',
       },
       // 成功色
       success: '#00A7A9',
@@ -188,7 +188,7 @@ export default defineConfig({
       text: {
         primary: '#333333',
         secondary: '#666666',
-        tertiary: '#999999'
+        tertiary: '#999999',
       },
       // 禁用色
       disabled: '#BFBFBF',
@@ -206,34 +206,39 @@ export default defineConfig({
       low: '#999', // 文字低强调色
 
       black: '#000000',
-      transparent: 'transparent'
+      transparent: 'transparent',
     },
     animationDuration: {
       300: '300ms',
       500: '500ms',
       1000: '1000ms',
       2000: '2000ms',
-      3000: '3000ms'
+      3000: '3000ms',
     },
     height: {
-      page: 'var(--default-layout-page-view-min-height)'
+      page: 'var(--default-layout-page-view-min-height)',
     },
     minHeight: {
-      page: 'var(--default-layout-page-view-min-height)'
+      page: 'var(--default-layout-page-view-min-height)',
     },
     fontFamily: {
-      'din-alternate': ['DIN Alternate', 'PingFang SC', 'Microsoft YaHei', 'sans-serif']
-    }
+      'din-alternate': [
+        'DIN Alternate',
+        'PingFang SC',
+        'Microsoft YaHei',
+        'sans-serif',
+      ],
+    },
   },
   rules: [
     [
       'p-safe',
       {
         padding:
-          'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)'
-      }
+          'env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)',
+      },
     ],
     ['pt-safe', { 'padding-top': 'env(safe-area-inset-top)' }],
-    ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }]
-  ]
+    ['pb-safe', { 'padding-bottom': 'env(safe-area-inset-bottom)' }],
+  ],
 })

@@ -1,6 +1,22 @@
 {
   "name": "@umoteam/editor",
   "version": "6.1.1",
+  "scripts": {
+    "build:lib": "vue-tsc --noEmit && vite build --mode lib",
+    "build": "vite build --mode dev",
+    "dev": "vite --port 9000 --open --force",
+    "format": "prettier --write .",
+    "check:code": "eslint --cache src",
+    "check:style": "stylelint src/**/*.{css,less,vue}",
+    "check:types": "vue-tsc --noEmit",
+    "lint:code": "eslint --cache --fix src",
+    "lint:style": "stylelint --fix src/**/*.{css,less,vue}",
+    "test": "NODE_NO_WARNINGS=1 vitest",
+    "test:coverage": "npm run test --coverage",
+    "test:watch": "npm run test --watch --coverage",
+    "prepare": "husky",
+    "prepublishOnly": "npm run build"
+  },
   "type": "module",
   "description": "Umo Editor is open-source document editor based on Vue3 and Tiptap. Umo Editor provides comprehensive document editing capabilities and AI creation features, supports pagination, supports Markdown syntax, offers basic rich text editing functions, allows for the insertion of various node types in multiple formats, provides a variety of practical tools, and supports setting page styles. It also supports exporting in various formats, printing and print preview, block-level document editing, adding custom extensions, multi-language settings, and a dark theme.",
   "keywords": [
@@ -49,21 +65,6 @@
     }
   },
   "types": "./types/index.d.ts",
-  "scripts": {
-    "build": "vue-tsc --noEmit && vite build",
-    "dev": "vite --port 9000 --open --force",
-    "format": "prettier --write .",
-    "check:code": "eslint --cache src",
-    "check:style": "stylelint src/**/*.{css,less,vue}",
-    "check:types": "vue-tsc --noEmit",
-    "lint:code": "eslint --cache --fix src",
-    "lint:style": "stylelint --fix src/**/*.{css,less,vue}",
-    "test": "NODE_NO_WARNINGS=1 vitest",
-    "test:coverage": "npm run test --coverage",
-    "test:watch": "npm run test --watch --coverage",
-    "prepare": "husky",
-    "prepublishOnly": "npm run build"
-  },
   "dependencies": {
     "@eslint/object-schema": "^2.1.4",
     "@imgly/background-removal": "1.5.5",
@@ -140,8 +141,8 @@
   "devDependencies": {
     "@codemirror/autocomplete": "^6.18.1",
     "@codemirror/commands": "^6.6.2",
-    "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-javascript": "^6.2.3",
+    "@codemirror/lang-json": "^6.0.1",
     "@codemirror/lang-sql": "^6.7.1",
     "@codemirror/language": "^6.10.3",
     "@codemirror/lint": "^6.8.1",
@@ -202,6 +203,7 @@
     "unplugin-vue-macros": "^2.11.11",
     "vite": "^4.5.3",
     "vite-plugin-inspect": "^0.8.7",
+    "vite-plugin-node-polyfills": "0.23.0",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^2.0.5",
@@ -210,6 +212,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "resolutions": {
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue,less,css,yml,yaml,json,md,html}": [
