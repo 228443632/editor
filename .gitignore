@@ -39,7 +39,6 @@ types/components.d.ts
 
 # Lock files
 package-lock.json
-yarn.lock
 pnpm-lock.yaml
 
 # Other
