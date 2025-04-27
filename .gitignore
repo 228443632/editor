@@ -37,10 +37,6 @@ vitest.config.ts.timestamp*
 types/imports.d.ts
 types/components.d.ts
 
-# Lock files
-package-lock.json
-pnpm-lock.yaml
-
 # Other
 .DS_Store
 Thumbs.db
