@@ -1,5 +1,5 @@
 import { type Editor, Extension } from '@tiptap/core'
-import { Plugin, PluginKey } from '@tiptap/pm/state'
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 
 declare module '@tiptap/core' {
@@ -36,12 +36,33 @@ export default Extension.create({
               }),
             ])
           },
+
+          // handleScrollToSelection(view) {
+          //   const tr = view.state.tr
+          //   const mark = tr.getMeta('scrollIntoView')
+          //   console.log('Meta mark:', mark, tr.steps)
+          //
+          //   // 自定义滚动逻辑（如需禁止滚动，返回 false）
+          //   return false // 禁止自动滚动
+          // },
         },
       }),
     ]
   },
   addCommands() {
     return {
+      selectAllV2:
+        () =>
+        ({ tr, dispatch, commands }) => {
+          if (dispatch) {
+            commands.focus()
+            tr.setSelection(
+              TextSelection.create(tr.doc, 0, tr.doc.content.size),
+            )
+          }
+          return true
+        },
+
       setCurrentNodeSelection:
         () =>
         ({ editor, chain }) => {

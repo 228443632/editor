@@ -50,6 +50,11 @@
       caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
     }
 
+    /* 针对 Tiptap 编辑器内容的选中区域样式 */
+    ::selection {
+      background-color: var(--umo-text-selection-background);
+    }
+
     > * {
       position: relative;
       z-index: 1;
@@ -668,3 +673,9 @@ body.preview {
     }
   }
 }
+
+img.ProseMirror-separator {
+  pointer-events: none;
+}
+
+

@@ -42,13 +42,107 @@ const paramsConfig = ref([
             return item.node.type.name == 'compText'
           })
         },
-        click() {
+        get attrs() {
           const compTexts = this.compTexts
+          return {
+            placeholder: `普通文本${compTexts.length + 1}`,
+          }
+        },
+        click() {
           editor.value
             .chain()
             .focus()
+            .deleteSelection()
             .setCompText({
-              placeholder: `普通文本${compTexts.length + 1}`,
+              ...this.attrs
+            })
+            .run()
+        },
+      },
+
+      {
+        label: '姓名',
+        value: 'compText',
+        icon: 'params-comp-username',
+        draggable: true,
+        get compTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == 'compText'
+          })
+        },
+        get attrs() {
+          const compTexts = this.compTexts
+          return {
+            fieldName: 'name',
+            placeholder: `姓名${compTexts.length + 1}`,
+          }
+        },
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .setCompText({
+              ...this.attrs
+            })
+            .run()
+        },
+      },
+
+      {
+        label: '手机号',
+        value: 'compText',
+        icon: 'params-comp-mobile',
+        draggable: true,
+        get compTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == 'compText'
+          })
+        },
+        get attrs() {
+          const compTexts = this.compTexts
+          return {
+            fieldName: 'mobile',
+            placeholder: `手机号${compTexts.length + 1}`,
+          }
+        },
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .setCompText({
+              ...this.attrs
+            })
+            .run()
+        },
+      },
+
+
+      {
+        label: '身份证',
+        value: 'compText',
+        icon: 'params-comp-idcard',
+        draggable: true,
+        get compTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == 'compText'
+          })
+        },
+        get attrs() {
+          const compTexts = this.compTexts
+          return {
+            fieldName: 'idcard',
+            placeholder: `身份证${compTexts.length + 1}`,
+          }
+        },
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .setCompText({
+              ...this.attrs
             })
             .run()
         },
@@ -191,7 +285,7 @@ const dragMethod = {
       type: cItem.value,
       isCompParams: true,
       attrs: {
-        placeholder: `普通文本${cItem.compTexts.length + 1}`,
+        ...cItem.attrs,
       },
     } as IDragNodeParamsNode
 
@@ -280,7 +374,7 @@ defineExpose({
       >
         <div class="umo-pr-group__title">{{ item.label }}</div>
 
-        <ul class="flex gap-12px !mt-8px">
+        <ul class="grid grid-cols-3 gap-12px !mt-8px">
           <li
             v-for="(cItem, cIndex) in item.children"
             :key="cIndex"

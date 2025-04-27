@@ -1,89 +1,95 @@
 <template>
   <div class="umo-page-container">
     <!-- 左侧目录   -->
-    <container-toc
-      v-if="pageOptions.showToc"
-      @close="pageOptions.showToc = false"
-    >
-      <template v-for="(_, key) in $slots" #[key]="scoped" :key="key">
-        <slot v-bind="scoped || {}" :name="key" />
-      </template>
-    </container-toc>
+    <transition name="slide-right" appear>
+      <container-toc
+        v-if="pageOptions.showToc"
+        @close="pageOptions.showToc = false"
+      >
+        <template v-for="(_, key) in $slots" #[key]="scoped" :key="key">
+          <slot v-bind="scoped || {}" :name="key" />
+        </template>
+      </container-toc>
+    </transition>
 
     <!--  中间内容  -->
     <div
-      ref="zoomableContainerRef"
-      class="umo-zoomable-container umo-scrollbar"
-    >
-      <div
-        class="umo-zoomable-content"
-        :style="{
-          width: pageZoomWidth,
-          height: pageZoomHeight,
-        }"
+        ref="zoomableContainerRef"
+        class="umo-zoomable-container umo-scrollbar"
       >
-        <t-watermark
-          class="umo-page-content"
-          ref="pageContentRef"
-          :alpha="pageOptions.watermark.alpha"
-          v-bind="watermarkOptions"
-          :watermark-content="pageOptions.watermark"
+        <div
+          class="umo-zoomable-content"
           :style="{
-            '--umo-page-background': pageOptions.background,
-            '--umo-page-margin-top': (pageOptions.margin?.top ?? '0') + 'cm',
-            '--umo-page-margin-bottom':
-              (pageOptions.margin?.bottom ?? '0') + 'cm',
-            '--umo-page-margin-left': (pageOptions.margin?.left ?? '0') + 'cm',
-            '--umo-page-margin-right':
-              (pageOptions.margin?.right ?? '0') + 'cm',
-            '--umo-page-width': pageSize.width + 'cm',
-            '--umo-page-height': pageSize.height + 'cm',
-            width: pageSize.width + 'cm',
-            transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
+            width: pageZoomWidth,
+            height: pageZoomHeight,
           }"
         >
-          <div class="umo-page-node-header" contenteditable="false">
-            <div
-              class="umo-page-corner corner-tl"
-              style="width: var(--umo-page-margin-left)"
-            ></div>
+          <t-watermark
+            class="umo-page-content"
+            ref="pageContentRef"
+            :alpha="pageOptions.watermark.alpha"
+            v-bind="watermarkOptions"
+            :watermark-content="pageOptions.watermark"
+            :style="{
+              '--umo-page-background': pageOptions.background,
+              '--umo-page-margin-top': (pageOptions.margin?.top ?? '0') + 'cm',
+              '--umo-page-margin-bottom':
+                (pageOptions.margin?.bottom ?? '0') + 'cm',
+              '--umo-page-margin-left':
+                (pageOptions.margin?.left ?? '0') + 'cm',
+              '--umo-page-margin-right':
+                (pageOptions.margin?.right ?? '0') + 'cm',
+              '--umo-page-width': pageSize.width + 'cm',
+              '--umo-page-height': pageSize.height + 'cm',
+              width: pageSize.width + 'cm',
+              transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
+            }"
+          >
+            <div class="umo-page-node-header" contenteditable="false">
+              <div
+                class="umo-page-corner corner-tl"
+                style="width: var(--umo-page-margin-left)"
+              ></div>
 
-            <div class="umo-page-node-header-content"></div>
-            <div
-              class="umo-page-corner corner-tr"
-              style="width: var(--umo-page-margin-right)"
-            ></div>
-          </div>
-          <div class="umo-page-node-content" ref="umoPageNodeContentRef">
-            <editor>
-              <template #bubble_menu="props">
-                <slot name="bubble_menu" v-bind="props" />
-              </template>
-            </editor>
-          </div>
-          <div class="umo-page-node-footer" contenteditable="false">
-            <div
-              class="umo-page-corner corner-bl"
-              style="width: var(--umo-page-margin-left)"
-            ></div>
-            <div class="umo-page-node-footer-content"></div>
-            <div
-              class="umo-page-corner corner-br"
-              style="width: var(--umo-page-margin-right)"
-            ></div>
-          </div>
-        </t-watermark>
+              <div class="umo-page-node-header-content"></div>
+              <div
+                class="umo-page-corner corner-tr"
+                style="width: var(--umo-page-margin-right)"
+              ></div>
+            </div>
+            <div class="umo-page-node-content" ref="umoPageNodeContentRef">
+              <editor>
+                <template #bubble_menu="props">
+                  <slot name="bubble_menu" v-bind="props" />
+                </template>
+              </editor>
+            </div>
+            <div class="umo-page-node-footer" contenteditable="false">
+              <div
+                class="umo-page-corner corner-bl"
+                style="width: var(--umo-page-margin-left)"
+              ></div>
+              <div class="umo-page-node-footer-content"></div>
+              <div
+                class="umo-page-corner corner-br"
+                style="width: var(--umo-page-margin-right)"
+              ></div>
+            </div>
+          </t-watermark>
+        </div>
       </div>
-    </div>
 
     <!--  右侧   -->
-    <div
-      :class="[`umo-page-right-slot`, pageOptions.showRightSlot && `is-show`]"
-    >
-      <section v-show="pageOptions.showRightSlot">
-        <slot name="page-right"></slot>
-      </section>
-    </div>
+    <transition name="slide-left" appear>
+      <div
+        v-show="pageOptions.showRightSlot"
+        :class="[`umo-page-right-slot`, pageOptions.showRightSlot && `is-show`]"
+      >
+        <section>
+          <slot name="page-right"></slot>
+        </section>
+      </div>
+    </transition>
 
     <t-image-viewer
       v-model:visible="imageViewer.visible"
@@ -375,12 +381,49 @@ watch(
     width: clamp(
       var(--right-aside-width),
       calc(
-        var(--layout-width) - var(--left-aside-width) - var(--padding-left) *
-          2 - var(--editor-width) - 8px
+        var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
+          var(--editor-width) - 8px
       ),
       400px
     );
   }
+}
+
+
+.common-transition-active {
+  transition:
+    transform 0.25s cubic-bezier(0.645, 0.045, 0.355, 1),
+    opacity 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.slide-top-leave-active,
+.slide-top-enter-active {
+  .common-transition-active;
+}
+.slide-top-enter-from {
+  position: relative;
+  opacity: 0;
+  transform: translateY(60px);
+}
+
+.slide-right-leave-active,
+.slide-right-enter-active {
+  .common-transition-active;
+}
+.slide-right-enter-from {
+  position: relative;
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+.slide-left-leave-active,
+.slide-left-enter-active {
+  .common-transition-active;
+}
+.slide-left-enter-from {
+  position: relative;
+  opacity: 0;
+  transform: translateX(60px);
 }
 </style>
 

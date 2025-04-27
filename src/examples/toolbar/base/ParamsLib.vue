@@ -32,22 +32,16 @@ onMounted(() => {})
 
 /* 暴露 */
 defineExpose({
-  $: proxy.$
+  $: proxy.$,
 })
 </script>
 
 <!--render-->
 <template>
-  <menus-button
-    text="参数库"
-    ico="params-lib"
-    :disabled="editor?.isEmpty"
-    huge
-    @menu-click="onClick"
-  >
+  <!-- editor?.isEmpty -->
+  <menus-button text="参数库" ico="params-lib" huge @menu-click="onClick">
   </menus-button>
 </template>
 
 <!--style-->
-<style scoped lang="less">
-</style>
+<style scoped lang="less"></style>

@@ -17,6 +17,7 @@ class HeadingNode extends InvisibleNode {
 const breakMarks = InvisibleCharacters.configure({
   injectCSS: false,
   builders: [new HardBreakNode(), new ParagraphNode(), new HeadingNode()],
+  // builders: [new HardBreakNode(), new ParagraphNode(), new HeadingNode()],
 })
 
 export default breakMarks

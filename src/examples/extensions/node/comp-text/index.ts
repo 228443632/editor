@@ -57,6 +57,11 @@ export default Node.create({
         default: '',
       },
 
+      /** 边框类型*/
+      borderType: {
+        default: 'underline', // 下划线，可选值：underline solid dashed
+      },
+
       /** 字段名称 */
       fieldName: {
         default: 'name',
@@ -88,7 +93,7 @@ export default Node.create({
     return [
       'span',
       mergeAttributes(HTMLAttributes, {
-        'data-placeholder': HTMLAttributes.placeholder,
+        'data-placeholder': HTMLAttributes.placeholder
       }),
       [
         'text', // 占位符

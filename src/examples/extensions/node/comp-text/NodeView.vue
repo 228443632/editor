@@ -8,6 +8,7 @@
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
+import { commonUtil } from '@/examples/utils/common-util'
 
 import { simpleUUID } from '@/utils/short-id'
 
@@ -28,6 +29,26 @@ const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
+const dict = {
+  borderType: [
+    {
+      key: 'underline',
+      label: '下划线',
+      style: 'border-bottom: 1px solid currentColor',
+    },
+    {
+      key: 'solid',
+      label: '边框',
+      style: 'border: 1px solid currentColor',
+    },
+    // {
+    //   key: 'dash',
+    //   label: '边框虚线',
+    //   style: 'border: 1px dashed var(--umo-node-text-border-color)',
+    // },
+    { key: 'none', label: '无边框' },
+  ],
+}
 
 /* 方法 */
 
@@ -57,6 +78,13 @@ async function onConfirm() {
 function onClose() {
   visible.dialog = false
   setBubbleMenuShow(true)
+}
+
+function onVisibleChange(popupVisible) {
+  console.log('popupVisible', popupVisible)
+  if (!popupVisible) {
+    onConfirm()
+  }
 }
 
 /**
@@ -94,72 +122,114 @@ defineExpose({
 <template>
   <node-view-wrapper
     as="span"
-    class="form-comp--text is-inline-block"
+    :class="[
+      `form-comp--text is-inline-block`,
+      `form-comp-border--${props.node?.attrs?.borderType}`,
+    ]"
     contenteditable="false"
     :data-placeholder="props?.node?.attrs?.placeholder"
     @click="onSelectNode"
   >
-    <modal
-      :visible="visible.dialog"
-      icon="params-comp-text"
-      :header="`参数修改`"
-      width="480px"
-      @confirm="onConfirm"
-      @close="onClose"
+    <t-popup
+      v-model:visible="visible.dialog"
+      destroy-on-close
+      trigger="click"
+      :on-visible-change="onVisibleChange"
+      width="fit-content"
     >
-      <t-form ref="formRef" :data="formData" :colon="true" label-align="top">
-        <t-form-item
-          label="名称"
-          name="placeholder"
-          required-mark
-          :rules="[{ required: true, message: '必填', type: 'error' }]"
+      <span></span>
+      <template #content>
+        <div
+          class="umo-scrollbar max-h-320px overscroll-contain box-shadow: var(--td-shadow-2) w-310px px-16px py-8px"
         >
-          <t-input
-            v-model="formData.placeholder"
-            placeholder="请输入内容"
-            maxlength="50"
-            clearable
-          ></t-input>
-        </t-form-item>
+          <t-form
+            ref="formRef"
+            :data="formData"
+            :colon="true"
+            label-align="top"
+            :style="{
+              '--td-comp-margin-xxl': '16px',
+            }"
+          >
+            <t-form-item
+              label="名称"
+              name="placeholder"
+              required-mark
+              :rules="[{ required: true, message: '必填', type: 'error' }]"
+            >
+              <t-input
+                v-model="formData.placeholder"
+                placeholder="请输入内容"
+                maxlength="50"
+                clearable
+              ></t-input>
+            </t-form-item>
 
-        <t-form-item
-          label="后台映射字段名"
-          name="fieldName"
-          required-mark
-          :rules="[{ required: true, message: '必填', type: 'error' }]"
-        >
-          <t-input
-            v-model="formData.fieldName"
-            placeholder="请输入字母数字或下划线"
-            maxlength="300"
-            clearable
-          ></t-input>
-        </t-form-item>
+            <t-form-item
+              label="后台映射字段名"
+              name="fieldName"
+              required-mark
+              :rules="[{ required: true, message: '必填', type: 'error' }]"
+            >
+              <t-input
+                v-model="formData.fieldName"
+                placeholder="请输入字母数字或下划线"
+                maxlength="300"
+                clearable
+              ></t-input>
+            </t-form-item>
 
-        <t-form-item label="默认值" name="name">
-          <t-input
-            v-model="formData.defaultValue"
-            placeholder="请输入默认值"
-            maxlength="300"
-            clearable
-          ></t-input>
-        </t-form-item>
+            <t-form-item label="外观" name="borderType">
+              <t-radio-group v-model="formData.borderType">
+                <t-radio
+                  v-for="(item, index) in dict.borderType"
+                  :value="item.key"
+                  :key="index"
+                  class="ml-4px"
+                >
+                  <span :style="item.style" class="-ml-2px px-2px">
+                    {{ item.label }}
+                  </span>
+                </t-radio>
+              </t-radio-group>
+            </t-form-item>
 
-        <t-form-item label="填写说明" name="desc">
-          <t-textarea
-            v-model="formData.desc"
-            placeholder="请输入填写说明(最多可输入100字)"
-            maxlength="100"
-            clearable
-          ></t-textarea>
-        </t-form-item>
-      </t-form>
-    </modal>
+            <t-form-item label="默认值" name="name">
+              <t-input
+                v-model="formData.defaultValue"
+                placeholder="请输入默认值"
+                maxlength="300"
+                clearable
+              ></t-input>
+            </t-form-item>
+
+            <t-form-item label="填写说明" name="desc">
+              <t-textarea
+                v-model="formData.desc"
+                placeholder="请输入填写说明(最多可输入100字)"
+                maxlength="100"
+                clearable
+              ></t-textarea>
+            </t-form-item>
+          </t-form>
+        </div>
+      </template>
+    </t-popup>
+    <!--    <modal-->
+    <!--      :visible="visible.dialog"-->
+    <!--      icon="params-comp-text"-->
+    <!--      :header="`参数修改`"-->
+    <!--      width="480px"-->
+    <!--      @confirm="onConfirm"-->
+    <!--      @close="onClose"-->
+    <!--    >-->
+    <!--    </modal>-->
   </node-view-wrapper>
 </template>
 
 <!--style-->
 <style lang="less">
+@border-color: var(--umo-node-text-border-color);
 .form-comp--text {
   position: relative;
   box-sizing: border-box;
@@ -167,7 +237,7 @@ defineExpose({
   min-height: 24px;
   text-align: left;
   border: 1px solid transparent;
-  border-bottom: 1px solid #cdd0d8;
+  border-bottom: 1px solid @border-color;
   padding: 0 2px;
   cursor: pointer;
   border-radius: 2px;
@@ -182,6 +252,34 @@ defineExpose({
     font-size: 14px;
     color: #9ba3b0;
     content: attr(data-placeholder);
+  }
+}
+
+.form-comp-border--underline {
+  border-bottom: 1px solid @border-color;
+}
+.form-comp-border--solid {
+  border: 1px solid @border-color;
+}
+.form-comp-border--dashed {
+  border: 1px dashed @border-color;
+}
+.form-comp-border--none {
+  border: 1px dashed transparent;
+}
+
+/*render node*/
+span[data-id][iscompparams] {
+  &[bordertype='underline'] {
+    border-bottom: 1px solid #333;
+  }
+
+  &[bordertype='solid'] {
+    border: 1px solid #333;
+  }
+
+  &[bordertype='dashed'] {
+    border: 1px dashed #333;
   }
 }
 </style>

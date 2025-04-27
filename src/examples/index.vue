@@ -74,8 +74,7 @@ const options = $ref(
       document: {
         title: '合同低码平台',
         content:
-          localStorage.getItem('document.content') ??
-          '<p data-id="a99806c5f14e13b90a1d">2234243测试文档<span nodeid="1e7968a2c380aeffc764" placeholder="普通文本2" fieldname="name" data-comp-is="text" data-placeholder="普通文本2"><text class="hidden">${name}</text></span><span nodeid="16cd3c0a1b5a9c7de8bb" placeholder="普通文本3" fieldname="name" data-comp-is="text" data-placeholder="普通文本3"><text class="hidden">${name}</text></span><span nodeid="950efc7c23640bc1bbc2" placeholder="普通文本1" fieldname="name" data-comp-is="text" data-placeholder="普通文本1"><text class="hidden">${name}</text></span>234242年什么饭呢什么饭</p><p data-id="743f142b2d58fdc6b4b5"></p><p data-id="bc646db6aa0ab9037534"><span nodeid="ffd8f1a92c8488a6fb86" placeholder="普通文本4" fieldname="name" data-comp-is="text" data-placeholder="普通文本4"><text class="hidden">${name}</text></span></p><p data-id="ec6f114f38aca3358143"><span nodeid="af11fbfc77290caa3abf" placeholder="普通文本5" fieldname="name" data-comp-is="text" data-placeholder="普通文本5"><text class="hidden">${name}</text></span></p><p data-id="7db73bd16aef3fa686a1"><span nodeid="2ed5df2171b11787c09e" placeholder="普通文本6" fieldname="name" data-comp-is="text" data-placeholder="普通文本6"><text class="hidden">${name}</text></span></p><p data-id="8bca669eed645608107e"><span nodeid="a11035760e718c5a3ff3" placeholder="普通文本7" fieldname="name" data-comp-is="text" data-placeholder="普通文本7"><text class="hidden">${name}</text></span></p><p data-id="6dc6277f048703eab075"><span nodeid="f1f4c3710d75f4cf9d25" placeholder="普通文本8" fieldname="name" data-comp-is="text" data-placeholder="普通文本8"><text class="hidden">${name}</text></span></p><p data-id="ccb715ba53fd77ce00ea"><span nodeid="6b61e84782a475d42f75" placeholder="普通文本9" fieldname="name" data-comp-is="text" data-placeholder="普通文本9"><text class="hidden">${name}</text></span></p><p data-id="85c6b78fc00a78537b7d"><span nodeid="afd276ba5bab2f449a34" placeholder="普通文本10" fieldname="name" data-comp-is="text" data-placeholder="普通文本10"><text class="hidden">${name}</text></span></p><p data-id="e5a161ec0041024d2a02"><span nodeid="744f64615d9cca1461bf" placeholder="普通文本11" fieldname="name" data-comp-is="text" data-placeholder="普通文本11"><text class="hidden">${name}</text></span></p><p data-id="66ab3ba5bbbd47b48017"><span nodeid="444217019d0aa55b86a5" placeholder="普通文本12" fieldname="name" data-comp-is="text" data-placeholder="普通文本12"><text class="hidden">${name}</text></span></p><p data-id="49486046f563ffc32daf"><span nodeid="c631a8c034f171796f33" placeholder="普通文本13" fieldname="name" data-comp-is="text" data-placeholder="普通文本13"><text class="hidden">${name}</text></span></p>',
+          localStorage.getItem('document.content') ?? '',
         /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
         editorProps: {
           // handleDrop(
@@ -88,7 +87,7 @@ const options = $ref(
         },
       },
       page: {
-        showRightSlot: false,
+        showRightSlot: true,
         showBookmark: false,
         watermark: {
           text: '开发环境' + '127.0.0.1',
@@ -174,7 +173,6 @@ onMounted(() => {
   console.log('editorRef', editorRef)
   // @ts-expect-error
   window.editor = editorRef
-  setTimeout(() => (options.page.showRightSlot = true), 500)
 })
 </script>
 
