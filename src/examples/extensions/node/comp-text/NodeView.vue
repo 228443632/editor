@@ -98,6 +98,8 @@ function setBubbleMenuShow(isShow = true) {
 
 /* 计算 */
 
+const _attributes = computed(() => props.node?.attrs)
+
 /* 监听 */
 
 /* 周期 */
@@ -126,13 +128,14 @@ defineExpose({
       `form-comp--text is-inline-block`,
       `form-comp-border--${props.node?.attrs?.borderType}`,
     ]"
+    :data-id="_attributes['data-id']"
     contenteditable="false"
     :data-placeholder="props?.node?.attrs?.placeholder"
     @click="onSelectNode"
   >
     <t-popup
       v-model:visible="visible.dialog"
-      destroy-on-close
+      :destroy-on-close="false"
       trigger="click"
       :on-visible-change="onVisibleChange"
       width="fit-content"

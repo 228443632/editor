@@ -211,6 +211,15 @@ export default Node.create({
   onTransaction({ editor, transaction }) {
     transaction.steps.forEach((step: any) => {
       if (step instanceof ReplaceStep && step.slice.size === 0) {
+        // fix
+        if (
+          !transaction.before?.content ||
+          step.from < 0 ||
+          step.to > transaction.before.content.size ||
+          step.from >= step.to
+        )
+          return
+
         // 使用事务前的文档状态来获取被删除的节点
         const deletedNodes = transaction.before.content.cut(step.from, step.to)
         const { options } = editor.storage

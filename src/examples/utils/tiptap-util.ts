@@ -4,7 +4,7 @@
  * @create 24/04/25 PM3:24
  */
 import type { Editor } from '@tiptap/core'
-import type { Node } from 'prosemirror-model'
+import type { Node, Fragment } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
 
 type TPosAtNodeOption = { key: string }
@@ -178,4 +178,28 @@ export const tiptapUtil = {
 
     return true
   },
+
+  /**
+   * 编辑node节点
+   * @param editor
+   * @param callback
+   */
+  descendants(
+    editor: Editor,
+    callback: Parameters<typeof Fragment.prototype.descendants>[0],
+  ) {
+    editor.state.doc.descendants(callback)
+  },
+
+
+  /**
+   * 根据 跳转查询 dom
+   * @param editor
+   * @param nodeTypeName
+   * @param attributes
+   */
+  domAtCondition(editor: Editor, nodeTypeName: string, attributes?: Record<string, any>) {
+    const nodePos = editor.$node(nodeTypeName, attributes)
+    return editor.view.domAtPos(nodePos.pos)
+  }
 }

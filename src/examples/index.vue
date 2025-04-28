@@ -39,6 +39,18 @@ import type { Editor } from '@tiptap/vue-3'
 // import type { Node as TNode } from 'prosemirror-model'
 // import { Plugin } from 'prosemirror-state'
 
+// {
+//   doc: {...} // 顶级文档
+//   blockquote: {...} //<blockquote>
+//   code_block: {...} //<pre>
+//   hard_break: {...} //<br>
+//   heading: {...} //<h1>..<h6>
+//   horizontal_rule: {...} //<hr>
+//   image: {...} //<img>
+//   paragraph: {...} //<p>
+//   text: {...} //文本
+// }
+
 const editorRef = $ref(null)
 
 const nodeList = ref([])
@@ -90,7 +102,7 @@ const options = $ref(
         showRightSlot: true,
         showBookmark: false,
         watermark: {
-          text: '开发环境' + '127.0.0.1',
+          text: '开发环境 ' + window.location.host,
         },
         tocTabsOptions: [{ label: '参数', value: 'params' }],
       },
@@ -172,7 +184,7 @@ console.log('options', options)
 onMounted(() => {
   console.log('editorRef', editorRef)
   // @ts-expect-error
-  window.editor = editorRef
+  window.editor = editorRef.useEditor()
 })
 </script>
 

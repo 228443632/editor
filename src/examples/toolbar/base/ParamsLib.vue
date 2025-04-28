@@ -20,7 +20,7 @@ const page = inject('page')
  * 点击
  */
 function onClick() {
-  page.value.showRightSlot = true
+  page.value.showRightSlot = !page.value.showRightSlot
 }
 
 /* 计算 */

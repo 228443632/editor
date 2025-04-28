@@ -12,8 +12,9 @@ import { useEventListener } from '@vueuse/core'
 import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extension-drag-params'
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/examples/utils/css-util'
-import type { Editor } from '@tiptap/core'
-import { arrayToObj, blobSaveAs, deepClone } from 'sf-utils2'
+import { NodePos } from '@tiptap/vue-3'
+import { type Editor } from '@tiptap/core'
+import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue' // 表单数据填充
 
 const props = defineProps({})
@@ -45,18 +46,21 @@ const paramsConfig = ref([
         get attrs() {
           const compTexts = this.compTexts
           return {
+            'data-id': commonUtil.simpleUUID(),
             placeholder: `普通文本${compTexts.length + 1}`,
           }
         },
         click() {
+          const attrs = this.attrs
           editor.value
             .chain()
             .focus()
             .deleteSelection()
-            .setCompText({
-              ...this.attrs
-            })
+            .setCompText(attrs)
             .run()
+
+          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          targetDom?.click?.()
         },
       },
 
@@ -73,19 +77,22 @@ const paramsConfig = ref([
         get attrs() {
           const compTexts = this.compTexts
           return {
+            'data-id': commonUtil.simpleUUID(),
             fieldName: 'name',
             placeholder: `姓名${compTexts.length + 1}`,
           }
         },
         click() {
+          const attrs = this.attrs
           editor.value
             .chain()
             .focus()
             .deleteSelection()
-            .setCompText({
-              ...this.attrs
-            })
+            .setCompText(attrs)
             .run()
+
+          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          targetDom?.click?.()
         },
       },
 
@@ -102,22 +109,24 @@ const paramsConfig = ref([
         get attrs() {
           const compTexts = this.compTexts
           return {
+            'data-id': commonUtil.simpleUUID(),
             fieldName: 'mobile',
             placeholder: `手机号${compTexts.length + 1}`,
           }
         },
         click() {
+          const attrs = this.attrs
           editor.value
             .chain()
             .focus()
             .deleteSelection()
-            .setCompText({
-              ...this.attrs
-            })
+            .setCompText(attrs)
             .run()
+
+          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          targetDom?.click?.()
         },
       },
-
 
       {
         label: '身份证',
@@ -132,19 +141,22 @@ const paramsConfig = ref([
         get attrs() {
           const compTexts = this.compTexts
           return {
+            'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
             placeholder: `身份证${compTexts.length + 1}`,
           }
         },
         click() {
+          const attrs = this.attrs
           editor.value
             .chain()
             .focus()
             .deleteSelection()
-            .setCompText({
-              ...this.attrs
-            })
+            .setCompText(attrs)
             .run()
+
+          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          targetDom?.click?.()
         },
       },
     ],
@@ -335,6 +347,20 @@ const dragMethod = {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move' // 设置为移动操作
   },
+
+  drop(e: DragEvent) {
+    const nodeData = (parseJsonNoError(
+      e.dataTransfer?.getData('text/plain'),
+    ) || {}) as IDragNodeParamsNode
+
+    console.log('targetDom', nodeData)
+
+    const dataId = nodeData?.attrs?.['data-id']
+    if (nodeData.isCompParams) {
+      const targetDom = document.querySelector(`span[data-id="${dataId}"]`) as HTMLHtmlElement
+      targetDom?.click?.()
+    }
+  }
 }
 
 /* 计算 */
@@ -347,6 +373,7 @@ onMounted(() => {
 
   useEventListener(target, 'dragover', dragMethod.dragover)
   useEventListener(target, 'dragenter', dragMethod.dragenter)
+  useEventListener(target, 'drop', dragMethod.drop)
 })
 
 /* 暴露 */
