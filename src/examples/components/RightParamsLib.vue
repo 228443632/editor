@@ -12,7 +12,6 @@ import { useEventListener } from '@vueuse/core'
 import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extension-drag-params'
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/examples/utils/css-util'
-import { NodePos } from '@tiptap/vue-3'
 import { type Editor } from '@tiptap/core'
 import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue' // 表单数据填充
@@ -47,7 +46,8 @@ const paramsConfig = ref([
           const compTexts = this.compTexts
           return {
             'data-id': commonUtil.simpleUUID(),
-            placeholder: `普通文本${compTexts.length + 1}`,
+            // placeholder: `普通文本${compTexts.length + 1}`,
+            placeholder: `普通文本`,
           }
         },
         click() {
@@ -59,7 +59,9 @@ const paramsConfig = ref([
             .setCompText(attrs)
             .run()
 
-          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          const targetDom = document.querySelector(
+            `span[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
           targetDom?.click?.()
         },
       },
@@ -79,7 +81,8 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'name',
-            placeholder: `姓名${compTexts.length + 1}`,
+            // placeholder: `姓名${compTexts.length + 1}`,
+            placeholder: `姓名`,
           }
         },
         click() {
@@ -91,7 +94,9 @@ const paramsConfig = ref([
             .setCompText(attrs)
             .run()
 
-          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          const targetDom = document.querySelector(
+            `span[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
           targetDom?.click?.()
         },
       },
@@ -111,7 +116,8 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'mobile',
-            placeholder: `手机号${compTexts.length + 1}`,
+            // placeholder: `手机号${compTexts.length + 1}`,
+            placeholder: `手机号`,
           }
         },
         click() {
@@ -123,7 +129,9 @@ const paramsConfig = ref([
             .setCompText(attrs)
             .run()
 
-          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          const targetDom = document.querySelector(
+            `span[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
           targetDom?.click?.()
         },
       },
@@ -143,7 +151,8 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
-            placeholder: `身份证${compTexts.length + 1}`,
+            // placeholder: `身份证${compTexts.length + 1}`,
+            placeholder: `身份证`,
           }
         },
         click() {
@@ -155,7 +164,9 @@ const paramsConfig = ref([
             .setCompText(attrs)
             .run()
 
-          const targetDom = document.querySelector(`span[data-id="${attrs['data-id']}"]`) as HTMLHtmlElement
+          const targetDom = document.querySelector(
+            `span[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
           targetDom?.click?.()
         },
       },
@@ -230,6 +241,12 @@ const paramsConfig = ref([
         value: '模拟数据填充',
         icon: 'edit',
         click() {
+          const mockJson = {
+            name: '张三',
+            mobile: '19166662333', //
+            idcard: '341210199909091010', //
+          }
+
           fillFormParamsAERef.value.visible.dialog = true
           nextTick(() => {
             const data = deepClone(
@@ -248,7 +265,7 @@ const paramsConfig = ref([
                   .map((cItem) => cItem.placeholder)
                   .join('，')
                 const dot = index == list.length - 1 ? '' : ','
-                return `  ${key}: ''${dot} // ${comment}`
+                return `  ${key}: '${mockJson[key] || ''}'${dot} // ${comment}`
               })
               .join('\n')
             fillFormParamsAERef.value.formData.configValue = [
@@ -349,18 +366,19 @@ const dragMethod = {
   },
 
   drop(e: DragEvent) {
-    const nodeData = (parseJsonNoError(
-      e.dataTransfer?.getData('text/plain'),
-    ) || {}) as IDragNodeParamsNode
+    const nodeData = (parseJsonNoError(e.dataTransfer?.getData('text/plain')) ||
+      {}) as IDragNodeParamsNode
 
     console.log('targetDom', nodeData)
 
     const dataId = nodeData?.attrs?.['data-id']
     if (nodeData.isCompParams) {
-      const targetDom = document.querySelector(`span[data-id="${dataId}"]`) as HTMLHtmlElement
+      const targetDom = document.querySelector(
+        `span[data-id="${dataId}"]`,
+      ) as HTMLHtmlElement
       targetDom?.click?.()
     }
-  }
+  },
 }
 
 /* 计算 */

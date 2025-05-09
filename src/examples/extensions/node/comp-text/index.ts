@@ -86,14 +86,14 @@ export default Node.create({
 
   // 解析规则（从HTML到编辑器节点） , getAttrs() {}
   parseHTML() {
-    return [{ tag: `span[name="${NAME}"][data-id][iscompparams][xxx]` }]
+    return [{ tag: `span[name="${NAME}"][data-id][iscompparams]` }]
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
       'span',
       mergeAttributes(HTMLAttributes, {
-        'data-placeholder': HTMLAttributes.placeholder
+        'data-placeholder': HTMLAttributes.placeholder,
       }),
       [
         'text', // 占位符

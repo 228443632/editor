@@ -123,6 +123,7 @@ defineExpose({
 <!--render-->
 <template>
   <node-view-wrapper
+    v-bind="props.node?.attrs"
     as="span"
     :class="[
       `form-comp--text is-inline-block`,

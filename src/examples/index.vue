@@ -34,6 +34,7 @@ import { debounce } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
+import { template01 } from '@/examples/template/demo01'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -85,8 +86,7 @@ const options = $ref(
       },
       document: {
         title: '合同低码平台',
-        content:
-          localStorage.getItem('document.content') ?? '',
+        content: localStorage.getItem('document.content') ?? template01,
         /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
         editorProps: {
           // handleDrop(
@@ -102,7 +102,7 @@ const options = $ref(
         showRightSlot: true,
         showBookmark: false,
         watermark: {
-          text: '开发环境 ' + window.location.host,
+          text: `开发环境 ${window.location.host}`,
         },
         tocTabsOptions: [{ label: '参数', value: 'params' }],
       },
