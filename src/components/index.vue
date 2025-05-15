@@ -99,6 +99,7 @@ import type {
   SupportedLocale,
   WatermarkOption,
 } from '@/types'
+import { contentTransform } from '@/utils/content-transform'
 import { consoleCopyright } from '@/utils/copyright'
 import { getOpitons } from '@/utils/options'
 import { shortId } from '@/utils/short-id'
@@ -550,11 +551,12 @@ const setPage = (params: {
       throw new Error('"params.size" must be a string.')
     }
     const size = options.value.dicts?.pageSizes.find(
-      (item: any) => item.label === params.size,
+      (item: any) =>
+        item.label === params.size || l(item.label) === params.size,
     )
     if (!size) {
       throw new Error(
-        `"params.size" must be one of ${options.value.dicts?.pageSizes.map((item: any) => item.label)}.`,
+        `"params.size" must be one of ${options.value.dicts?.pageSizes.map((item: any) => l(item.label))}.`,
       )
     }
     page.value.size = size
@@ -708,9 +710,10 @@ const setContent = (
   if (!editor.value) {
     throw new Error('editor is not ready!')
   }
+  const doc = contentTransform(content)
   editor.value
     .chain()
-    .setContent(content, options.emitUpdate)
+    .setContent(doc, options.emitUpdate)
     .focus(options.focusPosition as FocusPosition, options.focusOptions)
     .run()
 }
@@ -727,9 +730,10 @@ const insertContent = (
   if (!editor.value) {
     throw new Error('editor is not ready!')
   }
+  const doc = contentTransform(content)
   editor.value
     .chain()
-    .insertContent(content, { updateSelection: options.updateSelection })
+    .insertContent(doc, { updateSelection: options.updateSelection })
     .focus(options.focusPosition as FocusPosition, options.focusOptions)
     .run()
 }

@@ -115,3 +115,27 @@ export function getSelectionText(editor: Editor) {
   }
   return editor.state.doc.textBetween(from, to, '')
 }
+
+// 设置选中区域 包含选中效果
+export function setSelectionText(
+  editor: Editor,
+  prevDocLength: number,
+  from: number,
+  to: number,
+) {
+  const state = editor?.state
+  // 计算新的文档长度
+  const newDocLength = state.doc.content.size
+  // 计算插入内容后的实际结束位置
+  const newTo = to + (newDocLength - prevDocLength)
+  if (newTo <= from) {
+    return false
+  }
+  const selection = TextSelection.create(state.doc, from, newTo)
+  const { tr } = editor.view.state
+  if (tr && selection) {
+    tr.setSelection(selection)
+    editor.view.dispatch(tr)
+    editor?.commands.focus()
+  }
+}
