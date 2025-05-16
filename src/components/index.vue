@@ -192,6 +192,15 @@ const layoutDom = ref({
 const destroyed = ref(false)
 const tocActive = ref('dir') // 目录选中值
 
+const getWholeHtml = ref<
+  (
+    styles?: string[] | string,
+    extension?: {
+      isReadSelfHtmlStyleTag: boolean
+    },
+  ) => string
+>()
+
 provide('container', container)
 provide('options', options)
 provide('editor', editor)
@@ -210,6 +219,7 @@ provide('destroyed', destroyed)
 provide('layoutSize', layoutSize)
 provide('layoutDom', layoutDom)
 provide('tocActive', tocActive)
+provide('getWholeHtml', getWholeHtml)
 
 watch(layoutWidth, (val: number) => {
   layoutSize.value.layoutWidth = val
@@ -795,7 +805,9 @@ const getImage = async (format: 'blob' | 'jpeg' | 'png' = 'blob') => {
   const { zoomLevel } = page.value
   try {
     page.value.zoomLevel = 100
-    const node = document.querySelector(`${container} .umo-page-content`) as HTMLElement
+    const node = document.querySelector(
+      `${container} .umo-page-content`,
+    ) as HTMLElement
     if (format === 'blob') {
       return await toBlob(node)
     }
@@ -1103,6 +1115,10 @@ defineExpose({
   // feat
   layoutDom,
   layoutSize,
+  /**
+   * 获取整个html内容
+   */
+  getWholeHtml,
 })
 </script>
 

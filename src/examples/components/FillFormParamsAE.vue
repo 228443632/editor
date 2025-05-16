@@ -9,6 +9,7 @@
 import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
 import type { TableProps, TableRowData } from 'tdesign-vue-next'
 import Print from './Print.vue'
+import { saveAs } from 'file-saver'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -54,6 +55,24 @@ function onPreview() {
   printRef.value.printPage(fillFieldData)
 }
 
+/**
+ * 导出html
+ */
+function onDownHtml() {
+  let fillFieldData = {}
+  try {
+    fillFieldData = eval(`(${formData.value.configValue})`)
+  } catch (e) {
+    useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
+    return
+  }
+  const html = printRef.value.getIframeCode(fillFieldData)
+  const blob = new Blob([html], {
+    type: 'text/html;charset=utf-8',
+  })
+  const filename = '低码合同测试'
+  saveAs(blob, `${filename}.html`)
+}
 /* 计算 */
 
 /* 监听 */
@@ -114,6 +133,7 @@ defineExpose({
       <div class="flex items-center justify-end">
         <t-button theme="default" @click="onClose">取消</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
+        <t-button theme="primary" @click="onDownHtml">导出html</t-button>
       </div>
     </template>
     <Print ref="printRef"></Print>

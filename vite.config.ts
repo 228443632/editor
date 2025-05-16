@@ -14,8 +14,6 @@ import copyright from './src/utils/copyright'
 const IS_PRO = process.env.NODE_ENV === 'production'
 
 export default defineConfig(({ mode }) => {
-  console.log('mode', mode)
-
   const isLib = mode === 'lib'
 
   // Plugin configurations
@@ -59,8 +57,9 @@ export default defineConfig(({ mode }) => {
       output: [
         {
           banner: copyright,
-          intro: `import './style.css'`,
+          intro: `import './umo-editor.css'`,
           format: 'es' as const,
+          assetFileNames: () => 'umo-editor.css',
         },
       ],
       external: [

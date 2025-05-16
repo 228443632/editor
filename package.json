@@ -3,6 +3,7 @@
   "version": "6.1.1",
   "scripts": {
     "build:lib": "vue-tsc --noEmit && vite build --mode lib",
+    "build:lib-css": "vite build -c vite.config.lib-css.ts",
     "build": "vite build --mode dev",
     "build:upload": "npm run build && npx jiti ./build/upload.cjs",
     "dev": "vite --port 9000 --open --force",

@@ -3,12 +3,15 @@
 </template>
 
 <script setup lang="ts">
+import { isString } from 'sf-utils2'
+
 const container = inject('container')
 const editor = inject('editor')
 const printing = inject('printing')
 const exportFile = inject('exportFile')
 const page = inject('page')
 const options = inject('options')
+const getWholeHtml = inject('getWholeHtml')
 
 const iframeRef = $ref<HTMLIFrameElement | null>(null)
 let iframeCode = $ref('')
@@ -64,8 +67,18 @@ const defaultLineHeight = $computed(
     )?.value,
 )
 
-const getIframeCode = () => {
+const getIframeCode = (
+  styles?: string[] | string,
+  extension?: {
+    isReadSelfHtmlStyleTag: boolean
+  },
+) => {
   const { orientation, size, margin, background } = page.value
+
+  const isReadSelfHtmlStyleTag = extension?.isReadSelfHtmlStyleTag ?? true
+  let styleString: string
+  if (Array.isArray(styles)) styleString = styles.join('\n')
+  else if (typeof styles === 'string' && isString(styles)) styleString = styles
 
   // const fragment = document.createDocumentFragment()
   // fragment.append(getContentHtml())
@@ -80,8 +93,6 @@ const getIframeCode = () => {
 
   editorDom.innerHTML = editor.value.getHTML()
 
-  console.log(doc, doc.body.innerHTML)
-
   /* eslint-disable */
   return `
     <!DOCTYPE html>
@@ -90,36 +101,37 @@ const getIframeCode = () => {
       <title>${options.value.document?.title}</title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      ${getStylesHtml()}
+      ${isReadSelfHtmlStyleTag && getStylesHtml()}
       <style>
-      html{
-        margin: 0;
-        padding: 0;
-        overflow: visible;
-      }
-      body{
-        margin: 0;
-        padding: 0;
-        background-color: ${background};
-        -webkit-print-color-adjust: exact;
-      }
-      .umo-page-content{
-        transform: scale(1) !important;
-        overflow: hidden;
-      }
-      @page {
-        size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
-        padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
-        margin: 0;
-      }
-      @page:first {
-        padding-top: 0;
-      }
-      @page:last {
-        padding-bottom: 0;
-        page-break-after: avoid;
-      }
+        html{
+          margin: 0;
+          padding: 0;
+          overflow: visible;
+        }
+        body{
+          margin: 0;
+          padding: 0;
+          background-color: ${background};
+          -webkit-print-color-adjust: exact;
+        }
+        .umo-page-content{
+          transform: scale(1) !important;
+          overflow: hidden;
+        }
+        @page {
+          size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
+          padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
+          margin: 0;
+        }
+        @page:first {
+          padding-top: 0;
+        }
+        @page:last {
+          padding-bottom: 0;
+          page-break-after: avoid;
+        }
       </style>
+      <style>${styleString}</style>
     </head>
     <body class="is-print preview">
       <div id="sprite-plyr" style="display: none;">
@@ -149,6 +161,7 @@ const getIframeCode = () => {
     </html>`
   /* eslint-enable */
 }
+getWholeHtml.value = getIframeCode
 
 const printPage = () => {
   const key = `umo-print-page#read`

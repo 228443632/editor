@@ -3,6 +3,8 @@
 </template>
 
 <script setup lang="ts">
+import umoEditorPureCss from '@/examples/style/umo-editor-pure.css?raw'
+
 const container = inject('container')
 const editor = inject('editor')
 const printing = inject('printing')
@@ -91,7 +93,7 @@ const getIframeCode = (fillFieldData = {}) => {
       <title>${options.value.document?.title}</title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      ${getStylesHtml()}
+      <style>${umoEditorPureCss}</style>
       <style>
       html{
         margin: 0;
@@ -169,6 +171,10 @@ const printPage = (fillFieldData = {}) => {
     onConfirm() {
       dialog.destroy()
       setTimeout(() => {
+        console.log(
+          'debug-172',
+          iframeRef.contentWindow.document.documentElement.outerHTML,
+        )
         iframeRef?.contentWindow?.print()
       }, 300)
     },
@@ -181,6 +187,7 @@ const printPage = (fillFieldData = {}) => {
 
 defineExpose({
   printPage,
+  getIframeCode
 })
 </script>
 

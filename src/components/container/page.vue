@@ -14,70 +14,69 @@
 
     <!--  中间内容  -->
     <div
-        ref="zoomableContainerRef"
-        class="umo-zoomable-container umo-scrollbar"
+      ref="zoomableContainerRef"
+      class="umo-zoomable-container umo-scrollbar"
+    >
+      <div
+        class="umo-zoomable-content"
+        :style="{
+          width: pageZoomWidth,
+          height: pageZoomHeight,
+        }"
       >
-        <div
-          class="umo-zoomable-content"
+        <t-watermark
+          ref="pageContentRef"
+          class="umo-page-content"
+          :alpha="pageOptions.watermark.alpha"
+          v-bind="watermarkOptions"
+          :watermark-content="pageOptions.watermark"
           :style="{
-            width: pageZoomWidth,
-            height: pageZoomHeight,
+            '--umo-page-background': pageOptions.background,
+            '--umo-page-margin-top': (pageOptions.margin?.top ?? '0') + 'cm',
+            '--umo-page-margin-bottom':
+              (pageOptions.margin?.bottom ?? '0') + 'cm',
+            '--umo-page-margin-left': (pageOptions.margin?.left ?? '0') + 'cm',
+            '--umo-page-margin-right':
+              (pageOptions.margin?.right ?? '0') + 'cm',
+            '--umo-page-width': pageSize.width + 'cm',
+            '--umo-page-height': pageSize.height + 'cm',
+            width: pageSize.width + 'cm',
+            transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
           }"
         >
-          <t-watermark
-            class="umo-page-content"
-            ref="pageContentRef"
-            :alpha="pageOptions.watermark.alpha"
-            v-bind="watermarkOptions"
-            :watermark-content="pageOptions.watermark"
-            :style="{
-              '--umo-page-background': pageOptions.background,
-              '--umo-page-margin-top': (pageOptions.margin?.top ?? '0') + 'cm',
-              '--umo-page-margin-bottom':
-                (pageOptions.margin?.bottom ?? '0') + 'cm',
-              '--umo-page-margin-left':
-                (pageOptions.margin?.left ?? '0') + 'cm',
-              '--umo-page-margin-right':
-                (pageOptions.margin?.right ?? '0') + 'cm',
-              '--umo-page-width': pageSize.width + 'cm',
-              '--umo-page-height': pageSize.height + 'cm',
-              width: pageSize.width + 'cm',
-              transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
-            }"
-          >
-            <div class="umo-page-node-header" contenteditable="false">
-              <div
-                class="umo-page-corner corner-tl"
-                style="width: var(--umo-page-margin-left)"
-              ></div>
+          <div class="umo-page-node-header" contenteditable="false">
+            <div
+              class="umo-page-corner corner-tl"
+              style="width: var(--umo-page-margin-left)"
+            ></div>
 
-              <div class="umo-page-node-header-content"></div>
-              <div
-                class="umo-page-corner corner-tr"
-                style="width: var(--umo-page-margin-right)"
-              ></div>
-            </div>
-            <div class="umo-page-node-content" ref="umoPageNodeContentRef">
-              <editor>
-                <template #bubble_menu="props">
-                  <slot name="bubble_menu" v-bind="props" />
-                </template>
-              </editor>
-            </div>
-            <div class="umo-page-node-footer" contenteditable="false">
-              <div
-                class="umo-page-corner corner-bl"
-                style="width: var(--umo-page-margin-left)"
-              ></div>
-              <div class="umo-page-node-footer-content"></div>
-              <div
-                class="umo-page-corner corner-br"
-                style="width: var(--umo-page-margin-right)"
-              ></div>
-            </div>
-          </t-watermark>
-        </div>
+            <div class="umo-page-node-header-content"></div>
+            <div
+              class="umo-page-corner corner-tr"
+              style="width: var(--umo-page-margin-right)"
+            ></div>
+          </div>
+          <div ref="umoPageNodeContentRef" class="umo-page-node-content">
+            <editor>
+              <template #bubble_menu="props">
+                <slot name="bubble_menu" v-bind="props" />
+              </template>
+            </editor>
+          </div>
+          <div class="umo-page-node-footer" contenteditable="false">
+            <div
+              class="umo-page-corner corner-bl"
+              style="width: var(--umo-page-margin-left)"
+            ></div>
+            <div class="umo-page-node-footer-content"></div>
+            <div
+              class="umo-page-corner corner-br"
+              style="width: var(--umo-page-margin-right)"
+            ></div>
+          </div>
+        </t-watermark>
       </div>
+    </div>
 
     <!--  右侧   -->
     <transition name="slide-left" appear>
@@ -243,7 +242,7 @@ watch(
 )
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .umo-page-container {
   height: 100%;
   display: flex;
@@ -388,7 +387,6 @@ watch(
     );
   }
 }
-
 
 .common-transition-active {
   transition:
