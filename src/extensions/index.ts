@@ -155,13 +155,13 @@ export const getDefaultExtensions = ({
     // 页面
     Toc,
     BreakMarks.configure({
-      visible: page.showBreakMarks,
+      visible: page?.showBreakMarks,
     }),
     PageBreak,
 
     // 其他
     Mention.configure({
-      suggestion: getUsersSuggestion(users ?? []),
+      suggestion: getUsersSuggestion(users ?? [], container),
     }),
     Selection,
     NodeRange,
