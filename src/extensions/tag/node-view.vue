@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper as="span" class="umo-node-tag">
+  <node-view-wrapper as="span" class="umo-node-tag" data-u="tag">
     <span
       class="umo-node-tag-text"
       :style="{
@@ -17,8 +17,8 @@ import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 const { node } = defineProps(nodeViewProps)
 </script>
 
-<style lang="less" scoped>
-.umo-node-tag {
+<style lang="less">
+.umo-node-tag[data-u='tag'] {
   margin: 0 0.2em;
   background-color: transparent !important;
   vertical-align: middle;

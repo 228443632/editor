@@ -1,6 +1,6 @@
 <template>
   <div v-if="!page.preview?.enabled" class="umo-status-bar">
-   <!-- 左侧  -->
+    <!-- 左侧  -->
     <div class="umo-status-bar-left">
       <tooltip :content="page.showToc ? t('toc.hide') : t('toc.show')">
         <t-button
@@ -255,7 +255,7 @@
         :class="{ active: page.preview?.laserPointer }"
         @click="
           page.preview &&
-          (page.preview.laserPointer = !page.preview.laserPointer)
+            (page.preview.laserPointer = !page.preview.laserPointer)
         "
       >
         <icon name="laser-pointer" />
@@ -633,8 +633,7 @@ watch(
   user-select: none;
   display: flex;
   background: var(--umo-color-white);
-  box-shadow:
-    var(--td-shadow-2), var(--td-shadow-inset-top),
+  box-shadow: var(--td-shadow-2), var(--td-shadow-inset-top),
     var(--td-shadow-inset-right), var(--td-shadow-inset-bottom),
     var(--td-shadow-inset-left);
   gap: 5px;

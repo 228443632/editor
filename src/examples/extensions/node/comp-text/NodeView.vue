@@ -8,7 +8,6 @@
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
-import { commonUtil } from '@/examples/utils/common-util'
 
 import { simpleUUID } from '@/utils/short-id'
 
@@ -18,8 +17,10 @@ const props = defineProps({
   ...nodeViewProps,
 })
 const emit = defineEmits({})
-const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
-const options = inject('options') as Ref<{}>
+const __globalBizState__ = inject('__globalBizState__') as Ref<
+  Record<string, any>
+>
+const options = inject('options') as Ref<Record<string, any>>
 
 const { updateAttributes } = props
 /* 状态 */
@@ -31,6 +32,7 @@ const visible = reactive({
 })
 const dict = {
   borderType: [
+    { key: 'none', label: '无边框' },
     {
       key: 'underline',
       label: '下划线',
@@ -46,7 +48,6 @@ const dict = {
     //   label: '边框虚线',
     //   style: 'border: 1px dashed var(--umo-node-text-border-color)',
     // },
-    { key: 'none', label: '无边框' },
   ],
 }
 
@@ -83,7 +84,7 @@ function onClose() {
 function onVisibleChange(popupVisible) {
   console.log('popupVisible', popupVisible)
   if (!popupVisible) {
-    onConfirm()
+    void onConfirm()
   }
 }
 
@@ -99,6 +100,8 @@ function setBubbleMenuShow(isShow = true) {
 /* 计算 */
 
 const _attributes = computed(() => props.node?.attrs)
+
+const _text = computed(() => `$\{{${props.node?.attrs?.fieldName}}}`)
 
 /* 监听 */
 
@@ -132,8 +135,10 @@ defineExpose({
     :data-id="_attributes['data-id']"
     contenteditable="false"
     :data-placeholder="props?.node?.attrs?.placeholder"
+    data-u="comp-text"
     @click="onSelectNode"
   >
+    <text class="hidden">{{ _text }}</text>
     <t-popup
       v-model:visible="visible.dialog"
       :destroy-on-close="false"
@@ -187,8 +192,8 @@ defineExpose({
               <t-radio-group v-model="formData.borderType">
                 <t-radio
                   v-for="(item, index) in dict.borderType"
-                  :value="item.key"
                   :key="index"
+                  :value="item.key"
                   class="ml-4px"
                 >
                   <span :style="item.style" class="-ml-2px px-2px">
@@ -233,21 +238,20 @@ defineExpose({
 
 <!--style-->
 <style lang="less">
-@border-color: var(--umo-node-text-border-color);
-.form-comp--text {
+.form-comp--text[data-u='comp-text'] {
   position: relative;
   box-sizing: border-box;
   min-width: 140px;
   min-height: 24px;
   text-align: left;
   border: 1px solid transparent;
-  border-bottom: 1px solid @border-color;
+  border-bottom: 1px solid var(--umo-node-text-border-color);
   padding: 0 2px;
   cursor: pointer;
   border-radius: 2px;
   &.umo-node-focused {
     border-color: var(--umo-primary-color);
-    border-style: dashed dashed solid;
+    border-style: dashed solid;
   }
   &:hover {
     background-color: #f0f2f7;
@@ -259,31 +263,43 @@ defineExpose({
   }
 }
 
-.form-comp-border--underline {
-  border-bottom: 1px solid @border-color;
-}
-.form-comp-border--solid {
-  border: 1px solid @border-color;
-}
-.form-comp-border--dashed {
-  border: 1px dashed @border-color;
-}
-.form-comp-border--none {
-  border: 1px dashed transparent;
+/** 隐藏 */
+:root[mode='print'] {
+  .form-comp--text[data-u='comp-text'] {
+    --umo-node-text-border-color: red;
+    &:after {
+      content: '';
+    }
+  }
 }
 
 /*render node*/
 span[data-id][iscompparams] {
   &[bordertype='underline'] {
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--umo-node-text-border-color);
   }
 
   &[bordertype='solid'] {
-    border: 1px solid #333;
+    border: 1px solid var(--umo-node-text-border-color);
   }
 
   &[bordertype='dashed'] {
-    border: 1px dashed #333;
+    border: 1px dashed var(--umo-node-text-border-color);
   }
+}
+</style>
+
+<style lang="less">
+.form-comp-border--underline {
+  border-bottom: 1px solid var(--umo-node-text-border-color);
+}
+.form-comp-border--solid {
+  border: 1px solid var(--umo-node-text-border-color);
+}
+.form-comp-border--dashed {
+  border: 1px dashed var(--umo-node-text-border-color);
+}
+.form-comp-border--none {
+  border: 1px dashed transparent;
 }
 </style>

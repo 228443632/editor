@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+/* eslint-disable */
 import umoEditorPureCss from '@/examples/style/umo-editor-pure.css?raw'
 
 const container = inject('container')
@@ -74,21 +75,22 @@ const getIframeCode = (fillFieldData = {}) => {
   // const fragment = document.createDocumentFragment()
   // fragment.append(getContentHtml())
 
-  const body = getContentHtml()
+  let body = getContentHtml()
+  body = template(body, fillFieldData || {}, {
+    tmplRE: /\$\{{2}([.\w[\]\s]+)\}{2}/g as any,
+  })
   const parser = new DOMParser()
   const doc = parser.parseFromString(body, 'text/html')
 
-  const editorDom = doc.querySelector(
-    '.tiptap.ProseMirror.umo-editor',
-  ) as HTMLHtmlElement
+  // const editorDom = doc.querySelector(
+  //   '.tiptap.ProseMirror.umo-editor',
+  // ) as HTMLHtmlElement
 
-  editorDom.innerHTML = template(editor.value.getHTML(), fillFieldData || {}, {
-    tmplRE: /\$\{{2}([.\w[\]\s]+)\}{2}/g as any,
-  })
-  /* eslint-disable */
+  // editor.value.getHTML()
+
   return `
     <!DOCTYPE html>
-    <html lang="zh-CN" theme-mode="${options.value.theme}">
+    <html lang="zh-CN" theme-mode="${options.value.theme}" mode="print">
     <head>
       <title>${options.value.document?.title}</title>
       <meta charset="UTF-8">
@@ -122,6 +124,16 @@ const getIframeCode = (fillFieldData = {}) => {
         padding-bottom: 0;
         page-break-after: avoid;
       }
+      @media print {
+        table {
+          page-break-inside: auto;
+        }
+        tr {
+          page-break-inside: auto !important;
+        }
+        thead {
+          display: table-header-group;
+        }
       </style>
       <style>
         span text.hidden {
@@ -134,7 +146,7 @@ const getIframeCode = (fillFieldData = {}) => {
       ${getPlyrSprite()}
       </div>
       <div class="umo-editor-container" style="line-height: ${defaultLineHeight};" aria-expanded="false">
-        <div class="tiptap umo-editor" translate="no">
+        <div class="tiptap umo-editor" translate="no" style="display: flex; flex-direction: column; align-items: center">
           ${doc.body.innerHTML}
         </div>
       </div>
@@ -187,7 +199,7 @@ const printPage = (fillFieldData = {}) => {
 
 defineExpose({
   printPage,
-  getIframeCode
+  getIframeCode,
 })
 </script>
 

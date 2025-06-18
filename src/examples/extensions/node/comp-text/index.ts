@@ -59,7 +59,7 @@ export default Node.create({
 
       /** 边框类型*/
       borderType: {
-        default: 'underline', // 下划线，可选值：underline solid dashed
+        default: 'none', // 下划线，可选值：underline solid dashed
       },
 
       /** 字段名称 */

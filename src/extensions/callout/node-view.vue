@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper class="umo-node-view">
+  <node-view-wrapper class="umo-node-view" data-u="callout">
     <t-popup
       :attach="`${container} .umo-zoomable-container`"
       overlay-inner-class-name="umo-editor-bubble-menu"
@@ -61,8 +61,8 @@ const selectEmoji = (emoji: string) => {
 }
 </script>
 
-<style lang="less" scoped>
-.umo-node-callout {
+<style lang="less">
+.umo-node-callout[data-u='callout'] {
   padding: 6px 12px;
   border-radius: var(--umo-radius);
   display: flex;

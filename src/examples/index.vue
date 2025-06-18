@@ -101,9 +101,9 @@ const options = $ref(
       page: {
         showRightSlot: true,
         showBookmark: false,
-        watermark: {
-          text: `开发环境 ${window.location.host}`,
-        },
+        // watermark: {
+        //   // text: `开发环境 ${window.location.host}`,
+        // },
         tocTabsOptions: [{ label: '参数', value: 'params' }],
       },
       // templates,

@@ -1,5 +1,5 @@
 <template>
-  <node-view-wrapper as="span" class="umo-node-datetime">
+  <node-view-wrapper as="span" class="umo-node-datetime" data-u="datetime">
     <t-popup
       v-model="popupVisible"
       :attach="`${container} .umo-zoomable-container`"
@@ -86,8 +86,8 @@ const datetimeChange = (value: any) => {
 }
 </script>
 
-<style lang="less" scoped>
-.umo-node-datetime {
+<style lang="less">
+.umo-node-datetime[data-u='datetime'] {
   margin: 0 0.2em;
   background-color: transparent !important;
   vertical-align: middle;

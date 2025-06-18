@@ -11,6 +11,7 @@ import '@/components/index'
 import '@/components/container/page.vue'
 import '@/components/container/print.vue'
 import '@/components/editor/index.vue'
+import '@/components/menus/button.vue'
 
 import.meta.glob('@/examples/extensions/**/*.vue', { eager: true })
 import.meta.glob('@/examples/extensions/*.vue', { eager: true })
@@ -18,16 +19,35 @@ import.meta.glob('@/composables/**/*.vue', { eager: true })
 import.meta.glob('@/composables/*.vue', { eager: true })
 
 export {
-  BackTop,
+  // BackTop,
   Button,
+  Checkbox,
+  // ColorPickerPanel,
   ConfigProvider,
   DatePickerPanel,
-  Dialog,
+  // Dialog,
+  Drawer,
   Dropdown,
+  DropdownItem,
+  DropdownMenu,
   ImageViewer,
-  Popup,
+  Form,
+  FormItem,
+  Input,
+  InputNumber,
+  // Loading,
+  Option,
+  OptionGroup,
+  // Popup,
+  Radio,
+  RadioButton,
+  RadioGroup,
   Select,
+  Space,
+  Table,
+  Textarea,
+  Slider,
   Tooltip,
   Tree,
-  Watermark,
-} from 'tdesign-vue-next'
+  // Watermark,
+} from 'tdesign-vue-next/esm/index'
