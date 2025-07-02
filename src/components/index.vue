@@ -1131,6 +1131,8 @@ defineExpose({
   --td-error-color: var(--umo-error-color);
   --td-text-color-primary: var(--umo-text-color);
   --td-text-color-disabled: var(--umo-text-color-disabled);
+  --td-brand-color-focus: transparent;
+
   width: 100%;
   height: 100%;
   min-height: 400px;
@@ -1139,6 +1141,10 @@ defineExpose({
   color: var(--umo-text-color);
   font-family: var(--umo-font-family);
   position: relative !important;
+  background-color: var(--umo-page-bg-color);
+  font-size: var(--umo-font-size);
+  line-height: var(--umo-line-height);
+
   .umo-toolbar,
   .umo-footer {
     background-color: var(--umo-color-white);

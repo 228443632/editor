@@ -257,7 +257,6 @@ defineExpose({
     background-color: #f0f2f7;
   }
   &:after {
-    font-size: 14px;
     color: #9ba3b0;
     content: attr(data-placeholder);
   }

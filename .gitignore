@@ -41,3 +41,4 @@ types/components-pure.d.ts
 # Other
 .DS_Store
 Thumbs.db
+umo-editor-pure.js

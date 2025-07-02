@@ -20,7 +20,9 @@ import { presetLegacyCompat } from '@unocss/preset-legacy-compat'
 export default defineConfig({
   presets: [
     presetLegacyCompat(),
-    presetUno(),
+    presetUno({
+      preflight: false,
+    }),
     // 支持css class属性化
     // presetAttributify(),
   ],
@@ -43,7 +45,7 @@ export default defineConfig({
    * 自定义快捷语句
    * @see https://github.com/unocss/unocss#shortcuts
    */
-  shortcuts: [],
+  shortcuts: undefined,
   transformers: [
     // 启用 @apply 功能
     transformerDirectives({
