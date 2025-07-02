@@ -419,7 +419,7 @@ defineExpose({
       >
         <div class="umo-pr-group__title">{{ item.label }}</div>
 
-        <ul class="grid grid-cols-3 gap-12px !mt-8px">
+        <ul class="grid 2xl:grid-cols-3 container grid-cols-2 gap-12px !mt-8px">
           <li
             v-for="(cItem, cIndex) in item.children"
             :key="cIndex"

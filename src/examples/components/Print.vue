@@ -14,6 +14,7 @@ const page = inject('page')
 const options = inject('options')
 
 import { template } from 'sf-utils2'
+import { isPlainObject } from '@tiptap/core'
 
 const iframeRef = $ref<HTMLIFrameElement | null>(null)
 let iframeCode = $ref('')
@@ -69,18 +70,36 @@ const defaultLineHeight = $computed(
     )?.value,
 )
 
-const getIframeCode = (fillFieldData = {}) => {
+const getIframeCode = (fillFieldData) => {
   const { orientation, size, margin, background } = page.value
 
   // const fragment = document.createDocumentFragment()
   // fragment.append(getContentHtml())
 
   let body = getContentHtml()
-  body = template(body, fillFieldData || {}, {
-    tmplRE: /\$\{{2}([.\w[\]\s]+)\}{2}/g as any,
-  })
+  if (isPlainObject(fillFieldData)) {
+    body = template(body, fillFieldData || {}, {
+      tmplRE: /\$\{{2}([.\w[\]\s]+)\}{2}/g as any,
+    })
+  }
   const parser = new DOMParser()
   const doc = parser.parseFromString(body, 'text/html')
+
+  const watermark = doc.querySelector(
+    '.umo-watermark > .umo-page-node-footer+div',
+  ) as HTMLHtmlElement
+  if (watermark) {
+    watermark.remove()
+  }
+
+  const corners = doc.querySelectorAll(
+    '.umo-page-corner',
+  ) as HTMLHtmlElement[]
+  if (corners) {
+    corners.forEach((corner) => {
+      corner.remove()
+    })
+  }
 
   // const editorDom = doc.querySelector(
   //   '.tiptap.ProseMirror.umo-editor',
@@ -150,24 +169,9 @@ const getIframeCode = (fillFieldData = {}) => {
           ${doc.body.innerHTML}
         </div>
       </div>
-      <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-          const observer = new MutationObserver(mutations => {
-            mutations.forEach(mutation => {
-              if (mutation.removedNodes) {
-                Array.from(mutation.removedNodes).forEach(node => {
-                  if (node?.classList?.contains('umo-page-watermark')) {
-                    location.reload();
-                  }
-                });
-              }
-            });
-          });
-        });
-      <\/script>
     </body>
-    </html>`
-  /* eslint-enable */
+    </html>
+   `
 }
 
 const printPage = (fillFieldData = {}) => {

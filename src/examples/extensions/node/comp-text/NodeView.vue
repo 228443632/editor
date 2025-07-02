@@ -266,7 +266,7 @@ defineExpose({
 /** 隐藏 */
 :root[mode='print'] {
   .form-comp--text[data-u='comp-text'] {
-    --umo-node-text-border-color: red;
+    //--umo-node-text-border-color: red;
     &:after {
       content: '';
     }

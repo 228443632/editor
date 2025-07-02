@@ -73,6 +73,18 @@ function onDownHtml() {
   const filename = '低码合同测试'
   saveAs(blob, `${filename}.html`)
 }
+
+/**
+ * 导出html
+ */
+function onDownTemplateHtml() {
+  const html = printRef.value.getIframeCode(null)
+  const blob = new Blob([html], {
+    type: 'text/html;charset=utf-8',
+  })
+  const filename = '低码合同模版测试'
+  saveAs(blob, `${filename}.html`)
+}
 /* 计算 */
 
 /* 监听 */
@@ -134,6 +146,7 @@ defineExpose({
         <t-button theme="default" @click="onClose">取消</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
         <t-button theme="primary" @click="onDownHtml">导出html</t-button>
+        <t-button theme="primary" @click="onDownTemplateHtml">导出模版html</t-button>
       </div>
     </template>
     <Print ref="printRef"></Print>
