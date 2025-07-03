@@ -6,10 +6,12 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, to } from 'sf-utils2'
+import { deepClone, isObject, parseJsonNoError, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
+import { unrefElement } from '@vueuse/core'
 
 import { simpleUUID } from '@/utils/short-id'
+import { fontSizes } from '@/examples/utils/common-util'
 
 const { proxy } = getCurrentInstance()
 
@@ -24,7 +26,9 @@ const options = inject('options') as Ref<Record<string, any>>
 
 const { updateAttributes } = props
 /* 状态 */
-
+const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
+const $recent = useState('recent', options)
+const usedFonts = $ref<string[]>([])
 const formRef = ref<InstanceType<typeof Form>>()
 const formData = ref({})
 const visible = reactive({
@@ -60,9 +64,24 @@ function onSelectNode() {
   console.log('props.node', Object.create(props.node?.attrs))
 
   formData.value = deepClone({ ...props.node?.attrs })
+  if (!isObject(formData.value.styleObj)) {
+    formData.value.styleObj = parseJsonNoError(formData.value.styleObj) || {}
+  }
+  formData.value.styleObj.fontSize ||= getRootElementFontSize()
 
   // setBubbleMenuShow(false)
   visible.dialog = true
+}
+
+/**
+ * 获取当前根组件的字体大小
+ */
+function getRootElementFontSize() {
+  const rootElement = unrefElement(rootRef) as HTMLElement
+  if (rootElement.nodeType == Node.ELEMENT_NODE) {
+    return getComputedStyle(rootElement).fontSize
+  }
+  return ''
 }
 
 async function onConfirm() {
@@ -70,9 +89,12 @@ async function onConfirm() {
   const [valid, err] = await to(formRef.value.validate())
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
-  updateAttributes({
-    ...formData.value,
-  })
+  const cloneFormData = deepClone(formData.value)
+  if (isObject(cloneFormData.styleObj)) {
+    cloneFormData.styleObj = JSON.stringify(cloneFormData.styleObj)
+  }
+
+  updateAttributes(cloneFormData)
   onClose()
 }
 
@@ -102,6 +124,47 @@ function setBubbleMenuShow(isShow = true) {
 const _attributes = computed(() => props.node?.attrs)
 
 const _text = computed(() => `$\{{${props.node?.attrs?.fieldName}}}`)
+
+const _allFonts = computed(() => {
+  const all = [
+    {
+      label: t('base.fontFamily.all'),
+      children: options.value.dicts?.fonts ?? [],
+    },
+  ]
+  // 通过字体值获取字体列表
+  const getFontsByValues = (values: string[]) => {
+    return values.map(
+      (item) =>
+        options.value.dicts?.fonts.find(
+          ({ value }: { value: string }) => value === item,
+        ) ?? {
+          label: item,
+          item,
+        },
+    )
+  }
+  if ($recent.value.fonts.length > 0) {
+    all.unshift({
+      label: t('base.fontFamily.recent'),
+      children: getFontsByValues($recent.value.fonts) as any,
+    })
+  }
+  if (usedFonts.length > 0) {
+    all.unshift({
+      label: t('base.fontFamily.used'),
+      children: getFontsByValues(usedFonts) as any,
+    })
+  }
+  return all
+})
+
+/**
+ * 根节点样式
+ */
+const _rootStyle = computed(() => {
+  return _attributes.value.styleObj || {}
+})
 
 /* 监听 */
 
@@ -137,6 +200,8 @@ defineExpose({
     :data-placeholder="props?.node?.attrs?.placeholder"
     data-u="comp-text"
     @click="onSelectNode"
+    ref="rootRef"
+    :style="_rootStyle"
   >
     <text class="hidden">{{ _text }}</text>
     <t-popup
@@ -203,6 +268,23 @@ defineExpose({
               </t-radio-group>
             </t-form-item>
 
+            <t-form-item label="字体大小" name="styleObj.fontSize">
+              <t-select
+                v-model="formData.styleObj.fontSize"
+                placeholder="请选择"
+                clearable
+                filterable
+              >
+                <t-option
+                  v-for="item in fontSizes"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </t-option>
+              </t-select>
+            </t-form-item>
+
             <t-form-item label="默认值" name="name">
               <t-input
                 v-model="formData.defaultValue"
@@ -265,9 +347,15 @@ defineExpose({
 /** 隐藏 */
 :root[mode='print'] {
   .form-comp--text[data-u='comp-text'] {
+    --umo-node-text-border-color: currentColor;
     //--umo-node-text-border-color: red;
     &:after {
       content: '';
+    }
+  }
+  span[data-id][iscompparams] {
+    &[bordertype='none'] {
+      border-bottom: none;
     }
   }
 }

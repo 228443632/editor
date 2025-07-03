@@ -47,11 +47,9 @@
     caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
 
     & > p {
-      white-space: pre-wrap;
       white-space: break-spaces;
-      word-break: break-word;
-      word-wrap: break-word;
-      letter-spacing: normal;
+      word-break: break-all;
+      overflow-wrap: break-word;
     }
 
     &.caret--is-dragging {

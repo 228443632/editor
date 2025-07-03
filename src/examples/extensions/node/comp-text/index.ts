@@ -77,6 +77,11 @@ export default Node.create({
         default: '',
       },
 
+      /** 样式 序列化后的 */
+      styleObj: {
+        default: '',
+      },
+
       /** 默认值 */
       defaultValue: {
         default: '',

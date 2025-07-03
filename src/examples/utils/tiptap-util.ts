@@ -191,15 +191,18 @@ export const tiptapUtil = {
     editor.state.doc.descendants(callback)
   },
 
-
   /**
    * 根据 跳转查询 dom
    * @param editor
    * @param nodeTypeName
    * @param attributes
    */
-  domAtCondition(editor: Editor, nodeTypeName: string, attributes?: Record<string, any>) {
+  domAtCondition(
+    editor: Editor,
+    nodeTypeName: string,
+    attributes?: Record<string, any>,
+  ) {
     const nodePos = editor.$node(nodeTypeName, attributes)
     return editor.view.domAtPos(nodePos.pos)
-  }
+  },
 }

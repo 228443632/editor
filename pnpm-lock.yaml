@@ -207,8 +207,8 @@ dependencies:
     specifier: 1.1.0
     version: 1.1.0
   sf-utils2:
-    specifier: 3.3.0-beta18
-    version: 3.3.0-beta18
+    specifier: 3.3.2-beta3
+    version: 3.3.2-beta3
   sign-canvas-plus:
     specifier: 2.0.3
     version: 2.0.3(typescript@5.5.4)
@@ -1726,8 +1726,8 @@ packages:
       vue-i18n:
         optional: true
     dependencies:
-      '@intlify/message-compiler': 12.0.0-alpha.2
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/message-compiler': 12.0.0-alpha.3
+      '@intlify/shared': 12.0.0-alpha.3
       acorn: 8.14.1
       escodegen: 2.1.0
       estree-walker: 2.0.2
@@ -1752,11 +1752,11 @@ packages:
       '@intlify/shared': 10.0.0
       source-map-js: 1.2.1
 
-  /@intlify/message-compiler@12.0.0-alpha.2:
-    resolution: {integrity: sha512-PD9C+oQbb7BF52hec0+vLnScaFkvnfX+R7zSbODYuRo/E2niAtGmHd0wPvEMsDhf9Z9b8f/qyDsVeZnD/ya9Ug==}
+  /@intlify/message-compiler@12.0.0-alpha.3:
+    resolution: {integrity: sha512-mDDTN3gfYOHhBnpnlby19UHyvMaOnzdlpsIrxUfs44R/vCATfn8pMOkE8PXD2t410xkocEj3FpDcC9XC/0v4Dg==}
     engines: {node: '>= 16'}
     dependencies:
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/shared': 12.0.0-alpha.3
       source-map-js: 1.2.1
     dev: true
 
@@ -1764,8 +1764,8 @@ packages:
     resolution: {integrity: sha512-6ngLfI7DOTew2dcF9WMJx+NnMWghMBhIiHbGg+wRvngpzD5KZJZiJVuzMsUQE1a5YebEmtpTEfUrDp/NqVGdiw==}
     engines: {node: '>= 16'}
 
-  /@intlify/shared@12.0.0-alpha.2:
-    resolution: {integrity: sha512-P2DULVX9nz3y8zKNqLw9Es1aAgQ1JGC+kgpx5q7yLmrnAKkPR5MybQWoEhxanefNJgUY5ehsgo+GKif59SrncA==}
+  /@intlify/shared@12.0.0-alpha.3:
+    resolution: {integrity: sha512-ryaNYBvxQjyJUmVuBBg+HHUsmGnfxcEUPR0NCeG4/K9N2qtyFE35C80S15IN6iYFE2MGWLN7HfOSyg0MXZIc9w==}
     engines: {node: '>= 16'}
     dev: true
 
@@ -1784,8 +1784,8 @@ packages:
     dependencies:
       '@eslint-community/eslint-utils': 4.6.1(eslint@9.14.0)
       '@intlify/bundle-utils': 9.0.0(vue-i18n@10.0.0)
-      '@intlify/shared': 12.0.0-alpha.2
-      '@intlify/vue-i18n-extensions': 6.2.0(@intlify/shared@12.0.0-alpha.2)(vue-i18n@10.0.0)(vue@3.3.13)
+      '@intlify/shared': 12.0.0-alpha.3
+      '@intlify/vue-i18n-extensions': 6.2.0(@intlify/shared@12.0.0-alpha.3)(vue-i18n@10.0.0)(vue@3.3.13)
       '@rollup/pluginutils': 5.1.4
       '@typescript-eslint/scope-manager': 7.18.0
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.5.4)
@@ -1808,7 +1808,7 @@ packages:
       - typescript
     dev: true
 
-  /@intlify/vue-i18n-extensions@6.2.0(@intlify/shared@12.0.0-alpha.2)(vue-i18n@10.0.0)(vue@3.3.13):
+  /@intlify/vue-i18n-extensions@6.2.0(@intlify/shared@12.0.0-alpha.3)(vue-i18n@10.0.0)(vue@3.3.13):
     resolution: {integrity: sha512-RN6Jg80NxY/yv408zFQz/pSLh6mw7cFU/WoykzNsb24L8H0YvktOkdLtJSZcKgRiAlbK0MpK4n4nG2n8FxHiNw==}
     engines: {node: '>= 18'}
     peerDependencies:
@@ -1827,7 +1827,7 @@ packages:
         optional: true
     dependencies:
       '@babel/parser': 7.27.0
-      '@intlify/shared': 12.0.0-alpha.2
+      '@intlify/shared': 12.0.0-alpha.3
       vue: 3.3.13(typescript@5.5.4)
       vue-i18n: 10.0.0(vue@3.3.13)
     dev: true
@@ -3297,7 +3297,7 @@ packages:
   /@umoteam/editor-external@6.1.0(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13):
     resolution: {integrity: sha512-ezs4khkICpGTdtWz8ENgx4jGLoHmAKVEJoO+h3rnnWKZJprTqIlKRYWpfKuGFi5dQY6WcO2LzszbcyBb2uy5+g==}
     dependencies:
-      '@umoteam/editor': 6.1.1(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13)
+      '@umoteam/editor': 7.0.1(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13)
     transitivePeerDependencies:
       - '@vue/composition-api'
       - prosemirror-model
@@ -3308,8 +3308,8 @@ packages:
       - vue
     dev: false
 
-  /@umoteam/editor@6.1.1(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13):
-    resolution: {integrity: sha512-iXg5o7O4ooQ4D2c/eZmsZw+MkuutUS4ck8wRKCv+PdiA5erfrLpdwDe6M9IBKz8UT6AgxUGW2ZEJDexQLkUDng==}
+  /@umoteam/editor@7.0.1(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13):
+    resolution: {integrity: sha512-1hG4t92x8JJvR1naeXzEtAwRKXBmrlkYpzOccwTUgy8RlMvGzQZvSHZTwh2giy03fqZWFOzVzWnOyMjuFtWQlA==}
     engines: {node: '>=18.0.0'}
     dependencies:
       '@eslint/object-schema': 2.1.4
@@ -10325,8 +10325,8 @@ packages:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
     dev: true
 
-  /sf-utils2@3.3.0-beta18:
-    resolution: {integrity: sha512-l8vH4Yi0TC9I6PbhQJYkaMA2ZKg+9kC4RioZmYCdqUDU0aOlqqb5E2o3gHvK0M2k+16nGQt/P56DCguCpBOGnQ==}
+  /sf-utils2@3.3.2-beta3:
+    resolution: {integrity: sha512-p5qJMcj1WHN23ioxYBH0BQgXSH86XWBiyBSY8uWv7G0UF2dynw3WhWsvClD4QgtMW2ZwTRe8HnLkVwj8kEZhLw==}
     dependencies:
       clipboard: 2.0.11
       dayjs: 1.10.7

@@ -489,7 +489,8 @@ defineExpose({
     }
 
     .umo-pr-group__item {
-      width: 108px;
+      // width: 108px;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
