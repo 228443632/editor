@@ -6,6 +6,7 @@
 import type { Editor } from '@tiptap/core'
 import type { Node, Fragment } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
+import { cssUtil } from '@/examples/utils/css-util'
 
 type TPosAtNodeOption = { key: string }
 
@@ -205,4 +206,28 @@ export const tiptapUtil = {
     const nodePos = editor.$node(nodeTypeName, attributes)
     return editor.view.domAtPos(nodePos.pos)
   },
+
+  /**
+   *
+   */
+  addAttributes() {
+    return {
+      /** 样式 */
+      cssText: {
+        default: {},
+        parseHTML: (element) => {
+          return cssUtil.styleTextToObj(
+            [element.style.cssText, element.getAttribute('cssText')]
+              .filter(Boolean)
+              .join(';'),
+          )
+        },
+        renderHTML: (attrs) => {
+          const cssText = cssUtil.styleObjToText(attrs.cssText)
+          if (!cssText) return {}
+          return { cssText }
+        },
+      },
+    }
+  }
 }

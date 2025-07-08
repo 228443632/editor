@@ -104,16 +104,16 @@ export default [
     rules: {
       '@typescript-eslint/array-type': ['error', { default: 'array' }],
       '@typescript-eslint/consistent-indexed-object-style': 'error',
-      '@typescript-eslint/consistent-type-definitions': 'warn',
+      // '@typescript-eslint/consistent-type-definitions': 'warn',
       '@typescript-eslint/eqeqeq': 'off',
-      '@typescript-eslint/naming-convention': [
-        'error',
-        {
-          selector: 'interface',
-          format: ['PascalCase'],
-          custom: { regex: '^I[A-Z]', match: false },
-        },
-      ],
+      // '@typescript-eslint/naming-convention': [
+      //   'error',
+      //   {
+      //     selector: 'interface',
+      //     format: ['PascalCase'],
+      //     custom: { regex: '[A-Z]', match: false },
+      //   },
+      // ],
       '@typescript-eslint/no-extra-non-null-assertion': 'error',
       '@typescript-eslint/no-floating-promises': [
         'error',

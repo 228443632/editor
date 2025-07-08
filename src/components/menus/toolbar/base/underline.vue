@@ -6,7 +6,7 @@
     hide-text
     :menu-active="editor?.isActive('underline')"
     :disabled="!editor?.can().chain().focus().toggleUnderline().run()"
-    @menu-click="editor?.chain().focus().toggleUnderline().run()"
+    @menu-click="editor?.chain().focus().toggleUnderlineV2().run()"
   />
 </template>
 

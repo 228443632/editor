@@ -8,7 +8,7 @@ import Vue from '@vitejs/plugin-vue'
 import ReactivityTransform from '@vue-macros/reactivity-transform/vite'
 import VueMacros from 'unplugin-vue-macros/vite'
 import { defineConfig } from 'vite'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+// import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import UnoCSS from 'unocss/vite'
 import pkg from './package.json'
@@ -36,11 +36,11 @@ export default defineConfig(() => {
     //   resolvers: [TDesignResolver({ library: 'vue-next', esm: true })],
     //   dts: './types/components.d.ts',
     // }),
-    SvgIcons: createSvgIconsPlugin({
-      iconDirs: [`${process.cwd()}/src/assets/icons`],
-      symbolId: 'umo-icon-[name]',
-      customDomId: 'umo-icons',
-    }),
+    // SvgIcons: createSvgIconsPlugin({
+    //   iconDirs: [`${process.cwd()}/src/assets/icons`],
+    //   symbolId: 'umo-icon-[name]',
+    //   customDomId: 'umo-icons',
+    // }),
   }
 
   return {

@@ -3,7 +3,7 @@
     ico="clear-format"
     :text="t('base.clearFormat')"
     hide-text
-    @menu-click="editor?.chain().focus().unsetAllMarks().run()"
+    @menu-click="editor?.chain().focus().clearFormat().run()"
   />
 </template>
 

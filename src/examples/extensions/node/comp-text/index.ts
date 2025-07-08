@@ -3,6 +3,8 @@ import { mergeAttributes, Node, VueNodeViewRenderer } from '@tiptap/vue-3'
 import NodeView from './NodeView.vue'
 // import type { Editor } from '@tiptap/core'
 import { simpleUUID } from '@/utils/short-id'
+// import { cssUtil } from '@/examples/utils/css-util'
+import { tiptapUtil } from '@/examples/utils/tiptap-util'
 // import type { Node as TNode } from 'prosemirror-model'
 
 type TSetCompOptions = {
@@ -46,11 +48,14 @@ export default Node.create({
         default: NAME,
         parseHTML: () => NAME,
       },
+
       /** 唯一标识 */
       'data-id': {
         default: undefined,
         parseHTML: (element) => element.getAttribute('data-id') ?? simpleUUID(),
       },
+
+      ...tiptapUtil.addAttributes(),
 
       /** 占位 */
       placeholder: {
@@ -74,11 +79,6 @@ export default Node.create({
 
       /** 备注，填写说明 */
       desc: {
-        default: '',
-      },
-
-      /** 样式 序列化后的 */
-      styleObj: {
         default: '',
       },
 

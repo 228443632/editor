@@ -6,12 +6,11 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, isObject, parseJsonNoError, to } from 'sf-utils2'
+import { deepClone, isObject, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
 import { unrefElement } from '@vueuse/core'
 
 import { simpleUUID } from '@/utils/short-id'
-import { fontSizes } from '@/examples/utils/common-util'
 
 const { proxy } = getCurrentInstance()
 
@@ -64,10 +63,10 @@ function onSelectNode() {
   console.log('props.node', Object.create(props.node?.attrs))
 
   formData.value = deepClone({ ...props.node?.attrs })
-  if (!isObject(formData.value.styleObj)) {
-    formData.value.styleObj = parseJsonNoError(formData.value.styleObj) || {}
-  }
-  formData.value.styleObj.fontSize ||= getRootElementFontSize()
+  // if (!isObject(formData.value.styleObj)) {
+  //   formData.value.styleObj = parseJsonNoError(formData.value.styleObj) || {}
+  // }
+  // formData.value.styleObj.fontSize ||= getRootElementFontSize()
 
   // setBubbleMenuShow(false)
   visible.dialog = true
@@ -163,7 +162,7 @@ const _allFonts = computed(() => {
  * 根节点样式
  */
 const _rootStyle = computed(() => {
-  return _attributes.value.styleObj || {}
+  return _attributes.value.cssText || {}
 })
 
 /* 监听 */
@@ -190,6 +189,7 @@ defineExpose({
 <template>
   <node-view-wrapper
     v-bind="props.node?.attrs"
+    ref="rootRef"
     as="span"
     :class="[
       `form-comp--text is-inline-block`,
@@ -199,9 +199,8 @@ defineExpose({
     contenteditable="false"
     :data-placeholder="props?.node?.attrs?.placeholder"
     data-u="comp-text"
-    @click="onSelectNode"
-    ref="rootRef"
     :style="_rootStyle"
+    @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
     <t-popup
@@ -268,23 +267,6 @@ defineExpose({
               </t-radio-group>
             </t-form-item>
 
-            <t-form-item label="字体大小" name="styleObj.fontSize">
-              <t-select
-                v-model="formData.styleObj.fontSize"
-                placeholder="请选择"
-                clearable
-                filterable
-              >
-                <t-option
-                  v-for="item in fontSizes"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                >
-                </t-option>
-              </t-select>
-            </t-form-item>
-
             <t-form-item label="默认值" name="name">
               <t-input
                 v-model="formData.defaultValue"
@@ -326,14 +308,13 @@ defineExpose({
   min-width: 140px;
   min-height: 24px;
   text-align: left;
-  border: 1px solid transparent;
   border-bottom: 1px solid var(--umo-node-text-border-color);
-  padding: 0 2px;
+  //padding: 0 2px;
+  //padding: 0;
   cursor: pointer;
   border-radius: 2px;
-  &.umo-node-focused {
-    border-color: var(--umo-primary-color);
-    border-style: dashed solid;
+  &.umo-node-focused.umo-node-focused.umo-node-focused {
+    outline: 1px dashed var(--umo-primary-color);
   }
   &:hover {
     background-color: #f0f2f7;
@@ -342,6 +323,10 @@ defineExpose({
     color: #9ba3b0;
     content: attr(data-placeholder);
   }
+
+  ::selection {
+    background-color: var(--umo-text-selection-background);
+  }
 }
 
 /** 隐藏 */
@@ -349,6 +334,7 @@ defineExpose({
   .form-comp--text[data-u='comp-text'] {
     --umo-node-text-border-color: currentColor;
     //--umo-node-text-border-color: red;
+    //padding: 0;
     &:after {
       content: '';
     }
@@ -387,6 +373,6 @@ span[data-id][iscompparams] {
   border: 1px dashed var(--umo-node-text-border-color);
 }
 .form-comp-border--none {
-  border: 1px dashed transparent;
+  border: none;
 }
 </style>

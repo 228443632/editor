@@ -55,9 +55,9 @@ const colorChange = (color: string) => {
   }
 
   if (color === '') {
-    editor.value?.chain().focus().unsetColor().run()
+    editor.value?.chain().focus().unsetColorV2().run()
   } else {
-    editor.value?.chain().focus().setColor(color).run()
+    editor.value?.chain().focus().setColorV2(color).run()
   }
 }
 

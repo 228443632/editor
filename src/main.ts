@@ -1,5 +1,6 @@
 import type { UmoEditorOptions } from '@/types'
 import 'virtual:uno.css'
+import 'virtual:svg-icons-register'
 
 import App from './app.vue'
 import { useUmoEditor } from './components'

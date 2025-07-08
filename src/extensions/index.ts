@@ -4,7 +4,7 @@ import CharacterCount from '@tiptap/extension-character-count'
 import Color from '@tiptap/extension-color'
 import Dropcursor from '@tiptap/extension-dropcursor'
 import Focus from '@tiptap/extension-focus'
-import FontFamily from '@tiptap/extension-font-family'
+// import FontFamily from '@tiptap/extension-font-family'
 import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
 import Subscript from '@tiptap/extension-subscript'
@@ -38,6 +38,8 @@ import Echarts from './echarts'
 import File from './file'
 import FileHandler from './file-handler'
 import FontSize from './font-size'
+import FontFamily from './font-family'
+import ClearFormat from './clear-format'
 import FormatPainter from './format-painter'
 import hr from './hr'
 import Iframe from './iframe'
@@ -92,6 +94,7 @@ export const getDefaultExtensions = ({
     }),
     FormatPainter,
     FontFamily,
+    ClearFormat,
     FontSize,
     Bold.extend({
       renderHTML: ({ HTMLAttributes }) => ['b', HTMLAttributes, 0],
@@ -218,7 +221,7 @@ export const getDefaultExtensions = ({
     typeWriter,
     UniqueID.configure({
       types: ['heading', 'paragraph'],
-      generateID: () => simpleUUID()
+      generateID: () => simpleUUID(),
     }),
     BackgroundColor,
   ]

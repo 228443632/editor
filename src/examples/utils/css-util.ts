@@ -3,7 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 24/04/25 PM7:36
  */
-
+import { type CSSProperties } from 'vue'
 export const cssUtil = {
   /**
    * 获取所有的样式
@@ -69,5 +69,33 @@ export const cssUtil = {
       cssUtil.getAllCSSRules(),
     ])
     return cssRes.join('\n')
+  },
+
+  /**
+   * css样式文本转对象
+   * @param styleText
+   * @return {CSSProperties}
+   */
+  styleTextToObj(styleText = ''): CSSProperties {
+    const styleTextList = styleText.split(';')
+    return styleTextList.reduce((acc, cur) => {
+      if (!cur.trim()) return acc
+      const [key, val] = cur.split(':') as [string, string]
+      if (key && val) {
+        acc[key.trim()] = val.trim()
+      }
+      return acc
+    }, {}) as CSSProperties
+  },
+
+  /**
+   * style对象转styleText
+   * @param styleObj - CSS属性对象
+   */
+  styleObjToText(styleObj: CSSProperties = {}): string {
+    return Object.keys(styleObj).reduce((acc, cur) => {
+      acc += `${cur}:${styleObj[cur]};`
+      return acc
+    }, '')
   },
 }

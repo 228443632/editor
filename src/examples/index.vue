@@ -1,5 +1,9 @@
 <template>
   <div class="examples">
+    <div v-if="IS_DEV">
+      <t-button @click="testEditorFunc('demo001')">获取</t-button>
+      <t-button @click="testEditorFunc('demo002')">点击demo002</t-button>
+    </div>
     <umo-editor ref="editorRef" v-bind="options">
       <!-- 基础工具   -->
       <template #toolbar_base>
@@ -35,6 +39,8 @@ import { debounce } from 'sf-utils2'
 // types
 import type { Editor } from '@tiptap/vue-3'
 import { template01 } from '@/examples/template/demo01'
+import { testEditor } from '@/examples/utils/test'
+import { TiptapHelper } from '@/examples/utils/tiptap-helper'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -51,8 +57,10 @@ import { template01 } from '@/examples/template/demo01'
 //   paragraph: {...} //<p>
 //   text: {...} //文本
 // }
+const IS_DEV = process.env.NODE_ENV === 'development'
 
 const editorRef = $ref(null)
+const tiptapHelper = ref<TiptapHelper>()
 
 const nodeList = ref([])
 const globalBizState = ref({
@@ -62,6 +70,7 @@ const globalBizState = ref({
 
 provide('__compNodeList__', nodeList)
 provide('__globalBizState__', globalBizState)
+provide('__tiptapHelper__', tiptapHelper)
 
 function selectionChange({ editor }: { editor: Editor }) {
   const node = editor.state.doc.nodeAt(editor.state.selection.anchor)
@@ -87,6 +96,8 @@ const options = $ref(
       document: {
         title: '合同低码平台',
         content: localStorage.getItem('document.content') ?? template01,
+        // content: '<p><strong>AB<span style="color: red;">C</span></strong></p>',
+        // content: '<p><strong>ABC</strong></p><p>，</p>',
         /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
         editorProps: {
           // handleDrop(
@@ -179,13 +190,18 @@ const options = $ref(
   ),
 )
 
+watch(editorRef, () => {
+  tiptapHelper.value = editorRef.useEditor()
+})
+
 console.log('options', options)
 
 onMounted(() => {
   console.log('editorRef', editorRef)
-  // @ts-expect-error
   window.editor = editorRef.useEditor()
 })
+
+const testEditorFunc = testEditor(window.editor)
 </script>
 
 <style>

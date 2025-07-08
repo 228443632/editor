@@ -81,8 +81,8 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'name',
-            // placeholder: `姓名${compTexts.length + 1}`,
-            placeholder: `姓名`,
+            placeholder: `姓名${compTexts.length + 1}`,
+            // placeholder: `姓名`,
           }
         },
         click() {
