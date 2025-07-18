@@ -207,8 +207,8 @@ dependencies:
     specifier: 1.1.0
     version: 1.1.0
   sf-utils2:
-    specifier: 3.3.2-beta3
-    version: 3.3.2-beta3
+    specifier: 3.3.4
+    version: 3.3.4
   sign-canvas-plus:
     specifier: 2.0.3
     version: 2.0.3(typescript@5.5.4)
@@ -10325,8 +10325,8 @@ packages:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
     dev: true
 
-  /sf-utils2@3.3.2-beta3:
-    resolution: {integrity: sha512-p5qJMcj1WHN23ioxYBH0BQgXSH86XWBiyBSY8uWv7G0UF2dynw3WhWsvClD4QgtMW2ZwTRe8HnLkVwj8kEZhLw==}
+  /sf-utils2@3.3.4:
+    resolution: {integrity: sha512-ahGe/dpnUhyxRZajTYdBvEzV3b8rezCfFVy+sDHw7S0yuuVBZjPWYYosH1YsiMVrye3PSmatvozMEVEUGT97dQ==}
     dependencies:
       clipboard: 2.0.11
       dayjs: 1.10.7

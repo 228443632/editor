@@ -145,8 +145,10 @@ defineExpose({
       <div class="flex items-center justify-end">
         <t-button theme="default" @click="onClose">取消</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
-        <t-button theme="primary" @click="onDownHtml">导出html</t-button>
-        <t-button theme="primary" @click="onDownTemplateHtml">导出模版html</t-button>
+        <t-button theme="primary" @click="onDownHtml">导出已填充html</t-button>
+        <t-button theme="primary" @click="onDownTemplateHtml"
+          >导出未填充html</t-button
+        >
       </div>
     </template>
     <Print ref="printRef"></Print>

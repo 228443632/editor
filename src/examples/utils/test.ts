@@ -4,6 +4,7 @@
  * @create 05/07/25 PM1:24
  */
 import type { Editor } from '@tiptap/vue-3'
+import type { NodeSelection } from '@tiptap/pm/state'
 
 declare global {
   interface Window {
@@ -18,6 +19,9 @@ export function testEditor(editorRef: Editor) {
     const state = editor.state
     const doc = editor.state.doc
     const view = editor.view
+
+    console.log('[funcName]', funcName)
+
     switch (funcName) {
       case 'demo001': {
         const selection = editor.state.selection
@@ -102,6 +106,40 @@ export function testEditor(editorRef: Editor) {
         })
         // editor.commands.setMark('textStyle', { fontSize: '20px' })
 
+        break
+      }
+
+      case 'getCurrentFontSize': {
+        // 获取当前选区字体大小
+        const getCurrentFontSize = () => {
+          const { anchor, node } = selection as NodeSelection
+
+          if (
+            node &&
+            node.type?.name === 'compText' &&
+            node.attrs?.cssText?.fontSize
+          ) {
+            return node.attrs?.cssText?.fontSize
+          }
+
+          const resolvedPos = state.doc.resolve(anchor)
+
+          // 方案1：直接通过编辑器命令获取（推荐）
+          const styleAttrs = editor.getAttributes('textStyle')
+          console.log('styleAttrs', styleAttrs, resolvedPos)
+          if (styleAttrs.fontSize) return styleAttrs.fontSize
+
+          // 方案2：遍历节点链获取
+          for (let d = resolvedPos.depth; d >= 0; d--) {
+            const node = resolvedPos.node(d)
+            console.log('node', node)
+            const mark = node.marks?.find((m) => m.type.name === 'textStyle')
+            if (mark?.attrs?.fontSize) return mark.attrs.fontSize
+          }
+
+          return '默认大小'
+        }
+        console.log(getCurrentFontSize())
         break
       }
 

@@ -306,7 +306,7 @@ defineExpose({
   position: relative;
   box-sizing: border-box;
   min-width: 140px;
-  min-height: 24px;
+  min-height: 1em;
   text-align: left;
   border-bottom: 1px solid var(--umo-node-text-border-color);
   //padding: 0 2px;

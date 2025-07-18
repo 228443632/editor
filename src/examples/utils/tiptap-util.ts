@@ -7,6 +7,7 @@ import type { Editor } from '@tiptap/core'
 import type { Node, Fragment } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
 import { cssUtil } from '@/examples/utils/css-util'
+import { type EditorState, NodeSelection } from '@tiptap/pm/state' // 表单数据填充
 
 type TPosAtNodeOption = { key: string }
 
@@ -229,5 +230,58 @@ export const tiptapUtil = {
         },
       },
     }
-  }
+  },
+
+  /**
+   * 自定义节点是否被选中
+   */
+  isCompTextNodeSelected(editor: Editor) {
+    const { selection } = editor.state
+    // 1. 检查是否为节点选区（如点击选中图片节点）
+    if (selection instanceof NodeSelection) {
+      const node = selection.node
+      return node.type.name === 'compText'
+    }
+
+    // 2. 检查光标是否在自定义节点内部
+    const $pos = selection.$from
+    for (let depth = $pos.depth; depth >= 0; depth--) {
+      const node = $pos.node(depth)
+      if (node.type.name === 'compText') {
+        return true
+      }
+    }
+    return false
+  },
+
+  /**
+   * 获取当前字体样式
+   */
+  getStyleBySelection(editor: Editor, selection?: EditorState['selection']) {
+    const fontWeight = editor.isActive('bold') ? 'bold' : 'normal'
+    const textStyle = editor.getAttributes('textStyle') || {}
+    const backgroundColor = editor.getAttributes('highlight').color
+
+    const cssText = {
+      fontWeight,
+      backgroundColor,
+      ...textStyle,
+    }
+
+    selection ||= editor.state.selection
+    if (
+      tiptapUtil.isCompTextNodeSelected(editor) &&
+      selection instanceof NodeSelection
+    ) {
+      const tempCssText = selection.node.attrs.cssText || {}
+      Object.assign(cssText, tempCssText)
+    } else {
+      const $from = selection.$from
+      if ($from.nodeBefore?.type.name === 'compText') {
+        const tempCssText = $from.nodeBefore.attrs.cssText || {}
+        Object.assign(cssText, tempCssText)
+      }
+    }
+    return cssText
+  },
 }

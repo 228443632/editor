@@ -13,8 +13,16 @@ import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extens
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/examples/utils/css-util'
 import { type Editor } from '@tiptap/core'
-import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
-import FillFormParamsAE from './FillFormParamsAE.vue' // 表单数据填充
+import {
+  arrayToObj,
+  blobSaveAs,
+  deepClone,
+  parseJsonNoError,
+  getSize,
+} from 'sf-utils2'
+import FillFormParamsAE from './FillFormParamsAE.vue'
+import { NodeSelection } from '@tiptap/pm/state'
+import { tiptapUtil } from '@/examples/utils/tiptap-util' // 表单数据填充
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -44,8 +52,10 @@ const paramsConfig = ref([
         },
         get attrs() {
           const compTexts = this.compTexts
+          const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
+            cssText,
             // placeholder: `普通文本${compTexts.length + 1}`,
             placeholder: `普通文本`,
           }
@@ -78,10 +88,12 @@ const paramsConfig = ref([
         },
         get attrs() {
           const compTexts = this.compTexts
+          const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'name',
             placeholder: `姓名${compTexts.length + 1}`,
+            cssText,
             // placeholder: `姓名`,
           }
         },
@@ -113,11 +125,13 @@ const paramsConfig = ref([
         },
         get attrs() {
           const compTexts = this.compTexts
+          const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'mobile',
             // placeholder: `手机号${compTexts.length + 1}`,
             placeholder: `手机号`,
+            cssText,
           }
         },
         click() {
@@ -148,11 +162,13 @@ const paramsConfig = ref([
         },
         get attrs() {
           const compTexts = this.compTexts
+          const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
             // placeholder: `身份证${compTexts.length + 1}`,
             placeholder: `身份证`,
+            cssText,
           }
         },
         click() {

@@ -1,8 +1,9 @@
 <template>
   <div class="examples">
-    <div v-if="IS_DEV">
-      <t-button @click="testEditorFunc('demo001')">获取</t-button>
-      <t-button @click="testEditorFunc('demo002')">点击demo002</t-button>
+    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px">
+      <t-button @click="testEditorFunc('demo001')" size="small">获取</t-button>
+      <t-button @click="testEditorFunc('demo002')" size="small">点击demo002</t-button>
+      <t-button @click="testEditorFunc('getCurrentFontSize')" size="small">光标字大小</t-button>
     </div>
     <umo-editor ref="editorRef" v-bind="options">
       <!-- 基础工具   -->
