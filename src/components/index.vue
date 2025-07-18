@@ -72,7 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import type { FocusPosition } from '@tiptap/core'
+import type { FocusPosition, JSONContent } from '@tiptap/core'
+import type { Editor } from '@tiptap/vue-3'
 import {
   isBoolean,
   isNumber,
@@ -92,7 +93,14 @@ import { useElementSize } from '@vueuse/core'
 import { getSelectionNode, getSelectionText } from '@/extensions/selection'
 import { i18n } from '@/i18n'
 import { propsOptions } from '@/options'
-import type { PageOption, UmoEditorOptions } from '@/types'
+import type {
+  InsterContentOptions,
+  InsterContentType,
+  PageOption,
+  SetContentOptions,
+  SetContentType,
+  UmoEditorOptions,
+} from '@/types'
 import type {
   AutoSaveOptions,
   DocumentOptions,
@@ -150,8 +158,8 @@ const _slots = computed(() => {
 // state Setup
 const container = $ref(`#umo-editor-${shortId(4)}`)
 const defaultOptions = inject('defaultOptions', {})
-const options = ref(getOpitons(props, defaultOptions))
-const editor = ref(null)
+const options = ref<UmoEditorOptions>(getOpitons(props, defaultOptions))
+const editor = ref<Editor | null>(null)
 const savedAt = ref(null)
 const page = ref({})
 const blockMenu = ref(false)
@@ -358,30 +366,30 @@ watch(
     if (!editor.value) {
       return
     }
-    editor.value.on('create', ({ editor }: any) => {
+    editor.value.on('create', ({ editor }) => {
       destroyed.value = false
       emits('created', { editor })
     })
-    editor.value.on('update', ({ editor }: any) => {
+    editor.value.on('update', ({ editor }) => {
       emits('changed', { editor })
       contentUpdated = true
     })
-    editor.value.on('selectionUpdate', ({ editor }: any) => {
+    editor.value.on('selectionUpdate', ({ editor }) => {
       emits('changed:selection', { editor })
     })
-    editor.value.on('transaction', ({ editor, transaction }: any) => {
+    editor.value.on('transaction', ({ editor, transaction }) => {
       emits('changed:transaction', { editor, transaction })
     })
-    editor.value.on('focus', ({ editor, event }: any) => {
+    editor.value.on('focus', ({ editor, event }) => {
       emits('focus', { editor, event })
     })
     editor.value.on(
       'contentError',
-      ({ editor, error, disableCollaboration }: any) => {
+      ({ editor, error, disableCollaboration }) => {
         emits('contentError', { editor, error, disableCollaboration })
       },
     )
-    editor.value.on('blur', ({ editor, event }: any) => {
+    editor.value.on('blur', ({ editor, event }) => {
       emits('blur', { editor, event })
     })
     editor.value.on('destroy', () => {
@@ -499,7 +507,7 @@ const localeConfig = $ref<Record<string, GlobalConfigProvider>>({
 })
 
 // Options Setup
-const setOptions = (value: UmoEditorOptions) => {
+const setOptions = (value: UmoEditorOptions): UmoEditorOptions => {
   options.value = getOpitons(value)
   const $locale = useStorage('umo-editor:locale', options.value.locale)
   if (!$locale.value) {
@@ -655,7 +663,9 @@ const setWatermark = (params: Partial<WatermarkOption>) => {
 }
 
 const setDocument = (params: DocumentOptions) => {
-  if (!isRecord(params)) {
+  // The original "isRecord" function affects the following typeScript type derivation, so change the method to judge.
+  // 原来的“isRecord”函数影响了下面的typeScript类型推导，所以换一个方法判断。
+  if (Object.prototype.toString.call(params) !== '[object Object]') {
     throw new Error('params must be an object.')
   }
   if (!options.value.document) {
@@ -710,8 +720,8 @@ const setDocument = (params: DocumentOptions) => {
 
 // Content Methods
 const setContent = (
-  content: string,
-  options = {
+  content: SetContentType,
+  options: SetContentOptions = {
     emitUpdate: true,
     focusPosition: 'start',
     focusOptions: { scrollIntoView: true },
@@ -724,14 +734,14 @@ const setContent = (
   editor.value
     .chain()
     .setContent(doc, options.emitUpdate)
-    .focus(options.focusPosition as FocusPosition, options.focusOptions)
+    .focus(options.focusPosition, options.focusOptions)
     .run()
 }
 
 // Content Methods
 const insertContent = (
-  content: string,
-  options = {
+  content: InsterContentType,
+  options: InsterContentOptions = {
     updateSelection: true,
     focusPosition: 'start',
     focusOptions: { scrollIntoView: true },
@@ -744,7 +754,7 @@ const insertContent = (
   editor.value
     .chain()
     .insertContent(doc, { updateSelection: options.updateSelection })
-    .focus(options.focusPosition as FocusPosition, options.focusOptions)
+    .focus(options.focusPosition, options.focusOptions)
     .run()
 }
 
@@ -766,21 +776,23 @@ const stopTypewriter = () => {
 }
 
 const getTypewriterState = () => {
-  editor?.value?.commands.getTypewriterState()
+  return editor?.value?.commands.getTypewriterState()
 }
 
-const getContent = (format = 'html') => {
+const getContent = <T extends 'html' | 'json' | 'text' = 'html'>(
+  format: T = 'html' as T,
+): T extends 'json' ? JSONContent : string => {
   if (!editor.value) {
     throw new Error('editor is not ready!')
   }
   if (format === 'html') {
-    return editor.value.getHTML()
+    return editor.value.getHTML() as T extends 'json' ? JSONContent : string
   }
   if (format === 'text') {
-    return editor.value.getText()
+    return editor.value.getText() as T extends 'json' ? JSONContent : string
   }
   if (format === 'json') {
-    return editor.value.getJSON()
+    return editor.value.getJSON() as T extends 'json' ? JSONContent : string
   }
   throw new Error('format must be html, text or json')
 }
@@ -943,17 +955,17 @@ const saveContent = async (showMessage = true) => {
     console.error((e as Error).message)
   }
 }
-const getAllBookmarks = () => {
+const getAllBookmarks = (): any[] => {
   let bookmarkData: any = []
   editor.value?.commands.getAllBookmarks(function (_data: any) {
     bookmarkData = _data
   })
   return bookmarkData
 }
-const focusBookmark = (bookmarkName: string) => {
+const focusBookmark = (bookmarkName: string): boolean | undefined => {
   return editor.value?.commands.focusBookmark(bookmarkName)
 }
-const setBookmark = (bookmarkName: string) => {
+const setBookmark = (bookmarkName: string): boolean | undefined => {
   return editor.value?.commands.setBookmark({ bookmarkName })
 }
 const deleteBookmark = (bookmarkName: string) => {
@@ -1054,7 +1066,7 @@ provide('reset', reset)
 
 // Exposing Methods
 defineExpose({
-  getOptions: () => options.value,
+  getOptions: () => options.value as UmoEditorOptions,
   setOptions,
   setToolbar,
   setPage,
@@ -1077,15 +1089,17 @@ defineExpose({
   getJSON,
   saveContent,
   getContentExcerpt,
-  getEditor: () => editor,
-  useEditor: () => editor.value,
+  getEditor: () => editor as Ref<Editor> | null,
+  useEditor: () => editor.value as Editor | null,
   getTableOfContents: () => editor.value?.storage.tableOfContents.content,
-  getSelectionText: () => (editor.value ? getSelectionText(editor.value) : ''),
+  getSelectionText: () =>
+    (editor.value ? getSelectionText(editor.value) : '') as string,
   getSelectionNode: () =>
     editor.value ? getSelectionNode(editor.value) : null,
-  deleteSelectionNode: () => editor.value?.commands.deleteSelectionNode(),
+  deleteSelectionNode: () =>
+    editor.value?.commands.deleteSelectionNode() as boolean | undefined,
   setCurrentNodeSelection: () =>
-    editor.value?.commands.setCurrentNodeSelection(),
+    editor.value?.commands.setCurrentNodeSelection() as boolean | undefined,
   getLocale,
   getI18n,
   setReadOnly(readOnly = true) {

@@ -1,4 +1,6 @@
-import type { Extension } from '@tiptap/core'
+import type { Extension, HTMLContent, JSONContent } from '@tiptap/core'
+import type { FocusPosition } from '@tiptap/core'
+import { Fragment, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { AsyncFunction } from '@tool-belt/type-predicates'
 
 export type SupportedLocale = 'en-US' | 'zh-CN' | 'ru-RU'
@@ -205,6 +207,29 @@ export interface FileOptions {
   }[]
 }
 
+export type InsterContentType = string | Fragment | ProseMirrorNode
+
+export interface SetContentOptions {
+  emitUpdate: boolean
+  focusPosition: FocusPosition
+  focusOptions: { scrollIntoView: boolean }
+}
+export type InsterContentOptions = Omit<SetContentOptions, 'emitUpdate'> & {
+  updateSelection: boolean
+}
+
+export type SetContentType = InsterContentType | JSONContent | JSONContent[]
+
+type OnSaveFunction = (
+  content: {
+    html: HTMLContent
+    json: JSONContent
+    text: string
+  },
+  page: PageOption,
+  document: DocumentOptions,
+) => Promise<unknown>
+
 export interface UmoEditorOptions {
   editorKey?: string
   locale?: SupportedLocale
@@ -236,10 +261,10 @@ export interface UmoEditorOptions {
   users?: UserItem[]
   extensions?: Extension[]
   translations?: Record<string, unknown>
-  onSave?: AsyncFunction
+  onSave?: OnSaveFunction
   onFileUpload?: (file: File) => Promise<{ id: string; url: string }>
   onFileDelete?: CallableFunction
 }
 
 // 组件类型声明
-export * from '../dist/umo-editor'
+export * from './src/components'
