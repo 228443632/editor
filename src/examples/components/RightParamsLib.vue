@@ -378,7 +378,7 @@ const dragMethod = {
       {}) as IDragNodeParamsNode
 
     const dataId = nodeData?.attrs?.['data-id']
-    if (nodeData.type == 'imageParagraph') {
+    if (nodeData.type == 'compText') {
       const targetDom = document.querySelector(
         `span[data-id="${dataId}"]`,
       ) as HTMLHtmlElement

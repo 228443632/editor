@@ -18,9 +18,23 @@ export default Image.extend({
   name: NAME,
   addAttributes() {
     return {
+      /** 组件名称 */
       compName: {
         default: NAME,
       },
+
+      /** 是否参数组件 */
+      isCompParams: {
+        default: true,
+      },
+
+      /**
+       * 是否显示气泡菜单
+       */
+      isShowBubbleMenu: {
+        default: false,
+      },
+
       vnode: {
         default: true,
       },

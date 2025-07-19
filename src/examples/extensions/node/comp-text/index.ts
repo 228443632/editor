@@ -40,6 +40,7 @@ export default Node.create({
   inline: true, // 关键：标记为行内元素[4](@ref)
   defining: true,
   // marks: '',
+  // atom: true,
 
   addAttributes() {
     return {
@@ -49,6 +50,18 @@ export default Node.create({
         parseHTML: () => NAME,
       },
 
+      /** 是否参数组件 */
+      isCompParams: {
+        default: true,
+      },
+
+      /**
+       * 是否显示气泡菜单
+       */
+      isShowBubbleMenu: {
+        default: false,
+      },
+
       /** 唯一标识 */
       'data-id': {
         default: undefined,
@@ -56,6 +69,11 @@ export default Node.create({
       },
 
       ...tiptapUtil.addAttributes(),
+
+      /** 是否拖拽 */
+      isDraggable: {
+        default: false,
+      },
 
       /** 占位 */
       placeholder: {
@@ -70,11 +88,6 @@ export default Node.create({
       /** 字段名称 */
       fieldName: {
         default: 'fieldName',
-      },
-
-      /** 是否参数组件 */
-      isCompParams: {
-        default: true,
       },
 
       /** 备注，填写说明 */

@@ -17,6 +17,7 @@ const { proxy } = getCurrentInstance()
 const props = defineProps({
   ...nodeViewProps,
 })
+const { node } = props
 const emit = defineEmits({})
 const __globalBizState__ = inject('__globalBizState__') as Ref<
   Record<string, any>
@@ -26,8 +27,6 @@ const options = inject('options') as Ref<Record<string, any>>
 const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
-const $recent = useState('recent', options)
-const usedFonts = $ref<string[]>([])
 const formRef = ref<InstanceType<typeof Form>>()
 const formData = ref({})
 const visible = reactive({
@@ -58,29 +57,12 @@ const dict = {
 
 function onSelectNode() {
   props.editor.commands.setNodeSelection(props.getPos())
-  __globalBizState__.value.nodeActive = props.node
+  __globalBizState__.value.nodeActive = node
 
-  console.log('props.node', Object.create(props.node?.attrs))
-
-  formData.value = deepClone({ ...props.node?.attrs })
-  // if (!isObject(formData.value.styleObj)) {
-  //   formData.value.styleObj = parseJsonNoError(formData.value.styleObj) || {}
-  // }
-  // formData.value.styleObj.fontSize ||= getRootElementFontSize()
-
+  console.log('node', Object.create(node?.attrs))
+  formData.value = deepClone({ ...node?.attrs })
   // setBubbleMenuShow(false)
   visible.dialog = true
-}
-
-/**
- * 获取当前根组件的字体大小
- */
-function getRootElementFontSize() {
-  const rootElement = unrefElement(rootRef) as HTMLElement
-  if (rootElement.nodeType == Node.ELEMENT_NODE) {
-    return getComputedStyle(rootElement).fontSize
-  }
-  return ''
 }
 
 async function onConfirm() {
@@ -120,43 +102,9 @@ function setBubbleMenuShow(isShow = true) {
 
 /* 计算 */
 
-const _attributes = computed(() => props.node?.attrs)
+const _attributes = computed(() => node?.attrs)
 
-const _text = computed(() => `$\{{${props.node?.attrs?.fieldName}}}`)
-
-const _allFonts = computed(() => {
-  const all = [
-    {
-      label: t('base.fontFamily.all'),
-      children: options.value.dicts?.fonts ?? [],
-    },
-  ]
-  // 通过字体值获取字体列表
-  const getFontsByValues = (values: string[]) => {
-    return values.map(
-      (item) =>
-        options.value.dicts?.fonts.find(
-          ({ value }: { value: string }) => value === item,
-        ) ?? {
-          label: item,
-          item,
-        },
-    )
-  }
-  if ($recent.value.fonts.length > 0) {
-    all.unshift({
-      label: t('base.fontFamily.recent'),
-      children: getFontsByValues($recent.value.fonts) as any,
-    })
-  }
-  if (usedFonts.length > 0) {
-    all.unshift({
-      label: t('base.fontFamily.used'),
-      children: getFontsByValues(usedFonts) as any,
-    })
-  }
-  return all
-})
+const _text = computed(() => `$\{{${node?.attrs?.fieldName}}}`)
 
 /**
  * 根节点样式
@@ -171,7 +119,7 @@ const _rootStyle = computed(() => {
 onMounted(() => {
   // console.log('props', props, props.getPos(), props.updateAttributes)
   window.requestAnimationFrame(() => {
-    if (!props.node.attrs?.['data-id']) {
+    if (!node.attrs?.['data-id']) {
       props.updateAttributes({
         'data-id': simpleUUID(),
       })
@@ -188,16 +136,15 @@ defineExpose({
 <!--render-->
 <template>
   <node-view-wrapper
-    v-bind="props.node?.attrs"
+    v-bind="node?.attrs"
     ref="rootRef"
     as="span"
     :class="[
       `form-comp--text is-inline-block`,
-      `form-comp-border--${props.node?.attrs?.borderType}`,
+      `form-comp-border--${node?.attrs?.borderType}`,
     ]"
     :data-id="_attributes['data-id']"
-    contenteditable="false"
-    :data-placeholder="props?.node?.attrs?.placeholder"
+    :data-placeholder="node?.attrs?.placeholder"
     data-u="comp-text"
     :style="_rootStyle"
     @click="onSelectNode"

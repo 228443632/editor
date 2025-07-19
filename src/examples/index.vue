@@ -35,7 +35,7 @@ import { shallowMergeWithArrayOverride } from '@/examples/utils/object-util'
 
 // extension
 import extensions from './extensions'
-import { debounce } from 'sf-utils2'
+import { debounce, hasOwn } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
@@ -76,7 +76,7 @@ provide('__tiptapHelper__', tiptapHelper)
 function selectionChange({ editor }: { editor: Editor }) {
   const node = editor.state.doc.nodeAt(editor.state.selection.anchor)
   // const node = editor.state.selection.$anchor.parent
-  if (node?.attrs.isCompParams) {
+  if (hasOwn(node?.attrs, 'isShowBubbleMenu') && !node?.attrs.isShowBubbleMenu) {
     options.document.isShowBubbleMenu = false
   } else {
     options.document.isShowBubbleMenu = true

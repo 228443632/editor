@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { removeBackground } from '@imgly/background-removal'
+import { fileToBase64 } from 'file64'
 
 import { shortId } from '@/utils/short-id'
 
@@ -63,9 +64,6 @@ const selectImage = () => {
       return
     }
 
-    sealImg = URL.createObjectURL(file)
-    // FIXME
-    return
     try {
       sealImg = null
       converting = t('tools.seal.converting1')
@@ -81,7 +79,7 @@ const selectImage = () => {
           }
         },
       })
-      sealImg = URL.createObjectURL(img)
+      sealImg = fileToBase64(img)
     } catch {
       useMessage('error', {
         attach: container,
@@ -123,7 +121,7 @@ const setSeal = async () => {
       draggable: true,
       rotatable: true,
       previewType: null,
-      absolutePara: true
+      absolutePara: true,
     })
     .run()
   dialogVisible = false

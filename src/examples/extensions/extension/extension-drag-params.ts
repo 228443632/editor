@@ -10,17 +10,13 @@ import { parseJsonNoError } from 'sf-utils2'
 import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
-
-const compParamsMap = {
-  compText: 1,
-  imageParagraph: 1,
-} as const
+import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
 
 export interface IDragNodeParamsNode {
   /** node 参数组件类型*/
   value: string
   /** 等同于上面*/
-  type: TPrettifyString<keyof typeof compParamsMap>
+  type: TPrettifyString<keyof typeof COMP_PARAMS_MAP>
 
   /** node 参数组件名称*/
   label: string
@@ -41,8 +37,7 @@ export const ExtensionDragParams = Extension.create({
 
       e.preventDefault()
 
-      if (!nodeData.isCompParams) return true // 不是自定义的参数节点
-      if (!compParamsMap[nodeData.type]) return true
+      if (!COMP_PARAMS_MAP[nodeData.type]) return true
 
       switch (nodeData.type) {
         case 'compText': {
@@ -53,7 +48,7 @@ export const ExtensionDragParams = Extension.create({
           })
           const $pos = view.state.doc.resolve(coordinates.pos)
           const nodeTypeName = $pos.parent.type.name
-          if (compParamsMap[nodeTypeName]) {
+          if (COMP_PARAMS_MAP[nodeTypeName]) {
             useMessage('error', {
               content: '当前位置已有普通文本，请拖拽到其他位置',
             })
