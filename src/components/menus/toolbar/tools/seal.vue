@@ -62,6 +62,10 @@ const selectImage = () => {
     if (!file) {
       return
     }
+
+    sealImg = URL.createObjectURL(file)
+    // FIXME
+    return
     try {
       sealImg = null
       converting = t('tools.seal.converting1')
@@ -108,7 +112,7 @@ const setSeal = async () => {
   editor.value
     ?.chain()
     .focus()
-    .setImage({
+    .setImageParagraph({
       id,
       type: 'seal',
       name,
@@ -119,6 +123,7 @@ const setSeal = async () => {
       draggable: true,
       rotatable: true,
       previewType: null,
+      absolutePara: true
     })
     .run()
   dialogVisible = false

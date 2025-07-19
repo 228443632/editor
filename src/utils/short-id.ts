@@ -3,7 +3,6 @@ export const shortId = (length = 8) =>
     .toString(36)
     .substring(2, length + 2)
 
-
 /**
  * 生成UUId
  * @returns {string}

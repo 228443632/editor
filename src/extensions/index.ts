@@ -65,6 +65,9 @@ import typeWriter from './type-writer'
 import Video from './video'
 import { BackgroundColor } from '@weiruo/tiptap-extension-background-color'
 
+// 自定义
+import ImageParagraph from './image-paragraph'
+
 export const getDefaultExtensions = ({
   container,
   options,
@@ -129,9 +132,10 @@ export const getDefaultExtensions = ({
       searchResultClass: 'umo-search-result',
     }),
     Link,
+    ImageParagraph,
     Image.configure({
       allowBase64: true,
-      inline: true,
+      inline: false,
     }),
     Video,
     Audio,
@@ -221,7 +225,7 @@ export const getDefaultExtensions = ({
     typeWriter,
     UniqueID.configure({
       types: ['heading', 'paragraph'],
-      generateID: () => simpleUUID(),
+      generateID: () => simpleUUID().slice(8),
     }),
     BackgroundColor,
   ]

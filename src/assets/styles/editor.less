@@ -63,10 +63,10 @@
 
     > * {
       position: relative;
-      z-index: 1;
+      //z-index: 1;
 
       + *:not(.umo-floating-node) {
-        margin-top: var(--umo-content-node-bottom);
+        margin-bottom: var(--umo-content-node-bottom);
       }
 
       &.umo-node-focused,
@@ -79,16 +79,16 @@
             display: block;
             position: absolute;
             left: -8px;
-            top: -2px;
             right: -8px;
-            bottom: -2px;
             border-radius: var(--umo-radius);
             background: var(--umo-content-node-selected-background);
             pointer-events: none;
             z-index: -1;
+            bottom: -5px;
+            top: -5px;
           }
           &.umo-floating-node {
-            outline: solid 1px var(--umo-primary-color);
+            outline: solid 2px var(--umo-primary-color);
             transform: translateY(
               calc(var(--umo-content-node-bottom) / 2 - 1px)
             );
@@ -116,7 +116,7 @@
         }
 
         .umo-select-outline {
-          outline: solid 1px var(--umo-primary-color);
+          outline: solid 2px var(--umo-primary-color);
         }
       }
     }
@@ -536,13 +536,16 @@
   }
 
   .Tiptap-invisible-character {
+    pointer-events: none;
     text-indent: 0;
     &--break::before {
+      pointer-events: none;
       content: '↓';
       color: var(--umo-content-invisible-break-color);
     }
     &--paragraph::before {
       content: '↵';
+      pointer-events: none;
       color: var(--umo-content-invisible-break-color);
     }
   }
@@ -666,6 +669,7 @@
   &.Tiptap-invisible-character--paragraph,
   &.Tiptap-invisible-character--break {
     &:before {
+      pointer-events: none;
       content: '↵'; // ↵ ↩︎ ↩
       color: #d6d5d5;
       font-size: 12px;

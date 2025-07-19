@@ -1,18 +1,44 @@
 <template>
   <node-view-wrapper
+    :compname="node?.attrs?.compName"
     ref="containerRef"
     class="umo-node-view"
     :class="{ 'umo-floating-node': node.attrs.draggable }"
     :style="nodeStyle"
     @dblclick="openImageViewer"
   >
-    <div
-      class="umo-node-container umo-node-image"
+    <drager
+      :selected="selected"
+      :rotatable="true"
+      :boundary="false"
+      :skewable="true"
+      :snap-to-grid="false"
+      :draggablelike="
+        Boolean(node.attrs.draggable) && !options.document?.readOnly
+      "
+      :disabled="options.document?.readOnly"
+      :angle="node.attrs.angle"
+      :width="Number(node.attrs.width)"
+      :height="Number(node.attrs.height)"
+      :left="Number(node.attrs.left)"
+      :top="Number(node.attrs.top)"
+      :min-width="14"
+      :min-height="14"
+      :max-width="maxWidth"
+      :max-height="maxHeight"
+      :z-index="10"
+      :equal-proportion="node.attrs.equalProportion"
       :class="{
+        'umo-hover-shadow': !options.document?.readOnly,
+        'umo-select-outline': !node.attrs.draggable,
         'is-loading': node.attrs.src && isLoading,
         'is-error': node.attrs.src && error,
         'is-draggable': node.attrs.draggable,
       }"
+      @rotate="debounceOnRotate"
+      @resize="debounceOnResize"
+      @drag="debounceOnDrag"
+      @focus="selected = true"
     >
       <div
         v-if="node.attrs.src && isLoading"
@@ -30,58 +56,27 @@
         <icon name="image-failed" class="error-icon" />
         {{ t('node.image.error') }}
       </div>
-      <drager
+      <img
         v-else
-        :selected="selected"
-        :rotatable="true"
-        :boundary="false"
-        :skewable="true"
-        :snap-to-grid="false"
-        :draggablelike="
-          Boolean(node.attrs.draggable) && !options.document?.readOnly
-        "
-        :disabled="options.document?.readOnly"
-        :angle="node.attrs.angle"
-        :width="Number(node.attrs.width)"
-        :height="Number(node.attrs.height)"
-        :left="Number(node.attrs.left)"
-        :top="Number(node.attrs.top)"
-        :min-width="14"
-        :min-height="14"
-        :max-width="maxWidth"
-        :max-height="maxHeight"
-        :z-index="10"
-        :equal-proportion="node.attrs.equalProportion"
-        :class="{
-          'umo-hover-shadow': !options.document?.readOnly,
-          'umo-select-outline': !node.attrs.draggable,
+        ref="imageRef"
+        :src="node.attrs.src"
+        :style="{
+          transform:
+            node.attrs.flipX || node.attrs.flipY
+              ? `rotateX(${node.attrs.flipX ? '180' : '0'}deg) rotateY(${node.attrs.flipY ? '180' : '0'}deg)`
+              : 'none',
         }"
-        @rotate="debounceOnRotate"
-        @resize="debounceOnResize"
-        @drag="debounceOnDrag"
-        @focus="selected = true"
+        :data-id="node.attrs.id"
+        loading="lazy"
+        @load="onLoad"
+      />
+      <div
+        v-if="!node.attrs.uploaded && node.attrs.file !== null"
+        class="uploading"
       >
-        <img
-          ref="imageRef"
-          :src="node.attrs.src"
-          :style="{
-            transform:
-              node.attrs.flipX || node.attrs.flipY
-                ? `rotateX(${node.attrs.flipX ? '180' : '0'}deg) rotateY(${node.attrs.flipY ? '180' : '0'}deg)`
-                : 'none',
-          }"
-          :data-id="node.attrs.id"
-          loading="lazy"
-          @load="onLoad"
-        />
-        <div
-          v-if="!node.attrs.uploaded && node.attrs.file !== null"
-          class="uploading"
-        >
-          <span></span>
-        </div>
-      </drager>
-    </div>
+        <span></span>
+      </div>
+    </drager>
   </node-view-wrapper>
 </template>
 
@@ -249,15 +244,23 @@ watch(
 </script>
 
 <style lang="less">
-//.es-drager.selected.border.border {
-//  outline: 1px solid var(--umo-primary-color);
-//}
-.umo-node-view {
-  .umo-node-image {
+.umo-node-view.umo-node-view[compname='imageParagraph'] {
+  //top: var(--umo-page-margin-top);
+  display: contents;
+  &.umo-node-focused {
+    &:before {
+      display: none !important;
+    }
+  }
+}
+
+.umo-node-view[compname='imageParagraph'] {
+  .es-drager {
     max-width: 100%;
     width: auto;
-    position: relative;
     z-index: 20;
+    position: absolute;
+    left: var(--umo-page-margin-left);
     &.is-loading,
     &.is-error {
       outline: none !important;
@@ -335,24 +338,6 @@ watch(
         }
       }
     }
-  }
-}
-
-@keyframes turn {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes progress {
-  0% {
-    width: 0;
-  }
-  100% {
-    width: 100%;
   }
 }
 </style>

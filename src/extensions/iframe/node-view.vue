@@ -76,7 +76,7 @@ onClickOutside(containerRef, () => {
     max-width: 100%;
     .es-drager {
       &:not(.selected) {
-        outline: solid 1px var(--umo-content-node-border);
+        outline: solid 2px var(--umo-content-node-border);
       }
     }
     iframe {

@@ -123,10 +123,11 @@ const options = $ref(
       // shareUrl: 'https://umodoc.com',
       file: {
         allowedMimeTypes: [
-          'application/pdf',
-          'image/svg+xml',
-          'video/mp4',
-          'audio/*',
+          // '*',
+          // 'application/pdf',
+          // 'image/svg+xml',
+          // 'video/mp4',
+          // 'audio/*',
         ],
       },
 

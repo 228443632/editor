@@ -21,6 +21,7 @@
     v-if="editor && !destroyed && !page.preview?.enabled && editor.isEditable"
   >
     <menus-context-block v-if="options.document?.enableBlockMenu" />
+    <!-- 右击菜单冒泡   -->
     <menus-bubble
       v-if="options.document?.enableBubbleMenu"
       v-show="!editor?.view?.painter?.enabled && !editor?.isEmpty"

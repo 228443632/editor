@@ -58,6 +58,7 @@
           </div>
           <div ref="umoPageNodeContentRef" class="umo-page-node-content">
             <editor>
+              <!--  菜单冒泡   -->
               <template #bubble_menu="props">
                 <slot name="bubble_menu" v-bind="props" />
               </template>
@@ -90,6 +91,7 @@
       </div>
     </transition>
 
+    <!-- 图片预览 -->
     <t-image-viewer
       v-model:visible="imageViewer.visible"
       v-model:index="currentImageIndex"

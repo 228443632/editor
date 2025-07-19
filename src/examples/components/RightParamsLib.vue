@@ -13,15 +13,8 @@ import type { IDragNodeParamsNode } from '@/examples/extensions/extension/extens
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/examples/utils/css-util'
 import { type Editor } from '@tiptap/core'
-import {
-  arrayToObj,
-  blobSaveAs,
-  deepClone,
-  parseJsonNoError,
-  getSize,
-} from 'sf-utils2'
+import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue'
-import { NodeSelection } from '@tiptap/pm/state'
 import { tiptapUtil } from '@/examples/utils/tiptap-util' // 表单数据填充
 
 const props = defineProps({})
@@ -328,7 +321,6 @@ const dragMethod = {
     const nodeData = {
       ...cItem,
       type: cItem.value,
-      isCompParams: true,
       attrs: {
         ...cItem.attrs,
       },
@@ -385,10 +377,8 @@ const dragMethod = {
     const nodeData = (parseJsonNoError(e.dataTransfer?.getData('text/plain')) ||
       {}) as IDragNodeParamsNode
 
-    console.log('targetDom', nodeData)
-
     const dataId = nodeData?.attrs?.['data-id']
-    if (nodeData.isCompParams) {
+    if (nodeData.type == 'imageParagraph') {
       const targetDom = document.querySelector(
         `span[data-id="${dataId}"]`,
       ) as HTMLHtmlElement
