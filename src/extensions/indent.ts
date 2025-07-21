@@ -26,7 +26,7 @@ export default Extension.create({
     return {
       types: ['heading', 'listItem', 'taskItem', 'paragraph'],
       minLevel: 0,
-      maxLevel: 5,
+      maxLevel: 14,
     }
   },
   addGlobalAttributes() {

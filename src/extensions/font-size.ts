@@ -48,17 +48,6 @@ export default Extension.create<FontSizeOption>({
         (fontSize) =>
         ({ chain, editor }) => {
           const chainResult = chain().focus().setMark('textStyle', { fontSize })
-          const { from, to } = editor.state.selection
-          editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
-                cssText: {
-                  ...node.attrs.cssText,
-                  fontSize,
-                },
-              })
-            }
-          })
           return chainResult.run()
         },
       unsetFontSize:
@@ -67,17 +56,6 @@ export default Extension.create<FontSizeOption>({
           const chainResult = chain()
             .focus()
             .setMark('textStyle', { fontSize: null })
-          const { from, to } = editor.state.selection
-          editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
-                cssText: {
-                  ...node.attrs.cssText,
-                  fontSize: null,
-                },
-              })
-            }
-          })
           return chainResult.removeEmptyTextStyle().run()
         },
     }

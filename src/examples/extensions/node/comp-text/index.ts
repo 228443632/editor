@@ -70,11 +70,6 @@ export default Node.create({
 
       ...tiptapUtil.addAttributes(),
 
-      /** 是否拖拽 */
-      isDraggable: {
-        default: false,
-      },
-
       /** 占位 */
       placeholder: {
         default: '',

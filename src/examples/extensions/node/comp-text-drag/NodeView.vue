@@ -6,24 +6,22 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, isObject, to } from 'sf-utils2'
+import { debounce, deepClone, isObject, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
 
 import { simpleUUID } from '@/utils/short-id'
+import Drager from 'es-drager'
 
 const { proxy } = getCurrentInstance()
 
-const props = defineProps({
-  ...nodeViewProps,
-})
-const { node } = props
+const props = defineProps(nodeViewProps)
 const emit = defineEmits({})
 const __globalBizState__ = inject('__globalBizState__') as Ref<
   Record<string, any>
 >
 const options = inject('options') as Ref<Record<string, any>>
 
-const { updateAttributes } = props
+const { updateAttributes, node } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const formRef = ref<InstanceType<typeof Form>>()
@@ -31,26 +29,7 @@ const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
-const dict = {
-  borderType: [
-    { key: 'none', label: '无边框' },
-    {
-      key: 'underline',
-      label: '下划线',
-      style: 'border-bottom: 1px solid currentColor',
-    },
-    {
-      key: 'solid',
-      label: '边框',
-      style: 'border: 1px solid currentColor',
-    },
-    // {
-    //   key: 'dash',
-    //   label: '边框虚线',
-    //   style: 'border: 1px dashed var(--umo-node-text-border-color)',
-    // },
-  ],
-}
+const selected = ref(false)
 
 /* 方法 */
 
@@ -61,7 +40,9 @@ function onSelectNode() {
   console.log('node', Object.create(node?.attrs))
   formData.value = deepClone({ ...node?.attrs })
   // setBubbleMenuShow(false)
-  visible.dialog = true
+  window.requestAnimationFrame(() => {
+    visible.dialog = true
+  })
 }
 
 async function onConfirm() {
@@ -99,6 +80,32 @@ function setBubbleMenuShow(isShow = true) {
   options.value.document.enableBubbleMenu = isShow
 }
 
+const onRotate = ({ angle }: { angle: number }) => {
+  updateAttributes({ dragAttrs: { ..._dragAttrs.value, angle } })
+}
+const debounceOnRotate = debounce(onRotate, 20)
+const onResize = ({ width, height }: { width: number; height: number }) => {
+  updateAttributes({
+    dragAttrs: {
+      ..._dragAttrs.value,
+      width: width.toFixed(2),
+      height: height.toFixed(2),
+    },
+  })
+}
+const debounceOnResize = debounce(onResize, 20)
+
+const onDrag = ({ left, top }: { left: number; top: number }) => {
+  updateAttributes({
+    dragAttrs: {
+      ..._dragAttrs.value,
+      top,
+      left,
+    },
+  })
+}
+const debounceOnDrag = debounce(onDrag, 20)
+
 /* 计算 */
 
 const _attributes = computed(() => node?.attrs)
@@ -110,6 +117,10 @@ const _text = computed(() => `$\{{${node?.attrs?.fieldName}}}`)
  */
 const _rootStyle = computed(() => {
   return _attributes.value.cssText || {}
+})
+
+const _dragAttrs = computed(() => {
+  return _attributes.value.dragAttrs || {}
 })
 
 /* 监听 */
@@ -135,22 +146,48 @@ defineExpose({
 <!--render-->
 <template>
   <node-view-wrapper
-    v-bind="node?.attrs"
     ref="rootRef"
-    as="span"
-    :class="[
-      `form-comp--text is-inline-block`,
-      `form-comp-border--${node?.attrs?.borderType}`,
-    ]"
+    :compname="node.attrs?.compName"
+    as="div"
+    :iscompparams="node.attrs?.isCompParams"
     :data-id="_attributes['data-id']"
-    :data-placeholder="node?.attrs?.placeholder"
-    data-u="comp-text"
     :style="_rootStyle"
-    @click="onSelectNode"
+    :class="['umo-floating-node', 'umo-node-view']"
   >
-    <text class="hidden">{{ _text }}</text>
+    <Drager
+      :selected="selected"
+      :rotatable="true"
+      :boundary="false"
+      tag="span"
+      :skewable="true"
+      :snap-to-grid="false"
+      :angle="_dragAttrs.angle"
+      :width="Number(_dragAttrs.width)"
+      :height="Number(_dragAttrs.height)"
+      :left="Number(_dragAttrs.left)"
+      :top="Number(_dragAttrs.top)"
+      :min-width="14"
+      :min-height="14"
+      :z-index="1000"
+      :equal-proportion="_dragAttrs.equalProportion"
+      :class="[
+        'umo-select-outline umo-hover-shadow',
+        node.attrs.isDraggable && 'is-draggable',
+      ]"
+      @rotate="debounceOnRotate"
+      @resize="debounceOnResize"
+      @drag="debounceOnDrag"
+      @focus="selected = true"
+      @dblclick="onSelectNode"
+    >
+      <text class="hidden">{{ _text }}</text>
+      <span class="print-hidden text-placeholder">{{
+        _attributes.placeholder
+      }}</span>
+    </Drager>
+
     <t-popup
-      v-model:visible="visible.dialog"
+      :visible="visible.dialog"
       :destroy-on-close="false"
       trigger="click"
       :on-visible-change="onVisibleChange"
@@ -198,21 +235,6 @@ defineExpose({
               ></t-input>
             </t-form-item>
 
-            <t-form-item label="外观" name="borderType">
-              <t-radio-group v-model="formData.borderType">
-                <t-radio
-                  v-for="(item, index) in dict.borderType"
-                  :key="index"
-                  :value="item.key"
-                  class="ml-4px"
-                >
-                  <span :style="item.style" class="-ml-2px px-2px">
-                    {{ item.label }}
-                  </span>
-                </t-radio>
-              </t-radio-group>
-            </t-form-item>
-
             <t-form-item label="默认值" name="name">
               <t-input
                 v-model="formData.defaultValue"
@@ -234,42 +256,43 @@ defineExpose({
         </div>
       </template>
     </t-popup>
-    <!--    <modal-->
-    <!--      :visible="visible.dialog"-->
-    <!--      icon="params-comp-text"-->
-    <!--      :header="`参数修改`"-->
-    <!--      width="480px"-->
-    <!--      @confirm="onConfirm"-->
-    <!--      @close="onClose"-->
-    <!--    >-->
-    <!--    </modal>-->
   </node-view-wrapper>
 </template>
 
 <!--style-->
 <style lang="less">
-.form-comp--text[data-u='comp-text'] {
-  position: relative;
-  box-sizing: border-box;
-  min-width: 140px;
-  min-height: 1em;
-  text-align: left;
-  border-bottom: 1px solid var(--umo-node-text-border-color);
-  //padding: 0 2px;
-  //padding: 0;
+div[compname='compTextDrag'] {
+  display: contents;
+  height: 0;
+  width: 0;
   cursor: pointer;
-  border-radius: 2px;
-  &.umo-node-focused.umo-node-focused.umo-node-focused {
-    outline: 1px dashed var(--umo-primary-color);
+
+  // float-node
+  transform: translate(0, 0) !important;
+
+  .text-placeholder {
+    color: #9ba3b0;
   }
+
+  & > * {
+    transform: translate(0, 0) !important;
+  }
+
+  :hover {
+    //outline: 2px solid var(--umo-primary-color);
+  }
+
+  .es-drager {
+    cursor: move;
+    position: absolute;
+    margin-left: var(--umo-page-margin-left);
+    z-index: 1000;
+    background: #fff;
+  }
+
   &:hover {
     background-color: #f0f2f7;
   }
-  &:after {
-    color: #9ba3b0;
-    content: attr(data-placeholder);
-  }
-
   ::selection {
     background-color: var(--umo-text-selection-background);
   }
@@ -277,48 +300,7 @@ defineExpose({
 
 /** 隐藏 */
 :root[mode='print'] {
-  .form-comp--text[data-u='comp-text'] {
-    --umo-node-text-border-color: currentColor;
-    //--umo-node-text-border-color: red;
-    //padding: 0;
-    &:after {
-      content: '';
-    }
-  }
-  span[data-id][iscompparams] {
-    &[bordertype='none'] {
-      border-bottom: none;
-    }
-  }
-}
-
-/*render node*/
-span[data-id][iscompparams] {
-  &[bordertype='underline'] {
-    border-bottom: 1px solid var(--umo-node-text-border-color);
-  }
-
-  &[bordertype='solid'] {
-    border: 1px solid var(--umo-node-text-border-color);
-  }
-
-  &[bordertype='dashed'] {
-    border: 1px dashed var(--umo-node-text-border-color);
-  }
 }
 </style>
 
-<style lang="less">
-.form-comp-border--underline {
-  border-bottom: 1px solid var(--umo-node-text-border-color);
-}
-.form-comp-border--solid {
-  border: 1px solid var(--umo-node-text-border-color);
-}
-.form-comp-border--dashed {
-  border: 1px dashed var(--umo-node-text-border-color);
-}
-.form-comp-border--none {
-  border: none;
-}
-</style>
+<style lang="less"></style>

@@ -8,6 +8,7 @@
  * 组件参数节点
  */
 export const COMP_PARAMS_MAP = {
-  compText: 1,
-  imageParagraph: 1,
+  compText: 'compText',
+  compTextDrag: 'compTextDrag',
+  imageParagraph: 'imageParagraph',
 } as const

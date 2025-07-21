@@ -12,6 +12,7 @@
         'is-loading': node.attrs.src && isLoading,
         'is-error': node.attrs.src && error,
         'is-draggable': node.attrs.draggable,
+        // 'umo-select-outline': !node.attrs.draggable,
       }"
     >
       <div
@@ -35,9 +36,7 @@
         :selected="selected"
         :rotatable="true"
         :boundary="false"
-        :skewable="true"
-        :snap-to-grid="false"
-        :draggablelike="
+        :draggable="
           Boolean(node.attrs.draggable) && !options.document?.readOnly
         "
         :disabled="options.document?.readOnly"
@@ -52,10 +51,13 @@
         :max-height="maxHeight"
         :z-index="10"
         :equal-proportion="node.attrs.equalProportion"
-        :class="{
-          'umo-hover-shadow': !options.document?.readOnly,
-          'umo-select-outline': !node.attrs.draggable,
-        }"
+        :class="[
+          {
+            'umo-hover-shadow': !options.document?.readOnly,
+            'umo-select-outline': !node.attrs.draggable,
+          },
+          node.attrs.isDraggable && 'is-draggable',
+        ]"
         @rotate="debounceOnRotate"
         @resize="debounceOnResize"
         @drag="debounceOnDrag"
@@ -179,6 +181,7 @@ const onResize = ({ width, height }: { width: number; height: number }) => {
 const debounceOnResize = debounce(onResize, 20)
 
 const onDrag = ({ left, top }: { left: number; top: number }) => {
+  if (!node.attrs.draggable) return
   updateAttributes({ left, top })
 }
 const debounceOnDrag = debounce(onDrag, 20)
@@ -249,9 +252,6 @@ watch(
 </script>
 
 <style lang="less">
-//.es-drager.selected.border.border {
-//  outline: 1px solid var(--umo-primary-color);
-//}
 .umo-node-view {
   .umo-node-image {
     max-width: 100%;

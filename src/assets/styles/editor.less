@@ -1,5 +1,11 @@
 @import '@/assets/styles/_mixins.less';
 
+:root[mode='print'] {
+  .print-hidden {
+    display: none;
+  }
+}
+
 .umo-editor-content {
   accent-color: var(--umo-primary-color);
   &.show-line-number {
@@ -12,6 +18,7 @@
           content: counter(title) '.';
           counter-increment: title;
           right: 100%;
+          white-space: nowrap;
           margin-right: 20px;
           color: var(--umo-content-line-number-color);
           font-family: var(--umo-font-family);
@@ -89,7 +96,7 @@
             top: -5px;
           }
           &.umo-floating-node {
-            outline: solid 2px var(--umo-primary-color);
+            outline: solid 1px var(--umo-primary-color);
             transform: translateY(
               calc(var(--umo-content-node-bottom) / 2 - 1px)
             );
@@ -117,7 +124,7 @@
         }
 
         .umo-select-outline {
-          outline: solid 2px var(--umo-primary-color);
+          outline: solid 1px var(--umo-primary-color);
         }
       }
     }
@@ -392,6 +399,42 @@
     text-indent: 10em;
   }
 
+  .indent-6 {
+    text-indent: 12em;
+  }
+
+  .indent-7 {
+    text-indent: 14em;
+  }
+
+  .indent-8 {
+    text-indent: 16em;
+  }
+
+  .indent-9 {
+    text-indent: 16em;
+  }
+
+  .indent-10 {
+    text-indent: 20em;
+  }
+
+  .indent-11 {
+    text-indent: 22em;
+  }
+
+  .indent-12 {
+    text-indent: 24em;
+  }
+
+  .indent-13 {
+    text-indent: 26em;
+  }
+
+  .indent-14 {
+    text-indent: 28em;
+  }
+
   .tableWrapper {
     max-width: 100%;
     overflow-x: auto;
@@ -606,7 +649,7 @@
     border-radius: var(--umo-radius);
     padding: 8px 12px;
     &.umo-node-focused {
-      outline: 2px dashed var(--umo-primary-color);
+      outline: 1px dashed var(--umo-primary-color);
     }
   }
   h1 {

@@ -5,7 +5,6 @@
  */
 
 import compText from './comp-text'
+import compTextDrag from './comp-text-drag'
 
-export default [
-  compText
-]
+export default [compText, compTextDrag]

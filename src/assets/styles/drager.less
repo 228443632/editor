@@ -2,13 +2,13 @@
   position: relative;
   --es-drager-color: var(--umo-primary-color) !important;
   box-sizing: border-box;
-  &:not([draggablelike='true']) {
-    left: 0;
-    top: 0;
+  &:not(.is-draggable) {
+    left: 0 !important;
+    top: 0 !important;
   }
-  &[draggablelike='true'] {
+  &.is-draggable {
     position: absolute;
-    z-index: 1000 !important;
+    z-index: 10;
     cursor: move;
   }
   &:after {
@@ -29,7 +29,7 @@
 
     @media screen {
       &.border {
-        outline: 2px solid var(--umo-primary-color);
+        outline: 1px solid var(--umo-primary-color);
       }
       .es-drager-dot {
         display: block;
@@ -52,8 +52,8 @@
       transform: translate(50%, 50%);
     }
     &-handle {
-      width: 10px;
-      height: 10px;
+      width: 8px;
+      height: 8px;
       background: #fff;
       border: solid 1px var(--umo-primary-color);
     }

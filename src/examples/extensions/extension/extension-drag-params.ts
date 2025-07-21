@@ -40,7 +40,7 @@ export const ExtensionDragParams = Extension.create({
       if (!COMP_PARAMS_MAP[nodeData.type]) return true
 
       switch (nodeData.type) {
-        case 'compText': {
+        case COMP_PARAMS_MAP.compText: {
           // 获取位置并验证
           const coordinates = view.posAtCoords({
             left: e.clientX,
@@ -68,23 +68,35 @@ export const ExtensionDragParams = Extension.create({
           break
         }
 
-        // 图片段落
-        case 'imageParagraph': {
+        // 文本悬浮
+        case COMP_PARAMS_MAP.compTextDrag: {
           const viewRect = view.dom.getBoundingClientRect()
           const viewDomPl = Math.floor(
             +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),
           )
           const offsetX = e.clientX - viewRect.left - viewDomPl
           const offsetY = e.clientY - viewRect.top
-          // console.log('coordinates', {
-          //   offsetX,
-          //   offsetY,
-          //   coordinates,
-          //   nodeTypeName,
-          //   $pos,
-          //   left: e.clientX,
-          //   top: e.clientY,
-          // })
+
+          this.editor
+            .chain()
+            .insertCompTextDragByAttrs({
+              dragAttrs: {
+                top: offsetY,
+                left: offsetX,
+              },
+            })
+            .run()
+          break
+        }
+
+        // 图片段落
+        case COMP_PARAMS_MAP.imageParagraph: {
+          const viewRect = view.dom.getBoundingClientRect()
+          const viewDomPl = Math.floor(
+            +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),
+          )
+          const offsetX = e.clientX - viewRect.left - viewDomPl
+          const offsetY = e.clientY - viewRect.top
 
           this.editor
             .chain()

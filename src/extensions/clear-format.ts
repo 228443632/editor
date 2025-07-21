@@ -4,11 +4,16 @@
  * @create 06/07/25 AM10:50
  */
 import { Extension } from '@tiptap/core'
+import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     clearFormat: {
       clearFormat: () => ReturnType
+    }
+
+    clearFormatV2: {
+      clearFormatV2: () => ReturnType
     }
 
     toggleBoldV2: {
@@ -38,6 +43,13 @@ declare module '@tiptap/core' {
     unsetHighlightV2: {
       unsetHighlightV2: () => ReturnType
     }
+
+    setFontSizeV2: {
+      setFontSize: (fontSize: any) => ReturnType
+    }
+    unsetFontSizeV2: {
+      unsetFontSize: () => ReturnType
+    }
   }
 }
 export type ClearFormatOption = object
@@ -60,6 +72,19 @@ export default Extension.create<ClearFormatOption>({
             .run()
         },
 
+      clearFormatV2:
+        () =>
+        ({ chain, editor }) => {
+          const chainResult = chain().focus().unsetAllMarks()
+          const { from, to } = editor.state.selection
+          editor.state.doc.nodesBetween(from, to, (node) => {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, { cssText: {} })
+            }
+          })
+          return chainResult.removeEmptyTextStyle().run()
+        },
+
       /**
        * 粗体
        */
@@ -69,8 +94,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().toggleBold()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   fontWeight:
@@ -93,8 +118,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().toggleBold()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   fontStyle:
@@ -115,8 +140,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().toggleUnderline()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   textDecoration:
@@ -139,8 +164,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().toggleStrike()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   textDecoration:
@@ -163,8 +188,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().setColor(color)
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   color,
@@ -184,8 +209,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().unsetColor()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   color: null,
@@ -202,8 +227,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().setHighlight({ color })
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   backgroundColor: color,
@@ -220,8 +245,8 @@ export default Extension.create<ClearFormatOption>({
           const chainResult = chain().focus().unsetHighlight()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (node.type.name === 'compText') {
-              chainResult.updateAttributes('compText', {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
                   backgroundColor: null,
@@ -230,6 +255,44 @@ export default Extension.create<ClearFormatOption>({
             }
           })
           return chainResult.run()
+        },
+
+      setFontSizeV2:
+        (fontSize) =>
+        ({ chain, editor }) => {
+          const chainResult = chain().focus().setMark('textStyle', { fontSize })
+          const { from, to } = editor.state.selection
+          editor.state.doc.nodesBetween(from, to, (node) => {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
+                cssText: {
+                  ...node.attrs.cssText,
+                  fontSize,
+                },
+              })
+            }
+          })
+          return chainResult.run()
+        },
+
+      unsetFontSizeV2:
+        () =>
+        ({ chain, editor }) => {
+          const chainResult = chain()
+            .focus()
+            .setMark('textStyle', { fontSize: null })
+          const { from, to } = editor.state.selection
+          editor.state.doc.nodesBetween(from, to, (node) => {
+            if (COMP_PARAMS_MAP[node.type.name]) {
+              chainResult.updateAttributes(node.type.name, {
+                cssText: {
+                  ...node.attrs.cssText,
+                  fontSize: null,
+                },
+              })
+            }
+          })
+          return chainResult.removeEmptyTextStyle().run()
         },
     }
   },

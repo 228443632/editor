@@ -15,7 +15,8 @@ import { cssUtil } from '@/examples/utils/css-util'
 import { type Editor } from '@tiptap/core'
 import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue'
-import { tiptapUtil } from '@/examples/utils/tiptap-util' // 表单数据填充
+import { tiptapUtil } from '@/examples/utils/tiptap-util'
+import { COMP_PARAMS_MAP } from '@/examples/extensions/constant' // 表单数据填充
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -171,6 +172,46 @@ const paramsConfig = ref([
             .focus()
             .deleteSelection()
             .setCompText(attrs)
+            .run()
+
+          const targetDom = document.querySelector(
+            `span[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
+          targetDom?.click?.()
+        },
+      },
+
+      {
+        label: '文本悬浮',
+        value: 'compTextDrag',
+        icon: 'params-comp-idcard',
+        draggable: true,
+        get compTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == COMP_PARAMS_MAP.compTextDrag
+          })
+        },
+        get attrs() {
+          const cssText = tiptapUtil.getStyleBySelection(editor.value)
+          return {
+            isDragging: true,
+            'data-id': commonUtil.simpleUUID(),
+            fieldName: 'idcard',
+            // placeholder: `文本悬浮${compTexts.length + 1}`,
+            placeholder: `文本悬浮`,
+            cssText,
+          }
+        },
+        click() {
+          const attrs = this.attrs
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .insertCompTextDrag({
+              type: COMP_PARAMS_MAP.compTextDrag,
+              attrs: this.attrs,
+            })
             .run()
 
           const targetDom = document.querySelector(
@@ -525,6 +566,6 @@ defineExpose({
 </style>
 <style lang="less">
 .umo-page-content--dragging {
-  outline: 2px dashed var(--umo-primary-color);
+  outline: 1px dashed var(--umo-primary-color);
 }
 </style>

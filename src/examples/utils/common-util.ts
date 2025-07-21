@@ -5,7 +5,7 @@
  */
 
 import type { ITreeItem } from '@/types/tree'
-import { isArray, isNullableString, isObject } from 'sf-utils2'
+import { isArray, isNullable, isNullableString, isObject } from 'sf-utils2'
 import { isString } from '@tool-belt/type-predicates'
 
 /**
@@ -183,6 +183,33 @@ export const fontDetect = (font?: string) => {
     getImageDataWithFont(baseFont).join('') !==
     getImageDataWithFont(font).join('')
   )
+}
+
+export type TUpdateDefaultObjectValue<Target, DefaultValue> = Target &
+  Omit<DefaultValue, keyof Target>
+
+/**
+ * 更新对象默认值
+ * @param target
+ * @param defaultValue
+ * @example
+ * ```js
+ * const target = {id: 1}
+ * const default = {name: 2, id: null, height: 100}
+ * updateDefaultObjectValue(target, default)
+ * => {name: 2, id: 1, height: 100}
+ * ```
+ */
+export const updateDefaultObjectValue = <T extends object, D extends object>(
+  target: T,
+  defaultValue: D,
+) => {
+  Object.keys(defaultValue).forEach((key) => {
+    if (isNullable(target[key])) {
+      target[key] = defaultValue[key]
+    }
+  })
+  return target as TUpdateDefaultObjectValue<T, D>
 }
 
 export const commonUtil = {
