@@ -108,6 +108,11 @@ export default Node.create({
         },
       },
 
+      /** zIndex */
+      zIndex: {
+        default: null,
+      },
+
       /** 占位 */
       placeholder: {
         default: '占位文字',

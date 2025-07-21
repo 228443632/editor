@@ -2,10 +2,14 @@
   <div class="examples">
     <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px">
       <t-button @click="testEditorFunc('demo001')" size="small">获取</t-button>
-      <t-button @click="testEditorFunc('demo002')" size="small">点击demo002</t-button>
-      <t-button @click="testEditorFunc('getCurrentFontSize')" size="small">光标字大小</t-button>
+      <t-button @click="testEditorFunc('demo002')" size="small"
+        >点击demo002</t-button
+      >
+      <t-button @click="testEditorFunc('getCurrentFontSize')" size="small"
+        >光标字大小</t-button
+      >
     </div>
-    <umo-editor ref="editorRef" v-bind="options">
+    <umo-editor ref="umoEditorRef" v-bind="options">
       <!-- 基础工具   -->
       <template #toolbar_base>
         <ParamsLib></ParamsLib>
@@ -41,7 +45,7 @@ import { debounce, hasOwn } from 'sf-utils2'
 import type { Editor } from '@tiptap/vue-3'
 import { template01 } from '@/examples/template/demo01'
 import { testEditor } from '@/examples/utils/test'
-import { TiptapHelper } from '@/examples/utils/tiptap-helper'
+import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -60,23 +64,26 @@ import { TiptapHelper } from '@/examples/utils/tiptap-helper'
 // }
 const IS_DEV = process.env.NODE_ENV === 'development'
 
-const editorRef = $ref(null)
-const tiptapHelper = ref<TiptapHelper>()
+const umoEditorRef = ref(null)
+const tiptapEditorRef = ref<Editor>()
 
 const nodeList = ref([])
 const globalBizState = ref({
   /** 当前选中的node节点 */
   nodeActive: undefined,
 })
+useZIndexManage(tiptapEditorRef, { autoCalcInitial: true })
 
 provide('__compNodeList__', nodeList)
 provide('__globalBizState__', globalBizState)
-provide('__tiptapHelper__', tiptapHelper)
 
 function selectionChange({ editor }: { editor: Editor }) {
   const node = editor.state.doc.nodeAt(editor.state.selection.anchor)
   // const node = editor.state.selection.$anchor.parent
-  if (hasOwn(node?.attrs, 'isShowBubbleMenu') && !node?.attrs.isShowBubbleMenu) {
+  if (
+    hasOwn(node?.attrs, 'isShowBubbleMenu') &&
+    !node?.attrs.isShowBubbleMenu
+  ) {
     options.document.isShowBubbleMenu = false
   } else {
     options.document.isShowBubbleMenu = true
@@ -192,16 +199,11 @@ const options = $ref(
   ),
 )
 
-watch(editorRef, () => {
-  tiptapHelper.value = editorRef.useEditor()
+watch(umoEditorRef, () => {
+  window.editor = umoEditorRef.value.useEditor()
 })
 
 console.log('options', options)
-
-onMounted(() => {
-  console.log('editorRef', editorRef)
-  window.editor = editorRef.useEditor()
-})
 
 const testEditorFunc = testEditor(window.editor)
 </script>

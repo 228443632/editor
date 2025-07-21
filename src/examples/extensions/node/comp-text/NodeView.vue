@@ -65,15 +65,11 @@ function onSelectNode() {
 }
 
 async function onConfirm() {
-  console.log('formRef.value', formRef.value)
+  console.log('formRef.value', formRef.value, formData.value)
   const [valid, err] = await to(formRef.value.validate())
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
-  if (isObject(cloneFormData.styleObj)) {
-    cloneFormData.styleObj = JSON.stringify(cloneFormData.styleObj)
-  }
-
   updateAttributes(cloneFormData)
   onClose()
 }
@@ -135,8 +131,8 @@ defineExpose({
 <!--render-->
 <template>
   <node-view-wrapper
-    v-bind="node?.attrs"
     ref="rootRef"
+    :name="node.attrs?.name"
     as="span"
     :class="[
       `form-comp--text is-inline-block`,
@@ -146,7 +142,7 @@ defineExpose({
     :data-placeholder="node?.attrs?.placeholder"
     data-u="comp-text"
     :style="_rootStyle"
-    @click="onSelectNode"
+    @dblclick="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
     <t-popup

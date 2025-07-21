@@ -212,6 +212,13 @@ export const updateDefaultObjectValue = <T extends object, D extends object>(
   return target as TUpdateDefaultObjectValue<T, D>
 }
 
+/**
+ * 生成字段名称
+ */
+export const generateFieldName = (fieldName: string) => {
+  return `$\{{${fieldName}}}`
+}
+
 export const commonUtil = {
   simpleUUID,
   whitespace,
@@ -241,4 +248,6 @@ export const commonUtil = {
   trimSpace(str: string) {
     return str.replace(/\n+\s*/g, '')
   },
+
+  generateFieldName
 }
