@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
-import { type Form } from 'tdesign-vue-next'
+import NodeEdit from './components/NodeEdit.vue'
 
 import type { Editor } from '@tiptap/core'
 import { generateFieldName } from '@/examples/utils/common-util'
@@ -28,32 +28,11 @@ const options = inject('options') as Ref<Record<string, any>>
 const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
-const formRef = ref<InstanceType<typeof Form>>()
+const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
-
-const dict = {
-  borderType: [
-    { key: 'none', label: '无边框' },
-    {
-      key: 'underline',
-      label: '下划线',
-      style: 'border-bottom: 1px solid currentColor',
-    },
-    {
-      key: 'solid',
-      label: '边框',
-      style: 'border: 1px solid currentColor',
-    },
-    // {
-    //   key: 'dash',
-    //   label: '边框虚线',
-    //   style: 'border: 1px dashed var(--umo-node-text-border-color)',
-    // },
-  ],
-}
 
 /* 方法 */
 
@@ -74,8 +53,7 @@ function onSelectNode() {
 }
 
 async function onConfirm() {
-  console.log('formRef.value', formRef.value, formData.value)
-  const [valid, err] = await to(formRef.value.validate())
+  const [valid, err] = await to(nodeEditRef.value.formRef.validate())
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
@@ -147,91 +125,12 @@ defineExpose({
     @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
-    <t-popup
+    <NodeEdit
       v-model:visible="visible.dialog"
-      :destroy-on-close="false"
-      trigger="click"
-      :on-visible-change="onVisibleChange"
-      width="fit-content"
-    >
-      <span></span>
-      <template #content>
-        <div
-          class="umo-scrollbar max-h-320px overscroll-contain box-shadow: var(--td-shadow-2) w-310px px-16px py-8px"
-        >
-          <t-form
-            ref="formRef"
-            :data="formData"
-            :colon="true"
-            label-align="top"
-            :style="{
-              '--td-comp-margin-xxl': '16px',
-            }"
-          >
-            <t-form-item
-              label="名称"
-              name="placeholder"
-              required-mark
-              :rules="[{ required: true, message: '必填', type: 'error' }]"
-            >
-              <t-input
-                v-model="formData.placeholder"
-                placeholder="请输入内容"
-                maxlength="50"
-                clearable
-              ></t-input>
-            </t-form-item>
-
-            <t-form-item
-              label="后台映射字段名"
-              name="fieldName"
-              required-mark
-              :rules="[{ required: true, message: '必填', type: 'error' }]"
-            >
-              <t-input
-                v-model="formData.fieldName"
-                placeholder="请输入字母数字或下划线"
-                maxlength="300"
-                clearable
-              ></t-input>
-            </t-form-item>
-
-            <t-form-item label="外观" name="borderType">
-              <t-radio-group v-model="formData.borderType">
-                <t-radio
-                  v-for="(item, index) in dict.borderType"
-                  :key="index"
-                  :value="item.key"
-                  class="ml-4px"
-                >
-                  <span :style="item.style" class="-ml-2px px-2px">
-                    {{ item.label }}
-                  </span>
-                </t-radio>
-              </t-radio-group>
-            </t-form-item>
-
-            <t-form-item label="默认值" name="name">
-              <t-input
-                v-model="formData.defaultValue"
-                placeholder="请输入默认值"
-                maxlength="300"
-                clearable
-              ></t-input>
-            </t-form-item>
-
-            <t-form-item label="填写说明" name="desc">
-              <t-textarea
-                v-model="formData.desc"
-                placeholder="请输入填写说明(最多可输入100字)"
-                maxlength="100"
-                clearable
-              ></t-textarea>
-            </t-form-item>
-          </t-form>
-        </div>
-      </template>
-    </t-popup>
+      @visible-change="onVisibleChange"
+      v-model:form-data="formData"
+      ref="nodeEditRef"
+    ></NodeEdit>
     <!--    &ZeroWidthSpace;-->
   </node-view-wrapper>
 </template>

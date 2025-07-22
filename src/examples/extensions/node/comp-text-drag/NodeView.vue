@@ -7,9 +7,9 @@
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { debounce, deepClone, to } from 'sf-utils2'
-import { type Form, type Popup } from 'tdesign-vue-next'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
+import NodeEdit from './components/NodeEdit.vue'
 
 import { simpleUUID } from '@/utils/short-id'
 import Drager from 'es-drager'
@@ -28,19 +28,26 @@ const options = inject('options') as Ref<Record<string, any>>
 const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
-const formRef = ref<InstanceType<typeof Form>>()
 const editor = inject('editor') as Ref<Editor>
 const { zIndex, getTop } = useZIndexManage(editor)
-const tPopupRef = ref<InstanceType<typeof Popup>>()
+const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
 const selected = ref(false)
 
-onClickOutside(rootRef, () => {
-  console.log('formRef', unrefElement(formRef), unrefElement(tPopupRef))
-  selected.value = false
+onClickOutside(rootRef, (e: PointerEvent) => {
+  window.requestAnimationFrame(() => {
+    const target = e.target as HTMLHtmlElement
+    const containerDom = nodeEditRef.value.tPopupRef.getOverlay()
+    console.log('containerDom', containerDom?.contains?.(target), containerDom, target, e)
+    if (containerDom && containerDom.contains(target)) {
+      selected.value = true
+      return
+    }
+    selected.value = false
+  })
 })
 
 /* 方法 */
@@ -68,7 +75,7 @@ function onSelectNode() {
  * 确认
  */
 async function onConfirm() {
-  const [valid, err] = await to(formRef.value.validate())
+  const [valid, err] = await to(nodeEditRef.value.formRef.validate())
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
@@ -204,6 +211,7 @@ defineExpose({
       :class="[
         'umo-select-outline umo-hover-shadow',
         node.attrs.isDraggable && 'is-draggable',
+        selected && 'selected'
       ]"
       @rotate="debounceOnRotate"
       @resize="debounceOnResize"
@@ -211,13 +219,11 @@ defineExpose({
       @focus="selected = true"
       @click="onSelectNode"
     >
-      <t-popup
+      <NodeEdit
+        ref="nodeEditRef"
         v-model:visible="visible.dialog"
-        :destroy-on-close="false"
-        trigger="context-menu"
-        :on-visible-change="onVisibleChange"
-        width="fit-content"
-        ref="tPopupRef"
+        v-model:form-data="formData"
+        @visible-change="onVisibleChange"
       >
         <span class="!overflow-hidden inline-block w-full h-full">
           <text class="hidden">{{ _text }}</text>
@@ -225,91 +231,7 @@ defineExpose({
             props.node.attrs?.placeholder
           }}</span>
         </span>
-        <template #content>
-          <div
-            class="umo-scrollbar max-h-320px overscroll-contain box-shadow: var(--td-shadow-2) w-310px px-16px py-8px"
-          >
-            <t-form
-              ref="formRef"
-              :data="formData"
-              :colon="true"
-              label-align="top"
-              :style="{
-                '--td-comp-margin-xxl': '16px',
-              }"
-            >
-              <t-form-item
-                label="名称"
-                name="placeholder"
-                required-mark
-                :rules="[{ required: true, message: '必填', type: 'error' }]"
-              >
-                <t-input
-                  v-model="formData.placeholder"
-                  placeholder="请输入内容"
-                  maxlength="50"
-                  clearable
-                ></t-input>
-              </t-form-item>
-
-              <t-form-item
-                label="后台映射字段名"
-                name="fieldName"
-                required-mark
-                :rules="[{ required: true, message: '必填', type: 'error' }]"
-              >
-                <t-input
-                  v-model="formData.fieldName"
-                  placeholder="请输入字母数字或下划线"
-                  maxlength="300"
-                  clearable
-                ></t-input>
-              </t-form-item>
-
-              <t-form-item
-                label="层级"
-                name="zIndex"
-                required-mark
-                :rules="[{ required: true, message: '必填', type: 'error' }]"
-              >
-                <div class="w-full flex items-center gap-16px">
-                  <t-input-number
-                    v-model="formData.zIndex"
-                    :step="1"
-                    :min="1000"
-                    :allow-input-over-limit="false"
-                    class="!flex-1 w-0"
-                  />
-                  <t-button
-                    theme="default"
-                    variant="outline"
-                    @click="onGetTopZIndex"
-                    >最顶层</t-button
-                  >
-                </div>
-              </t-form-item>
-
-              <t-form-item label="默认值" name="name">
-                <t-input
-                  v-model="formData.defaultValue"
-                  placeholder="请输入默认值"
-                  maxlength="300"
-                  clearable
-                ></t-input>
-              </t-form-item>
-
-              <t-form-item label="填写说明" name="desc">
-                <t-textarea
-                  v-model="formData.desc"
-                  placeholder="请输入填写说明(最多可输入100字)"
-                  maxlength="100"
-                  clearable
-                ></t-textarea>
-              </t-form-item>
-            </t-form>
-          </div>
-        </template>
-      </t-popup>
+      </NodeEdit>
     </Drager>
   </node-view-wrapper>
 </template>
