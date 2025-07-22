@@ -186,7 +186,13 @@ export const getDefaultExtensions = ({
     }),
     FileHandler.configure({
       allowedMimeTypes: file?.allowedMimeTypes,
-      onPaste(editor: Editor, files: any) {
+      /**
+       * 复制粘贴逻辑
+       * @param editor
+       * @param files
+       * @param html
+       */
+      onPaste(editor: Editor, files: File[], html: string) {
         // 记录 已有位置
         const pageContainer = document.querySelector(
           `${container} .umo-zoomable-container`,

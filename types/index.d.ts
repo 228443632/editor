@@ -2,6 +2,7 @@ import type { Extension, HTMLContent, JSONContent } from '@tiptap/core'
 import type { FocusPosition } from '@tiptap/core'
 import { Fragment, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { AsyncFunction } from '@tool-belt/type-predicates'
+import type { Editor } from '@tiptap/vue-3'
 
 export type SupportedLocale = 'en-US' | 'zh-CN' | 'ru-RU'
 export interface MarginOption {
@@ -230,6 +231,12 @@ type OnSaveFunction = (
   document: DocumentOptions,
 ) => Promise<unknown>
 
+type TOnPasteFunction = (
+  editor: Editor,
+  files: File[],
+  html: string,
+) => Promise<unknown> | void
+
 export interface UmoEditorOptions {
   editorKey?: string
   locale?: SupportedLocale
@@ -261,6 +268,8 @@ export interface UmoEditorOptions {
   users?: UserItem[]
   extensions?: Extension[]
   translations?: Record<string, unknown>
+  // feat
+  // onPaste?: TOnPasteFunction
   onSave?: OnSaveFunction
   onFileUpload?: (file: File) => Promise<{ id: string; url: string }>
   onFileDelete?: CallableFunction

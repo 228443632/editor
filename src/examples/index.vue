@@ -126,23 +126,17 @@ const options = $ref(
         tocTabsOptions: [{ label: '参数', value: 'params' }],
       },
       // templates,
-      // cdnUrl: 'https://cdn.umodoc.com',
-      // shareUrl: 'https://umodoc.com',
+      cdnUrl: undefined,
+      shareUrl: undefined,
       file: {
-        allowedMimeTypes: [
-          // '*',
-          // 'application/pdf',
-          // 'image/svg+xml',
-          // 'video/mp4',
-          // 'audio/*',
-        ],
+        allowedMimeTypes: [],
       },
 
       /**
        * 富文本内容保存
        * @param content
        */
-      async onSave(content) {
+      async onSave(content: { html: string }) {
         localStorage.setItem('document.content', content?.html)
         return new Promise((resolve, reject) => {
           setTimeout(() => {

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { debounce, deepClone, to } from 'sf-utils2'
-import { type Form } from 'tdesign-vue-next'
+import { type Form, type Popup } from 'tdesign-vue-next'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
 
@@ -17,7 +17,6 @@ import { generateFieldName } from '@/examples/utils/common-util'
 import type { Editor } from '@tiptap/core'
 
 const { proxy } = getCurrentInstance()
-const { zIndex } = useZIndexManage()
 
 const props = defineProps(nodeViewProps)
 const emit = defineEmits({})
@@ -31,6 +30,8 @@ const { updateAttributes } = props
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const formRef = ref<InstanceType<typeof Form>>()
 const editor = inject('editor') as Ref<Editor>
+const { zIndex, getTop } = useZIndexManage(editor)
+const tPopupRef = ref<InstanceType<typeof Popup>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
@@ -38,6 +39,7 @@ const visible = reactive({
 const selected = ref(false)
 
 onClickOutside(rootRef, () => {
+  console.log('formRef', unrefElement(formRef), unrefElement(tPopupRef))
   selected.value = false
 })
 
@@ -119,6 +121,15 @@ const onDrag = ({ left, top }: { left: number; top: number }) => {
   })
 }
 const debounceOnDrag = debounce(onDrag, 20)
+
+/**
+ * 获取最高层级
+ */
+function onGetTopZIndex() {
+  updateAttributes({
+    zIndex: getTop(),
+  })
+}
 
 /* 计算 */
 
@@ -206,6 +217,7 @@ defineExpose({
         trigger="context-menu"
         :on-visible-change="onVisibleChange"
         width="fit-content"
+        ref="tPopupRef"
       >
         <span class="!overflow-hidden inline-block w-full h-full">
           <text class="hidden">{{ _text }}</text>
@@ -254,6 +266,29 @@ defineExpose({
                 ></t-input>
               </t-form-item>
 
+              <t-form-item
+                label="层级"
+                name="zIndex"
+                required-mark
+                :rules="[{ required: true, message: '必填', type: 'error' }]"
+              >
+                <div class="w-full flex items-center gap-16px">
+                  <t-input-number
+                    v-model="formData.zIndex"
+                    :step="1"
+                    :min="1000"
+                    :allow-input-over-limit="false"
+                    class="!flex-1 w-0"
+                  />
+                  <t-button
+                    theme="default"
+                    variant="outline"
+                    @click="onGetTopZIndex"
+                    >最顶层</t-button
+                  >
+                </div>
+              </t-form-item>
+
               <t-form-item label="默认值" name="name">
                 <t-input
                   v-model="formData.defaultValue"
@@ -298,21 +333,16 @@ div[compname='compTextDrag'] {
     transform: translate(0, 0) !important;
   }
 
-  :hover {
-    //outline: 2px solid var(--umo-primary-color);
-    box-shadow: var(--umo-shadow);
-  }
-
   .es-drager {
     cursor: move;
     position: absolute;
     margin-left: var(--umo-page-margin-left);
     z-index: 1000;
     background: #fff;
-  }
-
-  &:hover {
-    background-color: #f0f2f7;
+    &:hover {
+      //outline: 2px solid var(--umo-primary-color);
+      box-shadow: var(--umo-shadow);
+    }
   }
   ::selection {
     background-color: var(--umo-text-selection-background);

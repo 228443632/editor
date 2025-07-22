@@ -99,7 +99,10 @@ export default Node.create({
 
   // 解析规则（从HTML到编辑器节点） , getAttrs() {}
   parseHTML() {
-    return [{ tag: `span[name="${NAME}"][data-id][iscompparams]` }]
+    return [
+      { tag: `span[name="${NAME}"][data-id][iscompparams]` },
+      { tag: `span[compname="${NAME}"][data-id]` },
+    ]
   },
 
   renderHTML({ HTMLAttributes }) {

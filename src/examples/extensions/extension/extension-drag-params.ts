@@ -32,8 +32,8 @@ export const ExtensionDragParams = Extension.create({
   name: 'dragNodeParams',
   addProseMirrorPlugins() {
     /**
-     * 如果返回 true，则不允许有元素生成在内
-     * 如果是false， 允许
+     * 如果返回 true，则不允许有元素生成在内, 仅执行插件逻辑
+     * 如果是false， 允许 + 默认拖拽
      */
     const handleDrop = (
       view: EditorView,

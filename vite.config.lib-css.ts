@@ -13,6 +13,8 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 import UnoCSS from 'unocss/vite'
 import pkg from './package.json'
 import copyright from './src/utils/copyright'
+import fs from 'node:fs'
+import path from 'node:path'
 // import AutoImport from 'unplugin-auto-import/vite'
 // import { TDesignResolver } from 'unplugin-vue-components/resolvers'
 // import Components from 'unplugin-vue-components/vite'
@@ -46,6 +48,7 @@ export default defineConfig(() => {
   return {
     base: '/',
     plugins: [
+      afterEmitPlugin(),
       tsConfigPaths(),
       ReactivityTransform(),
       UnoCSS(),
@@ -101,3 +104,15 @@ export default defineConfig(() => {
     },
   }
 })
+
+function afterEmitPlugin() {
+  return {
+    name: 'vite-plugin-after-emit-delete-assets',
+
+    writeBundle(options, bundle) {
+      console.log('文件已写入磁盘，路径：', options.dir || options.file)
+      console.log('写入的文件列表：', Object.keys(bundle))
+      fs.unlinkSync(path.join(options.dir, 'umo-editor-pure.js'))
+    },
+  }
+}
