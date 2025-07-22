@@ -40,7 +40,7 @@ export default Node.create({
   inline: true, // 关键：标记为行内元素[4](@ref)
   defining: true,
   // marks: '',
-  // atom: true,
+  atom: true,
 
   addAttributes() {
     return {
@@ -103,17 +103,7 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return [
-      'span',
-      mergeAttributes(HTMLAttributes, {
-        'data-placeholder': HTMLAttributes.placeholder,
-      }),
-      [
-        'text', // 占位符
-        { class: 'hidden' },
-        `\${{${HTMLAttributes?.fieldName || ''}}}`,
-      ],
-    ]
+    return ['span', mergeAttributes(HTMLAttributes)]
   },
 
   addNodeView() {

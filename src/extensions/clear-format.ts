@@ -5,6 +5,7 @@
  */
 import { Extension } from '@tiptap/core'
 import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+import { NodeSelection } from '@tiptap/pm/state'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -92,21 +93,42 @@ export default Extension.create<ClearFormatOption>({
         () =>
         ({ chain, editor }) => {
           const chainResult = chain().focus().toggleBold()
-          const { from, to } = editor.state.selection
-          editor.state.doc.nodesBetween(from, to, (node) => {
+          // editor.commands.setNodeSelection(13)
+          const selection = editor.state.selection
+          const { from, to } = selection
+          if (from === to) {
+            let node
+            // 光标合并
+            if (selection instanceof NodeSelection) {
+              node = selection.node
+            } else {
+              node = editor.state.doc.nodeAt(from)
+            }
+            handleCustomNode(node, node.nodeSize)
+          } else {
+            editor.state.doc.nodesBetween(from, to, (node) => {
+              handleCustomNode(node)
+            })
+          }
+          return chainResult.run()
+          function handleCustomNode(node, nodeSize?: number) {
             if (COMP_PARAMS_MAP[node.type.name]) {
+              const cssText = {
+                ...node.attrs.cssText,
+                fontWeight:
+                  node.attrs.cssText.fontWeight === 'normal' ||
+                  !node.attrs.cssText.fontWeight
+                    ? 'bold'
+                    : 'normal',
+              }
+              if (nodeSize) {
+                chainResult.setTextSelection({ from, to: from + nodeSize })
+              }
               chainResult.updateAttributes(node.type.name, {
-                cssText: {
-                  ...node.attrs.cssText,
-                  fontWeight:
-                    node.attrs.cssText.fontWeight === 'bold'
-                      ? 'normal'
-                      : 'bold',
-                },
+                cssText,
               })
             }
-          })
-          return chainResult.run()
+          }
         },
 
       /**

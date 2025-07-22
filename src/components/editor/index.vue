@@ -70,7 +70,7 @@ const editorInstance: Editor = new Editor({
     ...options.value.document?.editorProps,
   },
   parseOptions: options.value.document?.parseOptions,
-  extensions: [...extensions, ...options.value.extensions],
+  extensions: [...options.value.extensions, ...extensions],
   onUpdate({ editor }) {
     const throttleFn = useThrottleFn(() => {
       $document.value.content = editor.getHTML()

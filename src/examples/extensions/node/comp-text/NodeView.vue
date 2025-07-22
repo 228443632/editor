@@ -6,10 +6,11 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, isObject, to } from 'sf-utils2'
+import { deepClone, to } from 'sf-utils2'
 import { type Form } from 'tdesign-vue-next'
 
-import { simpleUUID } from '@/utils/short-id'
+import type { Editor } from '@tiptap/core'
+import { generateFieldName } from '@/examples/utils/common-util'
 
 const { proxy } = getCurrentInstance()
 
@@ -21,6 +22,7 @@ const emit = defineEmits({})
 const __globalBizState__ = inject('__globalBizState__') as Ref<
   Record<string, any>
 >
+const editor = inject('editor') as Ref<Editor>
 const options = inject('options') as Ref<Record<string, any>>
 
 const { updateAttributes } = props
@@ -31,6 +33,7 @@ const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
+
 const dict = {
   borderType: [
     { key: 'none', label: '无边框' },
@@ -58,7 +61,13 @@ function onSelectNode() {
   props.editor.commands.setNodeSelection(props.getPos())
   __globalBizState__.value.nodeActive = node
 
-  console.log('node', Object.create(node?.attrs))
+  // 设置选中
+  const { anchor } = editor.value.state.selection
+  editor.value
+    .chain()
+    .setTextSelection({ from: anchor, to: anchor + node.nodeSize })
+    .run()
+
   formData.value = deepClone({ ...node?.attrs })
   // setBubbleMenuShow(false)
   visible.dialog = true
@@ -99,7 +108,7 @@ function setBubbleMenuShow(isShow = true) {
 
 const _attributes = computed(() => node?.attrs)
 
-const _text = computed(() => `$\{{${node?.attrs?.fieldName}}}`)
+const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
 
 /**
  * 根节点样式
@@ -113,13 +122,6 @@ const _rootStyle = computed(() => {
 /* 周期 */
 onMounted(() => {
   // console.log('props', props, props.getPos(), props.updateAttributes)
-  window.requestAnimationFrame(() => {
-    if (!node.attrs?.['data-id']) {
-      props.updateAttributes({
-        'data-id': simpleUUID(),
-      })
-    }
-  })
 })
 
 /* 暴露 */
@@ -142,7 +144,7 @@ defineExpose({
     :data-placeholder="node?.attrs?.placeholder"
     data-u="comp-text"
     :style="_rootStyle"
-    @dblclick="onSelectNode"
+    @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
     <t-popup
@@ -230,15 +232,7 @@ defineExpose({
         </div>
       </template>
     </t-popup>
-    <!--    <modal-->
-    <!--      :visible="visible.dialog"-->
-    <!--      icon="params-comp-text"-->
-    <!--      :header="`参数修改`"-->
-    <!--      width="480px"-->
-    <!--      @confirm="onConfirm"-->
-    <!--      @close="onClose"-->
-    <!--    >-->
-    <!--    </modal>-->
+    <!--    &ZeroWidthSpace;-->
   </node-view-wrapper>
 </template>
 

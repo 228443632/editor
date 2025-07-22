@@ -29,18 +29,30 @@ export interface IDragNodeParamsNode {
 }
 
 export const ExtensionDragParams = Extension.create({
+  name: 'dragNodeParams',
   addProseMirrorPlugins() {
-    const handleDrop = (view: EditorView, e: DragEvent) => {
+    /**
+     * 如果返回 true，则不允许有元素生成在内
+     * 如果是false， 允许
+     */
+    const handleDrop = (
+      view: EditorView,
+      e: DragEvent,
+      slice,
+      move: boolean,
+    ) => {
+      if (move) return false
+
       const nodeData = (parseJsonNoError(
         e.dataTransfer?.getData('text/plain'),
       ) || {}) as IDragNodeParamsNode
-
-      e.preventDefault()
 
       if (!COMP_PARAMS_MAP[nodeData.type]) return true
 
       switch (nodeData.type) {
         case COMP_PARAMS_MAP.compText: {
+          e.preventDefault()
+
           // 获取位置并验证
           const coordinates = view.posAtCoords({
             left: e.clientX,
@@ -70,6 +82,8 @@ export const ExtensionDragParams = Extension.create({
 
         // 文本悬浮
         case COMP_PARAMS_MAP.compTextDrag: {
+          e.preventDefault()
+
           const viewRect = view.dom.getBoundingClientRect()
           const viewDomPl = Math.floor(
             +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),

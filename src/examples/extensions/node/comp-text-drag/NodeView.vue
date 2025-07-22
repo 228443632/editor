@@ -14,6 +14,7 @@ import { onClickOutside } from '@vueuse/core'
 import { simpleUUID } from '@/utils/short-id'
 import Drager from 'es-drager'
 import { generateFieldName } from '@/examples/utils/common-util'
+import type { Editor } from '@tiptap/core'
 
 const { proxy } = getCurrentInstance()
 const { zIndex } = useZIndexManage()
@@ -29,6 +30,7 @@ const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const formRef = ref<InstanceType<typeof Form>>()
+const editor = inject('editor') as Ref<Editor>
 const formData = ref({})
 const visible = reactive({
   dialog: false,
@@ -48,6 +50,13 @@ function onSelectNode() {
   props.editor.commands.setNodeSelection(props.getPos())
   __globalBizState__.value.nodeActive = props.node
 
+  // 设置选中
+  const { anchor } = editor.value.state.selection
+  editor.value
+    .chain()
+    .setTextSelection({ from: anchor, to: anchor + props.node.nodeSize })
+    .run()
+
   formData.value = deepClone({ ...props.node?.attrs })
   // setBubbleMenuShow(false)
   visible.dialog = true
@@ -61,7 +70,6 @@ async function onConfirm() {
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
-  console.log('cloneFormData', cloneFormData)
   updateAttributes(cloneFormData)
   onClose()
 }
@@ -71,8 +79,7 @@ function onClose() {
   setBubbleMenuShow(true)
 }
 
-function onVisibleChange(popupVisible) {
-  console.log('popupVisible', popupVisible)
+function onVisibleChange(popupVisible: boolean) {
   if (!popupVisible) {
     void onConfirm()
   }
@@ -191,7 +198,7 @@ defineExpose({
       @resize="debounceOnResize"
       @drag="debounceOnDrag"
       @focus="selected = true"
-      @dblclick="onSelectNode"
+      @click="onSelectNode"
     >
       <t-popup
         v-model:visible="visible.dialog"
@@ -293,6 +300,7 @@ div[compname='compTextDrag'] {
 
   :hover {
     //outline: 2px solid var(--umo-primary-color);
+    box-shadow: var(--umo-shadow);
   }
 
   .es-drager {
