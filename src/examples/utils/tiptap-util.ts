@@ -258,6 +258,7 @@ export const tiptapUtil = {
    * 获取当前字体样式
    */
   getStyleBySelection(editor: Editor, selection?: EditorState['selection']) {
+    const editorDom = editor.view.dom
     const fontWeight = editor.isActive('bold') ? 'bold' : 'normal'
     const textStyle = editor.getAttributes('textStyle') || {}
     const backgroundColor = editor.getAttributes('highlight').color
@@ -265,6 +266,7 @@ export const tiptapUtil = {
     const cssText = {
       fontWeight,
       backgroundColor,
+      fontSize: undefined,
       ...textStyle,
     }
 
@@ -281,6 +283,11 @@ export const tiptapUtil = {
         const tempCssText = $from.nodeBefore.attrs.cssText || {}
         Object.assign(cssText, tempCssText)
       }
+    }
+
+    const varCalcStyle = window.getComputedStyle(editorDom)
+    if (cssText.fontSize == varCalcStyle.fontSize) {
+      delete cssText.fontSize
     }
     return cssText
   },

@@ -13,13 +13,24 @@ interface IUseZIndexOptions {
   autoCalcInitial?: boolean
 }
 
-const zIndex = ref(3000)
-const zIndexPools = shallowRef(new Set<number>()) as Ref<Set<number>>
+const zIndexObj = {
+  pools: new Set([1000]),
+
+  get max() {
+    return Math.max(...this.pools)
+  },
+
+  get min() {
+    return Math.min(...this.pools)
+  },
+}
 
 export function useZIndexManage(
-  editor: Ref<Editor>,
+  editor?: Ref<Editor>,
   options?: IUseZIndexOptions,
 ) {
+  let z = zIndexObj.max
+  const zIndex = ref(z++)
   watch(
     editor,
     (newEditor: Editor) => {
@@ -29,8 +40,8 @@ export function useZIndexManage(
             const nodeName = node.type.name
             // zIndex.value =
             if (COMP_PARAMS_MAP[nodeName] && +node.attrs.zIndex > 0) {
-              zIndexPools.value.add(+node.attrs.zIndex)
-              zIndex.value = Math.max(zIndex.value, node.attrs.zIndex)
+              zIndexObj.pools.add(+node.attrs.zIndex)
+              zIndex.value = zIndexObj.max
             }
           })
         }
@@ -41,18 +52,27 @@ export function useZIndexManage(
     },
   )
 
-  watch(zIndex, (newZIndex: number) => {
-    zIndexPools.value.add(newZIndex)
-  })
+  watch(
+    zIndex,
+    (newZIndex: number) => {
+      zIndexObj.pools.add(newZIndex)
+    },
+    {
+      immediately: true,
+    },
+  )
 
   /**
    * 获取最高
    * @param autoIncr
    */
   function getTop(autoIncr = true) {
-    const maxValue = Math.max(...zIndexPools.value)
-    if (autoIncr) zIndex.value = maxValue + 1
-    return zIndex.value
+    const maxValue = zIndexObj.max
+    if (autoIncr) {
+      zIndex.value = maxValue + 1
+      return zIndex.value
+    }
+    return maxValue
   }
 
   /**
@@ -60,16 +80,16 @@ export function useZIndexManage(
    * @param autoDecr
    */
   function getLow(autoDecr = true) {
-    let minValue = Math.min(...zIndexPools.value)
-    if (minValue) minValue--
+    const minValue = zIndexObj.min
+    if (autoDecr) {
+      zIndex.value = minValue - 1
+      return Math.max(zIndex.value, 1000)
+    }
     return Math.max(minValue, 1000)
   }
 
-  zIndex.value++
-
   return {
     zIndex,
-    zIndexPools,
     getTop,
     getLow,
   }

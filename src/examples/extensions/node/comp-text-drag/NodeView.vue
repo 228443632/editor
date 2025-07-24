@@ -6,7 +6,8 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { debounce, deepClone, to } from 'sf-utils2'
+import { deepClone, to, debounce } from 'sf-utils2'
+import { getNumString } from 'sf-utils2/lib/_helperNumber'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
 import NodeEdit from './components/NodeEdit.vue'
@@ -15,6 +16,7 @@ import { simpleUUID } from '@/utils/short-id'
 import Drager from 'es-drager'
 import { generateFieldName } from '@/examples/utils/common-util'
 import type { Editor } from '@tiptap/core'
+import { rafThrottle } from '@/examples/utils/dom'
 
 const { proxy } = getCurrentInstance()
 
@@ -29,25 +31,25 @@ const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const editor = inject('editor') as Ref<Editor>
-const { zIndex, getTop } = useZIndexManage(editor)
+const { zIndex, getTop } = useZIndexManage()
 const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
 const selected = ref(false)
+const scrollViewRef = ref<HTMLHtmlElement>(
+  document.querySelector('div.umo-zoomable-container.umo-scrollbar'),
+)
 
 onClickOutside(rootRef, (e: PointerEvent) => {
-  window.requestAnimationFrame(() => {
-    const target = e.target as HTMLHtmlElement
-    const containerDom = nodeEditRef.value.tPopupRef.getOverlay()
-    console.log('containerDom', containerDom?.contains?.(target), containerDom, target, e)
-    if (containerDom && containerDom.contains(target)) {
-      selected.value = true
-      return
-    }
-    selected.value = false
-  })
+  const target = e.target as HTMLHtmlElement
+  const containerDom = nodeEditRef.value.tPopupRef.getOverlay()
+  if (containerDom && containerDom.contains(target)) {
+    selected.value = true
+    return
+  }
+  selected.value = false
 })
 
 /* 方法 */
@@ -66,9 +68,12 @@ function onSelectNode() {
     .setTextSelection({ from: anchor, to: anchor + props.node.nodeSize })
     .run()
 
+  // TODO
+  selected.value = true
+
   formData.value = deepClone({ ...props.node?.attrs })
   // setBubbleMenuShow(false)
-  visible.dialog = true
+  visible.dialog = false
 }
 
 /**
@@ -85,13 +90,61 @@ async function onConfirm() {
 
 function onClose() {
   visible.dialog = false
-  setBubbleMenuShow(true)
+  // setBubbleMenuShow(true)
 }
 
 function onVisibleChange(popupVisible: boolean) {
   if (!popupVisible) {
     void onConfirm()
   }
+}
+
+/**
+ * 监听滚动
+ * @param event
+ */
+function onScroll(event: Event) {
+  const target = event.target as HTMLElement
+  if (onScroll._lastScrollTop === target.scrollTop) return
+  const diffH = target.scrollTop - onScroll._lastScrollTop
+  const translateY = _dragAttrs.value.translateY + diffH
+  updateAttributes({
+    dragAttrs: {
+      ..._dragAttrs.value,
+      translateY,
+    },
+  })
+  onScroll._lastScrollTop = target.scrollTop
+}
+onScroll._lastScrollTop = 0
+
+const rafThrottleOnScroll = rafThrottle(onScroll)
+const debounceOnScroll = debounce(onScroll, 100)
+
+function addScrollListener() {
+  if (!scrollViewRef.value) return
+  removeScrollListener()
+  scrollViewRef.value.addEventListener('scroll', rafThrottleOnScroll)
+  scrollViewRef.value.addEventListener('scroll', debounceOnScroll)
+}
+function removeScrollListener() {
+  if (!scrollViewRef.value) return
+  scrollViewRef.value.removeEventListener('scroll', rafThrottleOnScroll)
+  scrollViewRef.value.removeEventListener('scroll', debounceOnScroll)
+}
+
+/**
+ * 拖拽开始
+ */
+function onDragStart() {
+  addScrollListener()
+}
+
+/**
+ * 拖拽结束
+ */
+function onDragEnd() {
+  removeScrollListener()
 }
 
 /**
@@ -106,7 +159,7 @@ function setBubbleMenuShow(isShow = true) {
 const onRotate = ({ angle }: { angle: number }) => {
   updateAttributes({ dragAttrs: { ..._dragAttrs.value, angle } })
 }
-const debounceOnRotate = debounce(onRotate, 20)
+const rafThrottleOnRotate = rafThrottle(onRotate)
 const onResize = ({ width, height }: { width: number; height: number }) => {
   updateAttributes({
     dragAttrs: {
@@ -116,7 +169,7 @@ const onResize = ({ width, height }: { width: number; height: number }) => {
     },
   })
 }
-const debounceOnResize = debounce(onResize, 20)
+const rafThrottleOnResize = rafThrottle(onResize)
 
 const onDrag = ({ left, top }: { left: number; top: number }) => {
   updateAttributes({
@@ -127,16 +180,7 @@ const onDrag = ({ left, top }: { left: number; top: number }) => {
     },
   })
 }
-const debounceOnDrag = debounce(onDrag, 20)
-
-/**
- * 获取最高层级
- */
-function onGetTopZIndex() {
-  updateAttributes({
-    zIndex: getTop(),
-  })
-}
+const rafThrottleOnDrag = rafThrottle(onDrag)
 
 /* 计算 */
 
@@ -155,8 +199,15 @@ const _rootStyle = computed(() => {
   }
 })
 
+/**
+ * 拖拽属性
+ */
 const _dragAttrs = computed(() => {
-  return _attributes.value.dragAttrs || {}
+  const tempAttrs = _attributes.value.dragAttrs || {}
+  return {
+    ...tempAttrs,
+    translateY: +getNumString(tempAttrs.translateY),
+  }
 })
 
 /* 监听 */
@@ -164,21 +215,19 @@ const _dragAttrs = computed(() => {
 /* 周期 */
 onMounted(() => {
   if (!props.node.attrs.zIndex) {
-    updateAttributes({
-      zIndex: zIndex.value,
-    })
+    updateAttributes({ zIndex: zIndex.value })
   }
   if (!props.node.attrs?.['data-id']) {
-    props.updateAttributes({
-      'data-id': simpleUUID(),
-    })
+    props.updateAttributes({ 'data-id': simpleUUID() })
   }
 })
 
-/* 暴露 */
-defineExpose({
-  $: proxy.$,
+onBeforeUnmount(() => {
+  removeScrollListener()
 })
+
+/* 暴露 */
+defineExpose()
 </script>
 
 <!--render-->
@@ -192,77 +241,97 @@ defineExpose({
     :style="_rootStyle"
     :class="['umo-floating-node']"
   >
-    <Drager
-      :selected="selected"
-      :rotatable="true"
-      :boundary="false"
-      tag="span"
-      :skewable="true"
-      :snap-to-grid="false"
-      :angle="_dragAttrs.angle"
-      :width="Number(_dragAttrs.width)"
-      :height="Number(_dragAttrs.height)"
-      :left="Number(_dragAttrs.left)"
-      :top="Number(_dragAttrs.top)"
-      :min-width="14"
-      :min-height="14"
-      :z-index="10"
-      :equal-proportion="_dragAttrs.equalProportion"
-      :class="[
-        'umo-select-outline umo-hover-shadow',
-        node.attrs.isDraggable && 'is-draggable',
-        selected && 'selected'
-      ]"
-      @rotate="debounceOnRotate"
-      @resize="debounceOnResize"
-      @drag="debounceOnDrag"
-      @focus="selected = true"
-      @click="onSelectNode"
+    <span
+      class="drager-wrap"
+      :style="{
+        '--y': _dragAttrs.translateY + 'px',
+        zIndex: _rootStyle.zIndex,
+      }"
     >
-      <NodeEdit
-        ref="nodeEditRef"
-        v-model:visible="visible.dialog"
-        v-model:form-data="formData"
-        @visible-change="onVisibleChange"
+      <Drager
+        :selected="selected"
+        :rotatable="true"
+        :boundary="false"
+        tag="span"
+        :skewable="true"
+        :snap-to-grid="false"
+        :angle="_dragAttrs.angle"
+        :width="Number(_dragAttrs.width)"
+        :height="Number(_dragAttrs.height)"
+        :left="Number(_dragAttrs.left)"
+        :top="Number(_dragAttrs.top)"
+        :min-width="14"
+        :min-height="14"
+        :z-index="10"
+        :equal-proportion="_dragAttrs.equalProportion"
+        :class="[
+          'umo-select-outline umo-hover-shadow',
+          node.attrs.isDraggable && 'is-draggable',
+          selected && 'selected',
+        ]"
+        @rotate="rafThrottleOnRotate"
+        @resize="rafThrottleOnResize"
+        @drag-start="onDragStart"
+        @drag-end="onDragEnd"
+        @drag="rafThrottleOnDrag"
+        @click="onSelectNode"
       >
-        <span class="!overflow-hidden inline-block w-full h-full">
-          <text class="hidden">{{ _text }}</text>
-          <span class="print-hidden text-placeholder">{{
-            props.node.attrs?.placeholder
-          }}</span>
-        </span>
-      </NodeEdit>
-    </Drager>
+        <NodeEdit
+          ref="nodeEditRef"
+          v-model:visible="visible.dialog"
+          v-model:form-data="formData"
+          :extra-props="{
+            getTop,
+            updateAttributes,
+          }"
+          @visible-change="onVisibleChange"
+        >
+          <span class="!overflow-hidden inline-block w-full h-full">
+            <text class="hidden">{{ _text }}</text>
+            <span class="print-hidden text-placeholder">{{
+              props.node.attrs?.placeholder
+            }}</span>
+          </span>
+        </NodeEdit>
+      </Drager>
+    </span>
   </node-view-wrapper>
 </template>
 
 <!--style-->
 <style lang="less">
 div[compname='compTextDrag'] {
-  display: contents !important;
+  //display: contents !important;
+  display: contents;
   height: 0;
   width: 0;
   cursor: pointer;
-
-  // float-node
-  transform: translate(0, 0) !important;
+  font-size: 16px;
 
   .text-placeholder {
     color: #9ba3b0;
   }
 
-  & > * {
-    transform: translate(0, 0) !important;
+  //& > * {
+  //  transform: translate(0, 0) !important;
+  //}
+
+  .drager-wrap {
+    transform: translate3d(0, var(--y), 0);
+    display: inline-flex;
+    margin-left: var(--umo-page-margin-left);
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 
   .es-drager {
     cursor: move;
     position: absolute;
-    margin-left: var(--umo-page-margin-left);
     z-index: 1000;
     background: #fff;
     &:hover {
-      //outline: 2px solid var(--umo-primary-color);
+      outline: 2px solid var(--umo-primary-color);
       box-shadow: var(--umo-shadow);
     }
   }

@@ -85,9 +85,7 @@
         v-show="pageOptions.showRightSlot"
         :class="[`umo-page-right-slot`, pageOptions.showRightSlot && `is-show`]"
       >
-        <section>
-          <slot name="page-right"></slot>
-        </section>
+        <slot name="page-right"></slot>
       </div>
     </transition>
 
@@ -98,13 +96,16 @@
       :images="previewImages"
       @close="imageViewer.visible = false"
     />
+    <!-- 回到顶部 -->
     <t-back-top
       :container="`${container} .umo-zoomable-container`"
       :visible-height="800"
       size="small"
       :offset="['25px', '30px']"
     />
+    <!-- 搜索 -->
     <container-search-replace />
+    <!-- 打印 -->
     <container-print />
   </div>
 </template>

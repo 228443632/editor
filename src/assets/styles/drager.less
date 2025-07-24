@@ -29,7 +29,7 @@
 
     @media screen {
       &.border {
-        outline: 1px solid var(--umo-primary-color);
+        outline: 2px solid  var(--umo-primary-color);
       }
       .es-drager-dot {
         display: block;
@@ -42,20 +42,35 @@
     z-index: 1;
     transform: translate(-50%, -50%);
     cursor: se-resize;
+    &-handle {
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      //border-radius: 5px;
+      //background: var(--umo-primary-color);
+      border: solid 1px var(--umo-primary-color);
+    }
+    //&[data-side='left'], &[data-side='right'] {
+    //  & > div {
+    //    height: 16px;
+    //  }
+    //}
+    &[data-side*='left'] {
+      margin-left: -1px;
+    }
+    &[data-side*='top'] {
+      margin-top: -1px;
+    }
     &[data-side*='right'] {
       transform: translate(50%, -50%);
+      margin-right: -1px;
     }
     &[data-side*='bottom'] {
       transform: translate(-50%, 50%);
+      margin-bottom: -1px;
     }
     &[data-side='bottom-right'] {
       transform: translate(50%, 50%);
-    }
-    &-handle {
-      width: 8px;
-      height: 8px;
-      background: #fff;
-      border: solid 1px var(--umo-primary-color);
     }
   }
   &-rotate {
@@ -76,11 +91,11 @@
     &::after {
       content: '';
       display: block;
-      width: 1px;
+      width: 2px;
       height: 58px;
       position: absolute;
       background-color: var(--umo-primary-color);
-      left: 10px;
+      left: 8px;
       top: 21px;
     }
     &-handle {
@@ -88,6 +103,7 @@
       height: 16px;
       font-size: 20px;
       color: var(--umo-primary-color);
+      cursor: grabbing;
       svg {
         display: block;
       }

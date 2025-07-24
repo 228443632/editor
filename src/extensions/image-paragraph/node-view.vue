@@ -11,7 +11,6 @@
       :selected="selected"
       :rotatable="true"
       :boundary="false"
-      :skewable="true"
       :snap-to-grid="false"
       :draggablelike="
         Boolean(node.attrs.draggable) && !options.document?.readOnly

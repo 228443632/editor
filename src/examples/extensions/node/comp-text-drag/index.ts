@@ -49,6 +49,7 @@ const defaultAttributes = {
     angle: null,
     rotatable: false,
     equalProportion: false,
+    translateY: 0,
   },
 }
 
@@ -203,3 +204,11 @@ export default Node.create({
     }
   },
 })
+
+
+// /**
+//  * 获取拖拽节点的矩形信息
+//  */
+// function computedDragRect() {
+//
+// }

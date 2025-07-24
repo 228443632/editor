@@ -65,14 +65,14 @@ import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
 const umoEditorRef = ref(null)
-const tiptapEditorRef = ref<Editor>()
+const editorRef = ref<Editor>()
 
 const nodeList = ref([])
 const globalBizState = ref({
   /** 当前选中的node节点 */
   nodeActive: undefined,
 })
-useZIndexManage(tiptapEditorRef, { autoCalcInitial: true })
+useZIndexManage(editorRef, { autoCalcInitial: true })
 
 provide('__compNodeList__', nodeList)
 provide('__globalBizState__', globalBizState)
@@ -194,7 +194,7 @@ const options = $ref(
 )
 
 watch(umoEditorRef, () => {
-  window.editor = umoEditorRef.value.useEditor()
+  editorRef.value = window.editor = umoEditorRef.value.useEditor()
 })
 
 console.log('options', options)

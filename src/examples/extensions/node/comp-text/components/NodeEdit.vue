@@ -93,7 +93,7 @@ defineExpose({
     <span></span>
     <template #content>
       <div
-        class="umo-scrollbar max-h-320px overscroll-contain box-shadow: var(--td-shadow-2) w-310px px-16px py-8px"
+        class="umo-scrollbar max-h-320px overscroll-contain box-shadow: var(--td-shadow-2) w-640px px-16px py-8px"
       >
         <t-form
           ref="formRef"
@@ -104,66 +104,78 @@ defineExpose({
             '--td-comp-margin-xxl': '16px',
           }"
         >
-          <t-form-item
-            label="名称"
-            name="placeholder"
-            required-mark
-            :rules="[{ required: true, message: '必填', type: 'error' }]"
-          >
-            <t-input
-              v-model="_formData.placeholder"
-              placeholder="请输入内容"
-              maxlength="50"
-              clearable
-            ></t-input>
-          </t-form-item>
-
-          <t-form-item
-            label="后台映射字段名"
-            name="fieldName"
-            required-mark
-            :rules="[{ required: true, message: '必填', type: 'error' }]"
-          >
-            <t-input
-              v-model="_formData.fieldName"
-              placeholder="请输入字母数字或下划线"
-              maxlength="300"
-              clearable
-            ></t-input>
-          </t-form-item>
-
-          <t-form-item label="外观" name="borderType">
-            <t-radio-group v-model="_formData.borderType">
-              <t-radio
-                v-for="(item, index) in dict.borderType"
-                :key="index"
-                :value="item.key"
-                class="ml-4px"
+          <t-row :gutter="[16, 16]">
+            <t-col :span="6">
+              <t-form-item
+                label="名称"
+                name="placeholder"
+                required-mark
+                :rules="[{ required: true, message: '必填', type: 'error' }]"
               >
+                <t-input
+                  v-model="_formData.placeholder"
+                  placeholder="请输入内容"
+                  maxlength="50"
+                  clearable
+                ></t-input>
+              </t-form-item>
+            </t-col>
+
+            <t-col :span="6">
+              <t-form-item
+                label="后台映射字段名"
+                name="fieldName"
+                required-mark
+                :rules="[{ required: true, message: '必填', type: 'error' }]"
+              >
+                <t-input
+                  v-model="_formData.fieldName"
+                  placeholder="请输入字母数字或下划线"
+                  maxlength="300"
+                  clearable
+                ></t-input>
+              </t-form-item>
+            </t-col>
+
+            <t-col :span="6">
+              <t-form-item label="外观" name="borderType">
+                <t-radio-group v-model="_formData.borderType">
+                  <t-radio
+                    v-for="(item, index) in dict.borderType"
+                    :key="index"
+                    :value="item.key"
+                    class="ml-4px"
+                  >
                 <span :style="item.style" class="-ml-2px px-2px">
                   {{ item.label }}
                 </span>
-              </t-radio>
-            </t-radio-group>
-          </t-form-item>
+                  </t-radio>
+                </t-radio-group>
+              </t-form-item>
+            </t-col>
 
-          <t-form-item label="默认值" name="name">
-            <t-input
-              v-model="_formData.defaultValue"
-              placeholder="请输入默认值"
-              maxlength="300"
-              clearable
-            ></t-input>
-          </t-form-item>
+            <t-col :span="6">
+              <t-form-item label="默认值" name="name">
+                <t-input
+                  v-model="_formData.defaultValue"
+                  placeholder="请输入默认值"
+                  maxlength="300"
+                  clearable
+                ></t-input>
+              </t-form-item>
+            </t-col>
 
-          <t-form-item label="填写说明" name="desc">
-            <t-textarea
-              v-model="_formData.desc"
-              placeholder="请输入填写说明(最多可输入100字)"
-              maxlength="100"
-              clearable
-            ></t-textarea>
-          </t-form-item>
+            <t-col :span="6">
+              <t-form-item label="填写说明" name="desc">
+                <t-textarea
+                  v-model="_formData.desc"
+                  placeholder="请输入填写说明(最多可输入100字)"
+                  maxlength="100"
+                  clearable
+                ></t-textarea>
+              </t-form-item>
+            </t-col>
+          </t-row>
         </t-form>
       </div>
     </template>

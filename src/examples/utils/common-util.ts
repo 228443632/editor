@@ -249,5 +249,5 @@ export const commonUtil = {
     return str.replace(/\n+\s*/g, '')
   },
 
-  generateFieldName
+  generateFieldName,
 }

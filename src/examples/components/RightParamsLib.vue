@@ -39,14 +39,15 @@ const paramsConfig = ref([
         value: 'compText',
         icon: 'params-comp-text',
         draggable: true,
-        get compTexts() {
+        getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == 'compText'
           })
         },
-        get attrs() {
-          const compTexts = this.compTexts
+        getAttrs() {
+          const compTexts = this.getCompTexts()
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
+          console.log('cssText', cssText)
           return {
             'data-id': commonUtil.simpleUUID(),
             cssText,
@@ -55,7 +56,7 @@ const paramsConfig = ref([
           }
         },
         click() {
-          const attrs = this.attrs
+          const attrs = this.getAttrs()
           editor.value
             .chain()
             .focus()
@@ -75,13 +76,13 @@ const paramsConfig = ref([
         value: 'compText',
         icon: 'params-comp-username',
         draggable: true,
-        get compTexts() {
+        getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == 'compText'
           })
         },
-        get attrs() {
-          const compTexts = this.compTexts
+        getAttrs() {
+          const compTexts = this.getCompTexts()
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
@@ -92,7 +93,7 @@ const paramsConfig = ref([
           }
         },
         click() {
-          const attrs = this.attrs
+          const attrs = this.getAttrs()
           editor.value
             .chain()
             .focus()
@@ -112,13 +113,13 @@ const paramsConfig = ref([
         value: 'compText',
         icon: 'params-comp-mobile',
         draggable: true,
-        get compTexts() {
+        getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == 'compText'
           })
         },
-        get attrs() {
-          const compTexts = this.compTexts
+        getAttrs() {
+          const compTexts = this.getCompTexts()
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
@@ -129,7 +130,7 @@ const paramsConfig = ref([
           }
         },
         click() {
-          const attrs = this.attrs
+          const attrs = this.getAttrs()
           editor.value
             .chain()
             .focus()
@@ -149,13 +150,13 @@ const paramsConfig = ref([
         value: 'compText',
         icon: 'params-comp-idcard',
         draggable: true,
-        get compTexts() {
+        getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == 'compText'
           })
         },
-        get attrs() {
-          const compTexts = this.compTexts
+        getAttrs() {
+          const compTexts = this.getCompTexts()
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
@@ -166,7 +167,7 @@ const paramsConfig = ref([
           }
         },
         click() {
-          const attrs = this.attrs
+          const attrs = this.getAttrs()
           editor.value
             .chain()
             .focus()
@@ -186,12 +187,12 @@ const paramsConfig = ref([
         value: 'compTextDrag',
         icon: 'params-comp-idcard',
         draggable: true,
-        get compTexts() {
+        getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
             return item.node.type.name == COMP_PARAMS_MAP.compTextDrag
           })
         },
-        get attrs() {
+        getAttrs() {
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             isDragging: true,
@@ -203,7 +204,7 @@ const paramsConfig = ref([
           }
         },
         click() {
-          const attrs = this.attrs
+          const attrs = this.getAttrs()
           editor.value
             .chain()
             .focus()
@@ -458,7 +459,7 @@ defineExpose({
       </div>
     </div>
 
-    <div class="umo-pr-content">
+    <div class="umo-pr-content umo-scrollbar">
       <section
         v-for="(item, index) in paramsConfig"
         :key="index"
@@ -510,6 +511,7 @@ defineExpose({
     position: relative;
     padding: 0px 4px 10px 16px;
     gap: 14px;
+    flex: none;
     font-weight: bold;
     box-sizing: border-box;
   }
@@ -522,6 +524,9 @@ defineExpose({
   }
 
   .umo-pr-content {
+    flex: 1;
+    height: 0;
+    overflow-y: auto;
     padding: 12px 20px;
   }
 
@@ -566,6 +571,6 @@ defineExpose({
 </style>
 <style lang="less">
 .umo-page-content--dragging {
-  outline: 1px dashed var(--umo-primary-color);
+  outline: 2px dashed var(--umo-primary-color);
 }
 </style>

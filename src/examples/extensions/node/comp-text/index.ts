@@ -123,16 +123,6 @@ export default Node.create({
             attrs: options,
           })
         },
-
-      setComp:
-        (options) =>
-        ({ commands, editor }) => {
-          return commands.insertContentAt(editor.state.selection.anchor, {
-            ...options,
-            type: options.type,
-            attrs: options.attrs,
-          })
-        },
     }
   },
 

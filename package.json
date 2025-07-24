@@ -6,7 +6,7 @@
     "build:lib-css": "vite build -c vite.config.lib-css.ts",
     "build": "vite build --mode dev",
     "build:upload": "npm run build:lib-css && npm run build && npx jiti ./build/upload.cjs",
-    "dev": "vite --port 9000 --open --force",
+    "dev": "vite --port 9000 --open --force --host",
     "format": "prettier --write .",
     "check:code": "eslint --cache src",
     "check:style": "stylelint src/**/*.{css,less,vue}",

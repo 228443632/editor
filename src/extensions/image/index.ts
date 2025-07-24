@@ -77,7 +77,7 @@ export default Image.extend({
     }
   },
   parseHTML() {
-    return [{ tag: 'img' }]
+    return [{ tag: 'img[src]' }]
   },
   addNodeView() {
     return VueNodeViewRenderer(NodeView)

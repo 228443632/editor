@@ -94,18 +94,50 @@ const getIframeCode = (fillFieldData) => {
 
   const corners = doc.querySelectorAll(
     '.umo-page-corner',
-  ) as HTMLHtmlElement[]
+  ) as unknown as HTMLHtmlElement[]
   if (corners) {
     corners.forEach((corner) => {
       corner.remove()
     })
   }
 
-  // const editorDom = doc.querySelector(
-  //   '.tiptap.ProseMirror.umo-editor',
-  // ) as HTMLHtmlElement
+  const editorDom = doc.querySelector(
+    '.tiptap.ProseMirror.umo-editor',
+  ) as HTMLHtmlElement
+  if (editorDom) {
+    editorDom.setAttribute('contenteditable', 'false')
+  }
+  //
+  // const imgSepList = Array.from(
+  //   doc.querySelectorAll('img.ProseMirror-separator'),
+  // ) as unknown as HTMLHtmlElement[]
+  // if (imgSepList) {
+  //   imgSepList.forEach((imgSep) => {
+  //     imgSep.remove()
+  //   })
+  //   imgSepList.length = 0
+  // }
+  //
+  // const spanCharacterList = Array.from(
+  //   doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
+  // ) as unknown as HTMLHtmlElement[]
+  // if (spanCharacterList) {
+  //   spanCharacterList.forEach((item) => {
+  //     item.remove()
+  //   })
+  //   spanCharacterList.length = 0
+  // }
 
-  // editor.value.getHTML()
+  // 删除所有换行节点
+  // const brBreakList = Array.from(
+  //   doc.querySelectorAll('br.ProseMirror-trailingBreak'),
+  // )
+  // if (brBreakList) {
+  //   brBreakList.forEach((item) => {
+  //     item.remove()
+  //   })
+  //   brBreakList.length = 0
+  // }
 
   return `
     <!DOCTYPE html>
@@ -116,47 +148,61 @@ const getIframeCode = (fillFieldData) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>${umoEditorPureCss}</style>
       <style>
-      html{
-        margin: 0;
-        padding: 0;
-        overflow: visible;
-      }
-      body{
-        margin: 0;
-        padding: 0;
-        background-color: ${background};
-        -webkit-print-color-adjust: exact;
-      }
-      .umo-page-content{
-        transform: scale(1) !important;
-        overflow: hidden;
-      }
-      @page {
-        size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
-        padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
-        margin: 0;
-      }
-      @page:first {
-        padding-top: 0;
-      }
-      @page:last {
-        padding-bottom: 0;
-        page-break-after: avoid;
-      }
-      @media print {
-        table {
-          page-break-inside: auto;
+        html{
+          margin: 0;
+          padding: 0;
+          overflow: visible;
         }
-        tr {
-          page-break-inside: auto !important;
+        body{
+          margin: 0;
+          padding: 0;
+          background-color: ${background};
+          -webkit-print-color-adjust: exact;
         }
-        thead {
-          display: table-header-group;
+        .umo-page-content{
+          transform: scale(1) !important;
+          overflow: hidden;
         }
+        @page {
+          size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
+          padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
+          margin: 0;
+        }
+        @page:first {
+          padding-top: 0;
+        }
+        @page:last {
+          padding-bottom: 0;
+          page-break-after: avoid;
+        }
+        // @media print {
+        //   table {
+        //     page-break-inside: auto;
+        //   }
+        //   tr {
+        //     page-break-inside: auto !important;
+        //   }
+        //   thead {
+        //     display: table-header-group;
+        //   }
+        // }
+
+        // @media print {
+        //   table, img, svg {
+        //     page-break-inside: avoid;
+        //   }
+        //
+        //   h1, h2 {
+        //     page-break-after: avoid;
+        //   }
+        // }
       </style>
       <style>
         span text.hidden {
           display: inline;
+        }
+        .no-print {
+          display: none;
         }
       </style>
     </head>

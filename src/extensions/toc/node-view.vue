@@ -110,7 +110,7 @@ const headingActive = (value: any) => {
   .umo-node-toc {
     padding: 44px 24px 24px 10px;
     position: relative;
-    outline: solid 1px var(--umo-content-node-border);
+    outline: solid 2px var(--umo-content-node-border);
     border-radius: var(--umo-content-node-radius);
     background-color: #fff;
     width: 100%;

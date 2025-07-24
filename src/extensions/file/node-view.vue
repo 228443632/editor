@@ -183,7 +183,7 @@ const togglePreview = () => {
     display: inline-flex;
     align-items: center;
     padding: 12px;
-    outline: solid 1px var(--umo-content-node-border);
+    outline: solid 2px var(--umo-content-node-border);
     overflow: hidden;
     background-color: var(--umo-color-white);
     border-radius: var(--umo-content-node-radius);

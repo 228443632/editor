@@ -17,7 +17,6 @@ const { proxy } = getCurrentInstance()
 const props = defineProps({
   ...nodeViewProps,
 })
-const { node } = props
 const emit = defineEmits({})
 const __globalBizState__ = inject('__globalBizState__') as Ref<
   Record<string, any>
@@ -38,16 +37,16 @@ const visible = reactive({
 
 function onSelectNode() {
   props.editor.commands.setNodeSelection(props.getPos())
-  __globalBizState__.value.nodeActive = node
+  __globalBizState__.value.nodeActive = props.node
 
   // 设置选中
   const { anchor } = editor.value.state.selection
   editor.value
     .chain()
-    .setTextSelection({ from: anchor, to: anchor + node.nodeSize })
+    .setTextSelection({ from: anchor, to: anchor + props.node.nodeSize })
     .run()
 
-  formData.value = deepClone({ ...node?.attrs })
+  formData.value = deepClone({ ...props.node.attrs })
   // setBubbleMenuShow(false)
   visible.dialog = true
 }
@@ -57,6 +56,7 @@ async function onConfirm() {
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
+  console.log('cloneFormData', cloneFormData)
   updateAttributes(cloneFormData)
   onClose()
 }
@@ -66,8 +66,11 @@ function onClose() {
   setBubbleMenuShow(true)
 }
 
-function onVisibleChange(popupVisible) {
-  console.log('popupVisible', popupVisible)
+/**
+ * 弹窗显隐
+ * @param popupVisible
+ */
+function onVisibleChange(popupVisible: boolean) {
   if (!popupVisible) {
     void onConfirm()
   }
@@ -84,7 +87,7 @@ function setBubbleMenuShow(isShow = true) {
 
 /* 计算 */
 
-const _attributes = computed(() => node?.attrs)
+const _attributes = computed(() => props.node?.attrs)
 
 const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
 
@@ -126,10 +129,10 @@ defineExpose({
   >
     <text class="hidden">{{ _text }}</text>
     <NodeEdit
-      v-model:visible="visible.dialog"
-      @visible-change="onVisibleChange"
-      v-model:form-data="formData"
       ref="nodeEditRef"
+      v-model:visible="visible.dialog"
+      v-model:form-data="formData"
+      @visible-change="onVisibleChange"
     ></NodeEdit>
     <!--    &ZeroWidthSpace;-->
   </node-view-wrapper>
@@ -147,9 +150,9 @@ defineExpose({
   //padding: 0 2px;
   //padding: 0;
   cursor: pointer;
-  border-radius: 2px;
+  //border-radius: 2px;
   &.umo-node-focused.umo-node-focused.umo-node-focused {
-    outline: 1px dashed var(--umo-primary-color);
+    outline: 2px solid var(--umo-primary-color);
   }
   &:hover {
     background-color: #f0f2f7;
