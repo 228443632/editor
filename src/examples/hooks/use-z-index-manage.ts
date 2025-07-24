@@ -40,7 +40,7 @@ export function useZIndexManage(
             // zIndex.value =
             if (COMP_PARAMS_MAP[nodeName] && +node.attrs.zIndex > 0) {
               zIndexObj.pools.add(+node.attrs.zIndex)
-              zIndex.value = zIndexObj.max
+              zIndex.value = Math.max(zIndex.value, +node.attrs.zIndex)
             }
           })
         }

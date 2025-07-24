@@ -5,18 +5,18 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import { NodeViewContent, nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
+import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
 import { getNumString } from 'sf-utils2/lib/_helperNumber'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
 import NodeEdit from './components/NodeEdit.vue'
+import LineWrap from './components/LineWrap.vue'
 
-import { simpleUUID } from '@/utils/short-id'
 import Drager from 'es-drager'
 import { generateFieldName } from '@/examples/utils/common-util'
 import type { Editor } from '@tiptap/core'
-import { rafThrottle } from '@/examples/utils/dom'
+import { MAX_Z_INDEX, rafThrottle } from '@/examples/utils/dom'
 
 const props = defineProps(nodeViewProps)
 const emit = defineEmits({})
@@ -36,6 +36,7 @@ const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
+const lineWrapRef = ref<InstanceType<typeof LineWrap>>()
 const selected = ref(false)
 const scrollViewRef = ref<HTMLHtmlElement>(
   document.querySelector('div.umo-zoomable-container.umo-scrollbar'),
@@ -117,7 +118,6 @@ function onScroll(event: Event) {
 onScroll._oldScrollTop = 0
 
 const rafThrottleOnScroll = rafThrottle(onScroll)
-// const debounceOnScroll = debounce(onScroll, 100)
 
 function addScrollListener() {
   if (!scrollViewRef.value) return
@@ -134,6 +134,7 @@ function removeScrollListener() {
  * 拖拽开始
  */
 function onDragStart() {
+  selected.value = true
   addScrollListener()
 }
 
@@ -150,8 +151,6 @@ function onDragEnd() {
  */
 function onKeydown(e: KeyboardEvent) {
   // keyCode: 40 下 38 上。39 右 37 左
-  // e.stopPropagation()
-  e.preventDefault()
   switch (e.keyCode) {
     case 40: {
       // 下
@@ -159,6 +158,7 @@ function onKeydown(e: KeyboardEvent) {
       dragAttrs.top = dragAttrs.top + 1
       updateAttributes({ dragAttrs })
       nodeEditRef.value.tPopupRef.update()
+      e.preventDefault()
       break
     }
     case 38: {
@@ -167,6 +167,7 @@ function onKeydown(e: KeyboardEvent) {
       dragAttrs.top = dragAttrs.top - 1
       updateAttributes({ dragAttrs })
       nodeEditRef.value.tPopupRef.update()
+      e.preventDefault()
       break
     }
 
@@ -176,6 +177,7 @@ function onKeydown(e: KeyboardEvent) {
       dragAttrs.left = dragAttrs.left - 1
       updateAttributes({ dragAttrs })
       nodeEditRef.value.tPopupRef.update()
+      e.preventDefault()
       break
     }
     case 39: {
@@ -184,14 +186,13 @@ function onKeydown(e: KeyboardEvent) {
       dragAttrs.left = dragAttrs.left + 1
       updateAttributes({ dragAttrs })
       nodeEditRef.value.tPopupRef.update()
+      e.preventDefault()
       break
     }
     default: {
       break
     }
   }
-  return false
-
   // function onChoose() {
   //   window.requestAnimationFrame(() => {
   //     // editor.value.commands.setNodeSelection(props.getPos())
@@ -249,7 +250,7 @@ const _rootStyle = computed(() => {
   const cssText = _attributes.value.cssText || {}
   return {
     ...cssText,
-    zIndex: props.node.attrs.zIndex,
+    zIndex: selected.value ? MAX_Z_INDEX : props.node.attrs.zIndex,
   }
 })
 
@@ -271,12 +272,25 @@ const _dragAttrs = computed(() => {
  */
 watch(selected, (newSelected: boolean) => {
   if (newSelected) {
-    editor.value.setEditable(false)
-    document.addEventListener('keydown', onKeydown, { capture: true })
+    scrollViewRef.value.addEventListener('keydown', onKeydown, {
+      capture: true,
+    })
   } else {
-    editor.value.setEditable(true)
-    document.removeEventListener('keydown', onKeydown, { capture: true })
+    scrollViewRef.value.removeEventListener('keydown', onKeydown, {
+      capture: true,
+    })
   }
+})
+
+watchEffect(() => {
+  _dragAttrs.value.width
+  _dragAttrs.value.top
+  _dragAttrs.value.left
+  _dragAttrs.value.height
+  _dragAttrs.value.translateY
+  nextTick(() => {
+    lineWrapRef.value && lineWrapRef.value.update()
+  })
 })
 
 /* 周期 */
@@ -290,7 +304,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   removeScrollListener()
-  document.removeEventListener('keydown', onKeydown, { capture: true })
+  scrollViewRef.value.removeEventListener('keydown', onKeydown, {
+    capture: true,
+  })
 })
 
 /* 暴露 */
@@ -307,15 +323,14 @@ defineExpose()
     :data-id="_attributes['data-id']"
     :style="_rootStyle"
     :class="['umo-floating-node', selected && 'is-selected']"
-    @click="onSelectNode"
   >
     <span
+      ref="dragerWrapRef"
       class="drager-wrap"
       :style="{
         '--y': _dragAttrs.translateY + 'px',
         zIndex: _rootStyle.zIndex,
       }"
-      ref="dragerWrapRef"
     >
       <Drager
         :selected="selected"
@@ -345,23 +360,31 @@ defineExpose()
         @drag="rafThrottleOnDrag"
         @click.stop="onSelectNode"
       >
-        <NodeEdit
-          ref="nodeEditRef"
-          v-model:visible="visible.dialog"
-          v-model:form-data="formData"
-          :extra-props="{
-            getTop,
-            updateAttributes,
-          }"
-          @visible-change="onVisibleChange"
+        <LineWrap
+          ref="lineWrapRef"
+          :width="Number(_dragAttrs.width)"
+          :height="Number(_dragAttrs.height)"
+          :auto-resize="false"
+          :show-line="selected"
         >
-          <span class="!overflow-hidden inline-block w-full h-full">
-            <text class="hidden">{{ _text }}</text>
-            <span class="print-hidden text-placeholder">{{
-              props.node.attrs?.placeholder
-            }}</span>
-          </span>
-        </NodeEdit>
+          <NodeEdit
+            ref="nodeEditRef"
+            v-model:visible="visible.dialog"
+            v-model:form-data="formData"
+            :extra-props="{
+              getTop,
+              updateAttributes,
+            }"
+            @visible-change="onVisibleChange"
+          >
+            <span class="!overflow-hidden inline-block w-full h-full">
+              <text class="hidden">{{ _text }}</text>
+              <span class="print-hidden text-placeholder">{{
+                props.node.attrs?.placeholder
+              }}</span>
+            </span>
+          </NodeEdit>
+        </LineWrap>
       </Drager>
     </span>
   </node-view-wrapper>

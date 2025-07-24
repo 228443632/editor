@@ -6,6 +6,8 @@
 
 type ThrottledFunction<T> = (...args: any[]) => T
 
+export const MAX_Z_INDEX = 2 ** 16
+
 /**
  * raf版本 防抖
  * @param fn

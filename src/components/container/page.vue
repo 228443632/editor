@@ -75,6 +75,11 @@
               style="width: var(--umo-page-margin-right)"
             ></div>
           </div>
+
+          <!--  辅助线   -->
+          <section
+            class="umo-page-content__auxline absolute pointer-events-none"
+          ></section>
         </t-watermark>
       </div>
     </div>

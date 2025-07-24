@@ -11,6 +11,11 @@ import { type EditorState, NodeSelection } from '@tiptap/pm/state' // 表单数�
 
 type TPosAtNodeOption = { key: string }
 
+/**
+ * 分割线
+ */
+export const UMO_AUX_LINE_CTOR = 'umo-page-content__auxline'
+
 export const tiptapUtil = {
   /**
    * 根据pos位置获取node节点
