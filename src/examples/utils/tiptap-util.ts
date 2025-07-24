@@ -216,14 +216,14 @@ export const tiptapUtil = {
       /** 样式 */
       cssText: {
         default: {},
-        parseHTML: (element) => {
+        parseHTML: (element: HTMLElement) => {
           return cssUtil.styleTextToObj(
             [element.style.cssText, element.getAttribute('cssText')]
               .filter(Boolean)
               .join(';'),
           )
         },
-        renderHTML: (attrs) => {
+        renderHTML: (attrs: Record<string, any>) => {
           const cssText = cssUtil.styleObjToText(attrs.cssText)
           if (!cssText) return {}
           return { cssText }
@@ -290,5 +290,21 @@ export const tiptapUtil = {
       delete cssText.fontSize
     }
     return cssText
+  },
+
+  /**
+   * 获取当前选中的节点
+   * @param editor
+   * @param selection
+   */
+  getSelectionNode(editor: Editor, selection?: EditorState['selection']) {
+    selection ||= editor.state.selection
+    let node: Node
+    if (selection instanceof NodeSelection) {
+      node = selection.node
+    } else {
+      node = editor.state.doc.nodeAt(selection.from)
+    }
+    return node
   },
 }

@@ -5,8 +5,8 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, to, debounce } from 'sf-utils2'
+import { NodeViewContent, nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
+import { deepClone, to } from 'sf-utils2'
 import { getNumString } from 'sf-utils2/lib/_helperNumber'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
@@ -17,8 +17,6 @@ import Drager from 'es-drager'
 import { generateFieldName } from '@/examples/utils/common-util'
 import type { Editor } from '@tiptap/core'
 import { rafThrottle } from '@/examples/utils/dom'
-
-const { proxy } = getCurrentInstance()
 
 const props = defineProps(nodeViewProps)
 const emit = defineEmits({})
@@ -32,6 +30,7 @@ const { updateAttributes } = props
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const editor = inject('editor') as Ref<Editor>
 const { zIndex, getTop } = useZIndexManage()
+const dragerWrapRef = ref<HTMLHtmlElement>()
 const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
@@ -68,12 +67,10 @@ function onSelectNode() {
     .setTextSelection({ from: anchor, to: anchor + props.node.nodeSize })
     .run()
 
-  // TODO
-  selected.value = true
-
   formData.value = deepClone({ ...props.node?.attrs })
   // setBubbleMenuShow(false)
-  visible.dialog = false
+  visible.dialog = true
+  selected.value = true
 }
 
 /**
@@ -84,6 +81,7 @@ async function onConfirm() {
   if (err || !valid)
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
+  delete cloneFormData.dragAttrs
   updateAttributes(cloneFormData)
   onClose()
 }
@@ -104,9 +102,9 @@ function onVisibleChange(popupVisible: boolean) {
  * @param event
  */
 function onScroll(event: Event) {
-  const target = event.target as HTMLElement
-  if (onScroll._lastScrollTop === target.scrollTop) return
-  const diffH = target.scrollTop - onScroll._lastScrollTop
+  const target = scrollViewRef.value as HTMLElement
+  if (onScroll._oldScrollTop === target.scrollTop) return
+  const diffH = target.scrollTop - onScroll._oldScrollTop
   const translateY = _dragAttrs.value.translateY + diffH
   updateAttributes({
     dragAttrs: {
@@ -114,23 +112,22 @@ function onScroll(event: Event) {
       translateY,
     },
   })
-  onScroll._lastScrollTop = target.scrollTop
+  onScroll._oldScrollTop = target.scrollTop
 }
-onScroll._lastScrollTop = 0
+onScroll._oldScrollTop = 0
 
 const rafThrottleOnScroll = rafThrottle(onScroll)
-const debounceOnScroll = debounce(onScroll, 100)
+// const debounceOnScroll = debounce(onScroll, 100)
 
 function addScrollListener() {
   if (!scrollViewRef.value) return
   removeScrollListener()
+  onScroll._oldScrollTop = scrollViewRef.value.scrollTop
   scrollViewRef.value.addEventListener('scroll', rafThrottleOnScroll)
-  scrollViewRef.value.addEventListener('scroll', debounceOnScroll)
 }
 function removeScrollListener() {
   if (!scrollViewRef.value) return
   scrollViewRef.value.removeEventListener('scroll', rafThrottleOnScroll)
-  scrollViewRef.value.removeEventListener('scroll', debounceOnScroll)
 }
 
 /**
@@ -145,6 +142,63 @@ function onDragStart() {
  */
 function onDragEnd() {
   removeScrollListener()
+}
+
+/**
+ * 监听键盘事件
+ * @param e
+ */
+function onKeydown(e: KeyboardEvent) {
+  // keyCode: 40 下 38 上。39 右 37 左
+  // e.stopPropagation()
+  e.preventDefault()
+  switch (e.keyCode) {
+    case 40: {
+      // 下
+      const dragAttrs = deepClone(_dragAttrs.value)
+      dragAttrs.top = dragAttrs.top + 1
+      updateAttributes({ dragAttrs })
+      nodeEditRef.value.tPopupRef.update()
+      break
+    }
+    case 38: {
+      // 上
+      const dragAttrs = deepClone(_dragAttrs.value)
+      dragAttrs.top = dragAttrs.top - 1
+      updateAttributes({ dragAttrs })
+      nodeEditRef.value.tPopupRef.update()
+      break
+    }
+
+    case 37: {
+      // 左
+      const dragAttrs = deepClone(_dragAttrs.value)
+      dragAttrs.left = dragAttrs.left - 1
+      updateAttributes({ dragAttrs })
+      nodeEditRef.value.tPopupRef.update()
+      break
+    }
+    case 39: {
+      // 右
+      const dragAttrs = deepClone(_dragAttrs.value)
+      dragAttrs.left = dragAttrs.left + 1
+      updateAttributes({ dragAttrs })
+      nodeEditRef.value.tPopupRef.update()
+      break
+    }
+    default: {
+      break
+    }
+  }
+  return false
+
+  // function onChoose() {
+  //   window.requestAnimationFrame(() => {
+  //     // editor.value.commands.setNodeSelection(props.getPos())
+  //     dragerWrapRef.value.click()
+  //     editor.value.commands.focus()
+  //   })
+  // }
 }
 
 /**
@@ -206,24 +260,37 @@ const _dragAttrs = computed(() => {
   const tempAttrs = _attributes.value.dragAttrs || {}
   return {
     ...tempAttrs,
-    translateY: +getNumString(tempAttrs.translateY),
+    translateY: +getNumString(tempAttrs.translateY) || 0,
   }
 })
 
 /* 监听 */
+
+/**
+ * 监听是否选中
+ */
+watch(selected, (newSelected: boolean) => {
+  if (newSelected) {
+    editor.value.setEditable(false)
+    document.addEventListener('keydown', onKeydown, { capture: true })
+  } else {
+    editor.value.setEditable(true)
+    document.removeEventListener('keydown', onKeydown, { capture: true })
+  }
+})
 
 /* 周期 */
 onMounted(() => {
   if (!props.node.attrs.zIndex) {
     updateAttributes({ zIndex: zIndex.value })
   }
-  if (!props.node.attrs?.['data-id']) {
-    props.updateAttributes({ 'data-id': simpleUUID() })
-  }
 })
+
+// 浙商资产新核心系统
 
 onBeforeUnmount(() => {
   removeScrollListener()
+  document.removeEventListener('keydown', onKeydown, { capture: true })
 })
 
 /* 暴露 */
@@ -239,7 +306,8 @@ defineExpose()
     :iscompparams="node.attrs?.isCompParams"
     :data-id="_attributes['data-id']"
     :style="_rootStyle"
-    :class="['umo-floating-node']"
+    :class="['umo-floating-node', selected && 'is-selected']"
+    @click="onSelectNode"
   >
     <span
       class="drager-wrap"
@@ -247,6 +315,7 @@ defineExpose()
         '--y': _dragAttrs.translateY + 'px',
         zIndex: _rootStyle.zIndex,
       }"
+      ref="dragerWrapRef"
     >
       <Drager
         :selected="selected"
@@ -274,7 +343,7 @@ defineExpose()
         @drag-start="onDragStart"
         @drag-end="onDragEnd"
         @drag="rafThrottleOnDrag"
-        @click="onSelectNode"
+        @click.stop="onSelectNode"
       >
         <NodeEdit
           ref="nodeEditRef"
@@ -301,12 +370,16 @@ defineExpose()
 <!--style-->
 <style lang="less">
 div[compname='compTextDrag'] {
-  //display: contents !important;
-  display: contents;
   height: 0;
-  width: 0;
-  cursor: pointer;
-  font-size: 16px;
+  width: 100%;
+  position: relative;
+
+  //font-size: 16px;
+  //outline: none !important;
+
+  //&.is-selected {
+  //  outline: 2px solid var(--umo-primary-color);
+  //}
 
   .text-placeholder {
     color: #9ba3b0;
@@ -319,7 +392,7 @@ div[compname='compTextDrag'] {
   .drager-wrap {
     transform: translate3d(0, var(--y), 0);
     display: inline-flex;
-    margin-left: var(--umo-page-margin-left);
+    //margin-left: var(--umo-page-margin-left);
     position: absolute;
     left: 0;
     top: 0;

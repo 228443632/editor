@@ -6,12 +6,10 @@
 import { mergeAttributes, Node, VueNodeViewRenderer } from '@tiptap/vue-3'
 
 import NodeView from './NodeView.vue'
-// import type { Editor } from '@tiptap/core'
 import { simpleUUID } from '@/utils/short-id'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/examples/utils/common-util'
-// import type { Node as TNode } from 'prosemirror-model'
 
 export const NAME = 'compTextDrag' as const
 
@@ -56,9 +54,9 @@ const defaultAttributes = {
 export default Node.create({
   name: NAME,
   group: 'block',
-  content: 'text*', // 允许包含文本内容
+  content: 'inline*', // 允许包含文本内容
+  draggable: false,
   inline: false, // 关键：标记为行内元素[4](@ref)
-  defining: true,
   // marks: '',
   atom: true,
 
@@ -147,7 +145,7 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['span', mergeAttributes(HTMLAttributes)]
+    return ['span', mergeAttributes(HTMLAttributes), 0]
   },
 
   addNodeView() {
@@ -180,9 +178,13 @@ export default Node.create({
             left: offsetX,
             top: offsetY,
           })
+
+          console.log('options.attrs', options.attrs)
+
           return commands.insertContentAt(0, {
             type: options.type,
             attrs: {
+              ...options.attrs,
               dragAttrs,
             },
           })
@@ -204,7 +206,6 @@ export default Node.create({
     }
   },
 })
-
 
 // /**
 //  * 获取拖拽节点的矩形信息

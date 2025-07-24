@@ -195,7 +195,6 @@ const paramsConfig = ref([
         getAttrs() {
           const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
-            isDragging: true,
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
             // placeholder: `文本悬浮${compTexts.length + 1}`,
@@ -211,12 +210,12 @@ const paramsConfig = ref([
             .deleteSelection()
             .insertCompTextDrag({
               type: COMP_PARAMS_MAP.compTextDrag,
-              attrs: this.attrs,
+              attrs,
             })
             .run()
 
           const targetDom = document.querySelector(
-            `span[data-id="${attrs['data-id']}"]`,
+            `div[data-id="${attrs['data-id']}"]`,
           ) as HTMLHtmlElement
           targetDom?.click?.()
         },

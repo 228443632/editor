@@ -109,7 +109,7 @@ defineExpose({
         >
           <t-row :gutter="[16, 16]">
             <t-col :span="6">
-              <t-form-item
+              <t-form-ite
                 label="名称"
                 name="placeholder"
                 required-mark
@@ -121,7 +121,7 @@ defineExpose({
                   maxlength="50"
                   clearable
                 ></t-input>
-              </t-form-item>
+              </t-form-ite>
             </t-col>
             <t-col :span="6">
               <t-form-item

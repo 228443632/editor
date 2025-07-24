@@ -29,8 +29,7 @@ export function useZIndexManage(
   editor?: Ref<Editor>,
   options?: IUseZIndexOptions,
 ) {
-  let z = zIndexObj.max
-  const zIndex = ref(z++)
+  const zIndex = ref(zIndexObj.max + 1)
   watch(
     editor,
     (newEditor: Editor) => {

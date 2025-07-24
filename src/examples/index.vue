@@ -46,6 +46,8 @@ import type { Editor } from '@tiptap/vue-3'
 import { template01 } from '@/examples/template/demo01'
 import { testEditor } from '@/examples/utils/test'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
+import { tiptapUtil } from '@/examples/utils/tiptap-util'
+import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -195,6 +197,18 @@ const options = $ref(
 
 watch(umoEditorRef, () => {
   editorRef.value = window.editor = umoEditorRef.value.useEditor()
+
+  window.requestAnimationFrame(() => {
+    // 聚焦override
+    const originFocusCommands = editorRef.value.commandManager.rawCommands.focus
+    editorRef.value.commandManager.rawCommands.focus = function () {
+      const node = tiptapUtil.getSelectionNode(editorRef.value)
+      if (COMP_PARAMS_MAP.compTextDrag === node?.type.name) {
+        return () => false
+      }
+      return originFocusCommands.call(this, ...arguments)
+    }
+  })
 })
 
 console.log('options', options)

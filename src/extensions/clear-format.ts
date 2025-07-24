@@ -3,9 +3,10 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 06/07/25 AM10:50
  */
-import { Extension } from '@tiptap/core'
+import { type Editor, Extension } from '@tiptap/core'
 import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
-import { NodeSelection } from '@tiptap/pm/state'
+import { type EditorState, NodeSelection } from '@tiptap/pm/state'
+import { type Node } from '@tiptap/pm/model'
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -94,28 +95,25 @@ export default Extension.create<ClearFormatOption>({
         ({ chain, editor }) => {
           const chainResult = chain().focus().toggleBold()
           // editor.commands.setNodeSelection(13)
+          const fontWeight = editor.isActive('bold') ? 'bold' : undefined
           const selection = editor.state.selection
           const { from, to } = selection
           if (from === to) {
-            let node
             // 光标合并
-            if (selection instanceof NodeSelection) {
-              node = selection.node
-            } else {
-              node = editor.state.doc.nodeAt(from)
-            }
-            handleCustomNode(node, node.nodeSize)
+            const node = getSelectionNode(editor, selection)
+            node?.type && handleCustomNode(node, node?.nodeSize)
           } else {
             editor.state.doc.nodesBetween(from, to, (node) => {
               handleCustomNode(node)
             })
           }
           return chainResult.run()
-          function handleCustomNode(node, nodeSize?: number) {
+          function handleCustomNode(node: Node, nodeSize?: number) {
             if (COMP_PARAMS_MAP[node.type.name]) {
               const cssText = {
                 ...node.attrs.cssText,
                 fontWeight:
+                  fontWeight ||
                   node.attrs.cssText.fontWeight === 'normal' ||
                   !node.attrs.cssText.fontWeight
                     ? 'bold'
@@ -319,3 +317,22 @@ export default Extension.create<ClearFormatOption>({
     }
   },
 })
+
+/**
+ * 获取当前选中的节点
+ * @param editor
+ * @param selection
+ */
+function getSelectionNode(
+  editor: Editor,
+  selection?: EditorState['selection'],
+) {
+  selection ||= editor.state.selection
+  let node: Node
+  if (selection instanceof NodeSelection) {
+    node = selection.node
+  } else {
+    node = editor.state.doc.nodeAt(selection.from)
+  }
+  return node
+}

@@ -14,6 +14,8 @@ export default Node.create({
   group: 'block',
   content: 'inline*',
   draggable: false,
+  defining: true,
+  atoms: true,
   addAttributes() {
     return {
       vnode: {
