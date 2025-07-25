@@ -181,6 +181,7 @@
           :popup-props="{
             destroyOnClose: true,
             attach: container,
+            overlayClassName: attrs['overlay-class-name'] as string | undefined,
           }"
           v-bind="attrs"
           :options="selectOptions"

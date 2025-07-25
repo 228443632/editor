@@ -90,6 +90,7 @@ async function onConfirm() {
     return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
   delete cloneFormData.dragAttrs
+  delete cloneFormData.cssText
   updateAttributes(cloneFormData)
   onClose()
 }
@@ -290,11 +291,11 @@ watch(selected, (newSelected: boolean) => {
 })
 
 watchEffect(() => {
-  _dragAttrs.value.width
-  _dragAttrs.value.top
-  _dragAttrs.value.left
-  _dragAttrs.value.height
-  _dragAttrs.value.translateY
+  void _dragAttrs.value.width
+  void _dragAttrs.value.top
+  void _dragAttrs.value.left
+  void _dragAttrs.value.height
+  void _dragAttrs.value.translateY
   nextTick(() => {
     lineWrapRef.value && lineWrapRef.value.update()
   })
@@ -315,6 +316,9 @@ onBeforeUnmount(() => {
     capture: true,
   })
 })
+
+// 创建提供
+provide('NODE_PROPS', props)
 
 /* 暴露 */
 defineExpose()
@@ -384,11 +388,22 @@ defineExpose()
             }"
             @visible-change="onVisibleChange"
           >
-            <span class="!overflow-hidden inline-block w-full h-full">
+            <span
+              class="!overflow-hidden inline-block w-full h-full"
+              :style="{
+                textDecoration: _rootStyle.textDecoration,
+                backgroundColor: _rootStyle.backgroundColor,
+              }"
+            >
               <text class="hidden">{{ _text }}</text>
-              <span class="print-hidden text-placeholder">{{
-                props.node.attrs?.placeholder
-              }}</span>
+              <span
+                class="print-hidden text-placeholder"
+                :style="{
+                  textDecoration: _rootStyle.textDecoration,
+                  color: _rootStyle.color,
+                }"
+                >{{ props.node.attrs?.placeholder }}</span
+              >
             </span>
           </NodeEdit>
         </LineWrap>

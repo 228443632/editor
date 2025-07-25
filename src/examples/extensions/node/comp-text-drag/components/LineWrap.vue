@@ -132,18 +132,18 @@ defineExpose({
       class="contents line-wrap-teleport"
       :style="_lineWrapTeleportStyle"
     >
-      <section class="line-wrap-clone" :style="_lineWrapCloneStyle"/>
+      <section class="line-wrap-clone" :style="_lineWrapCloneStyle" />
       <div class="line-wrap__left line-wrap__x">
         <span
-          class="whitespace-nowrap rounded-4px text-white text-10px bg-[#333] px-4px py-1px"
-          >{{ _lineWrapTeleportStyle['--lt'] }}</span
+          class="whitespace-nowrap rounded-2px text-white text-10px bg-[#333] px-4px py-2px"
+          >{{ parseFloat(_lineWrapTeleportStyle['--lt']) }}</span
         >
       </div>
       <div class="line-wrap__right line-wrap__x"></div>
       <div class="line-wrap__top line-wrap__y">
         <span
-          class="whitespace-nowrap rounded-4px text-white text-10px bg-[#333] px-4px py-1px"
-          >{{ _lineWrapTeleportStyle['--ll'] }}</span
+          class="whitespace-nowrap rounded-2px text-white text-10px bg-[#333] px-4px py-2px"
+          >{{ parseFloat(_lineWrapTeleportStyle['--ll']) }}</span
         >
       </div>
       <div class="line-wrap__bottom line-wrap__y"></div>

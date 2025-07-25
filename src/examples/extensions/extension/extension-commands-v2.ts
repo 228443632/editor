@@ -89,12 +89,19 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const selection = editor.state.selection
           const { from, to } = selection
           const node = getSelectionNode(editor, selection)
-          // console.log('debug001', node, node?.type?.name)
-          //   const cond1 =  COMP_PARAMS_MAP.compTextDrag == node.type.name
-          //   const cond1 =  COMP_PARAMS_MAP.compTextDrag == node.type.name
-          //   handleCustomNode(node, node?.nodeSize)
-          //   return chainResult.run()
+
+          // if (node?.type) {
+          //   if (COMP_PARAMS_MAP.compInvisibleBlock == node.type.name) {
+          //     // 如果是占位符
+          //   }
+          //
+          //   if (COMP_PARAMS_MAP.compTextDrag == node.type.name) {
+          //     // 如果是拖拽的
+          //     handleCustomNode(node, node?.nodeSize)
+          //     return chainResult.run()
+          //   }
           // }
+
           chainResult.focus().toggleBold()
           if (from === to) {
             // 光标合并

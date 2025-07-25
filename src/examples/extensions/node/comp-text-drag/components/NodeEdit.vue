@@ -8,6 +8,7 @@
 import { useVModel } from '@vueuse/core'
 import { uuid } from 'sf-utils2'
 import { type Form, type Popup } from 'tdesign-vue-next'
+import AppearanceEdit from './AppearanceEdit.vue'
 
 const props = defineProps({
   /**
@@ -183,6 +184,12 @@ defineExpose({
                   maxlength="100"
                   clearable
                 ></t-textarea>
+              </t-form-item>
+            </t-col>
+
+            <t-col :span="6">
+              <t-form-item label="样式">
+                <AppearanceEdit></AppearanceEdit>
               </t-form-item>
             </t-col>
           </t-row>
