@@ -83,18 +83,19 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
       toggleBoldV2:
         () =>
         ({ chain, editor }) => {
-          const chainResult = chain().focus()
+          const chainResult = chain()
           // editor.commands.setNodeSelection(13)
           const fontWeight = editor.isActive('bold') ? 'bold' : undefined
           const selection = editor.state.selection
           const { from, to } = selection
           const node = getSelectionNode(editor, selection)
-          if (node?.type && COMP_PARAMS_MAP.compTextDrag == node.type.name) {
-            handleCustomNode(node, node?.nodeSize)
-            return chainResult.run()
-          }
-
-          chainResult.toggleBold()
+          // console.log('debug001', node, node?.type?.name)
+          //   const cond1 =  COMP_PARAMS_MAP.compTextDrag == node.type.name
+          //   const cond1 =  COMP_PARAMS_MAP.compTextDrag == node.type.name
+          //   handleCustomNode(node, node?.nodeSize)
+          //   return chainResult.run()
+          // }
+          chainResult.focus().toggleBold()
           if (from === to) {
             // 光标合并
             node?.type && handleCustomNode(node, node?.nodeSize)

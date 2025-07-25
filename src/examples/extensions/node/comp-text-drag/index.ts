@@ -10,6 +10,7 @@ import { simpleUUID } from '@/utils/short-id'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/examples/utils/common-util'
+import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
 
 export const NAME = 'compTextDrag' as const
 
@@ -141,11 +142,11 @@ export default Node.create({
 
   // 解析规则（从HTML到编辑器节点） , getAttrs() {}
   parseHTML() {
-    return [{ tag: `span[compname="${NAME}"]` }]
+    return [{ tag: `div[compname="${NAME}"]` }]
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['span', mergeAttributes(HTMLAttributes), 0]
+    return ['div', mergeAttributes(HTMLAttributes), 0]
   },
 
   addNodeView() {
@@ -156,7 +157,7 @@ export default Node.create({
     return {
       insertCompTextDrag:
         (options) =>
-        ({ editor, state, commands, view }) => {
+        ({ editor, state, chain, view, commands }) => {
           if (editor.isEmpty)
             return useMessage('error', {
               content:
@@ -179,29 +180,63 @@ export default Node.create({
             top: offsetY,
           })
 
-          console.log('options.attrs', options.attrs)
+          options.attrs['data-id'] ||= simpleUUID()
+          // const node = tiptapUtil.nodeAt(editor, 0)
+          // let pos = 0
+          // if (node && node.type.name !== COMP_PARAMS_MAP.compInvisibleBlock) {
+          //   commands.insertContentAt(0, {
+          //     type: COMP_PARAMS_MAP.compInvisibleBlock,
+          //   })
+          // }
 
-          return commands.insertContentAt(0, {
-            type: options.type,
-            attrs: {
-              ...options.attrs,
-              dragAttrs,
-            },
-          })
+          let invisibleBlockPos = 0
+          return chain()
+            .insertContentAt(invisibleBlockPos, {
+              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              attrs: {
+                refId: options.attrs['data-id'],
+              },
+            })
+            .command(({ tr }) => {
+              invisibleBlockPos = tr.mapping.map(invisibleBlockPos) // 动态映射位置
+              return true
+            })
+            .insertContentAt(invisibleBlockPos, {
+              type: options.type,
+              attrs: {
+                ...options.attrs,
+                dragAttrs,
+              },
+            })
+            .run()
         },
 
       insertCompTextDragByAttrs:
         (attrs) =>
-        ({ commands }) => {
+        ({ chain }) => {
+          let invisibleBlockPos = 0
           const dragAttrs = deepClone(attrs?.dragAttrs) || {}
+          attrs['data-id'] ||= simpleUUID()
           updateDefaultObjectValue(dragAttrs, defaultAttributes.dragAttrs)
-          return commands.insertContentAt(0, {
-            type: NAME,
-            attrs: {
-              ...attrs,
-              dragAttrs,
-            },
-          })
+          return chain()
+            .insertContentAt(invisibleBlockPos, {
+              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              attrs: {
+                refId: attrs['data-id'],
+              },
+            })
+            .command(({ tr }) => {
+              invisibleBlockPos = tr.mapping.map(invisibleBlockPos) // 动态映射位置
+              return true
+            })
+            .insertContentAt(2, {
+              type: NAME,
+              attrs: {
+                ...attrs,
+                dragAttrs,
+              },
+            })
+            .run()
         },
     }
   },

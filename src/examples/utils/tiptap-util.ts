@@ -3,7 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 24/04/25 PM3:24
  */
-import type { Editor } from '@tiptap/core'
+import type { DOMNode, Editor } from '@tiptap/core'
 import type { Node, Fragment } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
 import { cssUtil } from '@/examples/utils/css-util'
@@ -40,6 +40,27 @@ export const tiptapUtil = {
    */
   nodeAt(editor: Editor, pos: number) {
     return editor.state.doc.nodeAt(pos)
+  },
+
+  /**
+   * 获取node节点DOM，真实节点
+   * @param editor
+   * @param pos
+   */
+  nodeDOM(editor: Editor, pos: number) {
+    return editor.view.nodeDOM(pos)
+  },
+
+  /**
+   * 返回给定 DOM 的位置信息。（它会尽可能的优先选择直接检查文档结构来获取位置信息，
+   * 而不是用四处寻找逐个探测的方式，但是有些情况下，比如给定的是一个事件 target，那你别无选择只能逐个 target 的进行测试）
+   * @param editor
+   * @param node
+   * @param offset
+   * @param bias
+   */
+  posAtDom(editor: Editor, node: DOMNode, offset?: undefined, bias?: number) {
+    return editor.view.posAtDOM(node, offset, bias)
   },
 
   /**

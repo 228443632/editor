@@ -41,15 +41,22 @@ const selected = ref(false)
 const scrollViewRef = ref<HTMLHtmlElement>(
   document.querySelector('div.umo-zoomable-container.umo-scrollbar'),
 )
+const umoPageContentRef = ref<HTMLHtmlElement>(
+  document.querySelector('.umo-watermark.umo-page-content'),
+)
 
 onClickOutside(rootRef, (e: PointerEvent) => {
   const target = e.target as HTMLHtmlElement
+  if (umoPageContentRef.value.contains(target)) {
+    selected.value = false
+    return
+  }
   const containerDom = nodeEditRef.value.tPopupRef.getOverlay()
   if (containerDom && containerDom.contains(target)) {
     selected.value = true
     return
   }
-  selected.value = false
+  // selected.value = true
 })
 
 /* 方法 */

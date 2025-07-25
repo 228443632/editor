@@ -11,4 +11,5 @@ export const COMP_PARAMS_MAP = {
   compText: 'compText',
   compTextDrag: 'compTextDrag',
   imageParagraph: 'imageParagraph',
+  compInvisibleBlock: 'compInvisibleBlock',
 } as const

@@ -6,5 +6,6 @@
 
 import compText from './comp-text'
 import compTextDrag from './comp-text-drag'
+import compInvisibleBlock from './comp-invisible-block'
 
-export default [compText, compTextDrag]
+export default [compText, compTextDrag, compInvisibleBlock]

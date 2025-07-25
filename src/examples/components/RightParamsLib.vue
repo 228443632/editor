@@ -233,6 +233,22 @@ const paramsConfig = ref([
           useMessage('warning', { content: '动态表格暂未开发！' })
         },
       },
+      {
+        label: '不可见块',
+        value: 'params-comp-table2',
+        icon: 'params-comp-table2',
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .insertContentAt(0, {
+              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              attrs: {},
+            })
+            .run()
+        },
+      },
     ],
   },
   {
