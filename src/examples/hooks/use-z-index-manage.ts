@@ -29,7 +29,7 @@ export function useZIndexManage(
   editor?: Ref<Editor>,
   options?: IUseZIndexOptions,
 ) {
-  const zIndex = ref(zIndexObj.max + 1)
+  const zIndex = ref(zIndexObj.max)
   watch(
     editor,
     (newEditor: Editor) => {
@@ -60,6 +60,8 @@ export function useZIndexManage(
       immediately: true,
     },
   )
+
+  zIndex.value++
 
   /**
    * 获取最高

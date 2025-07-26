@@ -322,7 +322,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
       /**
        * 删除
        */
-      deleteV2: () => {
+      intentDeleteV2: () => {
         return ({ chain, editor }) => {
           // editor.view.dom.dispatchEvent(
           //   new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),

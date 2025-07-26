@@ -94,6 +94,7 @@ export const ExtensionDragParams = Extension.create({
           this.editor
             .chain()
             .insertCompTextDragByAttrs({
+              ...(nodeData.attrs || {}),
               dragAttrs: {
                 top: offsetY,
                 left: offsetX,

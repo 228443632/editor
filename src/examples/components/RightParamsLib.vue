@@ -193,13 +193,11 @@ const paramsConfig = ref([
           })
         },
         getAttrs() {
-          const cssText = tiptapUtil.getStyleBySelection(editor.value)
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
             // placeholder: `文本悬浮${compTexts.length + 1}`,
             placeholder: `文本悬浮`,
-            cssText,
           }
         },
         click() {
@@ -215,7 +213,7 @@ const paramsConfig = ref([
             .run()
 
           const targetDom = document.querySelector(
-            `div[data-id="${attrs['data-id']}"]`,
+            `[data-id="${attrs['data-id']}"]`,
           ) as HTMLHtmlElement
           targetDom?.click?.()
         },
@@ -238,11 +236,7 @@ const paramsConfig = ref([
         value: 'params-comp-table2',
         icon: 'params-comp-table2',
         click() {
-          editor.value
-            .chain()
-            .focus()
-            .deleteV2()
-            .run()
+          editor.value.chain().focus().intentDeleteV2().run()
         },
       },
       {
@@ -391,7 +385,7 @@ const dragMethod = {
       ...cItem,
       type: cItem.value,
       attrs: {
-        ...cItem.attrs,
+        ...cItem.getAttrs(),
       },
     } as IDragNodeParamsNode
 
@@ -447,12 +441,10 @@ const dragMethod = {
       {}) as IDragNodeParamsNode
 
     const dataId = nodeData?.attrs?.['data-id']
-    if (nodeData.type == 'compText') {
-      const targetDom = document.querySelector(
-        `span[data-id="${dataId}"]`,
-      ) as HTMLHtmlElement
-      targetDom?.click?.()
-    }
+    const targetDom = document.querySelector(
+      `[data-id="${dataId}"]`,
+    ) as HTMLHtmlElement
+    targetDom && targetDom?.click?.()
   },
 }
 

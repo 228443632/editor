@@ -181,7 +181,7 @@ export default Extension.create({
           return this.editor.commands.outdent()
         }
         // @ts-expect-error
-        return this.editor.commands.deleteV2()
+        return this.editor.commands.intentDeleteV2()
       },
     }
   },

@@ -341,6 +341,7 @@ defineExpose()
     :data-id="_attributes['data-id']"
     :style="_rootStyle"
     :class="['umo-floating-node', selected && 'is-selected']"
+    @click="onSelectNode"
   >
     <span
       ref="dragerWrapRef"
@@ -376,8 +377,8 @@ defineExpose()
         @drag-start="onDragStart"
         @drag-end="onDragEnd"
         @drag="rafThrottleOnDrag"
-        @click.stop="onSelectNode"
         ref="dragerRef"
+        @click.stop="onSelectNode"
       >
         <LineWrap
           ref="lineWrapRef"
@@ -425,7 +426,7 @@ defineExpose()
 div[compname='compTextDrag'] {
   height: 0;
   width: 100%;
-  position: relative;
+  position: absolute;
 
   //font-size: 16px;
   //outline: none !important;

@@ -4,6 +4,7 @@
  * @create 20/07/25 AM2:13
  */
 import { mergeAttributes, Node, VueNodeViewRenderer } from '@tiptap/vue-3'
+import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 
 import NodeView from './NodeView.vue'
 import { simpleUUID } from '@/utils/short-id'
@@ -11,6 +12,8 @@ import { tiptapUtil } from '@/examples/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/examples/utils/common-util'
 import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+
+const { getTop } = useZIndexManage()
 
 export const NAME = 'compTextDrag' as const
 
@@ -147,7 +150,7 @@ export default Node.create({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['div', mergeAttributes(HTMLAttributes), 0]
+    return ['div', mergeAttributes(HTMLAttributes)]
   },
 
   addNodeView() {
