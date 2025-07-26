@@ -57,6 +57,7 @@ export default Node.create({
   group: 'block',
   content: 'inline*', // 允许包含文本内容
   draggable: false,
+  selectable: true,
   inline: false, // 关键：标记为行内元素[4](@ref)
   // marks: '',
   atom: true,

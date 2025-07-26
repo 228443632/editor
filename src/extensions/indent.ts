@@ -157,7 +157,14 @@ export default Extension.create({
         if (this.editor.isActive('taskList')) {
           return this.editor.commands.sinkListItem('taskItem')
         }
-        return this.editor.commands.indent()
+
+        // 在首个字符
+        if (isCursorAtParagraphStart(this.editor.state)) {
+          return this.editor.commands.indent()
+        }
+        return this.editor.commands.insertContent({
+          type: 'compIntent',
+        })
       },
       'Shift-Tab': () => {
         if (
@@ -169,8 +176,25 @@ export default Extension.create({
         if (this.editor.isActive('taskList')) {
           return this.editor.commands.liftListItem('taskItem')
         }
-        return this.editor.commands.outdent()
+        // 在首个字符
+        if (isCursorAtParagraphStart(this.editor.state)) {
+          return this.editor.commands.outdent()
+        }
+        // @ts-expect-error
+        return this.editor.commands.deleteV2()
       },
     }
   },
 })
+
+/**
+ * 判断光标是否在段落开头
+ * @param state
+ */
+function isCursorAtParagraphStart(state: EditorState) {
+  const { $from } = state.selection
+  // 检查三个条件
+  return (
+    $from.parentOffset === 0 && $from.index() === 0 && $from.parent.type.isBlock
+  )
+}

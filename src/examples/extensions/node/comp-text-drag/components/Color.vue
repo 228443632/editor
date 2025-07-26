@@ -5,6 +5,7 @@
     popup-handle="arrow"
     hide-text
     :popup-visible="popupVisible"
+    overlay-class-name="sf-overlay-1001"
     @toggle-popup="togglePopup"
     @menu-click="colorChange(currentColor)"
   >

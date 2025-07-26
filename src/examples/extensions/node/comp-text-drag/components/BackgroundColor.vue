@@ -5,9 +5,10 @@
     popup-handle="arrow"
     hide-text
     :popup-visible="popupVisible"
+    overlay-class-name="sf-overlay-1001"
     @toggle-popup="togglePopup"
   >
-    <icon name="background-color" class="umo-icon-background-color" size="20"/>
+    <icon name="background-color" class="umo-icon-background-color" size="20" />
     <div
       :class="[`umo-current-color`, `umo-current-color--${_bgColor || ''}`]"
       :style="{

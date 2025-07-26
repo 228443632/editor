@@ -234,6 +234,18 @@ const paramsConfig = ref([
         },
       },
       {
+        label: '模拟删除',
+        value: 'params-comp-table2',
+        icon: 'params-comp-table2',
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteV2()
+            .run()
+        },
+      },
+      {
         label: '不可见块',
         value: 'params-comp-table2',
         icon: 'params-comp-table2',

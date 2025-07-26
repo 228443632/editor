@@ -8,6 +8,7 @@ import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from 'prosemirror-state'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
+import { DOMParser as DOMParser2, DOMSerializer } from 'prosemirror-model'
 
 import { Fragment } from 'prosemirror-model'
 
@@ -21,36 +22,67 @@ export const ExtensionPasteParams = Extension.create({
     const handlePaste = (view: EditorView, e: ClipboardEvent, slice) => {
       const { clipboardData } = e
       const html = clipboardData.getData('text/html') // html
-      // if (html) {
-      //   console.log('复制的html', html)
-      //   const fragmentDom = new DOMParser().parseFromString(html, 'text/html')
-      //   const scheme = view.state.schema
-      //   const slice = DOMParserAlias.fromSchema(scheme).parseSlice(fragmentDom)
-      //
-      //   // fragmentDom.createTreeWalker(fragmentDom.documentElement)
-      //
-      //   const modifiedContent = modifyFragment(slice.content, 'Roboto')
-      //   const newSlice = new Slice(
-      //     Fragment.from(modifiedContent),
-      //     slice.openStart,
-      //     slice.openEnd,
-      //   )
-      //   console.log('newSlice', newSlice.toJSON())
-      //   view.dispatch(view.state.tr.replaceSelection(newSlice))
-      //   return true
-      // }
+      if (html) {
+        //   console.log('复制的html', html)
 
+        // 加粗 b strong font-weight: bold
+        // 斜体 em i font-style: italic
+        // 删除线 s text-underline: line-through
+        // 下标 sub
+        // 上标 sup
+        const fragmentDom = new DOMParser().parseFromString(html, 'text/html')
+        const walker = document.createTreeWalker(
+          fragmentDom.documentElement,
+          NodeFilter.SHOW_ELEMENT,
+          null,
+        )
 
-      // const text = clipboardData.getData('text/text') // 文字
-      // const plain = clipboardData.getData('text/plain') //
-      // const urlList = clipboardData.getData('text/uri-list')
-      // console.log('parse', {
-      //   html,
-      //   plain,
-      //   text,
-      //   files,
-      //   urlList,
-      // })
+        let currentNode: Node
+        // 遍历所有文本节点
+        while ((currentNode = walker.nextNode())) {
+          // 忽略空白文本节点
+          if (currentNode['style'].fontFamily) {
+            currentNode['style'].fontFamily = ''
+          }
+          currentNode['style'].color = 'red'
+        }
+
+        const { schema } = view.state
+        const parser = DOMParser2.fromSchema(schema)
+        const slice = parser.parseSlice(fragmentDom, {
+          preserveWhitespace: true,
+        })
+        console.log('fragmentDom.documentElement', fragmentDom.documentElement)
+
+        view.dispatch(view.state.tr.replaceSelection(slice))
+
+        //   const scheme = view.state.schema
+        //   const slice = DOMParserAlias.fromSchema(scheme).parseSlice(fragmentDom)
+        //
+        //   // fragmentDom.createTreeWalker(fragmentDom.documentElement)
+        //
+        //   const modifiedContent = modifyFragment(slice.content, 'Roboto')
+        //   const newSlice = new Slice(
+        //     Fragment.from(modifiedContent),
+        //     slice.openStart,
+        //     slice.openEnd,
+        //   )
+        //   console.log('newSlice', newSlice.toJSON())
+        //   view.dispatch(view.state.tr.replaceSelection(newSlice))
+        //   return true
+        // }
+
+        // const text = clipboardData.getData('text/text') // 文字
+        // const plain = clipboardData.getData('text/plain') //
+        // const urlList = clipboardData.getData('text/uri-list')
+        // console.log('parse', {
+        //   html,
+        //   plain,
+        //   text,
+        //   files,
+        //   urlList,
+        return true
+      }
       return false
 
       /**

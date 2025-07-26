@@ -7,65 +7,73 @@
 export const defaultDict = {
   fonts: [
     {
-      label: { en_US: 'Default Font', zh_CN: '默认字体', ru_RU: 'default' },
-      value: null,
-    },
-    {
       label: { en_US: 'Songti', zh_CN: '宋体', ru_RU: 'Songti' },
       value: 'SimSun',
+    },
+    {
+      label: { en_US: 'XinSongti', zh_CN: '新宋体', ru_RU: 'XinSongti' },
+      value: 'NSimSun',
     },
     {
       label: { en_US: 'Heiti', zh_CN: '黑体', ru_RU: 'Heiti' },
       value: 'SimHei',
     },
     {
-      label: { en_US: 'Kaiti', zh_CN: '楷体', ru_RU: 'Kaiti' },
-      value: 'KaiTi',
-    },
-    {
       label: {
-        en_US: 'Kaiti GB2312',
-        zh_CN: '楷体_GB2312',
-        ru_RU: 'Kaiti GB2312',
+        en_US: 'WenQuanYi Bitmap Song',
+        zh_CN: '文泉驿点阵宋',
+        ru_RU: 'WenQuanYi Bitmap Song',
       },
-      value: 'KaiTi_GB2312',
+      value: 'WenQuanYi Bitmap Song',
     },
-    {
-      label: { en_US: 'Fangsong', zh_CN: '仿宋', ru_RU: 'Fangsong' },
-      value: 'FangSong',
-    },
-    {
-      label: {
-        en_US: 'Fangsong GB2312',
-        zh_CN: '仿宋_GB2312',
-        ru_RU: 'Fangsong GB2312',
-      },
-      value: 'FangSong_GB2312',
-    },
-    {
-      label: { en_US: 'STSong', zh_CN: '华文宋体', ru_RU: 'STSong' },
-      value: 'STSong',
-    },
-    {
-      label: { en_US: 'STFangsong', zh_CN: '华文仿宋', ru_RU: 'STFangsong' },
-      value: 'STFangsong',
-    },
-    {
-      label: {
-        en_US: 'FZ Fangsong Simplified',
-        zh_CN: '方正仿宋简体',
-        ru_RU: 'FZ Fangsong Simplified',
-      },
-      value: 'FZFangSong-Z02S',
-    },
-    {
-      label: {
-        en_US: 'FZ Xiaobiao Song',
-        zh_CN: '方正小标宋',
-        ru_RU: 'FZ Xiaobiao Song',
-      },
-      value: 'FZXiaoBiaoSong-B05S',
-    },
+    // {
+    //   label: { en_US: 'Kaiti', zh_CN: '楷体', ru_RU: 'Kaiti' },
+    //   value: 'KaiTi',
+    // },
+    // {
+    //   label: {
+    //     en_US: 'Kaiti GB2312',
+    //     zh_CN: '楷体_GB2312',
+    //     ru_RU: 'Kaiti GB2312',
+    //   },
+    //   value: 'KaiTi_GB2312',
+    // },
+    // {
+    //   label: { en_US: 'Fangsong', zh_CN: '仿宋', ru_RU: 'Fangsong' },
+    //   value: 'FangSong',
+    // },
+    // {
+    //   label: {
+    //     en_US: 'Fangsong GB2312',
+    //     zh_CN: '仿宋_GB2312',
+    //     ru_RU: 'Fangsong GB2312',
+    //   },
+    //   value: 'FangSong_GB2312',
+    // },
+    // {
+    //   label: { en_US: 'STSong', zh_CN: '华文宋体', ru_RU: 'STSong' },
+    //   value: 'STSong',
+    // },
+    // {
+    //   label: { en_US: 'STFangsong', zh_CN: '华文仿宋', ru_RU: 'STFangsong' },
+    //   value: 'STFangsong',
+    // },
+    // {
+    //   label: {
+    //     en_US: 'FZ Fangsong Simplified',
+    //     zh_CN: '方正仿宋简体',
+    //     ru_RU: 'FZ Fangsong Simplified',
+    //   },
+    //   value: 'FZFangSong-Z02S',
+    // },
+    // {
+    //   label: {
+    //     en_US: 'FZ Xiaobiao Song',
+    //     zh_CN: '方正小标宋',
+    //     ru_RU: 'FZ Xiaobiao Song',
+    //   },
+    //   value: 'FZXiaoBiaoSong-B05S',
+    // },
     {
       label: {
         en_US: 'Microsoft Yahei',
@@ -74,16 +82,16 @@ export const defaultDict = {
       },
       value: 'Microsoft Yahei',
     },
-    { label: 'Arial', value: 'Arial' },
-    { label: 'Times New Roman', value: 'Times New Roman' },
-    { label: 'Verdana', value: 'Verdana' },
-    { label: 'Helvetica', value: 'Helvetica' },
-    { label: 'Calibri', value: 'Calibri' },
-    { label: 'Cambria', value: 'Cambria' },
-    { label: 'Tahoma', value: 'Tahoma' },
-    { label: 'Georgia', value: 'Georgia' },
-    { label: 'Comic Sans MS', value: 'Comic Sans MS' },
-    { label: 'Impact', value: 'Impact' },
+    // { label: 'Arial', value: 'Arial' },
+    // { label: 'Times New Roman', value: 'Times New Roman' },
+    // { label: 'Verdana', value: 'Verdana' },
+    // { label: 'Helvetica', value: 'Helvetica' },
+    // { label: 'Calibri', value: 'Calibri' },
+    // { label: 'Cambria', value: 'Cambria' },
+    // { label: 'Tahoma', value: 'Tahoma' },
+    // { label: 'Georgia', value: 'Georgia' },
+    // { label: 'Comic Sans MS', value: 'Comic Sans MS' },
+    // { label: 'Impact', value: 'Impact' },
   ],
   // prettier-ignore
   colors: [

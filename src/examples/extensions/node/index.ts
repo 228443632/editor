@@ -5,7 +5,8 @@
  */
 
 import compText from './comp-text'
+import compIntent from './comp-intent'
 import compTextDrag from './comp-text-drag'
 import compInvisibleBlock from './comp-invisible-block'
 
-export default [compText, compTextDrag, compInvisibleBlock]
+export default [compIntent, compText, compTextDrag, compInvisibleBlock]

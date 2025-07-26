@@ -13,3 +13,7 @@ export const COMP_PARAMS_MAP = {
   imageParagraph: 'imageParagraph',
   compInvisibleBlock: 'compInvisibleBlock',
 } as const
+
+// export type COMP_BOLD_PARAMS = {
+//   imageParagraph: 'imageParagraph',
+// }

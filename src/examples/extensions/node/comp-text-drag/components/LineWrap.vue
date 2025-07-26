@@ -90,10 +90,25 @@ const _lineWrapTeleportStyle = computed(() => {
     '--line-c': MAX_Z_INDEX - 9,
     '--width': `${umoPageContentBound.width.value}px`,
     '--height': `${umoPageContentBound.height.value}px`,
+    // 距离左侧
     '--ll': `${Number(rootBound.left.value - umoPageContentBound.left.value).toFixed(1)}px`,
-    '--lr': `${Number(rootBound.right.value - umoPageContentBound.left.value).toFixed(1)}px`,
+    // 距离右侧到左侧
+    '--llr': `${Number(rootBound.right.value - umoPageContentBound.left.value).toFixed(1)}px`,
+    // 距离顶部
     '--lt': `${Number(rootBound.top.value - umoPageContentBound.top.value).toFixed(1)}px`,
-    '--lb': `${Number(rootBound.bottom.value - umoPageContentBound.top.value).toFixed(1)}px`,
+    // 底部距离到顶部
+    '--ltb': `${Number(rootBound.bottom.value - umoPageContentBound.top.value).toFixed(1)}px`,
+    '--lb': `${Number(umoPageContentBound.bottom.value - rootBound.bottom.value).toFixed(1)}px`,
+    '--lr': `${Number(umoPageContentBound.right.value - rootBound.right.value).toFixed(1)}px`,
+  }
+})
+
+const _position = computed(() => {
+  return {
+    left: parseFloat(_lineWrapTeleportStyle.value['--ll']),
+    right: parseFloat(_lineWrapTeleportStyle.value['--lr']),
+    top: parseFloat(_lineWrapTeleportStyle.value['--lt']),
+    bottom: parseFloat(_lineWrapTeleportStyle.value['--lb']),
   }
 })
 
@@ -118,6 +133,8 @@ onMounted(() => {})
 /* 暴露 */
 defineExpose({
   update,
+
+  _position,
 })
 </script>
 
@@ -178,7 +195,7 @@ defineExpose({
       left: 0;
       width: 1px;
       height: 100%;
-      background-image: linear-gradient(to bottom, #ccc 50%, transparent 50%);
+      background-image: linear-gradient(to bottom, #999 50%, transparent 50%);
       background-size: 1px 10px;
       background-repeat: repeat-y;
       z-index: 1;
@@ -193,7 +210,7 @@ defineExpose({
       left: 0;
       width: 100%;
       height: 1px;
-      background-image: linear-gradient(to right, #ccc 50%, transparent 50%);
+      background-image: linear-gradient(to right, #999 50%, transparent 50%);
       background-size: 10px 1px;
       background-repeat: repeat-x;
       z-index: 1;
@@ -208,7 +225,7 @@ defineExpose({
   width: 1px;
 }
 .line-wrap__right {
-  left: var(--lr);
+  left: var(--llr);
   top: 0;
   height: var(--height);
   width: 1px;
@@ -221,7 +238,7 @@ defineExpose({
 }
 .line-wrap__bottom {
   left: 0;
-  top: var(--lb);
+  top: var(--ltb);
   width: var(--width);
   height: 1px;
 }

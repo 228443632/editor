@@ -31,6 +31,7 @@ const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
 const editor = inject('editor') as Ref<Editor>
 const { zIndex, getTop } = useZIndexManage()
 const dragerWrapRef = ref<HTMLHtmlElement>()
+const dragerRef = ref<InstanceType<typeof Drager>>()
 const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
@@ -44,6 +45,7 @@ const scrollViewRef = ref<HTMLHtmlElement>(
 const umoPageContentRef = ref<HTMLHtmlElement>(
   document.querySelector('.umo-watermark.umo-page-content'),
 )
+const dragerUpdateFlag = ref(0)
 
 onClickOutside(rootRef, (e: PointerEvent) => {
   const target = e.target as HTMLHtmlElement
@@ -127,32 +129,6 @@ onScroll._oldScrollTop = 0
 
 const rafThrottleOnScroll = rafThrottle(onScroll)
 
-function addScrollListener() {
-  if (!scrollViewRef.value) return
-  removeScrollListener()
-  onScroll._oldScrollTop = scrollViewRef.value.scrollTop
-  scrollViewRef.value.addEventListener('scroll', rafThrottleOnScroll)
-}
-function removeScrollListener() {
-  if (!scrollViewRef.value) return
-  scrollViewRef.value.removeEventListener('scroll', rafThrottleOnScroll)
-}
-
-/**
- * 拖拽开始
- */
-function onDragStart() {
-  selected.value = true
-  addScrollListener()
-}
-
-/**
- * 拖拽结束
- */
-function onDragEnd() {
-  removeScrollListener()
-}
-
 /**
  * 监听键盘事件
  * @param e
@@ -234,6 +210,37 @@ const onResize = ({ width, height }: { width: number; height: number }) => {
 }
 const rafThrottleOnResize = rafThrottle(onResize)
 
+function addScrollListener() {
+  if (!scrollViewRef.value) return
+  removeScrollListener()
+  onScroll._oldScrollTop = scrollViewRef.value.scrollTop
+  scrollViewRef.value.addEventListener('scroll', rafThrottleOnScroll)
+}
+function removeScrollListener() {
+  if (!scrollViewRef.value) return
+  scrollViewRef.value.removeEventListener('scroll', rafThrottleOnScroll)
+}
+
+/**
+ * 拖拽开始
+ */
+function onDragStart() {
+  selected.value = true
+  addScrollListener()
+}
+
+/**
+ * 拖拽结束
+ */
+function onDragEnd() {
+  removeScrollListener()
+}
+
+/**
+ * 拖拽中
+ * @param left
+ * @param top
+ */
 const onDrag = ({ left, top }: { left: number; top: number }) => {
   updateAttributes({
     dragAttrs: {
@@ -370,6 +377,7 @@ defineExpose()
         @drag-end="onDragEnd"
         @drag="rafThrottleOnDrag"
         @click.stop="onSelectNode"
+        ref="dragerRef"
       >
         <LineWrap
           ref="lineWrapRef"

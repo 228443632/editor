@@ -139,7 +139,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
       toggleItalicV2:
         () =>
         ({ chain, editor }) => {
-          const chainResult = chain().focus().toggleBold()
+          const chainResult = chain().focus().toggleItalic()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
             if (COMP_PARAMS_MAP[node.type.name]) {
@@ -318,6 +318,33 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           })
           return chainResult.removeEmptyTextStyle().run()
         },
+
+      /**
+       * 删除
+       */
+      deleteV2: () => {
+        return ({ chain, editor }) => {
+          // editor.view.dom.dispatchEvent(
+          //   new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),
+          // )
+          const { $from, $to } = editor.state.selection
+          const chainResult = chain()
+          if ($from.pos === $to.pos) {
+            if ($from.nodeBefore?.type.spec.atom) {
+              chainResult.deleteRange({
+                from: $from.pos - $from.nodeBefore.nodeSize,
+                to: $from.pos,
+              })
+            } else {
+              chainResult.deleteRange({ from: $from.pos - 1, to: $from.pos })
+            }
+          } else {
+            chainResult.deleteSelection()
+          }
+          // 删除字符或默认行为
+          return chainResult.run()
+        }
+      },
     }
   },
 })

@@ -4,7 +4,7 @@
  * @create 24/04/25 PM3:24
  */
 import type { DOMNode, Editor } from '@tiptap/core'
-import type { Node, Fragment } from 'prosemirror-model'
+import { type Node, type Fragment, type ResolvedPos } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
 import { cssUtil } from '@/examples/utils/css-util'
 import { type EditorState, NodeSelection } from '@tiptap/pm/state' // 表单数据填充
@@ -61,6 +61,28 @@ export const tiptapUtil = {
    */
   posAtDom(editor: Editor, node: DOMNode, offset?: undefined, bias?: number) {
     return editor.view.posAtDOM(node, offset, bias)
+  },
+
+  /**
+   * 判断是否段落开头
+   * @param editor
+   * @param node
+   */
+  isAtStartInBlock(editor: Editor, node: ResolvedPos) {
+    return (
+      node.parentOffset === 0 && node.index() === 0 && node.parent.type.isBlock
+    )
+  },
+
+  /**
+   * 判断是否段落结尾
+   * @param editor
+   * @param node
+   */
+  isAtEndInBlock(editor: Editor, node: ResolvedPos) {
+    return (
+      node.parentOffset === node.parent.content.size && node.parent.type.isBlock
+    )
   },
 
   /**
