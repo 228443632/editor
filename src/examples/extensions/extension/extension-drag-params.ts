@@ -10,13 +10,13 @@ import { parseJsonNoError } from 'sf-utils2'
 import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
-import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant'
 
 export interface IDragNodeParamsNode {
   /** node 参数组件类型*/
   value: string
   /** 等同于上面*/
-  type: TPrettifyString<keyof typeof COMP_PARAMS_MAP>
+  type: TPrettifyString<keyof typeof COMP_PARAMS_NAME_MAP>
 
   /** node 参数组件名称*/
   label: string
@@ -47,10 +47,10 @@ export const ExtensionDragParams = Extension.create({
         e.dataTransfer?.getData('text/plain'),
       ) || {}) as IDragNodeParamsNode
 
-      if (!COMP_PARAMS_MAP[nodeData.type]) return true
+      if (!COMP_PARAMS_NAME_MAP[nodeData.type]) return true
 
       switch (nodeData.type) {
-        case COMP_PARAMS_MAP.compText: {
+        case COMP_PARAMS_NAME_MAP.compText: {
           e.preventDefault()
 
           // 获取位置并验证
@@ -60,7 +60,7 @@ export const ExtensionDragParams = Extension.create({
           })
           const $pos = view.state.doc.resolve(coordinates.pos)
           const nodeTypeName = $pos.parent.type.name
-          if (COMP_PARAMS_MAP[nodeTypeName]) {
+          if (COMP_PARAMS_NAME_MAP[nodeTypeName]) {
             useMessage('error', {
               content: '当前位置已有普通文本，请拖拽到其他位置',
             })
@@ -81,7 +81,7 @@ export const ExtensionDragParams = Extension.create({
         }
 
         // 文本悬浮
-        case COMP_PARAMS_MAP.compTextDrag: {
+        case COMP_PARAMS_NAME_MAP.compTextDrag: {
           e.preventDefault()
 
           const viewRect = view.dom.getBoundingClientRect()
@@ -105,7 +105,7 @@ export const ExtensionDragParams = Extension.create({
         }
 
         // 图片段落
-        case COMP_PARAMS_MAP.imageParagraph: {
+        case COMP_PARAMS_NAME_MAP.imageParagraph: {
           const viewRect = view.dom.getBoundingClientRect()
           const viewDomPl = Math.floor(
             +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),

@@ -9,7 +9,7 @@
  * @create 06/07/25 AM10:50
  */
 import { type Editor, Extension } from '@tiptap/core'
-import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+import { COMP_PARAMS_CONFIG_MAP } from '@/examples/extensions/constant'
 import { type EditorState, NodeSelection } from '@tiptap/pm/state'
 import { type Node } from '@tiptap/pm/model'
 
@@ -70,7 +70,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().unsetAllMarks()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.bold) {
               chainResult.updateAttributes(node.type.name, { cssText: {} })
             }
           })
@@ -91,11 +91,11 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const node = getSelectionNode(editor, selection)
 
           // if (node?.type) {
-          //   if (COMP_PARAMS_MAP.compInvisibleBlock == node.type.name) {
+          //   if (COMP_PARAMS_NAME_MAP.compInvisibleBlock == node.type.name) {
           //     // 如果是占位符
           //   }
           //
-          //   if (COMP_PARAMS_MAP.compTextDrag == node.type.name) {
+          //   if (COMP_PARAMS_NAME_MAP.compTextDrag == node.type.name) {
           //     // 如果是拖拽的
           //     handleCustomNode(node, node?.nodeSize)
           //     return chainResult.run()
@@ -113,7 +113,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           }
           return chainResult.run()
           function handleCustomNode(node: Node, nodeSize?: number) {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.bold) {
               const cssText = {
                 ...node.attrs.cssText,
                 fontWeight:
@@ -142,7 +142,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().toggleItalic()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.italic) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -164,7 +164,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().toggleUnderline()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.underline) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -188,7 +188,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().toggleStrike()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.strike) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -212,7 +212,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().setColor(color)
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.color) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -233,7 +233,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().unsetColor()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.color) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -251,7 +251,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().setHighlight({ color })
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.backgroundColor) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -269,7 +269,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().unsetHighlight()
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.backgroundColor) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -287,7 +287,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
           const chainResult = chain().focus().setMark('textStyle', { fontSize })
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.fontSize) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,
@@ -307,7 +307,7 @@ export const ExtensionCommandsV2 = Extension.create<CommandsV2Options>({
             .setMark('textStyle', { fontSize: null })
           const { from, to } = editor.state.selection
           editor.state.doc.nodesBetween(from, to, (node) => {
-            if (COMP_PARAMS_MAP[node.type.name]) {
+            if (COMP_PARAMS_CONFIG_MAP[node.type.name]?.fontSize) {
               chainResult.updateAttributes(node.type.name, {
                 cssText: {
                   ...node.attrs.cssText,

@@ -4,7 +4,7 @@
  * @create 21/07/25 AM11:46
  */
 import type { Editor } from '@tiptap/core'
-import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant'
 
 interface IUseZIndexOptions {
   /**
@@ -38,7 +38,7 @@ export function useZIndexManage(
           newEditor.state.doc.descendants((node) => {
             const nodeName = node.type.name
             // zIndex.value =
-            if (COMP_PARAMS_MAP[nodeName] && +node.attrs.zIndex > 0) {
+            if (COMP_PARAMS_NAME_MAP[nodeName] && +node.attrs.zIndex > 0) {
               zIndexObj.pools.add(+node.attrs.zIndex)
               zIndex.value = Math.max(zIndex.value, +node.attrs.zIndex)
             }

@@ -16,7 +16,7 @@ import { type Editor } from '@tiptap/core'
 import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
-import { COMP_PARAMS_MAP } from '@/examples/extensions/constant' // 表单数据填充
+import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant' // 表单数据填充
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -189,7 +189,7 @@ const paramsConfig = ref([
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == COMP_PARAMS_MAP.compTextDrag
+            return item.node.type.name == COMP_PARAMS_NAME_MAP.compTextDrag
           })
         },
         getAttrs() {
@@ -207,7 +207,7 @@ const paramsConfig = ref([
             .focus()
             .deleteSelection()
             .insertCompTextDrag({
-              type: COMP_PARAMS_MAP.compTextDrag,
+              type: COMP_PARAMS_NAME_MAP.compTextDrag,
               attrs,
             })
             .run()
@@ -249,7 +249,7 @@ const paramsConfig = ref([
             .focus()
             .deleteSelection()
             .insertContentAt(0, {
-              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              type: COMP_PARAMS_NAME_MAP.compInvisibleBlock,
               attrs: {},
             })
             .run()

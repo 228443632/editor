@@ -11,7 +11,7 @@ import { simpleUUID } from '@/utils/short-id'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/examples/utils/common-util'
-import { COMP_PARAMS_MAP } from '@/examples/extensions/constant'
+import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant'
 
 const { getTop } = useZIndexManage()
 
@@ -187,16 +187,16 @@ export default Node.create({
           options.attrs['data-id'] ||= simpleUUID()
           // const node = tiptapUtil.nodeAt(editor, 0)
           // let pos = 0
-          // if (node && node.type.name !== COMP_PARAMS_MAP.compInvisibleBlock) {
+          // if (node && node.type.name !== COMP_PARAMS_NAME_MAP.compInvisibleBlock) {
           //   commands.insertContentAt(0, {
-          //     type: COMP_PARAMS_MAP.compInvisibleBlock,
+          //     type: COMP_PARAMS_NAME_MAP.compInvisibleBlock,
           //   })
           // }
 
           let invisibleBlockPos = 0
           return chain()
             .insertContentAt(invisibleBlockPos, {
-              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              type: COMP_PARAMS_NAME_MAP.compInvisibleBlock,
               attrs: {
                 refId: options.attrs['data-id'],
               },
@@ -224,7 +224,7 @@ export default Node.create({
           updateDefaultObjectValue(dragAttrs, defaultAttributes.dragAttrs)
           return chain()
             .insertContentAt(invisibleBlockPos, {
-              type: COMP_PARAMS_MAP.compInvisibleBlock,
+              type: COMP_PARAMS_NAME_MAP.compInvisibleBlock,
               attrs: {
                 refId: attrs['data-id'],
               },
