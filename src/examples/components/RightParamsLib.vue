@@ -218,6 +218,42 @@ const paramsConfig = ref([
           targetDom?.click?.()
         },
       },
+
+      {
+        label: '文本悬浮2',
+        value: 'compTextareaDrag',
+        icon: 'params-comp-idcard',
+        draggable: true,
+        getCompTexts() {
+          return __compNodeList__.value.filter((item: { node: Node }) => {
+            return item.node.type.name == COMP_PARAMS_NAME_MAP.compTextareaDrag
+          })
+        },
+        getAttrs() {
+          return {
+            'data-id': commonUtil.simpleUUID(),
+            fieldName: 'idcard',
+            // placeholder: `文本悬浮${compTexts.length + 1}`,
+            placeholder: `文本悬浮2`,
+          }
+        },
+        click() {
+          const attrs = this.getAttrs()
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .insertCompTextareaDrag({
+              attrs,
+            })
+            .run()
+
+          const targetDom = document.querySelector(
+            `[data-id="${attrs['data-id']}"]`,
+          ) as HTMLHtmlElement
+          targetDom?.click?.()
+        },
+      },
     ],
   },
   {

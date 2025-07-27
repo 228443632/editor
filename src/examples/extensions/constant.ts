@@ -37,6 +37,7 @@ export const COMP_PARAMS_NAME_MAP = {
   compTextDrag: 'compTextDrag',
   imageParagraph: 'imageParagraph',
   compInvisibleBlock: 'compInvisibleBlock',
+  compTextareaDrag: 'compTextareaDrag',
 } as const
 
 /**
@@ -58,6 +59,10 @@ export const COMP_PARAMS_CONFIG_MAP = {
   },
   compInvisibleBlock: {
     name: 'compInvisibleBlock',
+    ...DEFAULT_STYLE_CONFIG,
+  },
+  compTextareaDrag: {
+    name: 'compTextareaDrag',
     ...DEFAULT_STYLE_CONFIG,
   },
 } as Record<
