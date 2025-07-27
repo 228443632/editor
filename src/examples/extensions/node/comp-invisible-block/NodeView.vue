@@ -38,9 +38,8 @@ defineExpose()
   <node-view-wrapper
     ref="rootRef"
     :compname="node.attrs?.compName"
-    as="label"
+    as="div"
     :data-id="props.node?.attrs['data-id']"
-    :for="props.node?.attrs.refId"
     :style="_rootStyle"
     :class="['umo-floating-node']"
   >

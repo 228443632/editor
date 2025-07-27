@@ -26,8 +26,9 @@ export default Node.create({
   content: 'inline*', // 允许包含文本内容
   draggable: false,
   inline: false, // 关键：标记为行内元素[4](@ref)
+  defining: true,
   // marks: '',
-  atom: true,
+  // atom: true,
 
   addAttributes() {
     return {

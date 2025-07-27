@@ -86,6 +86,26 @@ export const tiptapUtil = {
   },
 
   /**
+   * 判断文档是否为空
+   * @param editor
+   */
+  isEmptyDocument(editor: Editor) {
+    const doc = editor.state.doc
+    return (
+      doc.childCount === 1 &&
+      doc.firstChild.isTextblock &&
+      doc.firstChild.textContent.trim() === ''
+    )
+  },
+
+  deleteByNode(editor: Editor, node: Node) {
+
+    // node.
+    // editor.commands.delete(tiptapUtil.posAtNode(editor, node))
+  },
+
+
+  /**
    * 根据pos位置获取pos
    * @param editor
    * @param nodes

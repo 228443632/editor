@@ -200,6 +200,9 @@ dependencies:
   prosemirror-transform:
     specifier: 1.10.0
     version: 1.10.0
+  prosemirror-utils:
+    specifier: 1.2.2
+    version: 1.2.2(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)
   prosemirror-view:
     specifier: 1.39.2
     version: 1.39.2
@@ -9784,6 +9787,16 @@ packages:
     resolution: {integrity: sha512-pwDy22nAnGqNR1feOQKHxoFkkUtepoFAd3r2hbEDsnf4wp57kKA36hXsB3njA9FtONBEwSDnDeCiJe+ItD+ykw==}
     dependencies:
       prosemirror-model: 1.25.1
+
+  /prosemirror-utils@1.2.2(prosemirror-model@1.25.1)(prosemirror-state@1.4.3):
+    resolution: {integrity: sha512-7a2MPf99oCW8/587rQYI1/snX71Ban40+apr1hLkY8TmU9YXd7JeR6QsmktcTisJURO3WRjxIia4lTMsYgZVOw==}
+    peerDependencies:
+      prosemirror-model: ^1.19.2
+      prosemirror-state: ^1.4.3
+    dependencies:
+      prosemirror-model: 1.25.1
+      prosemirror-state: 1.4.3
+    dev: false
 
   /prosemirror-view@1.39.2:
     resolution: {integrity: sha512-BmOkml0QWNob165gyUxXi5K5CVUgVPpqMEAAml/qzgKn9boLUWVPzQ6LtzXw8Cn1GtRQX4ELumPxqtLTDaAKtg==}

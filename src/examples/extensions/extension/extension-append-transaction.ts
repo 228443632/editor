@@ -12,11 +12,17 @@ import { DOMParser as DOMParser2 } from 'prosemirror-model'
 import { debounce } from 'sf-utils2'
 
 import { Fragment } from 'prosemirror-model'
+import {
+  AddMarkStep,
+  RemoveMarkStep,
+  ReplaceAroundStep,
+  ReplaceStep,
+} from 'prosemirror-transform'
 import { useMessage } from '@/composables/dialog'
 
 const debounceUseMessage = debounce(useMessage, 500)
 
-export const ExtensionPasteParams = Extension.create({
+export const ExtensionAppendTransaction = Extension.create({
   name: 'pasteCustomParam',
   addProseMirrorPlugins() {
     /**
@@ -131,9 +137,95 @@ export const ExtensionPasteParams = Extension.create({
 
     return [
       new Plugin({
-        key: new PluginKey('PasteCustomParam'),
-        props: {
-          handlePaste,
+        key: new PluginKey('AppendTransactionPlugin'),
+        filterTransaction: (tr, state) => {
+          return true
+        },
+
+        appendTransaction(transactions, oldState, newState) {
+          let isBreakChange = false
+          const newTr = newState.tr
+          for (const tr of transactions) {
+            for (const step of tr.steps) {
+              if (step instanceof ReplaceStep) {
+                const { from, to, slice } = step
+                if (slice.content.size === 0) {
+                  // 删除操作
+                  console.log('删除操作:', `从 ${from} 到 ${to}`)
+                  oldState.doc.nodesBetween(from, to, (node) => {
+                    // 拖拽文本组件
+                    if (node.type.name === 'compTextDrag') {
+                      const dataId = node.attrs['data-id']
+
+                      const comInvisibleBlockNode = oldState.doc.children.find(
+                        (node) => {
+                          return (
+                            node.type.name === 'compInvisibleBlock' &&
+                            node.attrs['refId'] === dataId
+                          )
+                        },
+                      )
+                      if (comInvisibleBlockNode) {
+                        let tempPos
+                        oldState.doc.descendants((node, pos) => {
+                          if (
+                            node.type.name === 'compInvisibleBlock' &&
+                            node.attrs['refId'] === dataId
+                          ) {
+                            tempPos = pos
+                            return true
+                          }
+                          return false
+                        })
+
+                        console.log(
+                          'comInvisibleBlockNode',
+                          comInvisibleBlockNode,
+                          tempPos,
+                        )
+                        if (tempPos >= 0) {
+                          newTr.delete(
+                            tempPos,
+                            tempPos + comInvisibleBlockNode.nodeSize,
+                          )
+                        }
+                        isBreakChange = true
+                      }
+                    }
+                  })
+
+                  if (isBreakChange) {
+                    break
+                  }
+                } else {
+                  console.log(
+                    '替换操作:',
+                    `从 ${from} 到 ${to}，内容为 ${slice.content.toJSON()}`,
+                  )
+                }
+              } else if (step instanceof AddMarkStep) {
+                const { from, to, mark } = step
+                console.log(
+                  '添加样式:',
+                  `从 ${from} 到 ${to}，标记为 ${mark.type.name}`,
+                )
+              } else if (step instanceof RemoveMarkStep) {
+                const { from, to, mark } = step
+                console.log(
+                  '移除样式:',
+                  `从 ${from} 到 ${to}，标记为 ${mark.type.name}`,
+                )
+              } else if (step instanceof ReplaceAroundStep) {
+                const { from, to, gapFrom, gapTo, slice } = step
+                console.log(
+                  '复杂替换:',
+                  `范围 [${from}, ${to}], 插入内容: ${slice.content.toJSON()}`,
+                )
+              }
+            }
+          }
+          if (isBreakChange) return newTr
+          return null // 不修改事务
         },
       }),
     ]
