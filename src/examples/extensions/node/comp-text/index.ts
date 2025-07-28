@@ -45,7 +45,7 @@ export default Node.create({
   addAttributes() {
     return {
       /** 组件名称*/
-      name: {
+      compName: {
         default: NAME,
         parseHTML: () => NAME,
       },

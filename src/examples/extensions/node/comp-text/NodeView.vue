@@ -115,15 +115,14 @@ defineExpose({
 <template>
   <node-view-wrapper
     ref="rootRef"
-    :name="node.attrs?.name"
     as="span"
     :class="[
-      `form-comp--text is-inline-block`,
-      `form-comp-border--${node?.attrs?.borderType}`,
+      `is-inline-block umo-node-view2`,
+      `umo-node-border--${node?.attrs?.borderType}`,
     ]"
     :data-id="_attributes['data-id']"
     :data-placeholder="node?.attrs?.placeholder"
-    data-u="comp-text"
+    compname="comp-text"
     :style="_rootStyle"
     @click="onSelectNode"
   >
@@ -140,7 +139,7 @@ defineExpose({
 
 <!--style-->
 <style lang="less">
-.form-comp--text[data-u='comp-text'] {
+.umo-node-view2[compname='comp-text'] {
   position: relative;
   box-sizing: border-box;
   min-width: 140px;
@@ -170,7 +169,7 @@ defineExpose({
 
 /** 隐藏 */
 :root[mode='print'] {
-  .form-comp--text[data-u='comp-text'] {
+  .umo-node-view2[data-u='comp-text'] {
     --umo-node-text-border-color: currentColor;
     //--umo-node-text-border-color: red;
     //padding: 0;
@@ -202,16 +201,16 @@ span[data-id][iscompparams] {
 </style>
 
 <style lang="less">
-.form-comp-border--underline {
+.umo-node-border--underline {
   border-bottom: 1px solid var(--umo-node-text-border-color);
 }
-.form-comp-border--solid {
+.umo-node-border--solid {
   border: 1px solid var(--umo-node-text-border-color);
 }
-.form-comp-border--dashed {
+.umo-node-border--dashed {
   border: 1px dashed var(--umo-node-text-border-color);
 }
-.form-comp-border--none {
+.umo-node-border--none {
   border: none;
 }
 </style>
