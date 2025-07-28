@@ -11,16 +11,17 @@ declare module '@tiptap/core' {
 }
 export default Node.create({
   name: 'textBox',
-  group: 'block',
-  content: 'inline*',
+  group: 'inline',
+  content: 'inline*', // 允许包含文本内容
+  inline: true,
   draggable: false,
   defining: true,
   atoms: true,
   addAttributes() {
     return {
-      vnode: {
-        default: true,
-      },
+      // vnode: {
+      //   default: true,
+      // },
       width: {
         default: 200,
       },

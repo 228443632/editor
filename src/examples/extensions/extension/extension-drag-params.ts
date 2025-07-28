@@ -169,6 +169,7 @@ export const ExtensionDragParams = Extension.create({
           const tr = this.editor.state.tr
           tr.delete(nodeData.from, nodeData.to)
           tr.insert(dropPos, node)
+          tr.setNodeMarkup(dropPos, null, nodeData.attrs)
           this.editor.view.dispatch(tr)
           this.editor
             .chain()

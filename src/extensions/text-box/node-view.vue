@@ -1,8 +1,9 @@
 <template>
   <node-view-wrapper
     :id="node.attrs.id"
-    as="div"
     ref="containerRef"
+    as="span"
+    :compname="'textBox'"
     class="umo-node-view umo-floating-node"
     :style="{
       zIndex: 90,
@@ -12,15 +13,16 @@
       '--umo-textbox-background-color': node.attrs.backgroundColor,
     }"
   >
-    <div
+    <span
       class="umo-node-container umo-node-text-box"
+      :draggable="isInnerDraggable && !options?.document?.readOnly"
       @dragstart="onDragStart"
       @dragover="onDragOver"
-      :draggable="!options?.document?.readOnly"
     >
       <drager
         :selected="selected"
         :disabled="disabled"
+        tag="span"
         :rotatable="true"
         :boundary="false"
         :angle="node.attrs.angle"
@@ -31,16 +33,25 @@
         :min-width="14"
         :min-height="14"
         :title="t('node.textBox.tip')"
+        class="inline-block"
         @rotate="debounceOnRotate"
         @resize="debounceOnResize"
+        @dragstart="isInnerDraggable = false"
+        @dragend="isInnerDraggable = true"
         @drag="debounceOnDrag"
         @blur="disabled = false"
-        @click="selected = true"
+        @click="onClick"
         @dblclick="editTextBox"
       >
         <node-view-content ref="contentRef" class="umo-node-text-box-content" />
       </drager>
-    </div>
+      <span v-if="selected" class="contents" @mousedown="onChooseMove">
+        <span class="l umo-text-box-line"></span>
+        <span class="t umo-text-box-line"></span>
+        <span class="r umo-text-box-line"></span>
+        <span class="b umo-text-box-line"></span>
+      </span>
+    </span>
   </node-view-wrapper>
 </template>
 
@@ -58,6 +69,8 @@ const contentRef = $ref(null)
 let selected = $ref(false)
 let disabled = $ref(false)
 
+const isInnerDraggable = ref(false)
+
 const onRotate = ({ angle }: { angle: number }) => {
   updateAttributes({ angle })
 }
@@ -66,6 +79,23 @@ const onResize = ({ width, height }: { width: number; height: number }) => {
 }
 const onDrag = ({ left, top }: { left: number; top: number }) => {
   updateAttributes({ left, top })
+}
+const onClick = (event: MouseEvent) => {
+  // const classList = (event.target as HTMLElement).classList
+  // if (
+  //   classList.contains('es-drager-rotate-handle') ||
+  //   classList.contains('es-drager-resize-handle') ||
+  //   classList.contains('es-drager-dot-handle')
+  // ) {
+  //   isInnerDraggable.value = false
+  // }
+  selected = true
+  isInnerDraggable.value = false
+}
+
+const onChooseMove = () => {
+  selected = true
+  isInnerDraggable.value = true
 }
 
 const debounceOnRotate = debounce(onRotate, 20)
@@ -83,7 +113,11 @@ const onDragStart = (e: DragEvent) => {
       from: getPos(),
       to: pos + node.nodeSize,
       nodeSize: node.nodeSize,
-      attrs: node.attrs,
+      attrs: {
+        ...node.attrs,
+        left: 0,
+        top: 0,
+      },
     }),
   )
 }
@@ -110,6 +144,44 @@ const editTextBox = () => {
 </script>
 
 <style lang="less">
+.umo-node-view.umo-node-view[compname='textBox'] {
+  display: inline-flex;
+  position: absolute;
+  text-indent: 0;
+
+  .umo-text-box-line {
+    --w: 4px;
+    display: inline-block;
+    position: absolute;
+    background: transparent;
+    cursor: move;
+    z-index: 100;
+  }
+  .l {
+    left: calc(0px - var(--w));
+    top: 0;
+    width: var(--w);
+    height: 100%;
+  }
+  .r {
+    right: 0;
+    top: 0;
+    width: var(--w);
+    height: 100%;
+  }
+  .b {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--w);
+  }
+  .t {
+    left: 0;
+    top: calc(0px - var(--w));
+    width: 100%;
+    height: var(--w);
+  }
+}
 .umo-node-view {
   .umo-node-text-box {
     position: relative;
