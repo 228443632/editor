@@ -44,13 +44,14 @@
         @dblclick="editTextBox"
       >
         <node-view-content ref="contentRef" class="umo-node-text-box-content" />
+
+        <span v-if="selected" class="contents" @mousedown="onChooseMove">
+          <span class="l umo-text-box-line"></span>
+          <span class="t umo-text-box-line"></span>
+          <span class="r umo-text-box-line"></span>
+          <span class="b umo-text-box-line"></span>
+        </span>
       </drager>
-      <span v-if="selected" class="contents" @mousedown="onChooseMove">
-        <span class="l umo-text-box-line"></span>
-        <span class="t umo-text-box-line"></span>
-        <span class="r umo-text-box-line"></span>
-        <span class="b umo-text-box-line"></span>
-      </span>
     </span>
   </node-view-wrapper>
 </template>
