@@ -52,28 +52,28 @@
         </t-button>
       </tooltip>
       <div class="bar-split"></div>
-      <tooltip :content="t('poweredBy')">
-        <t-button
-          class="umo-status-bar-button"
-          variant="text"
-          size="small"
-          :href="`https://editor.umodoc.com/${locale === 'zh-CN' ? 'cn' : 'en'}/docs`"
-          target="_blank"
-        >
-          <icon name="home-page" />
-        </t-button>
-      </tooltip>
-      <tooltip :content="t('feedback')">
-        <t-button
-          class="umo-status-bar-button"
-          variant="text"
-          size="small"
-          href="https://github.com/umodoc/editor/issues"
-          target="_blank"
-        >
-          <icon name="message" />
-        </t-button>
-      </tooltip>
+      <!--      <tooltip :content="t('poweredBy')">-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          :href="`https://editor.umodoc.com/${locale === 'zh-CN' ? 'cn' : 'en'}/docs`"-->
+      <!--          target="_blank"-->
+      <!--        >-->
+      <!--          <icon name="home-page" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
+      <!--      <tooltip :content="t('feedback')">-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          href="https://github.com/umodoc/editor/issues"-->
+      <!--          target="_blank"-->
+      <!--        >-->
+      <!--          <icon name="message" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
       <div class="umo-status-bar-split"></div>
       <t-popup
         v-if="editor"

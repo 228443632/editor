@@ -11,12 +11,13 @@ import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
 import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant'
+import { NodeSelection } from '@tiptap/pm/state'
 
 export interface IDragNodeParamsNode {
   /** node 参数组件类型*/
   value: string
   /** 等同于上面*/
-  type: TPrettifyString<keyof typeof COMP_PARAMS_NAME_MAP>
+  type: TPrettifyString<keyof typeof COMP_PARAMS_NAME_MAP> | 'textBox'
 
   /** node 参数组件名称*/
   label: string
@@ -26,6 +27,16 @@ export interface IDragNodeParamsNode {
 
   /** 是否是自定义参数节点 */
   isCompParams: boolean
+
+  [K: string]: any
+}
+
+/**
+ * 拖拽组件映射
+ */
+const dragCompMap = {
+  ...COMP_PARAMS_NAME_MAP,
+  textBox: 'textBox',
 }
 
 export const ExtensionDragParams = Extension.create({
@@ -39,17 +50,18 @@ export const ExtensionDragParams = Extension.create({
       view: EditorView,
       e: DragEvent,
       slice,
-      move: boolean,
+      moved: boolean,
     ) => {
-      if (move) return false
+      if (moved) return false
 
       const nodeData = (parseJsonNoError(
         e.dataTransfer?.getData('text/plain'),
       ) || {}) as IDragNodeParamsNode
 
-      if (!COMP_PARAMS_NAME_MAP[nodeData.type]) return true
+      if (!dragCompMap[nodeData.type]) return false
 
       switch (nodeData.type) {
+        // 普通文本
         case COMP_PARAMS_NAME_MAP.compText: {
           e.preventDefault()
 
@@ -120,6 +132,49 @@ export const ExtensionDragParams = Extension.create({
               left: offsetX,
               top: offsetY,
               src: 'https://minio.tezixing.com/zsap/icon/20250616/1934517885540306945_1934517885540306946.jpg',
+            })
+            .run()
+          break
+        }
+
+        // 文本框
+        case 'textBox': {
+          // 获取位置并验证
+          const coordinates = view.posAtCoords({
+            left: e.clientX,
+            top: e.clientY,
+          })
+
+          const dropPos = coordinates.pos
+          // this.editor
+          //   .chain()
+          //   .focus()
+          //   .insertContentAt(dropPos, {
+          //     type: nodeData.value, // 替换为你的自定义节点类型
+          //     attrs: nodeData.attrs,
+          //   })
+          // .command(({ tr }) => {
+          //   dropPos = tr.mapping.map(dropPos) // 动态映射位置
+          //   return true
+          // })
+          // .setTextSelection({
+          //   from: dropPos,
+          //   to: dropPos + nodeData.nodeSize,
+          // })
+          // .run()
+          // const nodeSelection = NodeSelection.create(tr.doc, dropPos)
+          // tr.setSelection(nodeSelection)
+
+          const node = view.state.doc.nodeAt(nodeData.from) // 获取被拖拽节点
+          const tr = this.editor.state.tr
+          tr.delete(nodeData.from, nodeData.to)
+          tr.insert(dropPos, node)
+          this.editor.view.dispatch(tr)
+          this.editor
+            .chain()
+            .setTextSelection({
+              from: dropPos,
+              to: dropPos + nodeData.nodeSize,
             })
             .run()
           break

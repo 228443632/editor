@@ -1,6 +1,7 @@
 <template>
   <node-view-wrapper
     :id="node.attrs.id"
+    as="div"
     ref="containerRef"
     class="umo-node-view umo-floating-node"
     :style="{
@@ -11,11 +12,15 @@
       '--umo-textbox-background-color': node.attrs.backgroundColor,
     }"
   >
-    <div class="umo-node-container umo-node-text-box">
+    <div
+      class="umo-node-container umo-node-text-box"
+      @dragstart="onDragStart"
+      @dragover="onDragOver"
+      :draggable="!options?.document?.readOnly"
+    >
       <drager
         :selected="selected"
         :disabled="disabled"
-        :draggable="!options?.document?.readOnly"
         :rotatable="true"
         :boundary="false"
         :angle="node.attrs.angle"
@@ -26,9 +31,9 @@
         :min-width="14"
         :min-height="14"
         :title="t('node.textBox.tip')"
-        @rotate="onRotate"
-        @resize="onResize"
-        @drag="onDrag"
+        @rotate="debounceOnRotate"
+        @resize="debounceOnResize"
+        @drag="debounceOnDrag"
         @blur="disabled = false"
         @click="selected = true"
         @dblclick="editTextBox"
@@ -42,8 +47,9 @@
 <script setup lang="ts">
 import { NodeViewContent, nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import Drager from 'es-drager'
+import { debounce } from 'sf-utils2'
 
-const { node, updateAttributes } = defineProps(nodeViewProps)
+const { node, updateAttributes, getPos } = defineProps(nodeViewProps)
 
 const options = inject('options')
 
@@ -60,6 +66,31 @@ const onResize = ({ width, height }: { width: number; height: number }) => {
 }
 const onDrag = ({ left, top }: { left: number; top: number }) => {
   updateAttributes({ left, top })
+}
+
+const debounceOnRotate = debounce(onRotate, 20)
+const debounceOnResize = debounce(onResize, 20)
+const debounceOnDrag = debounce(onDrag, 20)
+
+const onDragStart = (e: DragEvent) => {
+  const pos = getPos()
+  e.dataTransfer.effectAllowed = 'move'
+  e.dataTransfer.setData(
+    'text/plain',
+    JSON.stringify({
+      type: 'textBox',
+      value: 'textBox',
+      from: getPos(),
+      to: pos + node.nodeSize,
+      nodeSize: node.nodeSize,
+      attrs: node.attrs,
+    }),
+  )
+}
+
+const onDragOver = (e: DragEvent) => {
+  e.preventDefault()
+  e.dataTransfer.dropEffect = 'move'
 }
 
 onClickOutside(containerRef, () => {

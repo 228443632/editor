@@ -423,7 +423,7 @@ defineExpose()
 
 <!--style-->
 <style lang="less">
-div[compname='compTextDrag'] {
+[compname='compTextDrag'] {
   height: 0;
   width: 100%;
   position: absolute;
