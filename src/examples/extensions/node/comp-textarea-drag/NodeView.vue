@@ -428,6 +428,7 @@ defineExpose()
   width: 100%;
   position: absolute;
   display: inline-block;
+  text-indent: 0;
 
   .text-placeholder {
     color: #9ba3b0;

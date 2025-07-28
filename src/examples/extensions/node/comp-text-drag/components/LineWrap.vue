@@ -177,6 +177,7 @@ defineExpose({
   pointer-events: none;
   & > div {
     position: absolute;
+    transition: 100ms;
     z-index: var(--line-z);
   }
 

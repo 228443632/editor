@@ -427,6 +427,7 @@ defineExpose()
   height: 0;
   width: 100%;
   position: absolute;
+  text-indent: 0;
 
   //font-size: 16px;
   //outline: none !important;
