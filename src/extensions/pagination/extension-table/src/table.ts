@@ -276,7 +276,7 @@ export const Table = Node.create<TableOptions>({
     }
   },
 
-  content: 'tableRow+',
+  content: '(tableRow)+',
 
   tableRole: 'table',
 

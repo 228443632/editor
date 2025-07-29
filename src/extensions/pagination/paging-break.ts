@@ -6,6 +6,7 @@
 import { Extension } from '@tiptap/core'
 import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
+import { rafThrottle } from '@/examples/utils/dom'
 
 interface PagingBreakOptions {
   pageHeight: number
@@ -58,36 +59,36 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
         display: none;
       }
       
-      // .rm-with-pagination table tr td,
-      // .rm-with-pagination table tr th {
-      //   word-break: break-all;
-      // }
-      // .rm-with-pagination table > tr {
-      //   display: grid;
-      //   min-width: 100%;
-      // }
-      // .rm-with-pagination table {
-      //   border-collapse: collapse;
-      //   width: 100%;
-      //   display: contents;
-      // }
-      // .rm-with-pagination table tbody{
-      //   display: table;
-      //   max-height: 300px;
-      //   overflow-y: auto;
-      // }
-      // .rm-with-pagination table tbody > tr{
-      //   display: table-row !important;
-      // }
-      // .rm-with-pagination p:has(br.ProseMirror-trailingBreak:only-child) {
-      //   display: table;
-      //   width: 100%;
-      // }
-      // .rm-with-pagination .table-row-group {
-      //   max-height: ${_pageHeight}px;
-      //   overflow-y: auto;
-      //   width: 100%;
-      // }
+      .rm-with-pagination table tr td,
+      .rm-with-pagination table tr th {
+        word-break: break-all;
+      }
+      .rm-with-pagination table > tr {
+        display: grid;
+        min-width: 100%;
+      }
+      .rm-with-pagination table {
+        border-collapse: collapse;
+        width: 100%;
+        display: contents;
+      }
+      .rm-with-pagination table tbody{
+        display: table;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .rm-with-pagination table tbody > tr{
+        display: table-row !important;
+      }
+      .rm-with-pagination p:has(br.ProseMirror-trailingBreak:only-child) {
+        display: table;
+        width: 100%;
+      }
+      .rm-with-pagination .table-row-group {
+        max-height: ${_pageHeight}px;
+        overflow-y: auto;
+        width: 100%;
+      }
       
       .rm-with-pagination .rm-page-footer-left,
       .rm-with-pagination .rm-page-footer-right,
@@ -156,7 +157,8 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
         }
       }
     }
-    const observer = new MutationObserver(callback)
+    const rafCallback = rafThrottle(callback)
+    const observer = new MutationObserver(rafCallback)
     observer.observe(targetNode, config)
     refreshPage(targetNode)
   },
@@ -165,7 +167,7 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
     const editor = this.editor
     return [
       new Plugin({
-        key: new PluginKey('pagination'),
+        key: new PluginKey('pagingBreak'),
 
         state: {
           init(_, state) {

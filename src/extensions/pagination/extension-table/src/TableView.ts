@@ -101,6 +101,21 @@ export class TableView implements NodeView {
     this.colgroup = this.table.appendChild(document.createElement('colgroup'))
     updateColumns(node, this.colgroup, this.table, cellMinWidth)
     this.contentDOM = this.table.appendChild(document.createElement('tbody'))
+
+    // const rows = Array.from(this.table.rows)
+    // console.log('rows', rows)
+    // const rowGroupDOMList = []
+    // rows.forEach((row, rowIndex) => {
+    //   const rowGroupDOM = document.createElement('div')
+    //   rowGroupDOM.className = 'table-row-group'
+    //   rowGroupDOM.appendChild(row)
+    //   rowGroupDOMList.push(rowGroupDOM)
+    //   // row.parentNode?.replaceChild(rowGroupDOM, row)
+    // })
+    //
+    // rowGroupDOMList.forEach((item) => {
+    //   this.table.appendChild(item)
+    // })
   }
 
   update(node: ProseMirrorNode) {

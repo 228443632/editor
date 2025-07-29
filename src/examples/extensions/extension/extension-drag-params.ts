@@ -11,7 +11,7 @@ import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
 import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant'
-import { NodeSelection } from '@tiptap/pm/state'
+// import { NodeSelection } from '@tiptap/pm/state'
 
 export interface IDragNodeParamsNode {
   /** node 参数组件类型*/

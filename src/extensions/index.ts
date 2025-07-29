@@ -67,10 +67,10 @@ import { BackgroundColor } from '@weiruo/tiptap-extension-background-color'
 
 import {
   PagingBreak,
-  // TableCellPlus,
-  // TableHeaderPlus,
-  // TablePlus,
-  // TableRowPlus,
+  TableCellPlus,
+  TableHeaderPlus,
+  TablePlus,
+  TableRowPlus,
 } from './pagination'
 
 // 自定义
@@ -171,16 +171,16 @@ export const getDefaultExtensions = ({
     // TableRowPlus,
     // TableCellPlus,
     // TableHeaderPlus,
-    PagingBreak.configure({
-      pageHeight: 400, // Height of each page in pixels
-      pageGap: 20, // Gap between pages in pixels
-      pageBreakBackground: '#f7f7f7', // Background color for page gaps
-      pageHeaderHeight: 50, // Height of page header/footer in pixels
-      footerRight: 'Made with ❤️ by Romik',
-      footerLeft: 'Page {page}',
-      headerLeft: 'Header Left',
-      headerRight: 'Header Right',
-    }),
+    // PagingBreak.configure({
+    //   pageHeight: 820, // Height of each page in pixels
+    //   pageGap: 20, // Gap between pages in pixels
+    //   pageBreakBackground: '#f7f7f7', // Background color for page gaps
+    //   pageHeaderHeight: 50, // Height of page header/footer in pixels
+    //   footerRight: 'Made with ❤️ by Romik',
+    //   footerLeft: 'Page {page}',
+    //   headerLeft: 'Header Left',
+    //   headerRight: 'Header Right',
+    // }),
 
     // 页面
     Toc,
