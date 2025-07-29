@@ -5,6 +5,7 @@
  */
 
 import compText from './comp-text'
+import compBdPage from './comp-bd-page'
 import compIntent from './comp-intent'
 import compTextDrag from './comp-text-drag'
 import compTextareaDrag from './comp-textarea-drag'
@@ -12,6 +13,7 @@ import compInvisibleBlock from './comp-invisible-block'
 
 export default [
   compIntent,
+  compBdPage,
   compText,
   compTextDrag,
   compInvisibleBlock,

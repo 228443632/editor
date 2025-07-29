@@ -60,6 +60,23 @@
       margin-bottom: var(--umo-content-node-bottom);
     }
 
+    & > div, & > section {
+      width: 100%;
+    }
+
+    .tableWrapper {
+      display: contents;
+      table {
+        display: inline-table;
+      }
+      tbody {
+        //display: inline-grid;
+      }
+      colgroup {
+        //display: none;
+      }
+    }
+
     &.caret--is-dragging {
       caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
     }

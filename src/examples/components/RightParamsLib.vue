@@ -268,6 +268,21 @@ const paramsConfig = ref([
         },
       },
       {
+        label: '插入分页',
+        value: 'compBdPage',
+        icon: 'params-comp-table',
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .insertContentAt(0, {
+              type: 'compBdPage',
+              attrs: {},
+            })
+            .run()
+        },
+      },
+      {
         label: '模拟删除',
         value: 'params-comp-table2',
         icon: 'params-comp-table2',
@@ -277,7 +292,7 @@ const paramsConfig = ref([
       },
       {
         label: '不可见块',
-        value: 'params-comp-table2',
+        value: 'params-comp-table3',
         icon: 'params-comp-table2',
         click() {
           editor.value
