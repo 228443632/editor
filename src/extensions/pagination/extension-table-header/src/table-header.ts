@@ -6,7 +6,7 @@ export interface TableHeaderOptions {
    * @default {}
    * @example { class: 'foo' }
    */
-  HTMLAttributes: Record<string, any>,
+  HTMLAttributes: Record<string, any>
 }
 
 /**
@@ -34,10 +34,10 @@ export const TableHeader = Node.create<TableHeaderOptions>({
       },
       colwidth: {
         default: null,
-        parseHTML: element => {
+        parseHTML: (element) => {
           const colwidth = element.getAttribute('colwidth')
           const value = colwidth
-            ? colwidth.split(',').map(width => parseInt(width, 10))
+            ? colwidth.split(',').map((width) => parseInt(width, 10))
             : null
 
           return value
@@ -51,13 +51,14 @@ export const TableHeader = Node.create<TableHeaderOptions>({
   isolating: true,
 
   parseHTML() {
-    return [
-      { tag: 'th' },
-    ]
+    return [{ tag: 'th' }]
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ['th', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0]
+    return [
+      'th',
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0,
+    ]
   },
-
 })

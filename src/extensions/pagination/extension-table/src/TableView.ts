@@ -21,7 +21,10 @@ export function updateColumns(
       const { colspan, colwidth } = row.child(i).attrs
 
       for (let j = 0; j < colspan; j += 1, col += 1) {
-        const hasWidth = overrideCol === col ? overrideValue : (colwidth && colwidth[j]) as number | undefined
+        const hasWidth =
+          overrideCol === col
+            ? overrideValue
+            : ((colwidth && colwidth[j]) as number | undefined)
         const cssWidth = hasWidth ? `${hasWidth}px` : ''
 
         totalWidth += hasWidth || cellMinWidth
@@ -33,16 +36,25 @@ export function updateColumns(
         if (!nextDOM) {
           const colElement = document.createElement('col')
 
-          const [propertyKey, propertyValue] = getColStyleDeclaration(cellMinWidth, hasWidth)
+          const [propertyKey, propertyValue] = getColStyleDeclaration(
+            cellMinWidth,
+            hasWidth,
+          )
 
           colElement.style.setProperty(propertyKey, propertyValue)
 
           colgroup.appendChild(colElement)
         } else {
           if ((nextDOM as HTMLTableColElement).style.width !== cssWidth) {
-            const [propertyKey, propertyValue] = getColStyleDeclaration(cellMinWidth, hasWidth);
+            const [propertyKey, propertyValue] = getColStyleDeclaration(
+              cellMinWidth,
+              hasWidth,
+            )
 
-            (nextDOM as HTMLTableColElement).style.setProperty(propertyKey, propertyValue)
+            ;(nextDOM as HTMLTableColElement).style.setProperty(
+              propertyKey,
+              propertyValue,
+            )
           }
 
           nextDOM = nextDOM.nextSibling
@@ -84,7 +96,7 @@ export class TableView implements NodeView {
     this.node = node
     this.cellMinWidth = cellMinWidth
     this.dom = document.createElement('div')
-    this.dom.className = 'tableWrapper'
+    this.dom.className = 'tableWrapper table-wrapper'
     this.table = this.dom.appendChild(document.createElement('table'))
     this.colgroup = this.table.appendChild(document.createElement('colgroup'))
     updateColumns(node, this.colgroup, this.table, cellMinWidth)
@@ -104,8 +116,9 @@ export class TableView implements NodeView {
 
   ignoreMutation(mutation: ViewMutationRecord) {
     return (
-      mutation.type === 'attributes'
-      && (mutation.target === this.table || this.colgroup.contains(mutation.target))
+      mutation.type === 'attributes' &&
+      (mutation.target === this.table ||
+        this.colgroup.contains(mutation.target))
     )
   }
 }
