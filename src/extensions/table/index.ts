@@ -1,4 +1,4 @@
-import Table from '@tiptap/extension-table'
+import Table from '@/extensions/pagination/extension-table/src'
 import { DOMParser as ProseMirrorDOMParser } from '@tiptap/pm/model'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 

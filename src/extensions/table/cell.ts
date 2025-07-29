@@ -1,4 +1,4 @@
-import TableCell from '@tiptap/extension-table-cell'
+import TableCell from '@/extensions/pagination/extension-table-cell/src/index'
 
 const TableCellOptions = {
   addAttributes(): any {

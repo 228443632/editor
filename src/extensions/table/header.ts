@@ -1,4 +1,4 @@
-import TableHeader from '@tiptap/extension-table-header'
+import TableHeader from '@/extensions/pagination/extension-table-header/src'
 
 import { TableCellOptions } from './cell'
 

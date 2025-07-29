@@ -3,9 +3,9 @@ import {
   getExtensionField,
   mergeAttributes,
   Node,
-  ParentConfig,
+  type ParentConfig,
 } from '@tiptap/core'
-import { DOMOutputSpec, Node as ProseMirrorNode } from '@tiptap/pm/model'
+import { type DOMOutputSpec, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import { TextSelection } from '@tiptap/pm/state'
 import {
   addColumnAfter,
@@ -26,7 +26,7 @@ import {
   toggleHeader,
   toggleHeaderCell,
 } from '@tiptap/pm/tables'
-import { EditorView, NodeView } from '@tiptap/pm/view'
+import { EditorView, type NodeView } from '@tiptap/pm/view'
 
 import { TableView } from './TableView.js'
 import { createColGroup } from './utilities/createColGroup.js'
