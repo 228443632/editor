@@ -9,7 +9,6 @@ import Highlight from '@tiptap/extension-highlight'
 import Placeholder from '@tiptap/extension-placeholder'
 import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
-import TableRow from '@tiptap/extension-table-row'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
 import TextColor from '@tiptap/extension-text-style'
@@ -57,6 +56,7 @@ import Selection from './selection'
 import Table from './table'
 import TableCell from './table/cell'
 import TableHeader from './table/header'
+import TableRow from './table/row'
 import Tag from './tag'
 import TextAlign from './text-align'
 import TextBox from './text-box'
@@ -65,13 +65,7 @@ import typeWriter from './type-writer'
 import Video from './video'
 import { BackgroundColor } from '@weiruo/tiptap-extension-background-color'
 
-import {
-  PagingBreak,
-  TableCellPlus,
-  TableHeaderPlus,
-  TablePlus,
-  TableRowPlus,
-} from './pagination'
+import { PagingBreak } from './pagination'
 
 // 自定义
 import ImageParagraph from './image-paragraph'

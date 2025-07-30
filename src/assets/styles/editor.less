@@ -1,5 +1,4 @@
 @import '@/assets/styles/_mixins.less';
-@import './pagination';
 
 :root[mode='print'] {
   .print-hidden {
@@ -292,7 +291,8 @@
     td,
     th {
       min-width: 1em;
-      border: 1px solid var(--umo-content-table-border-color);
+      // FIXME: pagination
+      //border: 1px solid var(--umo-content-table-border-color);
       padding: 3px 5px;
       vertical-align: middle;
       box-sizing: border-box;
@@ -756,3 +756,4 @@ img.ProseMirror-separator {
 }
 
 
+@import './pagination';
