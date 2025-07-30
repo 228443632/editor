@@ -124,6 +124,11 @@ export class TableView implements NodeView {
       subtree: true,
       attributes: true,
     })
+
+    this.dom['_computedCalcLayout'] = rafThrottle(() => {
+      this._computedColWidth()
+      this._computedTrProperties()
+    })
   }
 
   update(node: ProseMirrorNode) {

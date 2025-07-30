@@ -1,0 +1,65 @@
+<!--
+ * @Description:
+ * @Author 卞鹏飞 <228443632@qq.com>
+ * @create 29/07/25 PM8:25
+ -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <style>
+      table {
+        table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+        tr {
+          td,
+          th {
+            border: 1px solid #333;
+          }
+        }
+      }
+
+      .contents {
+        display: contents;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tbody>
+        <tr>
+          <th scope="row">Donuts</th>
+          <td>3,000</td>
+        </tr>
+        <tr>
+          <th scope="row">Stationery</th>
+          <td>18,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+
+<script>
+  const string = ` <table>
+      <tbody2>
+        <tr>
+          <th scope="row">Donuts</th>
+          <td>3,000</td>
+        </tr>
+        <tr>
+          <th scope="row">Stationery</th>
+          <td>18,000</td>
+        </tr>
+      </tbody>
+    </table>`
+
+  // const fragment = document.createRange().createContextualFragment(string)
+
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(string, 'text/html')
+  console.log('fragment', doc)
+
+</script>
+</html>

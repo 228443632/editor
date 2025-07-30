@@ -5,6 +5,7 @@
  */
 import type { Editor } from '@tiptap/vue-3'
 import type { NodeSelection } from '@tiptap/pm/state'
+import { Decoration, DecorationSet } from 'prosemirror-view'
 
 declare global {
   interface Window {
@@ -106,6 +107,15 @@ export function testEditor(editorRef: Editor) {
         })
         // editor.commands.setMark('textStyle', { fontSize: '20px' })
 
+        break
+      }
+
+      case 'demo003': {
+        // 创建一个装饰器，作用于文档位置 0 到 5
+        const highlight = Decoration.inline(0, 5, {
+          style: 'background-color: yellow',
+        })
+        const decorations = DecorationSet.create(state.doc, [highlight]);
         break
       }
 

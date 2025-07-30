@@ -21,7 +21,7 @@ import Mathematics from '@tiptap-pro/extension-mathematics'
 import NodeRange from '@tiptap-pro/extension-node-range'
 import { getHierarchicalIndexes } from '@tiptap-pro/extension-table-of-contents'
 import { TableOfContents } from '@tiptap-pro/extension-table-of-contents'
-import UniqueID from '@tiptap-pro/extension-unique-id'
+// import UniqueID from '@tiptap-pro/extension-unique-id'
 
 import type { UmoEditorOptions } from '@/types'
 import { shortId, simpleUUID } from '@/utils/short-id'
@@ -165,16 +165,16 @@ export const getDefaultExtensions = ({
     // TableRowPlus,
     // TableCellPlus,
     // TableHeaderPlus,
-    // PagingBreak.configure({
-    //   pageHeight: 820, // Height of each page in pixels
-    //   pageGap: 20, // Gap between pages in pixels
-    //   pageBreakBackground: '#f7f7f7', // Background color for page gaps
-    //   pageHeaderHeight: 50, // Height of page header/footer in pixels
-    //   footerRight: 'Made with ❤️ by Romik',
-    //   footerLeft: 'Page {page}',
-    //   headerLeft: 'Header Left',
-    //   headerRight: 'Header Right',
-    // }),
+    PagingBreak.configure({
+      pageHeight: 820, // Height of each page in pixels
+      pageGap: 20, // Gap between pages in pixels
+      pageBreakBackground: '#f7f7f7', // Background color for page gaps
+      pageHeaderHeight: 50, // Height of page header/footer in pixels
+      footerRight: 'Made with ❤️ by Romik',
+      footerLeft: 'Page {page}',
+      headerLeft: 'Header Left',
+      headerRight: 'Header Right',
+    }),
 
     // 页面
     Toc,
@@ -246,10 +246,10 @@ export const getDefaultExtensions = ({
     }),
     Echarts,
     typeWriter,
-    UniqueID.configure({
-      types: ['heading', 'paragraph'],
-      generateID: () => simpleUUID().slice(8),
-    }),
+    // UniqueID.configure({
+    //   types: ['heading', 'paragraph'],
+    //   generateID: () => simpleUUID().slice(8),
+    // }),
     BackgroundColor,
   ]
 

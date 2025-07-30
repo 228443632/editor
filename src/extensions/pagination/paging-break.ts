@@ -19,7 +19,7 @@ interface PagingBreakOptions {
   headerRight: string
   headerLeft: string
 }
-const page_count_meta_key = 'PAGE_COUNT_META_KEY'
+const PAGE_COUNT_META_KEY = 'PAGE_COUNT_META_KEY'
 export const PagingBreak = Extension.create<PagingBreakOptions>({
   name: 'PagingBreak',
   addOptions() {
@@ -37,94 +37,17 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
   },
   onCreate() {
     const targetNode = this.editor.view.dom
-    targetNode.classList.add('rm-with-pagination')
+    targetNode.classList.add('sf-with-pagination')
     const config = { attributes: true }
     const _pageHeaderHeight = this.options.pageHeaderHeight
     const _pageHeight = this.options.pageHeight - _pageHeaderHeight * 2
 
-    const style = document.createElement('style')
-    style.dataset.rmPaginationStyle = ''
-
-    style.textContent = `
-      .rm-with-pagination {
-        counter-reset: page-number;
-      }
-      .rm-with-pagination .rm-page-footer {
-        counter-increment: page-number;
-      }
-      .rm-with-pagination .rm-page-break:last-child .rm-pagination-gap {
-        display: none;
-      }
-      .rm-with-pagination .rm-page-break:last-child .rm-page-header {
-        display: none;
-      }
-      
-      .rm-with-pagination table tr td,
-      .rm-with-pagination table tr th {
-        word-break: break-all;
-      }
-      .rm-with-pagination table > tr {
-        display: grid;
-        min-width: 100%;
-      }
-      .rm-with-pagination table {
-        border-collapse: collapse;
-        width: 100%;
-        display: contents;
-      }
-      .rm-with-pagination table tbody{
-        display: table;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-      .rm-with-pagination table tbody > tr{
-        display: table-row !important;
-      }
-      .rm-with-pagination p:has(br.ProseMirror-trailingBreak:only-child) {
-        display: table;
-        width: 100%;
-      }
-      .rm-with-pagination .table-row-group {
-        max-height: ${_pageHeight}px;
-        overflow-y: auto;
-        width: 100%;
-      }
-      
-      .rm-with-pagination .rm-page-footer-left,
-      .rm-with-pagination .rm-page-footer-right,
-      .rm-with-pagination .rm-page-header-left,
-      .rm-with-pagination .rm-page-header-right {
-        display: inline-block;
-      }
-      .rm-with-pagination .rm-page-header-left,
-      .rm-with-pagination .rm-page-header-right{
-        padding-top: 15px !important;
-      }
-
-      .rm-with-pagination .rm-page-header-left,
-      .rm-with-pagination .rm-page-footer-left{
-        float: left;
-        margin-left: 25px;
-      }
-      .rm-with-pagination .rm-page-header-right,
-      .rm-with-pagination .rm-page-footer-right{
-        float: right;
-        margin-right: 25px;
-      }
-      .rm-with-pagination .rm-page-number::before {
-        content: counter(page-number);
-      }
-      .rm-with-pagination .rm-first-page-header{
-        display: inline-flex;
-        justify-content: space-between;
-        width: 100%;
-        padding-top: 15px !important;
-      }
-    `
-    document.head.appendChild(style)
-
+    document.documentElement.style.setProperty(
+      '--page-height',
+      `${_pageHeight}px`,
+    )
     const refreshPage = (targetNode: HTMLElement) => {
-      const paginationElement = targetNode.querySelector('[data-rm-pagination]')
+      const paginationElement = targetNode.querySelector('[data-sf-pagination]')
       if (paginationElement) {
         const lastPageBreak = paginationElement.lastElementChild?.querySelector(
           '.breaker',
@@ -142,12 +65,12 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
     ) => {
       if (mutationList.length > 0 && mutationList[0].target) {
         const _target = mutationList[0].target as HTMLElement
-        if (_target.classList.contains('rm-with-pagination')) {
+        if (_target.classList.contains('sf-with-pagination')) {
           const currentPageCount = getExistingPageCount(this.editor.view)
           const pageCount = calculatePageCount(this.editor.view, this.options)
           if (currentPageCount !== pageCount) {
             const tr = this.editor.view.state.tr.setMeta(
-              page_count_meta_key,
+              PAGE_COUNT_META_KEY,
               Date.now(),
             )
             this.editor.view.dispatch(tr)
@@ -197,7 +120,7 @@ export const PagingBreak = Extension.create<PagingBreakOptions>({
 
 const getExistingPageCount = (view: EditorView) => {
   const editorDom = view.dom
-  const paginationElement = editorDom.querySelector('[data-rm-pagination]')
+  const paginationElement = editorDom.querySelector('[data-sf-pagination]')
   if (paginationElement) {
     return paginationElement.children.length
   }
@@ -210,7 +133,7 @@ const calculatePageCount = (
   const editorDom = view.dom
   const pageContentAreaHeight =
     pageOptions.pageHeight - pageOptions.pageHeaderHeight * 2
-  const paginationElement = editorDom.querySelector('[data-rm-pagination]')
+  const paginationElement = editorDom.querySelector('[data-sf-pagination]')
   const currentPageCount = getExistingPageCount(view)
   if (paginationElement) {
     const lastElementOfEditor = editorDom.lastElementChild
@@ -262,7 +185,7 @@ function createDecoration(
       const breakerWidth = view.dom.clientWidth
 
       const el = document.createElement('div')
-      el.dataset.rmPagination = 'true'
+      el.dataset.sfPagination = 'true'
 
       const pageBreakDefinition = ({
         firstPage = false,
@@ -272,7 +195,7 @@ function createDecoration(
         lastPage: boolean
       }) => {
         const pageContainer = document.createElement('div')
-        pageContainer.classList.add('rm-page-break')
+        pageContainer.classList.add('sf-page-break')
 
         const page = document.createElement('div')
         page.classList.add('page')
@@ -296,31 +219,31 @@ function createDecoration(
         pageBreak.style.zIndex = '2'
 
         const pageFooter = document.createElement('div')
-        pageFooter.classList.add('rm-page-footer')
+        pageFooter.classList.add('sf-page-footer')
         pageFooter.style.height = _pageHeaderHeight + 'px'
 
         const footerRight = pageOptions.footerRight.replace(
           '{page}',
-          `<span class="rm-page-number"></span>`,
+          `<span class="sf-page-number"></span>`,
         )
         const footerLeft = pageOptions.footerLeft.replace(
           '{page}',
-          `<span class="rm-page-number"></span>`,
+          `<span class="sf-page-number"></span>`,
         )
 
         const pageFooterLeft = document.createElement('div')
-        pageFooterLeft.classList.add('rm-page-footer-left')
+        pageFooterLeft.classList.add('sf-page-footer-left')
         pageFooterLeft.innerHTML = footerLeft
 
         const pageFooterRight = document.createElement('div')
-        pageFooterRight.classList.add('rm-page-footer-right')
+        pageFooterRight.classList.add('sf-page-footer-right')
         pageFooterRight.innerHTML = footerRight
 
         pageFooter.append(pageFooterLeft)
         pageFooter.append(pageFooterRight)
 
         const pageSpace = document.createElement('div')
-        pageSpace.classList.add('rm-pagination-gap')
+        pageSpace.classList.add('sf-pagination-gap')
         pageSpace.style.height = _pageGap + 'px'
         pageSpace.style.borderLeft = '1px solid'
         pageSpace.style.borderRight = '1px solid'
@@ -332,15 +255,15 @@ function createDecoration(
         pageSpace.style.borderRightColor = _pageBreakBackground
 
         const pageHeader = document.createElement('div')
-        pageHeader.classList.add('rm-page-header')
+        pageHeader.classList.add('sf-page-header')
         pageHeader.style.height = _pageHeaderHeight + 'px'
 
         const pageHeaderLeft = document.createElement('div')
-        pageHeaderLeft.classList.add('rm-page-header-left')
+        pageHeaderLeft.classList.add('sf-page-header-left')
         pageHeaderLeft.innerHTML = pageOptions.headerLeft
 
         const pageHeaderRight = document.createElement('div')
-        pageHeaderRight.classList.add('rm-page-header-right')
+        pageHeaderRight.classList.add('sf-page-header-right')
         pageHeaderRight.innerHTML = pageOptions.headerRight
 
         pageHeader.append(pageHeaderLeft, pageHeaderRight)
@@ -378,15 +301,15 @@ function createDecoration(
     () => {
       const el = document.createElement('div')
       el.style.position = 'relative'
-      el.classList.add('rm-first-page-header')
+      el.classList.add('sf-first-page-header')
 
       const pageHeaderLeft = document.createElement('div')
-      pageHeaderLeft.classList.add('rm-first-page-header-left')
+      pageHeaderLeft.classList.add('sf-first-page-header-left')
       pageHeaderLeft.innerHTML = pageOptions.headerLeft
       el.append(pageHeaderLeft)
 
       const pageHeaderRight = document.createElement('div')
-      pageHeaderRight.classList.add('rm-first-page-header-right')
+      pageHeaderRight.classList.add('sf-first-page-header-right')
       pageHeaderRight.innerHTML = pageOptions.headerRight
       el.append(pageHeaderRight)
 

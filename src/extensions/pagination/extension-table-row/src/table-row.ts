@@ -67,28 +67,18 @@ export const TableRow = Node.create<TableRowOptions>({
       const trDom = document.createElement('tr')
       trDom.classList.add('table-row')
       dom.append(trDom)
-
-      // const observer = new MutationObserver((mutations) => {
-      //   mutations.forEach((mutation) => {
-      //     if (mutation.type === 'childList') {
-      //       console.log('DOM 已更新:', dom)
-      //     }
-      //   })
-      // })
-      // observer.observe(trDom, { childList: true, subtree: true })
       window.requestAnimationFrame(() => {
         const cells = Array.from(trDom.cells)
         cells.forEach((cellDOM) => {
           cellDOM.style.display = 'table-cell'
         })
       })
-
       return {
         dom,
         contentDOM: trDom,
         update(updateNode) {
-          if (!updateNode.sameMarkup(node)) return false
-          // if (updateNode.type.name !== node.type.name) return false
+          // if (!updateNode.sameMarkup(node)) return false
+          if (updateNode.type.name !== node.type.name) return false
           return true
         },
         ignoreMutation() {

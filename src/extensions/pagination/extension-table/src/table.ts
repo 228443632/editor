@@ -6,7 +6,7 @@ import {
   type ParentConfig,
 } from '@tiptap/core'
 import { type DOMOutputSpec, Node as ProseMirrorNode } from '@tiptap/pm/model'
-import { TextSelection } from '@tiptap/pm/state'
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state'
 import {
   addColumnAfter,
   addColumnBefore,
@@ -32,6 +32,8 @@ import { TableView } from './TableView.js'
 import { createColGroup } from './utilities/createColGroup.js'
 import { createTable } from './utilities/createTable.js'
 import { deleteTableWhenAllCellsSelected } from './utilities/deleteTableWhenAllCellsSelected.js'
+
+// import { history } from 'prosemirror-history'
 
 export interface TableOptions {
   /**
@@ -460,6 +462,7 @@ export const Table = Node.create<TableOptions>({
 
   addProseMirrorPlugins() {
     const isResizable = this.options.resizable && this.editor.isEditable
+    const editor = this.editor
 
     return [
       ...(isResizable
@@ -475,6 +478,26 @@ export const Table = Node.create<TableOptions>({
         : []),
       tableEditing({
         allowTableNodeSelection: this.options.allowTableNodeSelection,
+      }),
+      new Plugin({
+        key: new PluginKey('tableListeningKey'),
+        filterTransaction(tr, state) {
+          if (tr.getMeta('history$') || tr.getMeta('history$1')) {
+            // editor.value?.commands.updateAttributes
+            // 遍历文档中的所有节点
+            state.doc.descendants((node, pos) => {
+              if (node.type.name === 'table') {
+                const tableWrapperDOM = editor.view.nodeDOM(
+                  pos,
+                ) as HTMLDivElement
+                if (tableWrapperDOM?.['_computedCalcLayout']) {
+                  tableWrapperDOM['_computedCalcLayout']()
+                }
+              }
+            })
+          }
+          return true // 允许事务继续执行
+        },
       }),
     ]
   },
