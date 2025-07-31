@@ -9,8 +9,9 @@
     <div
       :id="container.substr(1)"
       ref="layoutUmoEditorContainerRef"
-      class="umo-editor-container"
       :class="{
+        'umo-editor-container': true,
+        'sf-pagination-container': options.isPagination, // 分页
         'toolbar-classic': isRecord($toolbar) && $toolbar.mode === 'classic',
         'toolbar-ribbon': isRecord($toolbar) && $toolbar.mode === 'ribbon',
         'preview-mode': page.preview?.enabled,
@@ -109,7 +110,7 @@ import type {
 } from '@/types'
 import { contentTransform } from '@/utils/content-transform'
 import { consoleCopyright } from '@/utils/copyright'
-import { getOpitons } from '@/utils/options'
+import { getOptions } from '@/utils/options'
 import { shortId } from '@/utils/short-id'
 
 import ruConfig from '../locales/tdesign/ru-RU'
@@ -158,7 +159,7 @@ const _slots = computed(() => {
 // state Setup
 const container = $ref(`#umo-editor-${shortId(4)}`)
 const defaultOptions = inject('defaultOptions', {})
-const options = ref<UmoEditorOptions>(getOpitons(props, defaultOptions))
+const options = ref<UmoEditorOptions>(getOptions(props, defaultOptions))
 const editor = ref<Editor | null>(null)
 const savedAt = ref(null)
 const page = ref({})
@@ -508,7 +509,7 @@ const localeConfig = $ref<Record<string, GlobalConfigProvider>>({
 
 // Options Setup
 const setOptions = (value: UmoEditorOptions): UmoEditorOptions => {
-  options.value = getOpitons(value)
+  options.value = getOptions(value)
   const $locale = useStorage('umo-editor:locale', options.value.locale)
   if (!$locale.value) {
     $locale.value = options.value.locale

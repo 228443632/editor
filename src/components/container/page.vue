@@ -44,7 +44,10 @@
             transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
           }"
         >
-          <div class="umo-page-node-header" contenteditable="false">
+          <div
+            :class="[options.isPagination && '!hidden', 'umo-page-node-header']"
+            contenteditable="false"
+          >
             <div
               class="umo-page-corner corner-tl"
               style="width: var(--umo-page-margin-left)"
@@ -64,7 +67,10 @@
               </template>
             </editor>
           </div>
-          <div class="umo-page-node-footer" contenteditable="false">
+          <div
+            :class="[options.isPagination && '!hidden', 'umo-page-node-footer']"
+            contenteditable="false"
+          >
             <div
               class="umo-page-corner corner-bl"
               style="width: var(--umo-page-margin-left)"
@@ -118,7 +124,7 @@
 <script setup lang="ts">
 import { useElementSize, unrefElement } from '@vueuse/core'
 
-import type { WatermarkOption } from '@/types'
+import type { UmoEditorOptions, WatermarkOption } from '@/types'
 
 import type Editor from '../editor/index.vue'
 import { type Watermark } from 'tdesign-vue-next'
@@ -128,6 +134,7 @@ const imageViewer = inject('imageViewer')
 const pageOptions = inject('page')
 const layoutSize = inject('layoutSize')
 const layoutDom = inject('layoutDom')
+const options = inject<Ref<UmoEditorOptions>>('options')
 
 const umoPageNodeContentRef = ref<InstanceType<typeof Editor>>()
 const zoomableContainerRef = ref<HTMLHtmlElement>() // 缩放容器
