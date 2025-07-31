@@ -5,11 +5,10 @@
       editor?.isActive('pageBreak') ||
       editor?.isActive('horizontalRule') ||
       editor?.isActive('codeBlock') ||
-      editor?.getAttributes('image').error ||
-      editor?.getAttributes('imageParagraph')
+      editor?.getAttributes('image').error
     "
   >
-  <!-- <menus-bubble-node-delete />-->
+    <menus-bubble-node-delete />
   </template>
   <template
     v-else-if="
