@@ -6,11 +6,13 @@
 import { ExtensionDragParams } from './extension-drag-params'
 import { ExtensionPasteParams } from './extension-paste-params'
 import { ExtensionCommandsV2 } from './extension-commands-v2'
+import { ExtensionDecorationTest } from './extension-decoration-test'
 // import { ExtensionAppendTransaction } from './extension-append-transaction'
 
 export default [
   ExtensionDragParams,
   ExtensionPasteParams,
   ExtensionCommandsV2,
+  ExtensionDecorationTest,
   // ExtensionAppendTransaction,
 ]

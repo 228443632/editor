@@ -88,4 +88,6 @@ export const defaultOptions = {
   },
   /** AI 文档助手配置，详见AI 文档助手。v3.0.0 新增 */
   ai: {},
+  /** 是否开启分页 */
+  isPagination: false,
 }

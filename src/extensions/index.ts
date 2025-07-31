@@ -24,7 +24,7 @@ import { TableOfContents } from '@tiptap-pro/extension-table-of-contents'
 // import UniqueID from '@tiptap-pro/extension-unique-id'
 
 import type { UmoEditorOptions } from '@/types'
-import { shortId, simpleUUID } from '@/utils/short-id'
+import { shortId } from '@/utils/short-id'
 
 import Audio from './audio'
 import Bookmark from './bookmark'
@@ -65,10 +65,12 @@ import typeWriter from './type-writer'
 import Video from './video'
 import { BackgroundColor } from '@weiruo/tiptap-extension-background-color'
 
-import { PagingBreak } from './pagination'
+import PaginationBreak from './pagination/extentsion-pagination-break'
+// import { PagingBreak as PaginationBreak } from './pagination'
 
 // 自定义
 import ImageParagraph from './image-paragraph'
+import { cssUtil } from '@/examples/utils/css-util'
 
 export const getDefaultExtensions = ({
   container,
@@ -79,7 +81,20 @@ export const getDefaultExtensions = ({
   options: { value: UmoEditorOptions }
   uploadFileMap: { value: any }
 }) => {
-  const { dicts, page, document: doc, users, file } = options.value
+  const {
+    dicts,
+    page,
+    document: doc,
+    users,
+    file,
+    isPagination,
+  } = options.value
+  const a4 = cssUtil.getPaperSize('A4')
+  const umoPageTop =
+    cssUtil.mmToPx(page.defaultMargin?.top) * 10 || a4._basePx.mt
+  const umoPageLeft =
+    cssUtil.mmToPx(page.defaultMargin?.left) * 10 || a4._basePx.ml
+  const umoPageHeight = cssUtil.mmToPx(page.size?.height) * 10 || a4._basePx.h
 
   const extensions = [
     StarterKit.configure({
@@ -161,20 +176,13 @@ export const getDefaultExtensions = ({
     TableHeader,
     TableCell,
 
-    // TablePlus,
-    // TableRowPlus,
-    // TableCellPlus,
-    // TableHeaderPlus,
-    PagingBreak.configure({
-      pageHeight: 820, // Height of each page in pixels
-      pageGap: 20, // Gap between pages in pixels
-      pageBreakBackground: '#f7f7f7', // Background color for page gaps
-      pageHeaderHeight: 50, // Height of page header/footer in pixels
-      footerRight: 'Made with ❤️ by Romik',
-      footerLeft: 'Page {page}',
-      headerLeft: 'Header Left',
-      headerRight: 'Header Right',
-    }),
+    isPagination &&
+      PaginationBreak.configure({
+        pageHeight: +Number(umoPageHeight).toFixed(1), // Height of each page in pixels
+        pageGap: 16, // Gap between pages in pixels
+        pageBreakBackground: 'var(--umo-container-background)', // Background color for page gaps
+        pageHeaderHeight: +Number(umoPageTop).toFixed(1), // Height of page header/footer in pixels
+      }),
 
     // 页面
     Toc,
@@ -251,7 +259,7 @@ export const getDefaultExtensions = ({
     //   generateID: () => simpleUUID().slice(8),
     // }),
     BackgroundColor,
-  ]
+  ].filter(Boolean)
 
   return extensions
 }

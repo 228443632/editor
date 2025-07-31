@@ -1,12 +1,15 @@
 <template>
   <div class="examples">
-    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px">
+    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">
       <t-button @click="testEditorFunc('demo001')" size="small">获取</t-button>
       <t-button @click="testEditorFunc('demo002')" size="small"
         >点击demo002</t-button
       >
       <t-button @click="testEditorFunc('getCurrentFontSize')" size="small"
         >光标字大小</t-button
+      >
+      <t-button @click="testEditorFunc('demo004')" size="small"
+      >设置属性不在选区</t-button
       >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
@@ -97,6 +100,7 @@ const options = $ref(
   shallowMergeWithArrayOverride(
     { ...defaultOptions },
     {
+      isPagination: true, // 开启分页
       extensions,
       toolbar: {
         // defaultMode: 'classic',
@@ -211,7 +215,7 @@ watch(umoEditorRef, () => {
   })
 })
 
-console.log('options', options)
+console.log('编辑器【options】', options)
 
 const testEditorFunc = testEditor(window.editor)
 </script>

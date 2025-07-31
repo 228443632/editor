@@ -91,23 +91,23 @@ export default defineConfig(({ mode }) => {
     base: '/',
     plugins: isLib
       ? [
-        tsConfigPaths(),
-        ReactivityTransform(),
-        UnoCSS(),
-        ...Object.values(vuePlugins),
-      ]
+          tsConfigPaths(),
+          ReactivityTransform(),
+          UnoCSS(),
+          ...Object.values(vuePlugins),
+        ]
       : [
-        tsConfigPaths(),
-        ReactivityTransform(),
-        UnoCSS(),
-        ...Object.values(vuePlugins),
-      ],
+          tsConfigPaths(),
+          ReactivityTransform(),
+          UnoCSS(),
+          ...Object.values(vuePlugins),
+        ],
     css: cssConfig,
     build: isLib
       ? buildConfig
       : {
-        cssMinify: true,
-      },
+          cssMinify: true,
+        },
     resolve: {
       alias: {
         '@': `${process.cwd()}/src`,

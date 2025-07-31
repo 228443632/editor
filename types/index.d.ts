@@ -273,6 +273,9 @@ export interface UmoEditorOptions {
   onSave?: OnSaveFunction
   onFileUpload?: (file: File) => Promise<{ id: string; url: string }>
   onFileDelete?: CallableFunction
+
+  /** 是否开启分页 */
+  isPagination: boolean
 }
 
 // 组件类型声明

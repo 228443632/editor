@@ -107,26 +107,26 @@ const getIframeCode = (fillFieldData) => {
   if (editorDom) {
     editorDom.setAttribute('contenteditable', 'false')
   }
-  //
-  // const imgSepList = Array.from(
-  //   doc.querySelectorAll('img.ProseMirror-separator'),
-  // ) as unknown as HTMLHtmlElement[]
-  // if (imgSepList) {
-  //   imgSepList.forEach((imgSep) => {
-  //     imgSep.remove()
-  //   })
-  //   imgSepList.length = 0
-  // }
-  //
-  // const spanCharacterList = Array.from(
-  //   doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
-  // ) as unknown as HTMLHtmlElement[]
-  // if (spanCharacterList) {
-  //   spanCharacterList.forEach((item) => {
-  //     item.remove()
-  //   })
-  //   spanCharacterList.length = 0
-  // }
+
+  const imgSepList = Array.from(
+    doc.querySelectorAll('img.ProseMirror-separator'),
+  ) as unknown as HTMLHtmlElement[]
+  if (imgSepList) {
+    imgSepList.forEach((imgSep) => {
+      imgSep.remove()
+    })
+    imgSepList.length = 0
+  }
+
+  const spanCharacterList = Array.from(
+    doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
+  ) as unknown as HTMLHtmlElement[]
+  if (spanCharacterList) {
+    spanCharacterList.forEach((item) => {
+      item.remove()
+    })
+    spanCharacterList.length = 0
+  }
 
   // 删除所有换行节点
   // const brBreakList = Array.from(
@@ -138,6 +138,9 @@ const getIframeCode = (fillFieldData) => {
   //   })
   //   brBreakList.length = 0
   // }
+
+  // 是否存在分页
+  const isFrontPagination = doc.querySelector('div[data-sf-pagination="true"]') || doc.querySelector('.sf-page-first__header[data-page-num]')
 
   return `
     <!DOCTYPE html>
@@ -165,7 +168,7 @@ const getIframeCode = (fillFieldData) => {
         }
         @page {
           size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
-          padding: ${margin?.top}cm 0 ${margin?.bottom}cm;
+          ${isFrontPagination ? '' : `padding: ${margin?.top}cm 0 ${margin?.bottom}cm;`}
           margin: 0;
         }
         @page:first {

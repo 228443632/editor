@@ -3,7 +3,7 @@ import { isRecord } from '@tool-belt/type-predicates'
 import { defaultOptions, ojbectSchema } from '@/options'
 import type { UmoEditorOptions } from '@/types'
 
-export const getOpitons = <T extends MaybeRef<UmoEditorOptions>>(
+export const getOptions = <T extends MaybeRef<UmoEditorOptions>>(
   propsOptions: T,
   globalOptions?: unknown,
 ) => {

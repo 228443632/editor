@@ -25,6 +25,7 @@ import { defaultWebPages } from './web-pages'
 
 // 默认配置
 const defaultOptions: UmoEditorOptions = {
+  isPagination: false,
   editorKey: 'default',
   locale: 'zh-CN',
   theme: 'light',
@@ -179,6 +180,11 @@ const isLocale = (value: unknown) => {
 }
 
 const ojbectSchema = new ObjectSchema({
+  isPagination: {
+    merge: 'replace',
+    validate: 'boolean',
+    required: false,
+  },
   editorKey: {
     merge: 'replace',
     validate: 'string!',

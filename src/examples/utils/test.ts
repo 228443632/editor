@@ -115,7 +115,32 @@ export function testEditor(editorRef: Editor) {
         const highlight = Decoration.inline(0, 5, {
           style: 'background-color: yellow',
         })
-        const decorations = DecorationSet.create(state.doc, [highlight]);
+        const decorations = DecorationSet.create(state.doc, [highlight])
+        break
+      }
+
+      // 设置样式不在光标内
+      case 'demo004': {
+        editor.state.doc.descendants((node, pos) => {
+          if (node.type.name === 'compText') {
+            console.log('node', pos)
+            view.dispatch(
+              // state.tr.setMeta('addAttributes', {
+              //   style: 'background-color: yellow',
+              // }),
+              state.tr.setNodeMarkup(10, node.type, {
+                ...node.attrs,
+                cssText: {
+                  color: 'red',
+                  fontWeight: 'bold'
+                },
+              }),
+            )
+          }
+        })
+
+        // const nodePos = editor.$pos(10)
+        // console.log('nodePos', nodePos)
         break
       }
 

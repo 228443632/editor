@@ -98,4 +98,124 @@ export const cssUtil = {
       return acc
     }, '')
   },
+
+  /**
+   * 获取dpi
+   * @returns {*[]}
+   */
+  getDpi() {
+    const result = []
+    if (window.screen['deviceXDPI'] != undefined) {
+      result[0] = window.screen['deviceXDPI']
+      result[1] = window.screen['deviceYDPI']
+    } else {
+      const tmpNode = document.createElement('div')
+      tmpNode.style.cssText =
+        'width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden'
+      document.body.appendChild(tmpNode)
+      result[0] = parseInt(`${tmpNode.offsetWidth}`)
+      result[1] = parseInt(`${tmpNode.offsetHeight}`)
+      tmpNode.parentNode.removeChild(tmpNode)
+    }
+    return result
+  },
+
+  /**
+   * mm 转成 px，
+   * @param mm 单位是毫米
+   */
+  mmToPx(mm: string | number) {
+    const DPI = cssUtil.getDpi()
+    if (typeof mm === 'string') mm = parseFloat(mm)
+    return +mm * (DPI[0] / 25.4)
+  },
+
+  /**
+   * px 转成 mm，
+   * @param px
+   */
+  pxToMm(px: string | number) {
+    const DPI = cssUtil.getDpi()[0]
+    if (typeof px === 'string') px = parseFloat(px)
+    return (+px * 25.4) / DPI
+  },
+
+  /**
+   * 获取纸张尺寸
+   * @param {String} type 可选值：A4、A5、A6
+   */
+  getPaperSize(type: 'A4' | 'A5' | 'A6') {
+    type ||= 'A4'
+
+    type TSize = {
+      w: number
+      h: number
+      mt: number // 外边距 上
+      mb: number // 外边距 下
+      ml: number // 外边距 左
+      mr: number // 外边距 右
+      pt: number // 页边距 上
+      pb: number // 页边距 下
+      pl: number // 页边距 左
+      pr: number // 页边距 右
+      hh: number // 页眉
+      fh: number // 页脚
+    }
+
+    const sizeConf = {
+      A4: {
+        w: 210, // 宽
+        h: 297, // 高
+        mt: 20, // 外边距 上
+        mb: 15, // 外边距 下
+        ml: 15, // 外边距 左
+        mr: 15, // 外边距 右
+        pt: 20, // 页边距 上
+        pb: 15, // 页边距 下
+        pl: 15, // 页边距 左
+        pr: 15, // 页边距 右
+        hh: 6.6, // 页眉
+        fh: 14, // 页脚
+      },
+      A5: {
+        w: 148,
+        h: 210,
+        mt: 20, // 外边距 上
+        mb: 15, // 外边距 下
+        ml: 15, // 外边距 左
+        mr: 15, // 外边距 右
+        pt: 20, // 页边距 上
+        pb: 15, // 页边距 下
+        pl: 15, // 页边距 左
+        pr: 15, // 页边距 右
+        hh: 6.6, // 页眉
+        fh: 14, // 页脚
+      },
+      A6: {
+        w: 105,
+        h: 148,
+        mt: 20, // 外边距 上
+        mb: 15, // 外边距 下
+        ml: 15, // 外边距 左
+        mr: 15, // 外边距 右
+        pt: 20, // 页边距 上
+        pb: 15, // 页边距 下
+        pl: 15, // 页边距 左
+        pr: 15, // 页边距 右
+        hh: 6.6, // 页眉
+        fh: 14, // 页脚
+      },
+    } as Record<string, TSize>
+    const size = sizeConf[type]
+    // 1px= 0.75pt
+    return {
+      _base: size as unknown as TSize,
+      _basePx: Object.entries(size).reduce((pre, [key, value]) => {
+        pre[key] = cssUtil.mmToPx(value)
+        return pre
+      }, {}) as unknown as TSize,
+    }
+  },
 }
+
+console.log('A4', cssUtil.getPaperSize('A4'))
