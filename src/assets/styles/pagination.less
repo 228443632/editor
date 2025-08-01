@@ -156,22 +156,10 @@ div.tableWrapper {
     background-color: var(--umo-container-background);
   }
 
-  .sf-page__sep-wrap {
-    &:last-child {
-      .sf-page__gap {
-        display: none;
-      }
-
-      .sf-page__header {
-        display: none;
-      }
-    }
-  }
-
-  .sf-page-first__header {
-    display: flex;
-    width: calc(100% + 2 * var(--umo-page-margin-left)) !important;
-    margin-left: calc(-1 * var(--umo-page-margin-left));
+  div[data-sf-pagination] {
+    width: calc(100% + 2 * var(--umo-page-margin-left));
+    left: calc(-1 * var(--umo-page-margin-left));
+    position: relative;
   }
 
   //p:has(br.ProseMirror-trailingBreak:only-child) {
