@@ -145,6 +145,9 @@ export type TTableIndexListItem = {
   cMax: number
   /** 当前列索引，真实在row中的td序号 */
   cIndex: number
+  /** 当前行号 */
+  rIndex: number
+
   /** 列索引*/
   index: number
 }

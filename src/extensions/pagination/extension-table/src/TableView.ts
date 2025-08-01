@@ -5,6 +5,7 @@ import { getColStyleDeclaration } from './utilities/colStyle.js'
 import { getTableIndexListPro } from '@/utils/browser'
 import { simpleUUID } from '@/utils/short-id'
 import { rafThrottle } from 'sf-utils2'
+import type { EditorView } from '@codemirror/view'
 
 export function updateColumns(
   node: ProseMirrorNode,
@@ -84,6 +85,9 @@ export function updateColumns(
 }
 
 export class TableView implements NodeView {
+  /** 是否开启分页 */
+  static isEnablePagination = false
+
   node: ProseMirrorNode
 
   cellMinWidth: number
@@ -99,7 +103,7 @@ export class TableView implements NodeView {
 
   _colgroupObserver: MutationObserver
 
-  constructor(node: ProseMirrorNode, cellMinWidth: number) {
+  constructor(node: ProseMirrorNode, cellMinWidth: number, view: EditorView) {
     this.node = node
     this.cellMinWidth = cellMinWidth
     this.dom = document.createElement('div')
@@ -145,11 +149,12 @@ export class TableView implements NodeView {
   }
 
   ignoreMutation(mutation: ViewMutationRecord) {
-    return (
-      mutation.type === 'attributes' &&
-      (mutation.target === this.table ||
-        this.colgroup.contains(mutation.target))
-    )
+    // return (
+    //   mutation.type === 'attributes' &&
+    //   (mutation.target === this.table ||
+    //     this.colgroup.contains(mutation.target))
+    // )
+    return true
   }
 
   destroy() {
@@ -163,6 +168,7 @@ export class TableView implements NodeView {
    * 计算列宽度
    */
   _computedColWidth() {
+    if (!TableView.isEnablePagination) return
     const colDOMs = Array.from(this.colgroup.children)
     colDOMs.forEach((col: HTMLTableColElement, colIndex: number) => {
       const width =
@@ -182,6 +188,7 @@ export class TableView implements NodeView {
    * 更新tr属性
    */
   _computedTrProperties() {
+    if (!TableView.isEnablePagination) return
     const trDOMs = this.dom.querySelectorAll(
       `table[data-id="${this.dom.id}"] > .table-wrapper-tbody> .table-row-group > tr`,
     ) as NodeListOf<HTMLTableRowElement>
@@ -199,6 +206,9 @@ export class TableView implements NodeView {
         const width = this.table.style.getPropertyValue(widthVarPropertyName)
         if (colInfo.isRowPart && colInfo.isColPart) {
           colInfo.tdEle.style.gridColumn = `${colInfo.index + 1} / span ${colInfo.cSpan}`
+          // if (colInfo.rSpan > 1) {
+          // colInfo.tdEle.style.gridRow = `${colInfo.rIndex + 1} / span ${colInfo.rSpan}`
+          // }
         }
         gridTemplateColumns.push(width ? `var(${widthVarPropertyName})` : '1fr')
       })

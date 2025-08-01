@@ -171,7 +171,9 @@ export const getDefaultExtensions = ({
     }),
 
     // 表格
-    Table,
+    Table.configure({
+      isEnablePagination: isPagination,
+    }),
     TableRow,
     TableHeader,
     TableCell,

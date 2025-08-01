@@ -89,6 +89,9 @@ export interface TableOptions {
    * @example true
    */
   allowTableNodeSelection: boolean
+
+  /** 是否开启分页，默认false */
+  isEnablePagination: boolean
 }
 
 declare module '@tiptap/core' {
@@ -271,10 +274,11 @@ export const Table = Node.create<TableOptions>({
       resizable: false,
       handleWidth: 5,
       cellMinWidth: 25,
-      // TODO: fix
       View: TableView,
       lastColumnResizable: true,
       allowTableNodeSelection: false,
+      /** 是否开启分页 */
+      isEnablePagination: false,
     }
   },
 
@@ -463,6 +467,9 @@ export const Table = Node.create<TableOptions>({
   addProseMirrorPlugins() {
     const isResizable = this.options.resizable && this.editor.isEditable
     const editor = this.editor
+    const options = this.options
+
+    TableView.isEnablePagination = options.isEnablePagination
 
     return [
       ...(isResizable
@@ -482,19 +489,22 @@ export const Table = Node.create<TableOptions>({
       new Plugin({
         key: new PluginKey('tableListeningKey'),
         filterTransaction(tr, state) {
-          if (tr.getMeta('history$') || tr.getMeta('history$1')) {
-            // editor.value?.commands.updateAttributes
-            // 遍历文档中的所有节点
-            state.doc.descendants((node, pos) => {
-              if (node.type.name === 'table') {
-                const tableWrapperDOM = editor.view.nodeDOM(
-                  pos,
-                ) as HTMLDivElement
-                if (tableWrapperDOM?.['_computedCalcLayout']) {
-                  tableWrapperDOM['_computedCalcLayout']()
+          if (options.isEnablePagination) {
+            // 如果开启分页
+            if (tr.getMeta('history$') || tr.getMeta('history$1')) {
+              // editor.value?.commands.updateAttributes
+              // 遍历文档中的所有节点
+              state.doc.descendants((node, pos) => {
+                if (node.type.name === 'table') {
+                  const tableWrapperDOM = editor.view.nodeDOM(
+                    pos,
+                  ) as HTMLDivElement
+                  if (tableWrapperDOM?.['_computedCalcLayout']) {
+                    tableWrapperDOM['_computedCalcLayout']()
+                  }
                 }
-              }
-            })
+              })
+            }
           }
           return true // 允许事务继续执行
         },
