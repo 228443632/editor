@@ -64,31 +64,33 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
       }
     }
 
-    const callback = (
-      mutationList: MutationRecord[],
-      observer: MutationObserver,
-    ) => {
-      if (mutationList.length > 0 && mutationList[0].target) {
-        const _target = mutationList[0].target as HTMLElement
-        if (_target.classList.contains('sf-with-pagination')) {
-          const currentPageCount = getExistingPageCount(this.editor.view)
-          const pageCount = calculatePageCount(this.editor.view, this.options)
-          if (currentPageCount !== pageCount) {
-            const tr = this.editor.view.state.tr.setMeta(
-              PAGE_COUNT_META_KEY,
-              Date.now(),
-            )
-            this.editor.view.dispatch(tr)
-          }
+    if (import.meta.env.PROD || import.meta.env.DEV) {
+      const callback = (
+        mutationList: MutationRecord[],
+        observer: MutationObserver,
+      ) => {
+        if (mutationList.length > 0 && mutationList[0].target) {
+          const _target = mutationList[0].target as HTMLElement
+          if (_target.classList.contains('sf-with-pagination')) {
+            const currentPageCount = getExistingPageCount(this.editor.view)
+            const pageCount = calculatePageCount(this.editor.view, this.options)
+            if (currentPageCount !== pageCount) {
+              const tr = this.editor.view.state.tr.setMeta(
+                PAGE_COUNT_META_KEY,
+                Date.now(),
+              )
+              this.editor.view.dispatch(tr)
+            }
 
-          refreshPage(_target)
+            refreshPage(_target)
+          }
         }
       }
+      const rafCallback = rafThrottle(callback)
+      const observer = new MutationObserver(rafCallback)
+      observer.observe(targetNode, config)
+      refreshPage(targetNode)
     }
-    const rafCallback = rafThrottle(callback)
-    const observer = new MutationObserver(rafCallback)
-    observer.observe(targetNode, config)
-    refreshPage(targetNode)
   },
   addProseMirrorPlugins() {
     const pageOptions = this.options

@@ -1,4 +1,5 @@
 import { mergeAttributes, Node } from '@tiptap/core'
+// import { isNoNullable } from 'sf-utils2'
 
 export interface TableCellOptions {
   /**
@@ -61,4 +62,32 @@ export const TableCell = Node.create<TableCellOptions>({
       0,
     ]
   },
+
+  // addNodeView() {
+  //   return ({ node }) => {
+  //     const dom = document.createElement('td')
+  //     Object.entries(node.attrs).forEach(([key, value]) => {
+  //       if (isNoNullable(value)) {
+  //         dom.setAttribute(key, value)
+  //       }
+  //     })
+  //
+  //     return {
+  //       dom,
+  //       contentDOM: dom,
+  //       update(updateNode) {
+  //         // if (!updateNode.sameMarkup(node)) return false
+  //         if (updateNode.type.name !== node.type.name) return false
+  //         // window.requestAnimationFrame(() => {
+  //         //   // dom.setAttribute('h', dom.clientHeight + '')
+  //         //   dom.style.display = 'table-cell'
+  //         // })
+  //         return true
+  //       },
+  //       // ignoreMutation() {
+  //       //   return true
+  //       // },
+  //     }
+  //   }
+  // },
 })

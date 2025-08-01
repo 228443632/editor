@@ -1,4 +1,5 @@
 import { mergeAttributes, Node } from '@tiptap/core'
+import { isNoNullable } from 'sf-utils2'
 
 export interface TableRowOptions {
   /**
@@ -73,11 +74,15 @@ export const TableRow = Node.create<TableRowOptions>({
           cellDOM.style.display = 'table-cell'
         })
       })
+      Object.entries(node.attrs).forEach(([key, value]) => {
+        if (isNoNullable(value)) {
+          trDom.setAttribute(key, value)
+        }
+      })
       return {
         dom,
         contentDOM: trDom,
         update(updateNode) {
-          // if (!updateNode.sameMarkup(node)) return false
           if (updateNode.type.name !== node.type.name) return false
           return true
         },

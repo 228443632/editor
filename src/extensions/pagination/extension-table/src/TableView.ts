@@ -142,19 +142,17 @@ export class TableView implements NodeView {
 
     this.node = node
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth)
-
     this._computedColWidth()
     this._computedTrProperties()
     return true
   }
 
   ignoreMutation(mutation: ViewMutationRecord) {
-    // return (
-    //   mutation.type === 'attributes' &&
-    //   (mutation.target === this.table ||
-    //     this.colgroup.contains(mutation.target))
-    // )
-    return true
+    return (
+      mutation.type === 'attributes' &&
+      (mutation.target === this.table ||
+        this.colgroup.contains(mutation.target))
+    )
   }
 
   destroy() {
@@ -162,6 +160,7 @@ export class TableView implements NodeView {
       this._colgroupObserver.disconnect()
       this._colgroupObserver = null
     }
+    return true
   }
 
   /**
@@ -188,6 +187,7 @@ export class TableView implements NodeView {
    * 更新tr属性
    */
   _computedTrProperties() {
+    console.log('_computedTrProperties', '_computedTrProperties')
     if (!TableView.isEnablePagination) return
     const trDOMs = this.dom.querySelectorAll(
       `table[data-id="${this.dom.id}"] > .table-wrapper-tbody> .table-row-group > tr`,
@@ -195,9 +195,10 @@ export class TableView implements NodeView {
     const indexListPro = getTableIndexListPro({
       rows: trDOMs,
     } as unknown as HTMLTableElement)
-    indexListPro.forEach((trInfo) => {
+    indexListPro.forEach((trInfo, trInfoIndex) => {
       const gridTemplateColumns = [] as string[]
       const trDOM = trInfo[0].trEle
+      const noCrossRowTdHeightList = []
       trInfo.forEach((colInfo, colIndex) => {
         const minWidthVarPropertyName = `--col-${colIndex}-min-w`
         const widthVarPropertyName = `--col-${colIndex}-w`
@@ -206,14 +207,25 @@ export class TableView implements NodeView {
         const width = this.table.style.getPropertyValue(widthVarPropertyName)
         if (colInfo.isRowPart && colInfo.isColPart) {
           colInfo.tdEle.style.gridColumn = `${colInfo.index + 1} / span ${colInfo.cSpan}`
-          // if (colInfo.rSpan > 1) {
-          // colInfo.tdEle.style.gridRow = `${colInfo.rIndex + 1} / span ${colInfo.rSpan}`
-          // }
+          if (colInfo.rSpan > 1) {
+            // colInfo.tdEle.style.gridRow = `${colInfo.rIndex + 1} / span ${colInfo.rSpan}`
+            const heightList = []
+            for (let i = 0; i < colInfo.rSpan; i++) {
+              heightList.push(`var(--row-${colInfo.rIndex + i}-h)`)
+            }
+            // colInfo.tdEle.style.height = `max(calc(${heightList.join(' + ')}), 100%)`
+          } else {
+            // 非跨行
+            noCrossRowTdHeightList.push(colInfo.tdEle.clientHeight)
+          }
         }
         gridTemplateColumns.push(width ? `var(${widthVarPropertyName})` : '1fr')
       })
       trDOM.style.gridTemplateColumns = gridTemplateColumns.join(' ')
       trDOM.style.width = `var(--width)`
+      const maxTdHeight = Math.max(...noCrossRowTdHeightList)
+      this.table.style.setProperty(`--row-${trInfoIndex}-h`, `${maxTdHeight}px`)
+      trDOM.style.height = `calc(--row-${trInfoIndex}-h)`
     })
   }
 }
