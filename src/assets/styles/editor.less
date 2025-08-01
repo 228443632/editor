@@ -60,7 +60,8 @@
       margin-bottom: var(--umo-content-node-bottom);
     }
 
-    & > div, & > section {
+    & > div,
+    & > section {
       width: 100%;
     }
 
@@ -161,8 +162,8 @@
         display: none;
       }
 
-      //&:only-child.is-editor-empty::after,
-      //&::after {
+      &:only-child.is-editor-empty::after,
+      &::after,
       &:has(.Tiptap-invisible-character:first-child)::after {
         color: var(--umo-content-placeholder-color);
         content: attr(data-placeholder);
@@ -755,6 +756,5 @@ body.preview {
 img.ProseMirror-separator {
   pointer-events: none;
 }
-
 
 @import './pagination';

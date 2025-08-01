@@ -108,8 +108,8 @@ div.tableWrapper {
     &.ProseMirror-selectednoderange {
       @media screen {
         &:not(.is-editor-empty):not(hr):not(.tableWrapper):not(
-          .umo-page-break
-        ):not(table):not(.umo-code-block):not(.umo-floating-node):before {
+            .umo-page-break
+          ):not(table):not(.umo-code-block):not(.umo-floating-node):before {
           // FIXME 分页隐藏
           //outline: 2px solid var(--umo-color-primary);
           //background: transparent;
@@ -120,6 +120,23 @@ div.tableWrapper {
   }
 }
 
+.sf-pagination-container {
+  /** 设置内容为空时候，默认占位内容*/
+  //.umo-editor-content > .tiptap {
+  //  & > * {
+  //    &.is-empty
+  //      .is-editor-empty:not(.umo-node-view):not(.tableWrapper):not(
+  //        .column-block
+  //      ):not(ul):not(ol) {
+  //      &::after {
+  //        color: var(--umo-content-placeholder-color);
+  //        content: attr(data-placeholder);
+  //        pointer-events: none;
+  //      }
+  //    }
+  //  }
+  //}
+}
 
 .sf-pagination-container {
   .umo-page-node-content {
@@ -153,19 +170,12 @@ div.tableWrapper {
 
   .sf-page-first__header {
     display: flex;
-    width: calc(100% + 2 * var(--umo-page-margin-left))!important;
+    width: calc(100% + 2 * var(--umo-page-margin-left)) !important;
     margin-left: calc(-1 * var(--umo-page-margin-left));
   }
 
-
   //p:has(br.ProseMirror-trailingBreak:only-child) {
   //  display: table;
-  //  width: 100%;
-  //}
-
-  //.table-row-group {
-  //  max-height: var(--sf-page-height);
-  //  overflow-y: auto;
   //  width: 100%;
   //}
 }
@@ -173,7 +183,7 @@ div.tableWrapper {
 @media print {
   .sf-with-pagination {
     .sf-page__gap {
-      display: none!important;
+      display: none !important;
       //height: 0!important;
       //border: none!important;
     }
@@ -182,4 +192,3 @@ div.tableWrapper {
     //}
   }
 }
-
