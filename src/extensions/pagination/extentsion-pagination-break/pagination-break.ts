@@ -48,11 +48,11 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
       childList: true,
     } as MutationObserverInit
     const _pageHeaderHeight = this.options.pageHeaderHeight
-    const _pageHeight = this.options.pageHeight - _pageHeaderHeight * 2
+    const _pageContainerHeight = this.options.pageHeight - _pageHeaderHeight * 2
 
     document.documentElement.style.setProperty(
       '--page-height',
-      `${_pageHeight}px`,
+      `${_pageContainerHeight}px`,
     )
     const refreshPage = (targetNode: HTMLElement) => {
       const paginationElement = targetNode.querySelector('[data-sf-pagination]')
@@ -207,6 +207,16 @@ function createDecoration(
       const pageCount = calculatePageCount(view, pageOptions)
       const el = document.createElement('div')
       el.dataset.sfPagination = 'true'
+      el.style.width = `calc(100% + 2 * var(--umo-page-margin-left))`
+      el.style.left = `calc(-1 * var(--umo-page-margin-left))`
+      el.setAttribute('page-height', `${pageOptions.pageHeight}px`)
+      // el.setAttribute('page-width', `${el.offsetWidth}px`)
+      el.setAttribute('page-gap', `${pageOptions.pageGap}px`)
+      el.setAttribute('page-header-height', `${pageOptions.pageHeaderHeight}px`)
+      el.setAttribute(
+        'page-container-height',
+        `${pageOptions.pageHeight - 2 * pageOptions.pageHeaderHeight}px`,
+      )
       // const container = document.createElement('div')
       void Promise.resolve().then(() => {
         el['__vueAppInstance'] = mountWithCreateApp(PageBreakWidget, {
@@ -217,6 +227,38 @@ function createDecoration(
             pageCount,
           },
         })
+
+        // sepc 单元测试
+
+        for (let i = 0; i < pageCount; i++) {
+          // const pageDOM = view.dom.querySelector(
+          //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
+          // )
+          // const rect = pageDOM.getBoundingClientRect()
+          // pageDOM.setAttribute('rect', JSON.stringify(rect))
+          //
+          // const headerDOM = pageDOM.querySelector('.sf-page__header')
+          // const footerDOM = pageDOM.querySelector('.sf-page__footer')
+
+        }
+        console.log('测试')
+
+        // const pageDOMS = Array.from(
+        //   view.dom.querySelectorAll('.sf-page__sep-wrap'),
+        // ) as HTMLDivElement[]
+        //
+        // pageDOMS.forEach((item) => {
+        //   const headerDOM = item.querySelector('.sf-page__header')
+        //   const footerDOM = item.querySelector('.sf-page__footer')
+        // })
+        //
+        // const headerDOMS = view.dom.querySelectorAll(
+        //   '.sf-page__sep-wrap .sf-page__header',
+        // )
+        //
+        // headerDOMS.forEach((headerDOM: HTMLDivElement) => {
+        //   console.log('headerDOMS', headerDOM.getBoundingClientRect())
+        // })
       })
       return el
     },

@@ -45,7 +45,8 @@
           }"
         >
           <div
-            :class="[options.isPagination && '!hidden', 'umo-page-node-header']"
+            v-if="!options.isPagination"
+            :class="['umo-page-node-header']"
             contenteditable="false"
           >
             <div
@@ -68,7 +69,8 @@
             </editor>
           </div>
           <div
-            :class="[options.isPagination && '!hidden', 'umo-page-node-footer']"
+            v-if="!options.isPagination"
+            :class="['umo-page-node-footer']"
             contenteditable="false"
           >
             <div

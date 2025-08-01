@@ -118,4 +118,5 @@ onBeforeUnmount(() => {
 <style lang="less">
 @import '@/assets/styles/editor.less';
 @import '@/assets/styles/drager.less';
+@import '@/assets/styles/pagination.less';
 </style>
