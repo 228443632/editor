@@ -7,7 +7,8 @@
 <script setup lang="ts">
 import { type PaginationBreakOptions } from './pagination-break'
 import type { EditorView } from '@codemirror/view'
-import FirstHeaderWidget from './FirstHeaderWidget.vue'
+import PageHeader from './components/PageHeader.vue'
+import PageFooter from './components/PageFooter.vue'
 const props = defineProps({
   /**
    * 分页参数选项
@@ -48,8 +49,8 @@ function getPageBreakStyle() {
 
   return {
     width: `calc(${breakerWidth}px)`,
-    marginLeft: `calc(calc(calc(${breakerWidth}px - 100%) / 2) - calc(${breakerWidth}px - 100%))`,
-    marginRight: `calc(calc(calc(${breakerWidth}px - 100%) / 2) - calc(${breakerWidth}px - 100%))`,
+    // marginLeft: `calc(calc(calc(${breakerWidth}px - 100%) / 2) - calc(${breakerWidth}px - 100%))`,
+    // marginRight: `calc(calc(calc(${breakerWidth}px - 100%) / 2) - calc(${breakerWidth}px - 100%))`,
     position: 'relative',
     float: 'left',
     clear: 'both',
@@ -125,27 +126,42 @@ defineExpose({})
     v-for="(item, index) in pageCount"
     :key="index"
     class="sf-page__sep-wrap"
-    :data-page-num="index + 1"
+    :page-num="index + 1"
+    :total="pageCount"
   >
+    <!-- 第一页的时候 -->
+    <template v-if="index == 0">
+      <!-- 页眉 -->
+      <div class="sf-page__header" :style="_headerStyle">
+        <PageHeader
+          :page-options="pageOptions"
+          :page-num="index + 1"
+          :total="pageCount"
+        ></PageHeader>
+      </div>
+    </template>
+
     <div class="sf-page__spacer" :style="getPageStyle(index)"></div>
     <div class="sf-page__breaker" :style="getPageBreakStyle()">
+      <!-- 页尾 -->
       <div class="sf-page__footer" :style="getPageFooterStyle()">
-        <div class="umo-page-node-footer" contenteditable="false">
-          <div
-            class="umo-page-corner corner-bl"
-            style="width: var(--umo-page-margin-left)"
-          ></div>
-          <div class="umo-page-node-footer-content"></div>
-          <div
-            class="umo-page-corner corner-br"
-            style="width: var(--umo-page-margin-right)"
-          ></div>
+        <PageFooter :page-num="index + 1" :total="pageCount"></PageFooter>
+      </div>
+
+      <!--  最后一页的时候    -->
+      <template v-if="index + 1 < pageCount">
+        <!-- 页间隔 -->
+        <div class="sf-page__gap" :style="getPageGapStyle()"></div>
+
+        <!-- 页眉 -->
+        <div :class="['sf-page__header', 'is-next']" :style="_headerStyle">
+          <PageHeader
+            :page-options="pageOptions"
+            :page-num="index + 2"
+            :total="pageCount"
+          ></PageHeader>
         </div>
-      </div>
-      <div class="sf-page__gap" :style="getPageGapStyle()"></div>
-      <div class="sf-page__header" :style="_headerStyle">
-        <FirstHeaderWidget :page-options="pageOptions"></FirstHeaderWidget>
-      </div>
+      </template>
     </div>
   </div>
 </template>

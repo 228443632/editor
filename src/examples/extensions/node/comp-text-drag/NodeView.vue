@@ -423,6 +423,15 @@ defineExpose()
 
 <!--style-->
 <style lang="less">
+// 分页
+.sf-with-pagination {
+  [compname='compTextDrag'] {
+    .es-drager {
+      margin-top: calc(-1 * var(--umo-page-margin-top));
+    }
+  }
+}
+
 [compname='compTextDrag'] {
   height: 0;
   width: 100%;

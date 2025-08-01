@@ -9,7 +9,6 @@ import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
 import { rafThrottle } from '@/examples/utils/dom'
 import { mountWithCreateApp } from '@/utils/vnode'
 import PageBreakWidget from './PageBreakWidget.vue'
-import FirstHeaderWidget from './FirstHeaderWidget.vue'
 
 export interface PaginationBreakOptions {
   /** 每一页 大小*/
@@ -43,7 +42,11 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
   onCreate() {
     const targetNode = this.editor.view.dom
     targetNode.classList.add('sf-with-pagination')
-    const config = { attributes: true }
+    const config = {
+      attributes: true,
+      subtree: true,
+      childList: true,
+    } as MutationObserverInit
     const _pageHeaderHeight = this.options.pageHeaderHeight
     const _pageHeight = this.options.pageHeight - _pageHeaderHeight * 2
 
@@ -205,7 +208,7 @@ function createDecoration(
       const el = document.createElement('div')
       el.dataset.sfPagination = 'true'
       // const container = document.createElement('div')
-      window.requestAnimationFrame(() => {
+      void Promise.resolve().then(() => {
         el['__vueAppInstance'] = mountWithCreateApp(PageBreakWidget, {
           element: el,
           props: {
@@ -219,27 +222,5 @@ function createDecoration(
     },
     { side: -1 },
   )
-
-  const firstHeaderWidget = Decoration.widget(
-    0,
-    () => {
-      const el = document.createElement('div')
-      el.style.position = 'relative'
-      el.classList.add('sf-page-first__header')
-      el.style.height = `${pageOptions.pageHeaderHeight}px`
-      el.setAttribute('data-page-num', '1')
-      window.requestAnimationFrame(() => {
-        el['__vueAppInstance'] = mountWithCreateApp(FirstHeaderWidget, {
-          element: el,
-          props: {
-            pageOptions,
-          },
-        })
-      })
-      return el
-    },
-    { side: -1 },
-  )
-
-  return !isInitial ? [pageWidget, firstHeaderWidget] : [pageWidget]
+  return !isInitial ? [pageWidget] : [pageWidget]
 }

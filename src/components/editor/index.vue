@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { Editor, EditorContent } from '@tiptap/vue-3'
-
+import { def } from 'sf-utils2'
 import { getDefaultExtensions, inputAndPasteRules } from '@/extensions'
 import { contentTransform } from '@/utils/content-transform'
 
@@ -80,6 +80,7 @@ const editorInstance: Editor = new Editor({
 })
 const editor = inject('editor')
 editor.value = editorInstance
+def(editor.value.view.dom, '__options', options)
 editor.value.storage.container = container
 watch(
   () => options.value,

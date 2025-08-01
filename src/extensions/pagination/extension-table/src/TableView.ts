@@ -187,7 +187,6 @@ export class TableView implements NodeView {
    * 更新tr属性
    */
   _computedTrProperties() {
-    console.log('_computedTrProperties', '_computedTrProperties')
     if (!TableView.isEnablePagination) return
     const trDOMs = this.dom.querySelectorAll(
       `table[data-id="${this.dom.id}"] > .table-wrapper-tbody> .table-row-group > tr`,

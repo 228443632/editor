@@ -324,8 +324,8 @@ watch(
     position: absolute;
     content: '';
     display: block;
-    height: 1cm;
-    width: 1cm;
+    height: var(--umo-corner-width);
+    width: var(--umo-corner-width);
     border: solid 1px #ccc;
   }
 

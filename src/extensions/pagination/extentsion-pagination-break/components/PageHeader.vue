@@ -5,7 +5,7 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import type { PaginationBreakOptions } from './pagination-break'
+import type { PaginationBreakOptions } from '../pagination-break'
 
 const props = defineProps({
   /**
@@ -20,6 +20,14 @@ const props = defineProps({
    * 当前页码
    */
   pageNum: {
+    type: Number,
+    default: 1,
+  },
+
+  /**
+   * 总页数
+   */
+  total: {
     type: Number,
     default: 1,
   },
@@ -43,21 +51,20 @@ defineExpose({})
 
 <!--render-->
 <template>
-  <div class="w-full flex items-center">
-    <div class="umo-page-node-header w-full" contenteditable="false">
-      <div
-        class="umo-page-corner corner-tl"
-        style="width: var(--umo-page-margin-left)"
-      ></div>
+  <div class="umo-page-node-header w-full" contenteditable="false">
+    <div
+      class="umo-page-corner corner-tl"
+      style="width: var(--umo-page-margin-left)"
+    ></div>
 
-      <div class="umo-page-node-header-content"></div>
-      <div
-        class="umo-page-corner corner-tr"
-        style="width: var(--umo-page-margin-right)"
-      ></div>
-    </div>
+    <div class="umo-page-node-header-content"></div>
+    <div
+      class="umo-page-corner corner-tr"
+      style="width: var(--umo-page-margin-right)"
+    ></div>
   </div>
 </template>
 
 <!--style-->
-<style scoped lang="less"></style>
+<style scoped lang="less">
+</style>

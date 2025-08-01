@@ -1,15 +1,15 @@
 <template>
   <div class="examples">
     <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">
-      <t-button @click="testEditorFunc('demo001')" size="small">获取</t-button>
-      <t-button @click="testEditorFunc('demo002')" size="small"
+      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>
+      <t-button size="small" @click="testEditorFunc('demo002')"
         >点击demo002</t-button
       >
-      <t-button @click="testEditorFunc('getCurrentFontSize')" size="small"
+      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"
         >光标字大小</t-button
       >
-      <t-button @click="testEditorFunc('demo004')" size="small"
-      >设置属性不在选区</t-button
+      <t-button size="small" @click="testEditorFunc('demo004')"
+        >设置属性不在选区</t-button
       >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
