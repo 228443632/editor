@@ -9,16 +9,15 @@ import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
 import { rafThrottle } from '@/examples/utils/dom'
 import { mountWithCreateApp } from '@/utils/vnode'
 import PageBreakWidget from './PageBreakWidget.vue'
+import Demo from './Demo.vue'
 
 export interface PaginationBreakOptions {
   /** 每一页 大小*/
   pageHeight: number
   /** 分页间距 */
   pageGap: number
-  /** 分页边框大小 */
-  pageGapBorderSize: 1
   /** 分页背景颜色 */
-  pageBreakBackground: string
+  pageBreakBackground?: string
   /** 分页眉高度 */
   pageHeaderHeight: number
 }
@@ -31,8 +30,6 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
       pageHeight: 800,
       /** 分页间距 */
       pageGap: 50,
-      /** 分页边框大小 */
-      pageGapBorderSize: 1,
       /** 分页背景颜色 */
       pageBreakBackground: '#ffffff',
       /** 分页眉高度 */
@@ -239,7 +236,6 @@ function createDecoration(
           //
           // const headerDOM = pageDOM.querySelector('.sf-page__header')
           // const footerDOM = pageDOM.querySelector('.sf-page__footer')
-
         }
         console.log('测试')
 
@@ -264,5 +260,56 @@ function createDecoration(
     },
     { side: -1 },
   )
+
+  const demoWidget = Decoration.widget(
+    0,
+    (view) => {
+      const pageCount = calculatePageCount(view, pageOptions)
+      const el = document.createElement('div')
+      // const container = document.createElement('div')
+      void Promise.resolve().then(() => {
+        el['__vueAppInstance'] = mountWithCreateApp(Demo, {
+          element: el,
+          props: {
+            pageOptions,
+          },
+        })
+
+        // sepc 单元测试
+
+        for (let i = 0; i < pageCount; i++) {
+          // const pageDOM = view.dom.querySelector(
+          //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
+          // )
+          // const rect = pageDOM.getBoundingClientRect()
+          // pageDOM.setAttribute('rect', JSON.stringify(rect))
+          //
+          // const headerDOM = pageDOM.querySelector('.sf-page__header')
+          // const footerDOM = pageDOM.querySelector('.sf-page__footer')
+        }
+        console.log('测试')
+
+        // const pageDOMS = Array.from(
+        //   view.dom.querySelectorAll('.sf-page__sep-wrap'),
+        // ) as HTMLDivElement[]
+        //
+        // pageDOMS.forEach((item) => {
+        //   const headerDOM = item.querySelector('.sf-page__header')
+        //   const footerDOM = item.querySelector('.sf-page__footer')
+        // })
+        //
+        // const headerDOMS = view.dom.querySelectorAll(
+        //   '.sf-page__sep-wrap .sf-page__header',
+        // )
+        //
+        // headerDOMS.forEach((headerDOM: HTMLDivElement) => {
+        //   console.log('headerDOMS', headerDOM.getBoundingClientRect())
+        // })
+      })
+      return el
+    },
+    { side: -1 },
+  )
+
   return !isInitial ? [pageWidget] : [pageWidget]
 }

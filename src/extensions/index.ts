@@ -178,14 +178,6 @@ export const getDefaultExtensions = ({
     TableHeader,
     TableCell,
 
-    isPagination &&
-      PaginationBreak.configure({
-        pageHeight: +Number(umoPageHeight).toFixed(1), // Height of each page in pixels
-        pageGap: 16, // Gap between pages in pixels
-        pageBreakBackground: 'var(--umo-container-background)', // Background color for page gaps
-        pageHeaderHeight: +Number(umoPageTop).toFixed(1), // Height of page header/footer in pixels
-      }),
-
     // 页面
     Toc,
     BreakMarks.configure({
@@ -262,6 +254,18 @@ export const getDefaultExtensions = ({
     // }),
     BackgroundColor,
   ].filter(Boolean)
+
+  if (isPagination) {
+    const configurePageOptions = {
+      pageHeight: +Number(umoPageHeight).toFixed(1), // Height of each page in pixels
+      pageGap: 16, // Gap between pages in pixels
+      pageBreakBackground: 'var(--umo-container-background)', // Background color for page gaps
+      pageHeaderHeight: +Number(umoPageTop).toFixed(1), // Height of page header/footer in pixels
+    }
+    extensions.push(PaginationBreak.configure(configurePageOptions))
+
+    options.value.paginationConfig = configurePageOptions
+  }
 
   return extensions
 }

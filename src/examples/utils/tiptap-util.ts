@@ -99,11 +99,9 @@ export const tiptapUtil = {
   },
 
   deleteByNode(editor: Editor, node: Node) {
-
     // node.
     // editor.commands.delete(tiptapUtil.posAtNode(editor, node))
   },
-
 
   /**
    * 根据pos位置获取pos

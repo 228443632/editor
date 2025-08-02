@@ -17,7 +17,11 @@ const emit = defineEmits([])
 /* 监听 */
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+
+  // 1122
+
+})
 
 /* 暴露 */
 defineExpose({})
@@ -25,15 +29,31 @@ defineExpose({})
 
 <!--render-->
 <template>
-  <div class="page">
-    <!-- 内容区 -->
-
-    222
-  </div>
+  <div
+    class="sf-page__spacer2"
+    page-num="1"
+    style="
+      position: relative;
+      float: left;
+      clear: both;
+      margin-top: 930.5px;
+    "
+  ></div>
+  <!-- 内容区 930.5px -->
+  <div class="sf-page__breaker2" page-num="1" style=""></div>
 </template>
 
 <!--style-->
 <style scoped lang="less">
-.page {
+.sf-page__breaker2 {
+  width: 184px;
+  position: relative;
+  float: left;
+  clear: both;
+  left: 0px;
+  right: 0px;
+  z-index: 2;
+  height: 1px;
+  background: red;
 }
 </style>

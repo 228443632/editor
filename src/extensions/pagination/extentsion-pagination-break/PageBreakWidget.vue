@@ -212,9 +212,9 @@ defineExpose({})
       :style="getPageBodyStyle(index)"
       :page-num="index + 1"
     >
-      <span class="p-2px bg-[#333] text-[#fff] text-12px">{{
-        proxy.refs?.[`pageBodyRef$${index + 1}`]?.[0]?.getBoundingClientRect?.()
-      }}</span>
+<!--      <span class="p-2px bg-[#333] text-[#fff] text-12px">{{-->
+<!--        proxy.refs?.[`pageBodyRef$${index + 1}`]?.[0]?.getBoundingClientRect?.()-->
+<!--      }}</span>-->
     </div>
 
     <div

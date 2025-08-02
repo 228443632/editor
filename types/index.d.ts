@@ -3,6 +3,7 @@ import type { FocusPosition } from '@tiptap/core'
 import { Fragment, Node as ProseMirrorNode } from '@tiptap/pm/model'
 import type { AsyncFunction } from '@tool-belt/type-predicates'
 import type { Editor } from '@tiptap/vue-3'
+import type { PaginationBreakOptions } from '@/extensions/pagination/extentsion-pagination-break/pagination-break'
 
 export type SupportedLocale = 'en-US' | 'zh-CN' | 'ru-RU'
 export interface MarginOption {
@@ -276,6 +277,9 @@ export interface UmoEditorOptions {
 
   /** 是否开启分页 */
   isPagination: boolean
+
+  /** 分页配置 */
+  paginationConfig: PaginationBreakOptions
 }
 
 // 组件类型声明

@@ -52,6 +52,7 @@ const defaultOptions: UmoEditorOptions = {
       },
     },
   },
+  paginationConfig: undefined,
   page: {
     defaultMargin: {
       left: 3.18,
@@ -188,6 +189,11 @@ const ojbectSchema = new ObjectSchema({
   editorKey: {
     merge: 'replace',
     validate: 'string!',
+    required: false,
+  },
+  paginationConfig: {
+    merge: 'replace',
+    validate: () => true,
     required: false,
   },
   locale: {
