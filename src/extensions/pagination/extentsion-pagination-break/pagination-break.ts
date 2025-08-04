@@ -201,29 +201,46 @@ function createDecoration(
   const pageWidget = Decoration.widget(
     0,
     (view) => {
+      console.log('view', view, this)
+
+      // 设置页码数
       const pageCount = calculatePageCount(view, pageOptions)
-      const el = document.createElement('div')
-      el.dataset.sfPagination = 'true'
-      el.style.width = `calc(100% + 2 * var(--umo-page-margin-left))`
-      el.style.left = `calc(-1 * var(--umo-page-margin-left))`
-      el.setAttribute('page-height', `${pageOptions.pageHeight}px`)
+      const paginationDOM = document.createElement('div')
+      paginationDOM.dataset.sfPagination = 'true'
+      paginationDOM.style.width = `calc(100% + 2 * var(--umo-page-margin-left))`
+      paginationDOM.style.left = `calc(-1 * var(--umo-page-margin-left))`
+      paginationDOM.setAttribute('page-height', `${pageOptions.pageHeight}px`)
       // el.setAttribute('page-width', `${el.offsetWidth}px`)
-      el.setAttribute('page-gap', `${pageOptions.pageGap}px`)
-      el.setAttribute('page-header-height', `${pageOptions.pageHeaderHeight}px`)
-      el.setAttribute(
+      paginationDOM.setAttribute('page-gap', `${pageOptions.pageGap}px`)
+      paginationDOM.setAttribute(
+        'page-header-height',
+        `${pageOptions.pageHeaderHeight}px`,
+      )
+      paginationDOM.setAttribute(
+        'page-footer-height',
+        `${pageOptions.pageHeaderHeight}px`,
+      )
+      paginationDOM.setAttribute(
         'page-container-height',
         `${pageOptions.pageHeight - 2 * pageOptions.pageHeaderHeight}px`,
       )
       // const container = document.createElement('div')
       void Promise.resolve().then(() => {
-        el['__vueAppInstance'] = mountWithCreateApp(PageBreakWidget, {
-          element: el,
-          props: {
-            pageOptions,
-            view,
-            pageCount,
+        paginationDOM['__vueAppInstance'] = mountWithCreateApp(
+          PageBreakWidget,
+          {
+            element: paginationDOM,
+            props: {
+              pageOptions,
+              view,
+              pageCount,
+            },
           },
-        })
+        )
+
+        // view.state.doc.descendants((node, pos) => {
+        // })
+
 
         // sepc 单元测试
 
@@ -256,7 +273,7 @@ function createDecoration(
         //   console.log('headerDOMS', headerDOM.getBoundingClientRect())
         // })
       })
-      return el
+      return paginationDOM
     },
     { side: -1 },
   )

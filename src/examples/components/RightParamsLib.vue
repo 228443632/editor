@@ -291,6 +291,22 @@ const paramsConfig = ref([
         },
       },
       {
+        label: '插入Float',
+        value: 'params-comp-table4',
+        icon: 'params-comp-table2',
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .insertContent({
+              type: 'compFloat',
+              attrs: {},
+            })
+            .run()
+        },
+      },
+      {
         label: '不可见块',
         value: 'params-comp-table3',
         icon: 'params-comp-table2',

@@ -4,13 +4,54 @@
  * @create 05/07/25 PM1:24
  */
 import type { Editor } from '@tiptap/vue-3'
-import type { NodeSelection } from '@tiptap/pm/state'
+import { type EditorState, NodeSelection } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
+
+//
+import type { Node as Node2, ResolvedPos } from 'prosemirror-model'
 
 declare global {
   interface Window {
     editor: Editor
   }
+}
+
+const isInTable = (state: EditorState): boolean => {
+  const { $from } = state.selection
+  for (let depth = $from.depth; depth > 0; depth--) {
+    if ($from.node(depth).type.name === 'table') return true
+  }
+  return false
+}
+
+const getCurrentCell = (state: EditorState) => {
+  const { $from } = state.selection
+  for (let depth = $from.depth; depth > 0; depth--) {
+    const node = $from.node(depth)
+    // 匹配 Tiptap 默认表格节点类型
+    if (['table_cell', 'table_header'].includes(node.type.name)) {
+      return {
+        cellNode: node,
+        cellPos: $from.start(depth), // 单元格起始位置
+        cellDepth: depth,
+      }
+    }
+  }
+  return null
+}
+
+const getCurrentTable = (state: EditorState, cellDepth: number) => {
+  const { $from } = state.selection
+  for (let depth = cellDepth; depth > 0; depth--) {
+    const node = $from.node(depth)
+    if (node.type.name === 'table') {
+      return {
+        tableNode: node,
+        tablePos: $from.start(depth), // 表格起始位置
+      }
+    }
+  }
+  return null
 }
 
 export function testEditor(editorRef: Editor) {
@@ -24,6 +65,186 @@ export function testEditor(editorRef: Editor) {
     console.log('[funcName]', funcName)
 
     switch (funcName) {
+      case 'demoInTable': {
+        const { $from, $to } = selection
+        let node: Node2
+        if (selection instanceof NodeSelection) {
+          node = selection.node
+        }
+
+        const nodeTypeNameMap = {
+          tableCell: 1,
+          tableTr: 1,
+        }
+
+        interface BaseNode {
+          node?: Node2
+          dom?: HTMLElement
+          startPos?: number
+          endPos?: number
+          beforePos?: number
+          afterPos?: number
+          resolvePos?: ResolvedPos
+        }
+
+        interface CellNode extends BaseNode {
+          dom?: HTMLTableCellElement
+        }
+
+        interface RowNode extends BaseNode {
+          dom?: HTMLTableRowElement
+        }
+
+        interface TableNode extends BaseNode {
+          dom?: HTMLTableElement
+        }
+
+        let tableCell: CellNode, // 单元格
+          tableRow: RowNode, // tr
+          table: TableNode // 表格
+
+        let parent: Node2
+        if (selection instanceof NodeSelection) {
+          parent = node
+        } else {
+          parent = $from.parent
+        }
+
+        console.log('$from', $from.parent)
+        node = $from.node($from.depth)
+        let depth = $from.depth
+        while (node && depth > 0) {
+          node = $from.node(depth)
+          const beforePos = $from.before(depth)
+          const afterPos = $from.after(depth)
+          const startPos = $from.start(depth)
+          const endPos = $from.end(depth)
+          console.log('$from2', { node, depth }, $from.parent === node)
+          const posObj = { node, beforePos, afterPos, startPos, endPos }
+          if (
+            node.type.name == 'tableCell' ||
+            node.type.name == 'tableHeader'
+          ) {
+            tableCell = {
+              ...posObj,
+              resolvePos: doc.resolve(startPos),
+              dom: view.nodeDOM(startPos) as HTMLTableCellElement,
+            }
+          } else if (node.type.name == 'tableRow') {
+            tableRow = {
+              ...posObj,
+              resolvePos: doc.resolve(startPos),
+              dom: view.nodeDOM(startPos) as HTMLTableRowElement,
+            }
+          } else if (node.type.name == 'table') {
+            table = {
+              ...posObj,
+              resolvePos: doc.resolve(startPos),
+              dom: view.nodeDOM(startPos) as HTMLTableElement,
+            }
+          }
+
+          depth--
+        }
+
+        console.log('输出结果', {
+          table,
+          tableCell,
+          tableRow,
+        })
+
+        tableCell.node.descendants((node, pos) => {
+          console.log('当前tableCell中 node', {
+            node,
+            pos: pos + tableCell.startPos,
+          })
+          const domRect = getDOMPosition(editor, pos)
+          if (domRect) {
+            console.log('当前tableCell中 node2', getDOMPosition(editor, pos))
+          }
+        })
+
+        if (tableCell) {
+          // const tr2 = state.tr
+          // editor
+          //   .chain()
+          //   .insertContentAt(tableCell.startPos, {
+          //     type: 'compFloat',
+          //     attrs: {},
+          //   })
+          //   .focus()
+          //   .run()
+        }
+
+        // const tempTr2 = state.tr.delete($from.pos, $to.pos)
+
+        const sliceA = state.doc.slice($from.pos, $to.pos)
+        const tempTr = state.tr
+          .delete($from.pos, $to.pos)
+          .insert(1, sliceA.content)
+        view.dispatch(tempTr)
+        console.log('sliceA', sliceA)
+
+        /**
+         * 获取当前dom位置
+         * @param editor
+         * @param pos
+         */
+        function getDOMPosition(editor: Editor, pos: number) {
+          const view = editor.view
+          const dom = view.nodeDOM(pos) as Node
+          if (!dom) return null
+          const rootDOM = view.dom
+          const rootDOMRect = rootDOM.getBoundingClientRect()
+
+          let tempRect: DOMRect
+          if (dom.nodeType === Node.TEXT_NODE) {
+            // 文本节点
+            const range = document.createRange()
+            range.selectNode(dom)
+            tempRect = range.getBoundingClientRect() // getClientRects
+          } else if (dom.nodeType === Node.ELEMENT_NODE) {
+            // 元素节点
+            tempRect = (dom as HTMLElement).getBoundingClientRect()
+          }
+
+          interface PageNumPosItem {
+            top: number
+            left: number
+            right: number
+            bottom: number
+            height: number
+            width: number
+          }
+
+          const top = tempRect.top - rootDOMRect.top
+          const left = tempRect.left - rootDOMRect.left
+
+          return {
+            top,
+            left,
+            bottom: top + tempRect.height,
+            right: left + tempRect.width,
+            width: tempRect.width,
+            height: tempRect.height,
+          }
+        }
+
+        // if (node && node.type.name === 'table') {
+        //   console.log('光标在表格内')
+        // } else {
+        //   let isInTable = false
+        //   if ($from.depth > 0) {
+        //     console.log('$from.node(0)', $from.node(0))
+        //     // $from.node(0).descendants((node, pos) => {
+        //     //   console.log('handleCustomNode', node, node, node?.type?.name)
+        //     // })
+        //   }
+        // }
+
+        break
+      }
+
       case 'demo001': {
         const selection = editor.state.selection
         const state = editor.state
@@ -132,7 +353,7 @@ export function testEditor(editorRef: Editor) {
                 ...node.attrs,
                 cssText: {
                   color: 'red',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
                 },
               }),
             )

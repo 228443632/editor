@@ -5,6 +5,8 @@ node_modules/
 dist/
 package/
 
+.tmp
+
 # Editor directories and files
 .idea/
 *.suo

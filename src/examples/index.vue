@@ -11,6 +11,9 @@
       <t-button size="small" @click="testEditorFunc('demo004')"
         >设置属性不在选区</t-button
       >
+      <t-button size="small" @click="testEditorFunc('demoInTable')"
+      >在表格中</t-button
+      >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
       <!-- 基础工具   -->
