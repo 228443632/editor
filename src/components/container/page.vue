@@ -40,6 +40,8 @@
               (pageOptions.margin?.right ?? '0') + 'cm',
             '--umo-page-width': pageSize.width + 'cm',
             '--umo-page-height': pageSize.height + 'cm',
+            '--umo-page-body-height':
+              pageSize.height - (pageOptions.margin?.left || 0) + 'cm',
             width: pageSize.width + 'cm',
             transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
           }"

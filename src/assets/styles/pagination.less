@@ -7,6 +7,7 @@
 // FIXME: pagination
 div.tableWrapper {
   display: contents;
+  clear: both;
   table {
     display: contents;
 
@@ -163,6 +164,14 @@ div.tableWrapper {
     width: calc(100% + 2 * var(--umo-page-margin-left));
     left: calc(-1 * var(--umo-page-margin-left));
     position: relative;
+  }
+
+  table {
+    td, th {
+      // FIXME
+      max-height: var(--umo-page-body-height);
+      overflow-y: auto;
+    }
   }
 
   //p:has(br.ProseMirror-trailingBreak:only-child) {

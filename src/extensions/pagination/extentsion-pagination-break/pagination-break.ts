@@ -221,7 +221,7 @@ function createDecoration(
         `${pageOptions.pageHeaderHeight}px`,
       )
       paginationDOM.setAttribute(
-        'page-container-height',
+        'page-body-height',
         `${pageOptions.pageHeight - 2 * pageOptions.pageHeaderHeight}px`,
       )
       // const container = document.createElement('div')
@@ -238,7 +238,11 @@ function createDecoration(
           },
         )
 
+        // console.log('editor+02', view.dom['__pageNumPosList'])
+
         // view.state.doc.descendants((node, pos) => {
+        //   console.log('node + pos')
+        //   return true
         // })
 
 
