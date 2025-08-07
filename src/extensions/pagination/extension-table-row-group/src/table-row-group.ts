@@ -1,0 +1,65 @@
+import { mergeAttributes, Node } from '@tiptap/core'
+import { isNoNullable } from 'sf-utils2'
+
+export interface TableRowOptions {
+  /**
+   * The HTML attributes for a table row node.
+   * @default {}
+   * @example { class: 'foo' }
+   */
+  HTMLAttributes: Record<string, any>
+}
+
+/**
+ * This extension allows you to create table rows.
+ * @see https://www.tiptap.dev/api/nodes/table-row
+ */
+export const TableRowGroup = Node.create<TableRowOptions>({
+  name: 'tableRowGroup',
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    }
+  },
+
+  group: 'tableRowGroup',
+
+  content: '(tableRow)*',
+
+  parseHTML() {
+    return [{ tag: 'tr' }, { tag: 'table-row-group' }]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return [
+      'table-row-wrap',
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0, // 0 表示插入子节点（即 tr 的内容）
+    ]
+  },
+
+  addNodeView() {
+    const view = this.editor.view
+    return ({ node, getPos }) => {
+      const dom = document.createElement('section')
+      dom.classList.add('table-row-group')
+      Object.entries(node.attrs).forEach(([key, value]) => {
+        if (isNoNullable(value)) {
+          dom.setAttribute(key, value)
+        }
+      })
+      return {
+        dom,
+        contentDOM: dom,
+        update(updateNode) {
+          if (updateNode.type.name !== node.type.name) return false
+          return true
+        },
+        ignoreMutation() {
+          return true
+        },
+      }
+    }
+  },
+})
