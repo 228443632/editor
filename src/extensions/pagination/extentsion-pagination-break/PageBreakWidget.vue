@@ -166,11 +166,15 @@ const _headerStyle = computed(() => {
   }
 })
 
+const _pageCount = computed(() => {
+  return props.pageCount ?? 1
+})
+
 /* 监听 */
 
 /* 周期 */
 onMounted(() => {
-  def(props.view.dom, '__pageNumPosList', getPosAll())
+  // def(props.view.dom, '__pageNumPosList', getPosAll())
 })
 
 /* 暴露 */
@@ -180,7 +184,7 @@ defineExpose({})
 <!--render-->
 <template>
   <div
-    v-for="(item, index) in pageCount"
+    v-for="(item, index) in _pageCount"
     :key="index"
     class="sf-page__sep-wrap"
     :page-num="index + 1"

@@ -3,7 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 30/07/25 PM10:55
  */
-import { Extension } from '@tiptap/core'
+import { type Editor, Extension } from '@tiptap/core'
 import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
 import { rafThrottle } from '@/examples/utils/dom'
@@ -95,24 +95,34 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
   addProseMirrorPlugins() {
     const pageOptions = this.options
     const editor = this.editor
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const _pluginCtx = this
     return [
       new Plugin({
         key: new PluginKey('PaginationBreak'),
 
         state: {
           init(_, state) {
-            const widgetList = createDecoration(state, pageOptions)
+            const widgetList = createDecoration.call(
+              _pluginCtx,
+              state,
+              pageOptions,
+            )
             return DecorationSet.create(state.doc, widgetList)
           },
-          apply(tr, oldDeco, oldState, newState) {
+          apply(tr, prevDecos, oldState, newState) {
             let pageCount = calculatePageCount(editor.view, pageOptions)
             const currentPageCount = getExistingPageCount(editor.view)
             pageCount = pageCount > 1 ? pageCount : 1
             if (pageCount !== currentPageCount) {
-              const widgetList = createDecoration(newState, pageOptions)
+              const widgetList = createDecoration.call(
+                _pluginCtx,
+                newState,
+                pageOptions,
+              )
               return DecorationSet.create(newState.doc, [...widgetList])
             }
-            return oldDeco
+            return prevDecos
           },
         },
 
@@ -141,7 +151,7 @@ function getExistingPageCount(view: EditorView) {
 
 /**
  * 计算页码总数
- * @param view
+ * @param editor
  * @param pageOptions
  */
 function calculatePageCount(
@@ -198,14 +208,16 @@ function createDecoration(
   pageOptions: PaginationBreakOptions,
   isInitial = false,
 ): Decoration[] {
+  const editor = this.editor as Editor
   const pageWidget = Decoration.widget(
     0,
     (view) => {
-      console.log('view', view, this)
+      // console.log('view-update', view, this)
 
       // 设置页码数
       const pageCount = calculatePageCount(view, pageOptions)
       const paginationDOM = document.createElement('div')
+      if (pageCount < 0) return paginationDOM
       paginationDOM.dataset.sfPagination = 'true'
       paginationDOM.style.width = `calc(100% + 2 * var(--umo-page-margin-left))`
       paginationDOM.style.left = `calc(-1 * var(--umo-page-margin-left))`
@@ -238,27 +250,39 @@ function createDecoration(
           },
         )
 
-        // console.log('editor+02', view.dom['__pageNumPosList'])
+        // const nodePosList = editor.$nodes('tableCell')
+        // const positionList = view.dom['__pageNumPosList'] || []
+        // if (nodePosList.length) {
+        // nodePosList.forEach((nodePos) => {
+        //   // const node = nodePos.node
+        //   // const nodeDOM = editor.view.nodeDOM(nodePos.pos)
+        //   // console.log('nodeDOM', nodeDOM)
+        // })
+        // }
+
+        // console.log(
+        //   'editor+02',
+        //   view.dom['__pageNumPosList'],
+        //   nodePosList
+        // )
 
         // view.state.doc.descendants((node, pos) => {
         //   console.log('node + pos')
         //   return true
         // })
 
-
         // sepc 单元测试
 
-        for (let i = 0; i < pageCount; i++) {
-          // const pageDOM = view.dom.querySelector(
-          //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
-          // )
-          // const rect = pageDOM.getBoundingClientRect()
-          // pageDOM.setAttribute('rect', JSON.stringify(rect))
-          //
-          // const headerDOM = pageDOM.querySelector('.sf-page__header')
-          // const footerDOM = pageDOM.querySelector('.sf-page__footer')
-        }
-        console.log('测试')
+        // for (let i = 0; i < pageCount; i++) {
+        // const pageDOM = view.dom.querySelector(
+        //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
+        // )
+        // const rect = pageDOM.getBoundingClientRect()
+        // pageDOM.setAttribute('rect', JSON.stringify(rect))
+        //
+        // const headerDOM = pageDOM.querySelector('.sf-page__header')
+        // const footerDOM = pageDOM.querySelector('.sf-page__footer')
+        // }
 
         // const pageDOMS = Array.from(
         //   view.dom.querySelectorAll('.sf-page__sep-wrap'),
@@ -282,55 +306,55 @@ function createDecoration(
     { side: -1 },
   )
 
-  const demoWidget = Decoration.widget(
-    0,
-    (view) => {
-      const pageCount = calculatePageCount(view, pageOptions)
-      const el = document.createElement('div')
-      // const container = document.createElement('div')
-      void Promise.resolve().then(() => {
-        el['__vueAppInstance'] = mountWithCreateApp(Demo, {
-          element: el,
-          props: {
-            pageOptions,
-          },
-        })
-
-        // sepc 单元测试
-
-        for (let i = 0; i < pageCount; i++) {
-          // const pageDOM = view.dom.querySelector(
-          //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
-          // )
-          // const rect = pageDOM.getBoundingClientRect()
-          // pageDOM.setAttribute('rect', JSON.stringify(rect))
-          //
-          // const headerDOM = pageDOM.querySelector('.sf-page__header')
-          // const footerDOM = pageDOM.querySelector('.sf-page__footer')
-        }
-        console.log('测试')
-
-        // const pageDOMS = Array.from(
-        //   view.dom.querySelectorAll('.sf-page__sep-wrap'),
-        // ) as HTMLDivElement[]
-        //
-        // pageDOMS.forEach((item) => {
-        //   const headerDOM = item.querySelector('.sf-page__header')
-        //   const footerDOM = item.querySelector('.sf-page__footer')
-        // })
-        //
-        // const headerDOMS = view.dom.querySelectorAll(
-        //   '.sf-page__sep-wrap .sf-page__header',
-        // )
-        //
-        // headerDOMS.forEach((headerDOM: HTMLDivElement) => {
-        //   console.log('headerDOMS', headerDOM.getBoundingClientRect())
-        // })
-      })
-      return el
-    },
-    { side: -1 },
-  )
+  // const demoWidget = Decoration.widget(
+  //   0,
+  //   (view) => {
+  //     const pageCount = calculatePageCount(view, pageOptions)
+  //     const el = document.createElement('div')
+  //     // const container = document.createElement('div')
+  //     void Promise.resolve().then(() => {
+  //       el['__vueAppInstance'] = mountWithCreateApp(Demo, {
+  //         element: el,
+  //         props: {
+  //           pageOptions,
+  //         },
+  //       })
+  //
+  //       // sepc 单元测试
+  //
+  //       for (let i = 0; i < pageCount; i++) {
+  //         // const pageDOM = view.dom.querySelector(
+  //         //   `.sf-page__sep-wrap[page-numb="${i + 1}"]`,
+  //         // )
+  //         // const rect = pageDOM.getBoundingClientRect()
+  //         // pageDOM.setAttribute('rect', JSON.stringify(rect))
+  //         //
+  //         // const headerDOM = pageDOM.querySelector('.sf-page__header')
+  //         // const footerDOM = pageDOM.querySelector('.sf-page__footer')
+  //       }
+  //       console.log('测试')
+  //
+  //       // const pageDOMS = Array.from(
+  //       //   view.dom.querySelectorAll('.sf-page__sep-wrap'),
+  //       // ) as HTMLDivElement[]
+  //       //
+  //       // pageDOMS.forEach((item) => {
+  //       //   const headerDOM = item.querySelector('.sf-page__header')
+  //       //   const footerDOM = item.querySelector('.sf-page__footer')
+  //       // })
+  //       //
+  //       // const headerDOMS = view.dom.querySelectorAll(
+  //       //   '.sf-page__sep-wrap .sf-page__header',
+  //       // )
+  //       //
+  //       // headerDOMS.forEach((headerDOM: HTMLDivElement) => {
+  //       //   console.log('headerDOMS', headerDOM.getBoundingClientRect())
+  //       // })
+  //     })
+  //     return el
+  //   },
+  //   { side: -1 },
+  // )
 
   return !isInitial ? [pageWidget] : [pageWidget]
 }

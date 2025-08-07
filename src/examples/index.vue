@@ -12,7 +12,10 @@
         >设置属性不在选区</t-button
       >
       <t-button size="small" @click="testEditorFunc('demoInTable')"
-      >在表格中</t-button
+        >在表格中</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"
+      >删除行</t-button
       >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
@@ -216,6 +219,23 @@ watch(umoEditorRef, () => {
       return originFocusCommands.call(this, ...arguments)
     }
   })
+
+
+  // TODO
+  // editorRef.value.on('update', ({ editor }) => {
+  //   console.log('update', editor)
+  // })
+
+  // editorRef.value.on('create', ({ editor }) => {
+  //   console.log('create', editor)
+  //   const positionList = editor.view.dom.__pageNumPosList as Array
+  //
+  //   // const
+  //
+  //
+  // })
+
+
 })
 
 console.log('编辑器【options】', options)

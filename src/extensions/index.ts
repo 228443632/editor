@@ -57,6 +57,7 @@ import Table from './table'
 import TableCell from './table/cell'
 import TableHeader from './table/header'
 import TableRow from './table/row'
+// import TableRowGroup from './table/row-group'
 import Tag from './tag'
 import TextAlign from './text-align'
 import TextBox from './text-box'
@@ -71,6 +72,13 @@ import PaginationBreak from './pagination/extentsion-pagination-break'
 // 自定义
 import ImageParagraph from './image-paragraph'
 import { cssUtil } from '@/examples/utils/css-util'
+
+// import {
+//   TablePlus,
+//   TableRowPlus,
+//   TableCellPlus,
+//   TableHeaderPlus
+// } from 'tiptap-pagination-plus'
 
 export const getDefaultExtensions = ({
   container,
@@ -177,6 +185,7 @@ export const getDefaultExtensions = ({
     TableRow,
     TableHeader,
     TableCell,
+    // TableRowGroup,
 
     // 页面
     Toc,

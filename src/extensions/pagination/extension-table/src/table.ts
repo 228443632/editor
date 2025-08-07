@@ -32,6 +32,7 @@ import { TableView } from './TableView.js'
 import { createColGroup } from './utilities/createColGroup.js'
 import { createTable } from './utilities/createTable.js'
 import { deleteTableWhenAllCellsSelected } from './utilities/deleteTableWhenAllCellsSelected.js'
+// import { tableDecorationPlugin } from '@/extensions/pagination/extension-table/src/table-decoration'
 
 // import { history } from 'prosemirror-history'
 

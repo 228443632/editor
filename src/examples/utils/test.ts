@@ -65,6 +65,56 @@ export function testEditor(editorRef: Editor) {
     console.log('[funcName]', funcName)
 
     switch (funcName) {
+      case 'deleteRowInTable': {
+        const nodePos = editor.$node('table')
+        const pos = nodePos.pos
+        const children = nodePos.children
+
+        const tr = state.tr
+        // 第四行
+        const row3Node = children[3]
+        const row3NodeResolvePos = row3Node.resolvedPos
+
+        console.log('deleteRowInTable', {
+          start: row3NodeResolvePos.start(),
+          end: row3NodeResolvePos.end(),
+          before: row3NodeResolvePos.before(),
+          after: row3NodeResolvePos.after(),
+          nodeSize: row3Node.node.nodeSize,
+          pos: row3NodeResolvePos.pos,
+        })
+
+        const row2Node = children[2]
+
+        // const slice = doc.slice(
+        //   row3Node.pos - 1,
+        //   row3Node.pos + row3Node.node.nodeSize - 2,
+        // )
+
+        tr.delete(row3Node.pos, row3Node.pos + row3Node.node.nodeSize - 1)
+        tr.insert(row2Node.resolvedPos.end(), row3Node.node.content)
+
+        // .delete(
+        //   row3Node.pos - 1,
+        //   row3Node.pos - 1 + row3Node.node.nodeSize,
+        // )
+        // .insert(row2Node.resolvedPos.end() - 1, slice.content)
+        // .delete(row3Node.pos - 1, row3Node.pos - 1 + row3Node.node.nodeSize)
+        // view.dispatch(tr)
+
+
+        const tableDom = view.nodeDOM(nodePos.resolvedPos.before())
+        console.log(tableDom)
+
+        const trList = Array.from(document.querySelectorAll('tr'))
+        const trDom2 = trList[1]
+        const trDom3 = trList[2]
+        const parentElement = trDom3.parentElement
+        trDom2.parentElement.append(trDom3)
+        parentElement.remove()
+        break
+      }
+
       case 'demoInTable': {
         const { $from, $to } = selection
         let node: Node2
