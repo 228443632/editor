@@ -17,6 +17,9 @@
       <t-button size="small" @click="testEditorFunc('deleteRowInTable')"
       >删除行</t-button
       >
+      <t-button size="small" @click="testEditorFunc('wrapTrTable')"
+      >手动添加包裹</t-button
+      >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
       <!-- 基础工具   -->

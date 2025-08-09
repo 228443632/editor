@@ -32,6 +32,7 @@ import { TableView } from './TableView.js'
 import { createColGroup } from './utilities/createColGroup.js'
 import { createTable } from './utilities/createTable.js'
 import { deleteTableWhenAllCellsSelected } from './utilities/deleteTableWhenAllCellsSelected.js'
+import { simpleUUID } from '@/utils/short-id'
 // import { tableDecorationPlugin } from '@/extensions/pagination/extension-table/src/table-decoration'
 
 // import { history } from 'prosemirror-history'
@@ -283,13 +284,19 @@ export const Table = Node.create<TableOptions>({
     }
   },
 
-  content: '(tableRow)+',
+  content: '(tableRow | block)+',
 
   tableRole: 'table',
 
   isolating: true,
 
   group: 'block',
+
+  addAttributes() {
+    return {
+      id: { default: 'x' + simpleUUID().slice(8) },
+    }
+  },
 
   parseHTML() {
     return [{ tag: 'table' }]

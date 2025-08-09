@@ -123,7 +123,7 @@ function getPageBodyStyle(pageIndex: number) {
     pointerEvents: 'none',
     zIndex: 100,
     // backgroundColor: 'red',
-    outline: '2px solid blue',
+    // outline: '2px dashed orange',
   }
 }
 
@@ -174,7 +174,7 @@ const _pageCount = computed(() => {
 
 /* 周期 */
 onMounted(() => {
-  // def(props.view.dom, '__pageNumPosList', getPosAll())
+  def(props.view.dom, '__pageNumPosList', getPosAll())
 })
 
 /* 暴露 */
@@ -216,9 +216,9 @@ defineExpose({})
       :style="getPageBodyStyle(index)"
       :page-num="index + 1"
     >
-<!--      <span class="p-2px bg-[#333] text-[#fff] text-12px">{{-->
-<!--        proxy.refs?.[`pageBodyRef$${index + 1}`]?.[0]?.getBoundingClientRect?.()-->
-<!--      }}</span>-->
+      <!--      <span class="p-2px bg-[#333] text-[#fff] text-12px">{{-->
+      <!--        proxy.refs?.[`pageBodyRef$${index + 1}`]?.[0]?.getBoundingClientRect?.()-->
+      <!--      }}</span>-->
     </div>
 
     <div

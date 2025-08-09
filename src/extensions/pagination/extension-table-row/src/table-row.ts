@@ -1,5 +1,6 @@
 import { mergeAttributes, Node } from '@tiptap/core'
 import { isNoNullable } from 'sf-utils2'
+import { type Node as ProseMirrorNode } from 'prosemirror-model'
 
 export interface TableRowOptions {
   /**
@@ -26,6 +27,14 @@ export const TableRow = Node.create<TableRowOptions>({
   content: '(tableCell | tableHeader)*',
 
   tableRole: 'row',
+
+  addAttributes() {
+    return {
+      tableId: {
+        default: null,
+      },
+    }
+  },
 
   parseHTML() {
     return [{ tag: 'tr' }]
@@ -62,11 +71,33 @@ export const TableRow = Node.create<TableRowOptions>({
   },
 
   addNodeView() {
-    return ({ node }) => {
+    return ({ node, editor, getPos }) => {
+      // console.log('node', node, editor, editor.$pos(getPos()).node)
+      // const nodePos = editor.$pos(getPos())
+      const resolvedPos = editor.state.doc.resolve(getPos())
+      let tableParentNode: ProseMirrorNode
+
+      let depth = resolvedPos.depth + 1
+      while (depth > 0) {
+        const parentNode = resolvedPos.node(depth)
+        if (parentNode?.type?.name === 'table') {
+          // 如果是表格
+          tableParentNode = parentNode
+          break
+        }
+        depth--
+      }
+
       const dom = document.createElement('section')
       dom.classList.add('table-row-group')
       const trDom = document.createElement('tr')
       trDom.classList.add('table-row')
+
+      if (tableParentNode && !trDom.getAttribute('tableid')) {
+        trDom.setAttribute('tableid', tableParentNode.attrs.id)
+      }
+      // const tableId = tableParentNode?.attrs.id
+
       dom.append(trDom)
       window.requestAnimationFrame(() => {
         const cells = Array.from(trDom.cells)
@@ -84,6 +115,18 @@ export const TableRow = Node.create<TableRowOptions>({
         contentDOM: trDom,
         update(updateNode) {
           if (updateNode.type.name !== node.type.name) return false
+          // const tableDOM = document.querySelector(
+          //   `table[tableid="${tableId}"]`,
+          // ) as HTMLTableElement
+          // if (tableDOM) {
+          //   const childIdx = tableParentNode.children.findIndex(
+          //     (node) => node === updateNode,
+          //   )
+          //   tableDOM.style.setProperty(
+          //     `--row-${childIdx}-h-2`,
+          //     trDom.clientHeight + 'px',
+          //   )
+          // }
           return true
         },
         ignoreMutation() {

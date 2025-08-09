@@ -1,3 +1,5 @@
+import { deepClone } from 'sf-utils2'
+
 const nav = typeof navigator !== 'undefined' ? navigator : null
 const doc = typeof document !== 'undefined' ? document : null
 export const agent = nav?.userAgent ?? ''
@@ -158,7 +160,15 @@ export type TTableIndexListItem = {
  */
 export function getTableIndexListPro(tableEle: HTMLTableElement) {
   const list = getTableIndexList(tableEle)
-  const result = [] as TTableIndexListItem[][]
+  const result = [] as TTableIndexListItem[][] & {
+    __originRelList?: {
+      rowIndex: number
+      colIndex: number
+      rowSpan: number
+      colSpan: number
+    }[]
+  }
+  result['__originRelList'] = deepClone(list)
   for (let i = 0; i < list.length; i++) {
     result[i] = []
     for (let j = 0; j < list[i].length; j++) {
@@ -182,4 +192,24 @@ export function getTableIndexListPro(tableEle: HTMLTableElement) {
     }
   }
   return result
+}
+
+/**
+ * 判断元素是否 隐藏了 display = none
+ * @return {boolean}
+ */
+export function isHidden(el: HTMLElement) {
+  if (!el) {
+    return false
+  }
+
+  const style = window.getComputedStyle(el)
+  const hidden = style.display === 'none'
+
+  // offsetParent returns null in the following situations:
+  // 1. The element or its parent element has the display property set to none.
+  // 2. The element has the position property set to fixed
+  const parentHidden = el.offsetParent === null && style.position !== 'fixed'
+
+  return hidden || parentHidden
 }

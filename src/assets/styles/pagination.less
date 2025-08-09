@@ -10,17 +10,6 @@ div.tableWrapper {
   clear: both;
   table {
     display: contents;
-
-    tr {
-      width: 100%;
-      max-width: 100%;
-      display: inline-grid;
-      //display: table-row;
-      th,
-      td {
-        grid-column: auto / span 1;
-      }
-    }
   }
 
   .table-wrapper-tbody {
@@ -28,77 +17,80 @@ div.tableWrapper {
   }
 
   .table-row-group {
-    //width: 100%;
-    //display: table-row-group;
-    display: block;
-    &:last-child {
-      tr {
-        //&:after {
-        //  background-position:
-        //    0 0,
-        //    0 calc(100%),
-        //    0 0;
-        //}
-      }
-    }
+    width: 100%;
+    margin-top: -1px;
+    display: table;
+    table-layout: fixed;
+    max-width: 100%;
   }
-
-  .table-row-tbody {
+  .table-row-group-merge {
+    margin-top: -1px;
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    max-width: 100%;
+    & > .table-row-group {
+      display: contents;
+    }
   }
 
   table {
     --cell-border: 1px solid var(--umo-content-table-border-color);
     --cell-border-color: var(--umo-content-table-border-color);
-    tbody {
-      //display: table;
-      //display: contents;
-    }
-    tr {
-      border-bottom: var(--cell-border);
-      position: relative;
-      margin-bottom: -1px;
-      grid-template-columns: repeat(var(--cell-count), 1fr);
-      &:after {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100;
-        pointer-events: none;
-        background-image: linear-gradient(
-            to right,
-            var(--cell-border-color),
-            var(--cell-border-color)
-          ),
-          linear-gradient(
-            to right,
-            var(--cell-border-color),
-            var(--cell-border-color)
-          ),
-          linear-gradient(to right, transparent, transparent);
-        background-repeat: no-repeat, no-repeat, no-repeat;
-        background-size:
-          100% 1px,
-          100% 1px,
-          100% 100%;
-        background-position:
-          0 0,
-          0 calc(100% + 1px),
-          0 0;
-      }
-      td,
-      th {
-        // grid-column: auto / span 1;
-        border-left: var(--cell-border);
-        border-right: var(--cell-border);
 
-        &:not(:first-child) {
-          border-left: none;
-        }
-      }
+    th, td {
+      border: var(--cell-border);
     }
+
+    //tr {
+    //  //border-bottom: var(--cell-border);
+    //  position: relative;
+    //  grid-template-columns: repeat(var(--cell-count), 1fr);
+    //  td,
+    //  th {
+    //    // grid-column: auto / span 1;
+    //    border-left: var(--cell-border);
+    //    border-right: var(--cell-border);
+    //    border-top: 0;
+    //    border-bottom: var(--cell-border);
+    //    margin-left: -1px;
+    //    margin-top: -1px;
+    //
+    //    &:not(:first-child) {
+    //      //border-left: none;
+    //    }
+    //    &:after {
+    //      content: '';
+    //      position: absolute;
+    //      left: 0;
+    //      top: 0;
+    //      width: 100%;
+    //      height: 100%;
+    //      z-index: 100;
+    //      pointer-events: none;
+    //      background-image: linear-gradient(
+    //              to right,
+    //              var(--cell-border-color),
+    //              var(--cell-border-color)
+    //      ),
+    //      linear-gradient(
+    //              to right,
+    //              var(--cell-border-color),
+    //              var(--cell-border-color)
+    //      ),
+    //      linear-gradient(to right, transparent, transparent);
+    //      background-repeat: no-repeat, no-repeat, no-repeat;
+    //      background-size:
+    //              100% 1px,
+    //              100% 1px,
+    //              100% 100%;
+    //      background-position:
+    //              0 0,
+    //              0 calc(100% + 1px),
+    //              0 0;
+    //    }
+    //  }
+    //}
   }
 }
 
@@ -171,6 +163,7 @@ div.tableWrapper {
       // FIXME
       max-height: var(--umo-page-body-height);
       overflow-x: hidden;
+      overflow-y: hidden;
     }
   }
 

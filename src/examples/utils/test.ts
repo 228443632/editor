@@ -65,6 +65,47 @@ export function testEditor(editorRef: Editor) {
     console.log('[funcName]', funcName)
 
     switch (funcName) {
+      case 'wrapTrTable': {
+        const table = document.querySelector('table')
+
+        const trDOMs = Array.from(table.querySelectorAll('tr'))
+        const trDOMsParents = trDOMs.map((node) => node.parentElement)
+
+        const trDOM2 = trDOMs[1]
+        const trDOM3 = trDOMs[2]
+        const trDOM4 = trDOMs[3]
+        const trDOM5 = trDOMs[4]
+
+        const div = document.createElement('div')
+        div.style.height = '100px'
+        div.style.background = 'red'
+
+        trDOM5.parentElement.parentElement.insertBefore(
+          div,
+          trDOM5.parentElement,
+        )
+        window.requestAnimationFrame(() => {
+          trDOM5.parentElement.parentElement.insertBefore(
+            div,
+            trDOM5.parentElement,
+          )
+        })
+
+
+
+        // div.style.display = 'contents'
+
+        // trDOM2.parentElement.parentElement.parentElement.insertBefore(
+        //   div,
+        //   trDOM2.parentElement.parentElement,
+        // )
+        // div.append(trDOM2.parentElement)
+        // div.append(trDOM3.parentElement)
+        // div.append(trDOM4.parentElement)
+
+        break
+      }
+
       case 'deleteRowInTable': {
         const nodePos = editor.$node('table')
         const pos = nodePos.pos
@@ -101,7 +142,6 @@ export function testEditor(editorRef: Editor) {
         // .insert(row2Node.resolvedPos.end() - 1, slice.content)
         // .delete(row3Node.pos - 1, row3Node.pos - 1 + row3Node.node.nodeSize)
         // view.dispatch(tr)
-
 
         const tableDom = view.nodeDOM(nodePos.resolvedPos.before())
         console.log(tableDom)

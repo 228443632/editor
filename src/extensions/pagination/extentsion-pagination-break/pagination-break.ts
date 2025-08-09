@@ -9,7 +9,6 @@ import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
 import { rafThrottle } from '@/examples/utils/dom'
 import { mountWithCreateApp } from '@/utils/vnode'
 import PageBreakWidget from './PageBreakWidget.vue'
-import Demo from './Demo.vue'
 
 export interface PaginationBreakOptions {
   /** 每一页 大小*/
@@ -149,6 +148,18 @@ function getExistingPageCount(view: EditorView) {
   return 0
 }
 
+function isHiddenElRect(el: HTMLElement) {
+  const rect = el.getBoundingClientRect()
+  return (
+    rect.width === 0 &&
+    rect.height === 0 &&
+    rect.left === 0 &&
+    rect.top === 0 &&
+    rect.right === 0 &&
+    rect.bottom === 0
+  )
+}
+
 /**
  * 计算页码总数
  * @param editor
@@ -164,10 +175,20 @@ function calculatePageCount(
   const paginationElement = editorDom.querySelector('[data-sf-pagination]')
   const currentPageCount = getExistingPageCount(view)
   if (paginationElement) {
-    const lastElementOfEditor = editorDom.lastElementChild
+    let lastElementOfEditor = editorDom.lastElementChild
     const lastPageBreak =
       paginationElement.lastElementChild?.querySelector('.sf-page__breaker')
     if (lastElementOfEditor && lastPageBreak) {
+      // 是表格case
+      if (
+        lastElementOfEditor.classList.contains('tableWrapper') ||
+        lastElementOfEditor.tagName === 'table'
+      ) {
+        lastElementOfEditor = lastElementOfEditor.querySelector(
+          'table > .table-wrapper-tbody > section.table-row-group:last-of-type',
+        ) as HTMLElement
+      }
+
       const lastPageGap =
         lastElementOfEditor.getBoundingClientRect().bottom -
         lastPageBreak.getBoundingClientRect().bottom

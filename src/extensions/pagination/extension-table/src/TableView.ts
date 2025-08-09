@@ -3,8 +3,7 @@ import type { NodeView, ViewMutationRecord } from '@tiptap/pm/view'
 
 import { getColStyleDeclaration } from './utilities/colStyle.js'
 import { getTableIndexListPro } from '@/utils/browser'
-import { simpleUUID } from '@/utils/short-id'
-import { rafThrottle } from 'sf-utils2'
+import { rafThrottle, uniq } from 'sf-utils2'
 import type { EditorView } from '@codemirror/view'
 
 export function updateColumns(
@@ -88,11 +87,15 @@ export class TableView implements NodeView {
   /** 是否开启分页 */
   static isEnablePagination = false
 
+  static tableRowGroupMergeClass = 'table-row-group-merge'
+
   node: ProseMirrorNode
 
   cellMinWidth: number
 
   dom: HTMLDivElement
+
+  view: EditorView
 
   table: HTMLTableElement
 
@@ -104,21 +107,26 @@ export class TableView implements NodeView {
   _colgroupObserver: MutationObserver
 
   constructor(node: ProseMirrorNode, cellMinWidth: number, view: EditorView) {
+    this.view = view
     this.node = node
     this.cellMinWidth = cellMinWidth
     this.dom = document.createElement('div')
     this.dom.className = 'tableWrapper table-wrapper'
-    this.dom.id = simpleUUID().slice(8)
+    this.dom.id ||= this.node.attrs.id
     this.table = this.dom.appendChild(document.createElement('table'))
     this.colgroup = this.table.appendChild(document.createElement('colgroup'))
+
+    this.colgroup.setAttribute('tableid', this.node.attrs.id)
+
     updateColumns(node, this.colgroup, this.table, cellMinWidth)
     this.contentDOM = this.table.appendChild(document.createElement('tbody'))
     this.contentDOM.classList.add('table-wrapper-tbody')
 
     // FIXME: 添加id
-    this.table.dataset.id = this.dom.id
+    this.table.setAttribute('tableid', this.dom.id)
 
     const mutationCallback = (mutations: MutationRecord[]) => {
+      this._computedTrProperties()
       this._computedColWidth()
     }
     const rafMutationCallback = rafThrottle(mutationCallback)
@@ -129,10 +137,12 @@ export class TableView implements NodeView {
       attributes: true,
     })
 
-    this.dom['_computedCalcLayout'] = rafThrottle(() => {
+    this.dom.style.visibility = 'hidden'
+    this.dom['_computedCalcLayout'] = () => {
       this._computedColWidth()
       this._computedTrProperties()
-    })
+      this.dom.style.visibility = 'unset'
+    }
   }
 
   update(node: ProseMirrorNode) {
@@ -142,17 +152,17 @@ export class TableView implements NodeView {
 
     this.node = node
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth)
-    this._computedColWidth()
-    this._computedTrProperties()
+    window.requestAnimationFrame(this.dom['_computedCalcLayout'])
     return true
   }
 
   ignoreMutation(mutation: ViewMutationRecord) {
-    return (
-      mutation.type === 'attributes' &&
-      (mutation.target === this.table ||
-        this.colgroup.contains(mutation.target))
-    )
+    // return (
+    //   mutation.type === 'attributes' &&
+    //   (mutation.target === this.table ||
+    //     this.colgroup.contains(mutation.target))
+    // )
+    return true
   }
 
   destroy() {
@@ -184,47 +194,171 @@ export class TableView implements NodeView {
   }
 
   /**
+   * 更新colgroup
+   */
+  _updateEverySubTableColgroup() {
+    // _getTrDOMList
+    const trDOMs = this._getTrDOMList()
+    trDOMs.forEach((trDOM: HTMLTableRowElement) => {
+      const tableDom = this.getNearsetTable(trDOM)
+      const colgroupDomList = Array.from(
+        tableDom.querySelectorAll(`colgroup[tableid=${this.dom.id}]`),
+      )
+      colgroupDomList.forEach((colgroupDom: HTMLTableColElement) => {
+        colgroupDom.remove()
+      })
+      const colgroupDomClone = this.colgroup.cloneNode(
+        true,
+      ) as HTMLTableColElement
+      tableDom.appendChild(colgroupDomClone)
+    })
+  }
+
+  _getPos() {
+    let result: number
+    const doc = this.view.state.doc as unknown as ProseMirrorNode
+    doc.descendants((node, pos) => {
+      if (node === this.node) {
+        result = pos
+        return false
+      }
+    })
+    return result
+  }
+
+  /**
+   * 获取当前table的父元素table
+   */
+  getNearsetTable(trDOM: HTMLTableRowElement) {
+    if (trDOM?.tagName != 'TR') return
+    const parentElement = trDOM.parentElement.parentElement
+    if (parentElement.classList.contains(TableView.tableRowGroupMergeClass)) {
+      return parentElement
+    }
+    return trDOM.parentElement.classList.contains('table-row-group')
+      ? trDOM.parentElement
+      : null
+  }
+
+  /**
+   * 获取tr DOM 列表
+   */
+  _getTrDOMList() {
+    const tableId = this.dom.id
+    const trDOMs = this.dom.querySelectorAll(
+      `table[tableid="${tableId}"] tr[tableid="${tableId}"]`,
+    ) as NodeListOf<HTMLTableRowElement>
+    if (!trDOMs?.length) return [] as unknown as NodeListOf<HTMLTableRowElement>
+    return trDOMs
+  }
+
+  /**
    * 更新tr属性
    */
   _computedTrProperties() {
     if (!TableView.isEnablePagination) return
-    const trDOMs = this.dom.querySelectorAll(
-      `table[data-id="${this.dom.id}"] > .table-wrapper-tbody> .table-row-group > tr`,
-    ) as NodeListOf<HTMLTableRowElement>
+    const trDOMs = this._getTrDOMList()
+    if (!trDOMs?.length) return
+
+    trDOMs.forEach((trDOM: HTMLTableRowElement) => {
+      const parentElement = this.getNearsetTable(trDOM)
+      const colgroupDomList = Array.from(
+        parentElement.querySelectorAll(`colgroup[tableid=${this.dom.id}]`),
+      )
+      colgroupDomList.forEach((colgroupDom: HTMLTableColElement) => {
+        colgroupDom.remove()
+      })
+      if (parentElement.classList.contains(TableView.tableRowGroupMergeClass)) {
+        // 父元素是table-row-group-merge
+        removePrentNode(parentElement)
+      }
+    })
+
     const indexListPro = getTableIndexListPro({
       rows: trDOMs,
     } as unknown as HTMLTableElement)
-    indexListPro.forEach((trInfo, trInfoIndex) => {
-      const gridTemplateColumns = [] as string[]
-      const trDOM = trInfo[0].trEle
-      const noCrossRowTdHeightList = []
-      trInfo.forEach((colInfo, colIndex) => {
-        const minWidthVarPropertyName = `--col-${colIndex}-min-w`
-        const widthVarPropertyName = `--col-${colIndex}-w`
-        colInfo.tdEle.style.minWidth = `var(${minWidthVarPropertyName})`
+    // let isChangePosition: boolean // 位置是否发生变化
 
-        const width = this.table.style.getPropertyValue(widthVarPropertyName)
+    // console.log("this.dom['__originRelList']", this.dom['__originRelList'])
+
+    // if (
+    //   this.dom['__originRelList'] &&
+    //   looseEqual(this.dom['__originRelList'], indexListPro.__originRelList)
+    // ) {
+    //   isChangePosition = false
+    // } else {
+    //   isChangePosition = true
+    // }
+    //
+    // if (!isChangePosition) return
+    //
+    // this.dom['__originRelList'] = indexListPro.__originRelList
+
+    const tdAccRowspanList = [] as number[]
+    const rowHiddenGroup = [] as {
+      groupRowIndex: number
+      children: number[]
+    }[]
+
+    indexListPro.forEach((trInfo, trInfoIndex) => {
+      trInfo.forEach((colInfo, colIndex) => {
+        tdAccRowspanList[colIndex] ??= 0
         if (colInfo.isRowPart && colInfo.isColPart) {
-          colInfo.tdEle.style.gridColumn = `${colInfo.index + 1} / span ${colInfo.cSpan}`
-          if (colInfo.rSpan > 1) {
-            // colInfo.tdEle.style.gridRow = `${colInfo.rIndex + 1} / span ${colInfo.rSpan}`
-            const heightList = []
-            for (let i = 0; i < colInfo.rSpan; i++) {
-              heightList.push(`var(--row-${colInfo.rIndex + i}-h)`)
-            }
-            // colInfo.tdEle.style.height = `max(calc(${heightList.join(' + ')}), 100%)`
-          } else {
-            // 非跨行
-            noCrossRowTdHeightList.push(colInfo.tdEle.clientHeight)
-          }
+          tdAccRowspanList[colIndex] += colInfo.rSpan || 1
         }
-        gridTemplateColumns.push(width ? `var(${widthVarPropertyName})` : '1fr')
       })
-      trDOM.style.gridTemplateColumns = gridTemplateColumns.join(' ')
-      trDOM.style.width = `var(--width)`
-      const maxTdHeight = Math.max(...noCrossRowTdHeightList)
-      this.table.style.setProperty(`--row-${trInfoIndex}-h`, `${maxTdHeight}px`)
-      trDOM.style.height = `calc(--row-${trInfoIndex}-h)`
+
+      const tdAccRowspanListSet = uniq(tdAccRowspanList)
+      if (tdAccRowspanListSet?.length == 1) {
+        if (tdAccRowspanList[0] > 1) {
+          const lastGroupRowIndex = trInfoIndex - tdAccRowspanList[0]
+          const children = []
+          const groupRowIndex = lastGroupRowIndex ? lastGroupRowIndex + 1 : 0
+          for (let i = groupRowIndex + 1; i <= trInfoIndex; i++) {
+            children.push(i)
+          }
+          rowHiddenGroup.push({
+            groupRowIndex: lastGroupRowIndex ? lastGroupRowIndex + 1 : 0,
+            children,
+          })
+        }
+        tdAccRowspanList.length = 0
+      }
     })
+
+    rowHiddenGroup.forEach((group) => {
+      const groupTrDom = trDOMs[group.groupRowIndex]
+      const div = document.createElement('section')
+      const tableRowGroupDom = groupTrDom.parentElement
+      tableRowGroupDom.parentElement.insertBefore(div, tableRowGroupDom)
+      div.classList.add(TableView.tableRowGroupMergeClass)
+      div.append(tableRowGroupDom)
+      group.children.forEach((child) => {
+        const childTrDom = trDOMs[child]
+        const childTableRowGroupDom = childTrDom.parentElement
+        div.append(childTableRowGroupDom)
+      })
+    })
+
+    this._updateEverySubTableColgroup()
   }
+}
+
+/**
+ * 只删除删除父节点，保留子节点
+ * @param node
+ * @returns {*}
+ */
+function removePrentNode(node: Node) {
+  const parent = node.parentNode
+  let child: Node
+  if (parent) {
+    if (node.hasChildNodes()) {
+      while ((child = node.firstChild)) {
+        parent.insertBefore(child, node)
+      }
+    }
+    parent.removeChild(node)
+  }
+  return node
 }
