@@ -161,9 +161,9 @@ div.tableWrapper {
   table {
     td, th {
       // FIXME
-      max-height: var(--umo-page-body-height);
+      max-height: calc(var(--umo-page-body-height) - 2px);
       overflow-x: hidden;
-      overflow-y: hidden;
+      overflow-y: auto;
     }
   }
 

@@ -6,6 +6,7 @@
 
 // 入口
 import '@/components/index'
+import '@/assets/styles/prosemirror.less'
 
 // 为了方便编译
 import '@/components/container/page.vue'

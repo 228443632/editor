@@ -16,8 +16,8 @@ const options = inject('options')
 import { template } from 'sf-utils2'
 import { isPlainObject } from '@tiptap/core'
 
-const iframeRef = $ref<HTMLIFrameElement | null>(null)
-let iframeCode = $ref('')
+const iframeRef = ref<HTMLIFrameElement>()
+const iframeCode = ref('')
 const getStylesHtml = () => {
   return Array.from(document.querySelectorAll('link, style'))
     .map((item) => item.outerHTML)
@@ -73,9 +73,6 @@ const defaultLineHeight = $computed(
 const getIframeCode = (fillFieldData) => {
   const { orientation, size, margin, background } = page.value
 
-  // const fragment = document.createDocumentFragment()
-  // fragment.append(getContentHtml())
-
   let body = getContentHtml()
   if (isPlainObject(fillFieldData)) {
     body = template(body, fillFieldData || {}, {
@@ -85,12 +82,29 @@ const getIframeCode = (fillFieldData) => {
   const parser = new DOMParser()
   const doc = parser.parseFromString(body, 'text/html')
 
+  // 删除水印
   const watermark = doc.querySelector(
     '.umo-watermark > .umo-page-node-footer+div',
   ) as HTMLHtmlElement
   if (watermark) {
     watermark.remove()
   }
+
+  // 删除水印2
+  const umoPageContentDOM = doc.querySelector('.umo-watermark.umo-page-content')
+  if (umoPageContentDOM.children) {
+    const lastChildDOM = umoPageContentDOM.children[
+      umoPageContentDOM.children.length - 1
+    ] as HTMLElement
+    if (
+      lastChildDOM.style.position == 'absolute' &&
+      lastChildDOM.style.inset == '0px'
+    ) {
+      lastChildDOM.remove()
+    }
+  }
+
+  // watermark2DOM
 
   const corners = doc.querySelectorAll(
     '.umo-page-corner',
@@ -108,6 +122,7 @@ const getIframeCode = (fillFieldData) => {
     editorDom.setAttribute('contenteditable', 'false')
   }
 
+  // 删除图片分隔符
   const imgSepList = Array.from(
     doc.querySelectorAll('img.ProseMirror-separator'),
   ) as unknown as HTMLHtmlElement[]
@@ -118,6 +133,7 @@ const getIframeCode = (fillFieldData) => {
     imgSepList.length = 0
   }
 
+  // 删除所有不可见字符
   const spanCharacterList = Array.from(
     doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
   ) as unknown as HTMLHtmlElement[]
@@ -140,7 +156,15 @@ const getIframeCode = (fillFieldData) => {
   // }
 
   // 是否存在分页
-  const isFrontPagination = doc.querySelector('div[data-sf-pagination="true"]') || doc.querySelector('.sf-page-first__header[data-page-num]')
+  const isFrontPagination =
+    doc.querySelector('div[data-sf-pagination="true"]') ||
+    doc.querySelector('.sf-page-first__header[data-page-num]')
+
+  console.log('printScript.toString()', printScript.toString())
+
+  const scriptListString = [`${printScript.toString()}`]
+    .map((scriptString) => `<script>${scriptString}; \n printScript(); <\/script>`)
+    .join('\n')
 
   return `
     <!DOCTYPE html>
@@ -218,14 +242,109 @@ const getIframeCode = (fillFieldData) => {
           ${doc.body.innerHTML}
         </div>
       </div>
+      ${scriptListString}
     </body>
     </html>
    `
 }
 
+/**
+ * 打印脚本
+ */
+function printScript() {
+  repairTable()
+
+  /**
+   * 修复table 表格
+   */
+  function repairTable() {
+    const tableDOMAll = document.querySelectorAll('table')
+
+    tableDOMAll.forEach((tableDOM) => {
+      const tableId = tableDOM.getAttribute('tableid')
+      const colgroupDOMList = tableDOM.querySelectorAll(
+        `colgroup[tableid='${tableId}']`,
+      )
+      const templateColgroupDOM = colgroupDOMList[0]
+
+      // 删除无用的colgroup
+      colgroupDOMList.forEach((colgroupDOM, colgroupDOMIndex) => {
+        if (colgroupDOMIndex > 0) {
+          colgroupDOM.remove()
+        }
+      })
+
+      // tr DOM 集合
+      const trDOMList = tableDOM.querySelectorAll(`tr[tableid='${tableId}']`)
+
+      // 表格中直接子节点
+      const tableChildren = Array.from(tableDOM.children)
+
+      const willAppendChildren = [] // 将要添加到table子节点dom
+
+      tableChildren.forEach((tableChildDOM) => {
+        if (tableChildDOM.tagName === 'TBODY') {
+          const tbodyChildrenDOM = Array.from(tableChildDOM.children) // tbody 元素直接子节点
+          if (tbodyChildrenDOM.length > 1) {
+            // 说明是合并的
+            const tableRowGroupMergeDOM = document.createElement('section')
+            tableRowGroupMergeDOM.classList.add('table-row-group-merge')
+
+            const tableRowGroupDOM = document.createElement('section')
+            tableRowGroupDOM.classList.add('table-row-group')
+
+            tableRowGroupMergeDOM.append(tableRowGroupDOM)
+
+            tbodyChildrenDOM.forEach((trDOM) => {
+              tableRowGroupDOM.append(trDOM)
+            })
+
+            willAppendChildren.push(tableRowGroupMergeDOM)
+          } else {
+            const tableRowGroupDOM = document.createElement('section')
+            tableRowGroupDOM.classList.add('table-row-group')
+            tbodyChildrenDOM.forEach((trDOM) => {
+              tableRowGroupDOM.append(trDOM)
+            })
+            willAppendChildren.push(tableRowGroupDOM)
+          }
+        }
+        // 移除直接子节点
+        tableChildDOM.remove()
+      })
+
+      // tr容器
+      const tbodyWrapDOM = document.createElement('tbody')
+      tbodyWrapDOM.classList.add('table-wrapper-tbody')
+      tbodyWrapDOM.append(...willAppendChildren)
+
+      tableDOM.append(templateColgroupDOM, tbodyWrapDOM)
+    })
+
+    // 清除表格直接子节点
+    const tableWrapperList = document.querySelectorAll(
+      '.tableWrapper.table-wrapper',
+    )
+    console.log('tableWrapperList', tableWrapperList)
+
+    tableWrapperList.forEach((tableWrapperDOM) => {
+      const children = Array.from(tableWrapperDOM.children)
+      children.forEach((childItemDOM) => {
+        if (childItemDOM.tagName !== 'TABLE') {
+          childItemDOM.remove()
+        }
+      })
+    })
+  }
+}
+
+/**
+ * 获取打印代码
+ * @param fillFieldData
+ */
 const printPage = (fillFieldData = {}) => {
   editor.value?.commands.blur()
-  iframeCode = getIframeCode(fillFieldData)
+  iframeCode.value = getIframeCode(fillFieldData)
 
   const dialog = useConfirm({
     attach: container,
@@ -238,9 +357,9 @@ const printPage = (fillFieldData = {}) => {
       setTimeout(() => {
         console.log(
           'debug-172',
-          iframeRef.contentWindow.document.documentElement.outerHTML,
+          iframeRef.value.contentWindow.document.documentElement.outerHTML,
         )
-        iframeRef?.contentWindow?.print()
+        iframeRef.value.contentWindow?.print()
       }, 300)
     },
     onClosed() {

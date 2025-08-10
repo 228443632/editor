@@ -10,6 +10,7 @@ import compIntent from './comp-intent'
 import compTextDrag from './comp-text-drag'
 import compTextareaDrag from './comp-textarea-drag'
 import compInvisibleBlock from './comp-invisible-block'
+import compDivider from './comp-divider'
 import compFloat from './comp-float'
 
 export default [
@@ -19,5 +20,6 @@ export default [
   compTextDrag,
   compInvisibleBlock,
   compTextareaDrag,
-  compFloat
+  compFloat,
+  compDivider,
 ]

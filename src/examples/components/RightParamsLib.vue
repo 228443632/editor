@@ -291,6 +291,22 @@ const paramsConfig = ref([
         },
       },
       {
+        label: '分割线',
+        value: 'params-comp-table4',
+        icon: 'params-comp-table4',
+        click() {
+          editor.value
+            .chain()
+            .focus()
+            .deleteSelection()
+            .insertContent({
+              type: 'compDivider',
+              attrs: {},
+            })
+            .run()
+        },
+      },
+      {
         label: '插入Float',
         value: 'params-comp-table4',
         icon: 'params-comp-table2',

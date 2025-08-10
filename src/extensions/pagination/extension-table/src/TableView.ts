@@ -152,7 +152,12 @@ export class TableView implements NodeView {
 
     this.node = node
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth)
-    window.requestAnimationFrame(this.dom['_computedCalcLayout'])
+
+    this._computedColWidth()
+    this._computedTrProperties()
+    window.requestAnimationFrame(() => {
+      this.dom.style.visibility = 'unset'
+    })
     return true
   }
 
@@ -303,7 +308,7 @@ export class TableView implements NodeView {
     indexListPro.forEach((trInfo, trInfoIndex) => {
       trInfo.forEach((colInfo, colIndex) => {
         tdAccRowspanList[colIndex] ??= 0
-        if (colInfo.isRowPart && colInfo.isColPart) {
+        if (colInfo.isRowPart) {
           tdAccRowspanList[colIndex] += colInfo.rSpan || 1
         }
       })

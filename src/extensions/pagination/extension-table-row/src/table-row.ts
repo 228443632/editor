@@ -110,6 +110,17 @@ export const TableRow = Node.create<TableRowOptions>({
           trDom.setAttribute(key, value)
         }
       })
+
+      _updateRowIndex()
+
+      function _updateRowIndex() {
+        if (!tableParentNode) return
+        const rowIndex = tableParentNode.children.findIndex(
+          (node) => node === node,
+        )
+        trDom.setAttribute(`rowIndex`, `${rowIndex  }`)
+      }
+
       return {
         dom,
         contentDOM: trDom,
@@ -127,6 +138,7 @@ export const TableRow = Node.create<TableRowOptions>({
           //     trDom.clientHeight + 'px',
           //   )
           // }
+          _updateRowIndex()
           return true
         },
         ignoreMutation() {
