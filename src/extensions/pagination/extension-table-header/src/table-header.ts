@@ -58,7 +58,13 @@ export const TableHeader = Node.create<TableHeaderOptions>({
     return [
       'th',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
+      [
+        'div',
+        {
+          class: 'table-cell-body umo-scrollbar',
+        },
+        0,
+      ],
     ]
   },
 })

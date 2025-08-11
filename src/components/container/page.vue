@@ -41,7 +41,7 @@
             '--umo-page-width': pageSize.width + 'cm',
             '--umo-page-height': pageSize.height + 'cm',
             '--umo-page-body-height':
-              pageSize.height - (pageOptions.margin?.left || 0) + 'cm',
+              sub(pageSize.height, (pageOptions.margin?.top || 0) * 2) + 'cm',
             width: pageSize.width + 'cm',
             transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
           }"
@@ -132,6 +132,7 @@ import type { UmoEditorOptions, WatermarkOption } from '@/types'
 
 import type Editor from '../editor/index.vue'
 import { type Watermark } from 'tdesign-vue-next'
+import { sub } from 'sf-utils2'
 
 const container = inject('container')
 const imageViewer = inject('imageViewer')

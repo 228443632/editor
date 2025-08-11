@@ -1,4 +1,5 @@
 import { mergeAttributes, Node } from '@tiptap/core'
+import { isNoNullable } from 'sf-utils2'
 // import { isNoNullable } from 'sf-utils2'
 
 export interface TableCellOptions {
@@ -59,7 +60,13 @@ export const TableCell = Node.create<TableCellOptions>({
     return [
       'td',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
+      [
+        'div',
+        {
+          class: 'table-cell-body umo-scrollbar',
+        },
+        0,
+      ],
     ]
   },
 

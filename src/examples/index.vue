@@ -15,10 +15,13 @@
         >在表格中</t-button
       >
       <t-button size="small" @click="testEditorFunc('deleteRowInTable')"
-      >删除行</t-button
+        >删除行</t-button
       >
       <t-button size="small" @click="testEditorFunc('wrapTrTable')"
-      >手动添加包裹</t-button
+        >手动添加包裹</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('truncate001')"
+        >截取</t-button
       >
     </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
@@ -223,7 +226,6 @@ watch(umoEditorRef, () => {
     }
   })
 
-
   // TODO
   // editorRef.value.on('update', ({ editor }) => {
   //   console.log('update', editor)
@@ -237,8 +239,6 @@ watch(umoEditorRef, () => {
   //
   //
   // })
-
-
 })
 
 console.log('编辑器【options】', options)

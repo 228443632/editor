@@ -4,11 +4,16 @@
  * @create 05/07/25 PM1:24
  */
 import type { Editor } from '@tiptap/vue-3'
-import { type EditorState, NodeSelection } from '@tiptap/pm/state'
+import {
+  type EditorState,
+  NodeSelection,
+  TextSelection,
+} from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 
 //
 import type { Node as Node2, ResolvedPos } from 'prosemirror-model'
+// import { setSelectionText } from '@/extensions/selection'
 
 declare global {
   interface Window {
@@ -65,6 +70,55 @@ export function testEditor(editorRef: Editor) {
     console.log('[funcName]', funcName)
 
     switch (funcName) {
+      case 'truncate001': {
+        const table = document.querySelector('table')
+
+        // const tr = state.tr
+        // tr.setText
+
+        // setSelectionText(editor, 2, 0, 10)
+        // const from = 65
+        // const selection = TextSelection.create(state.doc, from, from + 10)
+        // const { tr } = editor.view.state
+        // if (tr && selection) {
+        //   tr.setSelection(selection)
+        //   editor.view.dispatch(tr)
+        //   editor?.commands.focus()
+        // }
+
+        const tdNodeList = getAllTds()
+        const tdNodePos = editor.$pos(tdNodeList[1].pos)
+        // for (let i = tdNodePos.node.nodeSize; i >= 0; i--) {
+        //   const tempFrom = tdNodePos.pos + i - 1
+        //   const selection = TextSelection.create(
+        //     state.doc,
+        //     tempFrom,
+        //     tempFrom + 1,
+        //   )
+        //   const tr = editor.state.tr
+        //   tr.setSelection(selection)
+        //   editor.view.dispatch(tr)
+        //   const range = window.getSelection().getRangeAt(0)
+        //   console.log(range.getBoundingClientRect())
+        // }
+
+        console.log('getAllTds', getAllTds())
+
+        // 获取所有 td 节点
+        function getAllTds() {
+          const tds = []
+          editor.state.doc.descendants((node, pos) => {
+            if (node.type.name === 'tableCell') {
+              // 识别表格单元格节点
+              tds.push({ node, pos }) // 记录节点及其位置
+            }
+          })
+          return tds
+        }
+
+        break
+      }
+
       case 'wrapTrTable': {
         const table = document.querySelector('table')
 
@@ -90,8 +144,6 @@ export function testEditor(editorRef: Editor) {
             trDOM5.parentElement,
           )
         })
-
-
 
         // div.style.display = 'contents'
 
