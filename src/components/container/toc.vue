@@ -216,9 +216,15 @@ const headingActive = (value: any) => {
   if (!nodeElement || !pageContainer || !pageHeader) {
     return
   }
-  pageContainer.scrollTo({
-    top: nodeElement.offsetTop + pageHeader.offsetHeight,
+  // pageContainer.scrollTo({
+  //   top: nodeElement.offsetTop + pageHeader.offsetHeight,
+  // })
+
+  nodeElement.scrollIntoView({
+    block: 'start',
+    behavior: 'smooth',
   })
+
   const pos = editor.value.view.posAtDOM(nodeElement as Node, 0)
   const { tr } = editor.value.view.state
   tr.setSelection(new TextSelection(tr.doc.resolve(pos)))

@@ -44,6 +44,8 @@
               sub(pageSize.height, (pageOptions.margin?.top || 0) * 2) + 'cm',
             width: pageSize.width + 'cm',
             transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
+            '--umo-content-bound-rect-top':
+              (pageContentBoundRect?.top || 110) + 'px',
           }"
         >
           <div
@@ -199,6 +201,8 @@ watch([editorContainerWidth, editorWidth], () => {
     layoutSize.value.leftAsideGap -
     layoutSize.value.leftAsideWidth
 })
+
+const pageContentBoundRect = useElementBounding(pageContentRef)
 
 // FIXME:
 const editorInstance = inject('editor')

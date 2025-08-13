@@ -8,7 +8,7 @@ import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
 import { rafThrottle } from '@/examples/utils/dom'
 import { mountWithCreateApp } from '@/utils/vnode'
-import PageBreakWidget from './PageBreakWidget.vue'
+import PaginationBreakWidget from './PaginationBreakWidget.vue'
 
 export interface PaginationBreakOptions {
   /** 每一页 大小*/
@@ -260,7 +260,7 @@ function createDecoration(
       // const container = document.createElement('div')
       void Promise.resolve().then(() => {
         paginationDOM['__vueAppInstance'] = mountWithCreateApp(
-          PageBreakWidget,
+          PaginationBreakWidget,
           {
             element: paginationDOM,
             props: {

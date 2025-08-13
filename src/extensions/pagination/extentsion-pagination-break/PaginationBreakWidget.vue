@@ -174,7 +174,7 @@ const _pageCount = computed(() => {
 
 /* 周期 */
 onMounted(() => {
-  def(props.view.dom, '__pageNumPosList', getPosAll())
+  // def(props.view.dom, '__pageNumPosList', getPosAll())
 })
 
 /* 暴露 */

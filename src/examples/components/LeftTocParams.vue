@@ -134,7 +134,7 @@ function onChooseItem(item: { node: Node; pos: number }) {
   editor.value.chain().focus().setNodeSelection(item.pos).run()
   const dom = editor.value.view.nodeDOM(item.pos)
   if (dom) {
-    dom.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    dom.scrollIntoView({ block: 'start', behavior: 'smooth' })
   }
 }
 
@@ -172,7 +172,6 @@ watch(_nodeActiveNodeId, () => {
     )
     if (activeNodeDom)
       activeNodeDom.scrollIntoView({
-        block: 'center',
         behavior: 'smooth',
       })
   })

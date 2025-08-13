@@ -116,9 +116,9 @@ export const TableRow = Node.create<TableRowOptions>({
       function _updateRowIndex() {
         if (!tableParentNode) return
         const rowIndex = tableParentNode.children.findIndex(
-          (node) => node === node,
+          (childNode) => childNode === node,
         )
-        trDom.setAttribute(`rowIndex`, `${rowIndex  }`)
+        trDom.setAttribute(`rowIndex`, `${rowIndex}`)
       }
 
       return {

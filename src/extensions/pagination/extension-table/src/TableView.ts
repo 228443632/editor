@@ -316,14 +316,13 @@ export class TableView implements NodeView {
       const tdAccRowspanListSet = uniq(tdAccRowspanList)
       if (tdAccRowspanListSet?.length == 1) {
         if (tdAccRowspanList[0] > 1) {
-          const lastGroupRowIndex = trInfoIndex - tdAccRowspanList[0]
+          const groupRowIndex = trInfoIndex - tdAccRowspanList[0] + 1
           const children = []
-          const groupRowIndex = lastGroupRowIndex ? lastGroupRowIndex + 1 : 0
           for (let i = groupRowIndex + 1; i <= trInfoIndex; i++) {
             children.push(i)
           }
           rowHiddenGroup.push({
-            groupRowIndex: lastGroupRowIndex ? lastGroupRowIndex + 1 : 0,
+            groupRowIndex,
             children,
           })
         }
