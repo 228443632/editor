@@ -122,6 +122,9 @@
           </div>
         </template>
       </t-popup>
+      <span class="text-12px"
+        >总页数：{{ __layoutSize__?.pagination?.total }}</span
+      >
     </div>
 
     <!-- 右侧  -->
@@ -317,6 +320,7 @@ const container = inject('container')
 const editor = inject('editor')
 const page = inject('page')
 const options = inject('options')
+const __layoutSize__ = inject('layoutSize')
 const $document = useState('document', options)
 
 // 快捷键抽屉

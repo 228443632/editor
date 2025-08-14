@@ -84,10 +84,12 @@ export const getDefaultExtensions = ({
   container,
   options,
   uploadFileMap,
+  layoutSize,
 }: {
   container: string
   options: { value: UmoEditorOptions }
   uploadFileMap: { value: any }
+  layoutSize: Ref
 }) => {
   const {
     dicts,
@@ -266,6 +268,7 @@ export const getDefaultExtensions = ({
 
   if (isPagination) {
     const configurePageOptions = {
+      provider: { layoutSize },
       pageHeight: +Number(umoPageHeight).toFixed(1), // Height of each page in pixels
       pageGap: 16, // Gap between pages in pixels
       pageBreakBackground: 'var(--umo-container-background)', // Background color for page gaps

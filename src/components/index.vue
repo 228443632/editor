@@ -192,6 +192,12 @@ const layoutSize = ref({
 
   /** 右侧宽度 */
   rightAsideWidth: 280,
+
+  /** 分页数据 */
+  pagination: {
+    total: 1,
+    pageNum: 1
+  }
 })
 const layoutDom = ref({
   /** 页面内容容器 */

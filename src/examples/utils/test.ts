@@ -13,6 +13,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view'
 
 //
 import type { Node as Node2, ResolvedPos } from 'prosemirror-model'
+import { PageBreak } from '@/examples/utils/page-break'
 // import { setSelectionText } from '@/extensions/selection'
 
 declare global {
@@ -67,11 +68,31 @@ export function testEditor(editorRef: Editor) {
     const doc = editor.state.doc
     const view = editor.view
 
+    // 公式：pageNum * (页眉高度 + 页内容高度 + 页脚高度) + (pageNum - 1) * 每页间距
+
     console.log('[funcName]', funcName)
+
+    const pageBreak = new PageBreak(editor)
 
     switch (funcName) {
       case 'truncate001': {
-        const table = document.querySelector('table')
+        setTimeout(() => {
+          const s = getSelection()
+          s.removeAllRanges()
+          setTimeout(() => {
+            editor.commands.focus()
+            const r = document.createRange()
+            r.selectNode(document.querySelector('h2'))
+            s.addRange(r)
+          }, 500)
+        }, 500)
+
+
+
+        // const table = document.querySelector('table')
+        // window.requestAnimationFrame(() => {
+        //   pageBreak.run()
+        // })
 
         // const tr = state.tr
         // tr.setText
@@ -86,8 +107,8 @@ export function testEditor(editorRef: Editor) {
         //   editor?.commands.focus()
         // }
 
-        const tdNodeList = getAllTds()
-        const tdNodePos = editor.$pos(tdNodeList[1].pos)
+        // const tdNodeList = getAllTds()
+        // const tdNodePos = editor.$pos(tdNodeList[1].pos)
         // for (let i = tdNodePos.node.nodeSize; i >= 0; i--) {
         //   const tempFrom = tdNodePos.pos + i - 1
         //   const selection = TextSelection.create(
@@ -102,19 +123,14 @@ export function testEditor(editorRef: Editor) {
         //   console.log(range.getBoundingClientRect())
         // }
 
-        console.log('getAllTds', getAllTds())
+        // console.log('getAllTds', getAllTds())
 
-        // 获取所有 td 节点
-        function getAllTds() {
-          const tds = []
-          editor.state.doc.descendants((node, pos) => {
-            if (node.type.name === 'tableCell') {
-              // 识别表格单元格节点
-              tds.push({ node, pos }) // 记录节点及其位置
-            }
-          })
-          return tds
-        }
+        // for (let i = 0; i < 100; i++) {
+        //   const pageNum = i + 1
+        //   const scope = getPageScopeByNum(pageNum)
+        //   const { top, bottom } = scope
+        //   // console.log(`分页${pageNum}`, getPageScopeByNum(pageNum))
+        // }
 
         break
       }

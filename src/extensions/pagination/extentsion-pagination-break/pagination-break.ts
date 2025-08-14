@@ -11,6 +11,7 @@ import { mountWithCreateApp } from '@/utils/vnode'
 import PaginationBreakWidget from './PaginationBreakWidget.vue'
 
 export interface PaginationBreakOptions {
+  provider: any
   /** 每一页 大小*/
   pageHeight: number
   /** 分页间距 */
@@ -25,6 +26,9 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
   name: 'PaginationBreak',
   addOptions() {
     return {
+      provider: {
+        layoutSize: {}
+      },
       /** 每一页 大小*/
       pageHeight: 800,
       /** 分页间距 */
@@ -257,6 +261,10 @@ function createDecoration(
         'page-body-height',
         `${pageOptions.pageHeight - 2 * pageOptions.pageHeaderHeight}px`,
       )
+
+      // 设置总页码数量
+      pageOptions.provider.layoutSize.value.pagination.total = pageCount
+
       // const container = document.createElement('div')
       void Promise.resolve().then(() => {
         paginationDOM['__vueAppInstance'] = mountWithCreateApp(

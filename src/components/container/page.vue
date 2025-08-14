@@ -21,7 +21,7 @@
         class="umo-zoomable-content"
         :style="{
           width: pageZoomWidth,
-          height: pageZoomHeight,
+          // height: pageZoomHeight,
         }"
       >
         <t-watermark

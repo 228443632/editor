@@ -5,6 +5,7 @@ import { getColStyleDeclaration } from './utilities/colStyle.js'
 import { getTableIndexListPro } from '@/utils/browser'
 import { rafThrottle, uniq } from 'sf-utils2'
 import type { EditorView } from '@codemirror/view'
+import { looseEqual } from 'sf-utils2'
 
 export function updateColumns(
   node: ProseMirrorNode,
@@ -153,8 +154,14 @@ export class TableView implements NodeView {
     this.node = node
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth)
 
-    this._computedColWidth()
-    this._computedTrProperties()
+    if (this.isNeedUpdate()) {
+      this.table.classList.add('is-standalone')
+      this._computedColWidth()
+      this._computedTrProperties()
+    } else {
+      this.table.classList.remove('is-standalone')
+    }
+
     window.requestAnimationFrame(() => {
       this.dom.style.visibility = 'unset'
     })
@@ -176,6 +183,19 @@ export class TableView implements NodeView {
       this._colgroupObserver = null
     }
     return true
+  }
+
+  /**
+   * 是否需要更新列
+   */
+  isNeedUpdate() {
+    const trNodeList = this.node.children
+    return trNodeList.some((trNode) => {
+      const tdNodeList = trNode.children
+      return tdNodeList.some((tdNode) => {
+        return +tdNode.attrs.rowspan > 1
+      })
+    })
   }
 
   /**
@@ -253,8 +273,20 @@ export class TableView implements NodeView {
     const trDOMs = this.dom.querySelectorAll(
       `table[tableid="${tableId}"] tr[tableid="${tableId}"]`,
     ) as NodeListOf<HTMLTableRowElement>
+    // const trNodeList = this.node.children
+    // const trDOMs = []
+    // trNodeList.forEach((trNode, trNodeIdx) => {
+    //   const cells = []
+    //   trNode.children.forEach((tdNode) => {
+    //     cells.push({
+    //       rowspan: tdNode.attrs.rowspan,
+    //       colspan: tdNode.attrs.colspan,
+    //     })
+    //   })
+    //   trDOMs.push({ cells })
+    // })
     if (!trDOMs?.length) return [] as unknown as NodeListOf<HTMLTableRowElement>
-    return trDOMs
+    return trDOMs as unknown as NodeListOf<HTMLTableRowElement>
   }
 
   /**
@@ -264,6 +296,18 @@ export class TableView implements NodeView {
     if (!TableView.isEnablePagination) return
     const trDOMs = this._getTrDOMList()
     if (!trDOMs?.length) return
+
+    const indexListPro = getTableIndexListPro({
+      rows: trDOMs,
+    } as unknown as HTMLTableElement)
+
+    let isOverRowspan = true // 是否跨行
+
+    if (
+      indexListPro.length &&
+      indexListPro.every((item) => item['maxRowspan'] <= 1)
+    )
+      isOverRowspan = false
 
     trDOMs.forEach((trDOM: HTMLTableRowElement) => {
       const parentElement = this.getNearsetTable(trDOM)
@@ -279,13 +323,8 @@ export class TableView implements NodeView {
       }
     })
 
-    const indexListPro = getTableIndexListPro({
-      rows: trDOMs,
-    } as unknown as HTMLTableElement)
     // let isChangePosition: boolean // 位置是否发生变化
-
     // console.log("this.dom['__originRelList']", this.dom['__originRelList'])
-
     // if (
     //   this.dom['__originRelList'] &&
     //   looseEqual(this.dom['__originRelList'], indexListPro.__originRelList)
@@ -296,54 +335,54 @@ export class TableView implements NodeView {
     // }
     //
     // if (!isChangePosition) return
-    //
     // this.dom['__originRelList'] = indexListPro.__originRelList
 
-    const tdAccRowspanList = [] as number[]
-    const rowHiddenGroup = [] as {
-      groupRowIndex: number
-      children: number[]
-    }[]
+    // 处理跨行
+    if (isOverRowspan) {
+      const tdAccRowspanList = [] as number[]
+      const rowHiddenGroup = [] as {
+        groupRowIndex: number
+        children: number[]
+      }[]
 
-    indexListPro.forEach((trInfo, trInfoIndex) => {
-      trInfo.forEach((colInfo, colIndex) => {
-        tdAccRowspanList[colIndex] ??= 0
-        if (colInfo.isRowPart) {
-          tdAccRowspanList[colIndex] += colInfo.rSpan || 1
-        }
-      })
-
-      const tdAccRowspanListSet = uniq(tdAccRowspanList)
-      if (tdAccRowspanListSet?.length == 1) {
-        if (tdAccRowspanList[0] > 1) {
-          const groupRowIndex = trInfoIndex - tdAccRowspanList[0] + 1
-          const children = []
-          for (let i = groupRowIndex + 1; i <= trInfoIndex; i++) {
-            children.push(i)
+      indexListPro.forEach((trInfo, trInfoIndex) => {
+        trInfo.forEach((colInfo, colIndex) => {
+          tdAccRowspanList[colIndex] ??= 0
+          if (colInfo.isRowPart) {
+            tdAccRowspanList[colIndex] += colInfo.rSpan || 1
           }
-          rowHiddenGroup.push({
-            groupRowIndex,
-            children,
-          })
+        })
+
+        const tdAccRowspanListSet = uniq(tdAccRowspanList)
+        if (tdAccRowspanListSet?.length == 1) {
+          if (tdAccRowspanList[0] > 1) {
+            const groupRowIndex = trInfoIndex - tdAccRowspanList[0] + 1
+            const children = []
+            for (let i = groupRowIndex + 1; i <= trInfoIndex; i++) {
+              children.push(i)
+            }
+            rowHiddenGroup.push({
+              groupRowIndex,
+              children,
+            })
+          }
+          tdAccRowspanList.length = 0
         }
-        tdAccRowspanList.length = 0
-      }
-    })
-
-    rowHiddenGroup.forEach((group) => {
-      const groupTrDom = trDOMs[group.groupRowIndex]
-      const div = document.createElement('section')
-      const tableRowGroupDom = groupTrDom.parentElement
-      tableRowGroupDom.parentElement.insertBefore(div, tableRowGroupDom)
-      div.classList.add(TableView.tableRowGroupMergeClass)
-      div.append(tableRowGroupDom)
-      group.children.forEach((child) => {
-        const childTrDom = trDOMs[child]
-        const childTableRowGroupDom = childTrDom.parentElement
-        div.append(childTableRowGroupDom)
       })
-    })
-
+      rowHiddenGroup.forEach((group) => {
+        const groupTrDom = trDOMs[group.groupRowIndex]
+        const div = document.createElement('section')
+        const tableRowGroupDom = groupTrDom.parentElement
+        tableRowGroupDom.parentElement.insertBefore(div, tableRowGroupDom)
+        div.classList.add(TableView.tableRowGroupMergeClass)
+        div.append(tableRowGroupDom)
+        group.children.forEach((child) => {
+          const childTrDom = trDOMs[child]
+          const childTableRowGroupDom = childTrDom.parentElement
+          div.append(childTableRowGroupDom)
+        })
+      })
+    }
     this._updateEverySubTableColgroup()
   }
 }

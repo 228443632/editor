@@ -26,24 +26,3 @@ export function rafThrottle<T>(fn: ThrottledFunction<T>) {
   }
 }
 
-
-/**
- * 获取当前页码， 根据目标dom
- * @param editor
- * @param target
- * TODO
- */
-export function getCurPageNumByDOM(editor: Editor, target: HTMLElement) {
-  const targetRect = target.getBoundingClientRect()
-
-  const isEnablePagination = editor.view.dom['__options']?.isPagination // 是否分页
-
-
-
-  // return {
-  //   left: rect.left + window.scrollX,
-  //   top: rect.top + window.scrollY,
-  //   width: rect.width,
-  //   height: rect.height,
-  // }
-}

@@ -57,7 +57,7 @@ defineExpose({})
       style="width: var(--umo-page-margin-left)"
     ></div>
     <div
-      class="umo-page-node-footer-content sf-page__footer-content text-[var(--umo-text-color-light)]"
+      class="umo-page-node-footer-content sf-page__footer-content text-[var(--umo-text-color-light)] border-0 border-t-0 border-[rgba(0, 0, 0, .5)] border-solid"
     >
       <span
         class="flex h-[var(--umo-corner-width)] items-center w-full mx-auto justify-center text-12px"

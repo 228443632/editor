@@ -43,6 +43,9 @@ const uploadFileMap = inject('uploadFileMap')
 // 助手
 const assistant = inject('assistant')
 
+// 布局
+const layoutSize = inject('layoutSize')
+
 const $document = useState('document', options)
 
 const defaultLineHeight = $computed(
@@ -55,6 +58,7 @@ const extensions: any[] = getDefaultExtensions({
   container,
   options,
   uploadFileMap,
+  layoutSize
 })
 
 const editorInstance: Editor = new Editor({

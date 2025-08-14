@@ -187,6 +187,11 @@ export function getTableIndexListPro(tableEle: HTMLTableElement) {
         item.trEle = tableEle.rows[item.rIndex] // 当前列dom对象
         item.tdEle = item.trEle.cells[item.cIndex] // 对应的td dom对象
         item.index = j // 索引
+
+        result[i]['maxRowspan'] = Math.max(
+          result[i]['maxRowspan'] || 1,
+          item.rSpan,
+        )
       }
       result[i].push(item || {})
     }
