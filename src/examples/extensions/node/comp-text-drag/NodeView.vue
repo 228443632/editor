@@ -78,6 +78,12 @@ function onSelectNode() {
     .run()
 
   formData.value = deepClone({ ...props.node?.attrs })
+
+  if (!formData.value.zIndex) {
+    updateAttributes({ zIndex: zIndex.value })
+    formData.value.zIndex = zIndex.value
+  }
+
   // setBubbleMenuShow(false)
   visible.dialog = true
   selected.value = true

@@ -109,6 +109,8 @@ onMounted(() => {
 defineExpose({
   $: proxy.$,
 })
+
+provide('NODE_PROPS', props)
 </script>
 
 <!--render-->

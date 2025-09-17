@@ -8,6 +8,7 @@
 import { useVModel } from '@vueuse/core'
 import { uuid } from 'sf-utils2'
 import { type Form, type Popup } from 'tdesign-vue-next'
+import AppearanceEdit from '@/examples/extensions/node/comp-text-drag/components/AppearanceEdit.vue'
 
 const props = defineProps({
   /**
@@ -125,6 +126,7 @@ defineExpose({
               <t-form-item
                 label="后台映射字段名"
                 name="fieldName"
+                disabled
                 required-mark
                 :rules="[{ required: true, message: '必填', type: 'error' }]"
               >
@@ -174,6 +176,12 @@ defineExpose({
                   clearable
                 ></t-textarea>
               </t-form-item>
+            </t-col>
+
+            <t-col :span="6">
+                <t-form-item label="样式">
+                  <AppearanceEdit></AppearanceEdit>
+                </t-form-item>
             </t-col>
           </t-row>
         </t-form>

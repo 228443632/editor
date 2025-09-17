@@ -201,6 +201,7 @@ const paramsConfig = ref([
           }
         },
         click() {
+          const state = editor.value.state
           const attrs = this.getAttrs()
           editor.value
             .chain()
