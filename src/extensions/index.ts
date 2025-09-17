@@ -21,10 +21,10 @@ import Mathematics from '@tiptap-pro/extension-mathematics'
 import NodeRange from '@tiptap-pro/extension-node-range'
 import { getHierarchicalIndexes } from '@tiptap-pro/extension-table-of-contents'
 import { TableOfContents } from '@tiptap-pro/extension-table-of-contents'
-// import UniqueID from '@tiptap-pro/extension-unique-id'
+import UniqueID from '@tiptap-pro/extension-unique-id'
 
 import type { UmoEditorOptions } from '@/types'
-import { shortId } from '@/utils/short-id'
+import { shortId, simpleUUID } from '@/utils/short-id'
 
 import Audio from './audio'
 import Bookmark from './bookmark'
@@ -259,10 +259,11 @@ export const getDefaultExtensions = ({
     }),
     Echarts,
     typeWriter,
-    // UniqueID.configure({
-    //   types: ['heading', 'paragraph'],
-    //   generateID: () => simpleUUID().slice(8),
-    // }),
+    UniqueID.configure({
+      attributeName: 'data-id',
+      types: ['heading', 'paragraph', 'table', 'table-cell', 'table-row', 'table-header'],
+      generateID: () => simpleUUID().slice(2, 8),
+    }),
     BackgroundColor,
   ].filter(Boolean)
 

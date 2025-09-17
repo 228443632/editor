@@ -51,7 +51,7 @@ defineExpose({})
 
 <!--render-->
 <template>
-  <div class="umo-page-node-footer" contenteditable="false">
+  <div class="umo-page-node-footer no-print" contenteditable="false">
     <div
       class="umo-page-corner corner-bl"
       style="width: var(--umo-page-margin-left)"
@@ -73,4 +73,5 @@ defineExpose({})
 </template>
 
 <!--style-->
-<style scoped lang="less"></style>
+<style scoped lang="less">
+</style>
