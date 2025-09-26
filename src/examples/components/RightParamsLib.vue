@@ -16,7 +16,16 @@ import { type Editor } from '@tiptap/core'
 import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
-import { COMP_PARAMS_NAME_MAP } from '@/examples/extensions/constant' // 表单数据填充
+import {
+  COMP_PARAMS_NAME_MAP,
+  COMP_SEAL_STYLE,
+  COMP_SIGN_STYLE,
+  FLOAT_NODE_TYPE_MAP,
+} from '@/examples/extensions/constant' // 表单数据填充
+import testSealImg from '@/assets/images/test-seal.svg'
+import testSealImgRaw from '@/assets/images/test-seal.svg?raw'
+import testSignImg from '@/assets/images/test-sign.svg'
+import testSignImgRaw from '@/assets/images/test-sign.svg?raw'
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -37,7 +46,6 @@ const paramsConfig = ref([
       {
         label: '普通文本',
         value: 'compText',
-        icon: 'params-comp-text',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -74,7 +82,6 @@ const paramsConfig = ref([
       {
         label: '姓名',
         value: 'compText',
-        icon: 'params-comp-username',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -111,7 +118,6 @@ const paramsConfig = ref([
       {
         label: '手机号',
         value: 'compText',
-        icon: 'params-comp-mobile',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -148,7 +154,6 @@ const paramsConfig = ref([
       {
         label: '身份证',
         value: 'compText',
-        icon: 'params-comp-idcard',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -185,7 +190,6 @@ const paramsConfig = ref([
       {
         label: '文本悬浮',
         value: 'compTextDrag',
-        icon: 'params-comp-idcard',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -223,7 +227,6 @@ const paramsConfig = ref([
       {
         label: '文本悬浮2',
         value: 'compTextareaDrag',
-        icon: 'params-comp-idcard',
         draggable: true,
         getCompTexts() {
           return __compNodeList__.value.filter((item: { node: Node }) => {
@@ -261,9 +264,30 @@ const paramsConfig = ref([
     label: '其他',
     children: [
       {
+        type: 'seal',
+        value: 'compSeal',
+        getAttrs() {
+          return {
+            'data-id': commonUtil.simpleUUID(),
+            fieldName: 'idcard',
+            placeholder: '印章'
+          }
+        },
+      },
+      {
+        type: 'sign',
+        value: 'compSign',
+        getAttrs() {
+          return {
+            'data-id': commonUtil.simpleUUID(),
+            fieldName: 'idcard',
+            placeholder: '签名'
+          }
+        },
+      },
+      {
         label: '动态表格',
         value: 'compTable',
-        icon: 'params-comp-table',
         click() {
           useMessage('warning', { content: '动态表格暂未开发！' })
         },
@@ -271,7 +295,6 @@ const paramsConfig = ref([
       {
         label: '插入分页',
         value: 'compBdPage',
-        icon: 'params-comp-table',
         click() {
           editor.value
             .chain()
@@ -286,7 +309,6 @@ const paramsConfig = ref([
       {
         label: '模拟删除',
         value: 'params-comp-table2',
-        icon: 'params-comp-table2',
         click() {
           editor.value.chain().focus().intentDeleteV2().run()
         },
@@ -294,7 +316,6 @@ const paramsConfig = ref([
       {
         label: '分割线',
         value: 'params-comp-table4',
-        icon: 'params-comp-table4',
         click() {
           editor.value
             .chain()
@@ -310,7 +331,6 @@ const paramsConfig = ref([
       {
         label: '插入Float',
         value: 'params-comp-table4',
-        icon: 'params-comp-table2',
         click() {
           editor.value
             .chain()
@@ -326,7 +346,6 @@ const paramsConfig = ref([
       {
         label: '不可见块',
         value: 'params-comp-table3',
-        icon: 'params-comp-table2',
         click() {
           editor.value
             .chain()
@@ -347,7 +366,6 @@ const paramsConfig = ref([
       {
         label: '获取HTML',
         value: '1002',
-        icon: 'edit',
         async click() {
           useMessage('loading', { content: '正在导出中', closeBtn: true })
           // const body = onGetHtml()
@@ -395,7 +413,6 @@ const paramsConfig = ref([
       {
         label: '模拟数据填充',
         value: '模拟数据填充',
-        icon: 'edit',
         click() {
           const mockJson = {
             name: '张三',
@@ -477,15 +494,52 @@ const dragMethod = {
     e.dataTransfer?.setData('text/plain', JSON.stringify(nodeData))
     e.dataTransfer.effectAllowed = 'move'
 
-    // 设置透明度
     const targetNode = e.target as HTMLElement
-    targetNode.classList.add('is-dragging')
     dragMethod.dragNodeDom = targetNode
-    e.dataTransfer.setDragImage(
-      targetNode,
-      -targetNode.offsetWidth,
-      -targetNode.offsetHeight - 24,
-    )
+
+    console.log('cItem.type', cItem)
+
+    if (cItem.value == COMP_PARAMS_NAME_MAP.compSeal) {
+      // 印章
+      const dragImage = document.createElement('div')
+      document.body.prepend(dragImage)
+      dragImage.style.cssText =
+        'position: fixed; left: -9999px; top: -9999px; z-index: -100'
+      dragImage.innerHTML = testSealImgRaw
+      dragImage.style.width = COMP_SEAL_STYLE.width + 'px'
+      dragImage.style.height = COMP_SEAL_STYLE.height + 'px'
+      dragImage.style.border = '2px dashed var(--umo-primary-color)'
+      e.dataTransfer.setDragImage(
+        dragImage,
+        -dragImage.offsetWidth,
+        -dragImage.offsetHeight,
+      )
+      setTimeout(() => dragImage.remove())
+    } else if (cItem.value == COMP_PARAMS_NAME_MAP.compSign) {
+      // 签名
+      const dragImage = document.createElement('div')
+      document.body.prepend(dragImage)
+      dragImage.style.cssText =
+        'position: fixed; left: -9999px; top: -9999px; z-index: -100'
+      dragImage.innerHTML = testSignImgRaw
+      dragImage.style.width = COMP_SIGN_STYLE.width + 'px'
+      dragImage.style.height = COMP_SIGN_STYLE.height + 'px'
+      dragImage.style.border = '2px dashed var(--umo-primary-color)'
+      e.dataTransfer.setDragImage(
+        dragImage,
+        -dragImage.offsetWidth,
+        -dragImage.offsetHeight,
+      )
+      setTimeout(() => dragImage.remove())
+    } else {
+      // 设置透明度
+      targetNode.classList.add('is-dragging')
+      e.dataTransfer.setDragImage(
+        targetNode,
+        -targetNode.offsetWidth,
+        -targetNode.offsetHeight - 24,
+      )
+    }
 
     // 设置光标颜色
     const viewDom = editor.value.view.dom
@@ -574,14 +628,28 @@ defineExpose({
           <li
             v-for="(cItem, cIndex) in item.children"
             :key="cIndex"
-            class="umo-pr-group__item"
+            :class="[
+              'umo-pr-group__item',
+              cItem.class,
+              cItem.type && `is-${cItem.type}`,
+            ]"
             v-bind="cItem"
             @click="() => cItem.click?.(cItem)"
             @dragstart="(event) => dragMethod.dragStart(cItem, event)"
             @dragend="dragMethod.dragend"
           >
-            <icon size="16" :name="cItem.icon"></icon>
-            <span class="ml-4px">{{ cItem.label }}</span>
+            <template v-if="cItem.type == 'seal'">
+              <img :src="testSealImg" class="w-64px h-64px rounded-full" />
+            </template>
+
+            <template v-else-if="cItem.type == 'sign'">
+              <img :src="testSignImg" class="w-88px h-23px rounded-full" />
+            </template>
+
+            <template v-else>
+              <!--              <icon size="16" :name="cItem.icon"></icon>-->
+              <span class="ml-4px">{{ cItem.label }}</span>
+            </template>
           </li>
         </ul>
       </section>
@@ -650,16 +718,23 @@ defineExpose({
       justify-content: center;
       align-items: center;
       font-size: 12px;
-      height: 36px;
+      min-height: 36px;
+      padding: 8px 0;
       border: 1px solid #e1e4eb;
       border-radius: 4px;
       cursor: pointer;
       @primary-color: #2d49d1;
       &.is-dragging {
+        border: 2px dashed red;
         cursor: grabbing;
-        border-style: dashed;
-        box-sizing: 0px 6px 16px -8px rgba(0, 0, 0, 0.08);
-        background-color: rgba(@primary-color, 0.12);
+        box-shadow: 0px 6px 16px -8px rgba(0, 0, 0, 0.08);
+        background-color: rgba(var(--umo-primary-color), 0.12);
+      }
+      &.is-seal {
+        .is-dragging {
+          border-radius: 50%;
+          overflow: hidden;
+        }
       }
       &[draggable] {
         cursor: grab;

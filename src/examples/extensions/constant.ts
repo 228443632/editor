@@ -38,6 +38,8 @@ export const COMP_PARAMS_NAME_MAP = {
   imageParagraph: 'imageParagraph',
   compInvisibleBlock: 'compInvisibleBlock',
   compTextareaDrag: 'compTextareaDrag',
+  compSign: 'compSign',
+  compSeal: 'compSeal',
 } as const
 
 /**
@@ -71,6 +73,35 @@ export const COMP_PARAMS_CONFIG_MAP = {
     name: (typeof COMP_PARAMS_NAME_MAP)[keyof typeof COMP_PARAMS_NAME_MAP]
   }
 >
+
+/**
+ * 悬浮框内容类名
+ */
+export const FLOAT_REAL_CONTENT_CLASS_NAME = 'float-real-content'
+
+/**
+ * 悬浮框内容类名
+ */
+export const FLOAT_NODE_TYPE_MAP = {
+  [COMP_PARAMS_NAME_MAP.compSeal]: 1,
+  [COMP_PARAMS_NAME_MAP.compSign]: 1,
+}
+
+/**
+ * 电子签章样式
+ */
+export const COMP_SEAL_STYLE = {
+  width: 140,
+  height: 140
+}
+
+/**
+ * 签名样式
+ */
+export const COMP_SIGN_STYLE = {
+  width: 105,
+  height: 28
+}
 
 // export type COMP_BOLD_PARAMS = {
 //   imageParagraph: 'imageParagraph',

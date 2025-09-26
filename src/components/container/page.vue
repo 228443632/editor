@@ -278,7 +278,7 @@ watch(
 .umo-zoomable-container {
   flex: 1;
   padding: var(--padding-top) var(--padding-left);
-  scroll-behavior: smooth;
+  //scroll-behavior: smooth;
   .umo-zoomable-content {
     margin: 0 auto;
     //box-shadow:

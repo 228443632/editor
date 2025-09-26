@@ -57,13 +57,6 @@ const rootBound = useElementBounding(rootRef)
 const umoPageContentBound = useElementBounding(umoPageContentRef)
 const updateFlag = ref(0)
 
-// umoPageContentRef.value.getBoundingClientRect = () => {
-//   const rect = umoPageContentRef.value.getBoundingClientRect()
-//   rect.width = _width.value
-//   rect.height = _height.value
-//   return rect
-// }
-
 /* 方法 */
 
 const update = () => {
@@ -152,14 +145,22 @@ defineExpose({
       <section class="line-wrap-clone" :style="_lineWrapCloneStyle" />
       <div class="line-wrap__left line-wrap__x">
         <span
-          class="whitespace-nowrap rounded-2px text-white text-10px bg-[#333] px-4px py-2px"
+          class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
+          :style="{
+            top: `${parseFloat(_lineWrapTeleportStyle['--lt']) / 2}px`,
+            transform: `translateY(-50%)`,
+          }"
           >{{ parseFloat(_lineWrapTeleportStyle['--lt']) }}</span
         >
       </div>
       <div class="line-wrap__right line-wrap__x"></div>
-      <div class="line-wrap__top line-wrap__y">
+      <div class="line-wrap__top line-wrap__y absolute">
         <span
-          class="whitespace-nowrap rounded-2px text-white text-10px bg-[#333] px-4px py-2px"
+          class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
+          :style="{
+            left: `${parseFloat(_lineWrapTeleportStyle['--ll']) / 2}px`,
+            transform: `translateX(-50%)`,
+          }"
           >{{ parseFloat(_lineWrapTeleportStyle['--ll']) }}</span
         >
       </div>

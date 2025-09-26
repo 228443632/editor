@@ -5,8 +5,8 @@
     shortcut="Ctrl+B"
     hide-text
     :menu-active="editor?.isActive('bold')"
-    :disabled="!editor?.can().chain().toggleBoldV2().run()"
-    @menu-click="editor?.chain().focus().toggleBoldV2().run()"
+    :disabled="!editor?.can()?.chain?.()?.toggleBoldV2()?.run()"
+    @menu-click="editor?.chain()?.focus()?.toggleBoldV2?.().run()"
   />
 </template>
 

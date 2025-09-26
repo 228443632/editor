@@ -29,31 +29,32 @@
       </div>
     </section>
 
-    <div
-      v-show="tocActive == `dir`"
-      class="umo-toc-content umo-scrollbar umo-toc-content--dir umo-toc-content--active"
-    >
-      <t-tree
-        class="umo-toc-tree"
-        :data="tocTreeData"
-        :keys="{
+    <template v-for="item in _tabOptions" :key="item.value">
+      <div
+        v-if="item.value == 'dir'"
+        v-show="tocActive == `dir`"
+        class="umo-toc-content umo-scrollbar umo-toc-content--dir umo-toc-content--active"
+      >
+        <t-tree
+          class="umo-toc-tree"
+          :data="tocTreeData"
+          :keys="{
           label: 'textContent',
           value: 'id',
         }"
-        ref="tTreeRef"
-        draggable
-        :empty="t('toc.empty')"
-        :transition="false"
-        activable
-        hover
-        expand-all
-        @active="headingActive"
-        @drop="onHandleDrop"
-        :allowDrop="allowDrop"
-      />
-    </div>
+          ref="tTreeRef"
+          draggable
+          :empty="t('toc.empty')"
+          :transition="false"
+          activable
+          hover
+          expand-all
+          @active="headingActive"
+          @drop="onHandleDrop"
+          :allowDrop="allowDrop"
+        />
+      </div>
 
-    <template v-for="item in _tabOptions.slice(1)" :key="item.value">
       <div
         v-show="tocActive == item.value"
         :class="[
@@ -278,11 +279,11 @@ const stopResize = () => {
 
 const _tabOptions = computed(() => {
   return [
+    ...(page.value?.tocTabsOptions || []),
     {
       label: t('toc.title'),
       value: 'dir',
     },
-    ...(page.value?.tocTabsOptions || []),
   ]
 })
 </script>

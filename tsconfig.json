@@ -9,6 +9,7 @@
     "allowJs": true,
     "strictNullChecks": false,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
@@ -34,7 +35,17 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/types": ["./types"],
-      "@/types/*": ["./types/*"]
+      "@/types/*": ["./types/*"],
+      "@shared/base/*": ["./src/@shared/base/*"],
+      "@shared/utils/*": ["./src/@shared/utils/*"],
+      "@shared/directives/*": ["./src/@shared/directives/*"],
+      "@shared/hooks/*": ["./src/@shared/hooks/*"],
+      "@shared/style/*": ["./src/@shared/style/*"],
+      "~@shared/base/*": ["./src/@shared/base/*"],
+      "~@shared/utils/*": ["./src/@shared/utils/*"],
+      "~@shared/directives/*": ["./src/@shared/directives/*"],
+      "~@shared/hooks/*": ["./src/@shared/hooks/*"],
+      "~@shared/style/*": ["./src/@shared/style/*"]
     },
     "lib": ["ESNext", "DOM", "DOM.Iterable", "ScriptHost"]
   },

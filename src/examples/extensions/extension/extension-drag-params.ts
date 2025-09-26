@@ -4,7 +4,7 @@
  * @create 23/04/25 PM2:10
  */
 
-import { Extension } from '@tiptap/core'
+import { type Editor, Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from 'prosemirror-state'
 import { parseJsonNoError } from 'sf-utils2'
 import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
@@ -89,6 +89,96 @@ export const ExtensionDragParams = Extension.create({
               attrs: nodeData.attrs,
             })
             .run()
+          break
+        }
+
+        // 用印
+        case COMP_PARAMS_NAME_MAP.compSeal: {
+          e.preventDefault()
+
+          const valid = validateSeal(this.editor)
+          if (!valid) return true
+
+          const viewRect = view.dom.getBoundingClientRect()
+          const viewDomPl = Math.floor(
+            +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),
+          )
+          const offsetX = e.clientX - viewRect.left - viewDomPl
+          const offsetY = e.clientY - viewRect.top
+
+          this.editor
+            .chain()
+            .insertCompSealByAttrs({
+              ...(nodeData.attrs || {}),
+              dragAttrs: {
+                top: offsetY,
+                left: offsetX,
+              },
+            })
+            .run()
+
+
+          // 校验印章
+          function validateSeal(editor: Editor) {
+            let isExist = false
+            editor.state.doc.descendants((node) => {
+              if (isExist) return false
+              if (node.type.name === COMP_PARAMS_NAME_MAP.compSeal) {
+                useMessage('error', {
+                  content: '印章只能放一个',
+                })
+                isExist = true
+                return false
+              }
+              return true
+            })
+            return !isExist
+          }
+          break
+        }
+
+        // 签名
+        case COMP_PARAMS_NAME_MAP.compSign: {
+          e.preventDefault()
+
+          const valid = validateSign(this.editor)
+          if (!valid) return true
+
+          const viewRect = view.dom.getBoundingClientRect()
+          const viewDomPl = Math.floor(
+            +window.getComputedStyle(view.dom).paddingLeft.replace('px', ''),
+          )
+          const offsetX = e.clientX - viewRect.left - viewDomPl
+          const offsetY = e.clientY - viewRect.top
+
+          this.editor
+            .chain()
+            .insertCompSignByAttrs({
+              ...(nodeData.attrs || {}),
+              dragAttrs: {
+                top: offsetY,
+                left: offsetX,
+              },
+            })
+            .run()
+
+          // 校验签名
+          function validateSign(editor: Editor) {
+            let isExist = false
+            editor.state.doc.descendants((node) => {
+              if (isExist) return false
+              if (node.type.name === COMP_PARAMS_NAME_MAP.compSign) {
+                useMessage('error', {
+                  content: '签名只能放一个',
+                })
+                isExist = true
+                return false
+              }
+              return true
+            })
+            return !isExist
+          }
+
           break
         }
 

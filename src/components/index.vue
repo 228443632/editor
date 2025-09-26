@@ -181,8 +181,8 @@ const layoutSize = ref({
   /** 编辑器左侧距离*/
   editorLeft: undefined,
 
-  /** 左侧边栏宽度*/
-  leftAsideWidth: 286,
+  /** 左侧边栏宽度 老的 286*/
+  leftAsideWidth: 250,
 
   /** 左侧距离左侧距离*/
   leftAsideLeft: undefined,
@@ -205,7 +205,7 @@ const layoutDom = ref({
 })
 // const bookmark = ref(false)
 const destroyed = ref(false)
-const tocActive = ref('dir') // 目录选中值
+const tocActive = ref('params') // 目录选中值
 
 const getWholeHtml = ref<
   (

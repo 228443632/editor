@@ -10,6 +10,7 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 import UnoCSS from 'unocss/vite'
 import pkg from './package.json'
 import copyright from './src/utils/copyright'
+import path from 'node:path'
 
 const IS_PRO = process.env.NODE_ENV === 'production'
 
@@ -81,14 +82,33 @@ export default defineConfig(({ mode }) => {
     devSourcemap: !IS_PRO,
     preprocessorOptions: {
       less: {
-        modifyVars: { '@prefix': 'umo' },
+        // additionalData: `@import "${path.join(__dirname, 'src/@shared/style/app/vars.less')};`,
+        modifyVars: {
+          // hack: `true; @import (reference) "${path.join(__dirname, 'src/@shared/style/app/vars.less')}";
+          //              @import (reference) "${path.join(__dirname, 'src/@shared/style/app/mixin.less')}";
+          //              @import (reference) "${path.join(__dirname, 'src/@shared/style/app/mixin.less')}";`,
+          '@prefix': 'umo',
+        },
         javascriptEnabled: true,
       },
+      // scss: {
+      //   additionalData:
+      //     '@use "src/@shared/style/element-plus/index.scss" as *;',
+      //   warnRuleAsWarning: false,
+      // },
     },
   }
 
   return {
     base: '/',
+    optimizeDeps: {
+      include: [
+        // '@shared/base/element-plus-enhancer',
+        // '@shared/base/element-plus-enhancer/el-button', // 显式包含子目录
+        // '@shared/base/element-plus-enhancer/el-message'
+        // /@shared\/base/,       // 处理 @shared/utils 模块
+      ],
+    },
     plugins: isLib
       ? [
           tsConfigPaths(),
@@ -97,7 +117,7 @@ export default defineConfig(({ mode }) => {
           ...Object.values(vuePlugins),
         ]
       : [
-          tsConfigPaths(),
+          // tsConfigPaths(),
           ReactivityTransform(),
           UnoCSS(),
           ...Object.values(vuePlugins),
@@ -109,9 +129,24 @@ export default defineConfig(({ mode }) => {
           cssMinify: true,
         },
     resolve: {
+      // conditions: ['node'],
+      // preserveSymlinks: true,
+      extensions: [
+        '.mjs',
+        '.js',
+        '.ts',
+        '.jsx',
+        '.tsx',
+        '.json',
+        '.vue',
+        '.scss',
+        '.less',
+        '.css',
+      ],
       alias: {
         '@': `${process.cwd()}/src`,
         '@root/': `${process.cwd()}/`,
+        '@shared/base': path.resolve(__dirname, 'node_modules/@shared/base'),
       },
     },
   }

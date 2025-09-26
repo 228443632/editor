@@ -15,6 +15,7 @@ import {
 
 import useEditorEvent from '@/composables/useEditorEvent'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
+import { COMP_PARAMS_NAME_MAP, FLOAT_REAL_CONTENT_CLASS_NAME } from '@/examples/extensions/constant.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -105,11 +106,16 @@ const vueDraggableAttrs = ref({
 
 /* 方法 */
 
+/**
+ * 更新内容list
+ */
 function updateContentList() {
   // editor.state.doc.forEach(
 
   const nameMap = {
-    compText: 1,
+    [COMP_PARAMS_NAME_MAP.compSeal]: 1,
+    [COMP_PARAMS_NAME_MAP.compSign]: 1,
+    [COMP_PARAMS_NAME_MAP.compText]: 1,
   }
 
   const tempCompNodeList = []
@@ -132,8 +138,24 @@ const debounceUpdateContentList = debounce(updateContentList, 100)
 function onChooseItem(item: { node: Node; pos: number }) {
   __globalBizState__.value.nodeActive = item.node
   editor.value.chain().focus().setNodeSelection(item.pos).run()
+
+  const floatComp = {
+    [COMP_PARAMS_NAME_MAP.compSeal]: 1,
+    [COMP_PARAMS_NAME_MAP.compSign]: 1,
+  }
+  const nodeTypeName = item.node.type.name
+
   const dom = editor.value.view.nodeDOM(item.pos)
   if (dom) {
+    if (floatComp[nodeTypeName]) {
+      // 如果是悬浮的
+      const floatDom = dom.querySelector(`.${FLOAT_REAL_CONTENT_CLASS_NAME}`)
+      if (floatDom) {
+        floatDom.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        return
+      }
+    }
+
     dom.scrollIntoView({ block: 'start', behavior: 'smooth' })
   }
 }

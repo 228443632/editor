@@ -2,11 +2,11 @@
   "name": "@umoteam/editor",
   "version": "6.1.1",
   "scripts": {
-    "build:lib": "vue-tsc --noEmit && vite build --mode lib",
+    "build:lib": "vite build --mode lib",
     "build:lib-css": "vite build -c vite.config.lib-css.ts",
     "build": "vite build --mode dev",
     "build:upload": "npm run build:lib-css && npm run build && npx jiti ./build/upload.cjs",
-    "dev": "vite --port 9000 --open --force --host",
+    "dev": "vite --port 9000 --force --host",
     "format": "prettier --write .",
     "check:code": "eslint --cache src",
     "check:style": "stylelint src/**/*.{css,less,vue}",
@@ -117,6 +117,9 @@
     "@weiruo/tiptap-extension-background-color": "2.0.4-0",
     "browserify-fs": "1.0.0",
     "buffer-image-size": "0.6.4",
+    "core-js": "3.45.1",
+    "crypto-js": "4.2.0",
+    "vue-router": "4.3.3",
     "dom-to-image-more": "3.4.3",
     "es-drager": "1.2.11",
     "file-saver": "2.0.5",
@@ -136,6 +139,8 @@
     "prosemirror-transform": "1.10.0",
     "prosemirror-view": "1.39.2",
     "qrcode-svg": "1.1.0",
+    "sass": "1.51.0",
+    "sass-loader": "10.1.1",
     "sf-utils2": "3.3.4",
     "sign-canvas-plus": "2.0.3",
     "smooth-signature": "1.0.15",
@@ -183,6 +188,7 @@
     "@vue-macros/reactivity-transform": "1.0.4",
     "@vue-macros/volar": "0.29.1",
     "@vue/eslint-config-prettier": "9.0.0",
+    "dayjs": "1.11.7",
     "eslint": "9.14.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-functional": "5.0.8",
@@ -196,6 +202,8 @@
     "less": "4.2.0",
     "less-loader": "12.2.0",
     "lint-staged": "15.2.10",
+    "mx-private-utils": "1.0.11",
+    "numeral": "2.0.6",
     "postcss": "8.3.3",
     "postcss-html": "1.7.0",
     "prettier": "3.3.3",
@@ -205,7 +213,6 @@
     "stylelint-less": "3.0.1",
     "tailwindcss": "3.4.10",
     "tdesign-vue-next": "1.11.5",
-    "tiptap-pagination-plus": "1.1.2",
     "typescript": "5.5.4",
     "typescript-eslint": "8.5.0",
     "unocss": "66.1.0-beta.12",
@@ -214,6 +221,7 @@
     "unplugin-vue-components": "0.27.4",
     "unplugin-vue-macros": "2.11.11",
     "vite": "4.5.3",
+    "vite-plugin-commonjs": "0.10.4",
     "vite-plugin-inspect": "0.8.7",
     "vite-plugin-node-polyfills": "0.23.0",
     "vite-plugin-svg-icons": "2.0.1",
@@ -223,10 +231,11 @@
     "vue-tsc": "2.2.10"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=16.0.0"
   },
   "overrides": {
-    "esbuild": "0.25.3"
+    "esbuild": "0.25.3",
+    "@esbuild/*": "0.25.3"
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue,less,css,yml,yaml,json,md,html}": [

@@ -112,7 +112,7 @@ const options = $ref(
   shallowMergeWithArrayOverride(
     { ...defaultOptions },
     {
-      isPagination: true, // 开启分页
+      isPagination: false, // 开启分页
       extensions,
       toolbar: {
         // defaultMode: 'classic',
@@ -222,8 +222,12 @@ watch(umoEditorRef, () => {
       if (COMP_PARAMS_NAME_MAP.compTextDrag === node?.type.name) {
         return () => false
       }
-      return originFocusCommands.call(this, ...arguments)
+      return () => true
+      // return originFocusCommands.call(this, ...arguments)
     }
+    editorRef.value.view.dom.focus = () => undefined
+
+    editorRef.value.commands.focus = () => true
   })
 
   // TODO

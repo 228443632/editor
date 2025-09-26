@@ -4,153 +4,157 @@
  * @create 29/07/25 PM5:01
  */
 
-// FIXME: pagination
-div.tableWrapper {
-  display: contents;
-  clear: both;
-  table {
+.sf-with-pagination {
+  // FIXME: pagination
+  div.tableWrapper {
     display: contents;
-  }
-
-  .table-wrapper-tbody {
-    display: contents;
-  }
-
-  .table-row-group {
-    width: 100%;
-    margin-top: -1px;
-    display: table;
-    table-layout: fixed;
-    max-width: 100%;
-    &:first-child {
-      margin-top: 0px;
-    }
-    th,
-    td {
-      &:after {
-        z-index: 2;
-        position: absolute;
-        content: '';
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        pointer-events: none;
-      }
-      &:hover {
-        &:after {
-          background-color: color-mix(
-            in oklab,
-            var(--color-blue-200, oklch(88.2% 0.059 254.128)) 15%,
-            transparent
-          );
-        }
-      }
-      &.umo-node-focused {
-        &:after {
-          background: var(--umo-content-table-selected-background);
-        }
-      }
-    }
-  }
-  .table-row-group-merge {
-    margin-top: -1px;
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-    max-width: 100%;
-    & > .table-row-group {
+    clear: both;
+    table {
       display: contents;
     }
-  }
 
-  .table-cell-body {
-    max-height: calc(var(--umo-page-body-height) - 4px);
-    overflow-x: hidden;
-    overflow-y: hidden;
-    padding: 0px 5px;
-  }
-
-  table {
-    --cell-border: 1px solid var(--umo-content-table-border-color);
-    --cell-border-color: var(--umo-content-table-border-color);
-
-    th,
-    td {
-      border: var(--cell-border);
-      padding: 0;
+    .table-wrapper-tbody {
+      display: contents;
     }
 
-    //tr {
-    //  //border-bottom: var(--cell-border);
-    //  position: relative;
-    //  grid-template-columns: repeat(var(--cell-count), 1fr);
-    //  td,
-    //  th {
-    //    // grid-column: auto / span 1;
-    //    border-left: var(--cell-border);
-    //    border-right: var(--cell-border);
-    //    border-top: 0;
-    //    border-bottom: var(--cell-border);
-    //    margin-left: -1px;
-    //    margin-top: -1px;
-    //
-    //    &:not(:first-child) {
-    //      //border-left: none;
-    //    }
-    //    &:after {
-    //      content: '';
-    //      position: absolute;
-    //      left: 0;
-    //      top: 0;
-    //      width: 100%;
-    //      height: 100%;
-    //      z-index: 100;
-    //      pointer-events: none;
-    //      background-image: linear-gradient(
-    //              to right,
-    //              var(--cell-border-color),
-    //              var(--cell-border-color)
-    //      ),
-    //      linear-gradient(
-    //              to right,
-    //              var(--cell-border-color),
-    //              var(--cell-border-color)
-    //      ),
-    //      linear-gradient(to right, transparent, transparent);
-    //      background-repeat: no-repeat, no-repeat, no-repeat;
-    //      background-size:
-    //              100% 1px,
-    //              100% 1px,
-    //              100% 100%;
-    //      background-position:
-    //              0 0,
-    //              0 calc(100% + 1px),
-    //              0 0;
-    //    }
-    //  }
-    //}
-  }
-}
+    .table-row-group {
+      width: 100%;
+      margin-top: -1px;
+      display: table;
+      table-layout: fixed;
+      max-width: 100%;
+      &:first-child {
+        margin-top: 0px;
+      }
+      th,
+      td {
+        &:after {
+          z-index: 2;
+          position: absolute;
+          content: '';
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          pointer-events: none;
+        }
+        &:hover {
+          &:after {
+            background-color: color-mix(
+                    in oklab,
+                    var(--color-blue-200, oklch(88.2% 0.059 254.128)) 15%,
+                    transparent
+            );
+          }
+        }
+        &.umo-node-focused {
+          &:after {
+            background: var(--umo-content-table-selected-background);
+          }
+        }
+      }
+    }
+    .table-row-group-merge {
+      margin-top: -1px;
+      display: table;
+      table-layout: fixed;
+      width: 100%;
+      max-width: 100%;
+      & > .table-row-group {
+        display: contents;
+      }
+    }
 
-// 隐藏背景选中背景色
-.umo-editor.sf-with-pagination {
-  > * {
-    &.umo-node-focused,
-    &.ProseMirror-selectednoderange {
-      @media screen {
-        &:not(.is-editor-empty):not(hr):not(.tableWrapper):not(
+    .table-cell-body {
+      max-height: calc(var(--umo-page-body-height) - 4px);
+      overflow-x: hidden;
+      overflow-y: hidden;
+      padding: 0px 5px;
+    }
+
+    table {
+      --cell-border: 1px solid var(--umo-content-table-border-color);
+      --cell-border-color: var(--umo-content-table-border-color);
+
+      th,
+      td {
+        border: var(--cell-border);
+        padding: 0;
+      }
+
+      //tr {
+      //  //border-bottom: var(--cell-border);
+      //  position: relative;
+      //  grid-template-columns: repeat(var(--cell-count), 1fr);
+      //  td,
+      //  th {
+      //    // grid-column: auto / span 1;
+      //    border-left: var(--cell-border);
+      //    border-right: var(--cell-border);
+      //    border-top: 0;
+      //    border-bottom: var(--cell-border);
+      //    margin-left: -1px;
+      //    margin-top: -1px;
+      //
+      //    &:not(:first-child) {
+      //      //border-left: none;
+      //    }
+      //    &:after {
+      //      content: '';
+      //      position: absolute;
+      //      left: 0;
+      //      top: 0;
+      //      width: 100%;
+      //      height: 100%;
+      //      z-index: 100;
+      //      pointer-events: none;
+      //      background-image: linear-gradient(
+      //              to right,
+      //              var(--cell-border-color),
+      //              var(--cell-border-color)
+      //      ),
+      //      linear-gradient(
+      //              to right,
+      //              var(--cell-border-color),
+      //              var(--cell-border-color)
+      //      ),
+      //      linear-gradient(to right, transparent, transparent);
+      //      background-repeat: no-repeat, no-repeat, no-repeat;
+      //      background-size:
+      //              100% 1px,
+      //              100% 1px,
+      //              100% 100%;
+      //      background-position:
+      //              0 0,
+      //              0 calc(100% + 1px),
+      //              0 0;
+      //    }
+      //  }
+      //}
+    }
+  }
+
+  // 隐藏背景选中背景色
+  .umo-editor.sf-with-pagination {
+    > * {
+      &.umo-node-focused,
+      &.ProseMirror-selectednoderange {
+        @media screen {
+          &:not(.is-editor-empty):not(hr):not(.tableWrapper):not(
             .umo-page-break
           ):not(table):not(.umo-code-block):not(.umo-floating-node):before {
-          // FIXME 分页隐藏
-          //outline: 2px solid var(--umo-color-primary);
-          //background: transparent;
-          //box-shadow: 0 0 0 2px var(--umo-color-primary);
+            // FIXME 分页隐藏
+            //outline: 2px solid var(--umo-color-primary);
+            //background: transparent;
+            //box-shadow: 0 0 0 2px var(--umo-color-primary);
+          }
         }
       }
     }
   }
 }
+
+
 
 .sf-pagination-container {
   /** 设置内容为空时候，默认占位内容*/

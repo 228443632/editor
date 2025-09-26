@@ -10,13 +10,13 @@ import { deepClone, to } from 'sf-utils2'
 import { getNumString } from 'sf-utils2/lib/_helperNumber'
 import { useZIndexManage } from '@/examples/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
-import NodeEdit from './components/NodeEdit.vue'
-import LineWrap from './components/LineWrap.vue'
+import LineWrap from '../comp-text-drag/components/LineWrap.vue'
+import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 
 import Drager from 'es-drager'
-import { generateFieldName } from '@/examples/utils/common-util'
 import type { Editor } from '@tiptap/core'
 import { MAX_Z_INDEX, rafThrottle } from '@/examples/utils/dom'
+import { FLOAT_REAL_CONTENT_CLASS_NAME } from '@/examples/extensions/constant.ts'
 
 const props = defineProps(nodeViewProps)
 const emit = defineEmits({})
@@ -32,7 +32,6 @@ const editor = inject('editor') as Ref<Editor>
 const { zIndex, getTop } = useZIndexManage()
 const dragerWrapRef = ref<HTMLHtmlElement>()
 const dragerRef = ref<InstanceType<typeof Drager>>()
-const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
@@ -45,17 +44,11 @@ const scrollViewRef = ref<HTMLHtmlElement>(
 const umoPageContentRef = ref<HTMLHtmlElement>(
   document.querySelector('.umo-watermark.umo-page-content'),
 )
-const dragerUpdateFlag = ref(0)
 
 onClickOutside(rootRef, (e: PointerEvent) => {
   const target = e.target as HTMLHtmlElement
   if (umoPageContentRef.value.contains(target)) {
     selected.value = false
-    return
-  }
-  const containerDom = nodeEditRef.value.tPopupRef.getOverlay()
-  if (containerDom && containerDom.contains(target)) {
-    selected.value = true
     return
   }
   // selected.value = true
@@ -108,10 +101,7 @@ async function onDeleteSelf(event) {
   const boundRect = inputRef.value.getBoundingClientRect()
 
   // fix 删除节点
-  editor.value
-    .chain()
-    .setNodeSelection(props.getPos())
-    .run()
+  editor.value.chain().setNodeSelection(props.getPos()).run()
 
   editor.value
     .chain()
@@ -119,10 +109,9 @@ async function onDeleteSelf(event) {
     .deleteSelectionNode()
     .run()
 
-    window.requestAnimationFrame(() => {
-      scrollViewRef.value.scrollTop = oldScrollTop
-    })
-
+  window.requestAnimationFrame(() => {
+    scrollViewRef.value.scrollTop = oldScrollTop
+  })
 
   // setTimeout(() => {
   //   const { view } = editor.value
@@ -153,9 +142,6 @@ async function onDeleteSelf(event) {
  * 确认
  */
 async function onConfirm() {
-  const [valid, err] = await to(nodeEditRef.value.formRef.validate())
-  if (err || !valid)
-    return useMessage('error', { content: '请检查表单是否填写完整' })
   const cloneFormData = deepClone(formData.value)
   delete cloneFormData.dragAttrs
   delete cloneFormData.cssText
@@ -207,7 +193,6 @@ function onKeydown(e: KeyboardEvent) {
       const dragAttrs = deepClone(_dragAttrs.value)
       dragAttrs.top = dragAttrs.top + 2
       updateAttributes({ dragAttrs })
-      nodeEditRef.value.tPopupRef.update()
       e.preventDefault()
       break
     }
@@ -216,7 +201,6 @@ function onKeydown(e: KeyboardEvent) {
       const dragAttrs = deepClone(_dragAttrs.value)
       dragAttrs.top = dragAttrs.top - 2
       updateAttributes({ dragAttrs })
-      nodeEditRef.value.tPopupRef.update()
       e.preventDefault()
       break
     }
@@ -226,7 +210,6 @@ function onKeydown(e: KeyboardEvent) {
       const dragAttrs = deepClone(_dragAttrs.value)
       dragAttrs.left = dragAttrs.left - 2
       updateAttributes({ dragAttrs })
-      nodeEditRef.value.tPopupRef.update()
       e.preventDefault()
       break
     }
@@ -235,7 +218,7 @@ function onKeydown(e: KeyboardEvent) {
       const dragAttrs = deepClone(_dragAttrs.value)
       dragAttrs.left = dragAttrs.left + 2
       updateAttributes({ dragAttrs })
-      nodeEditRef.value.tPopupRef.update()
+
       e.preventDefault()
       break
     }
@@ -322,7 +305,7 @@ const rafThrottleOnDrag = rafThrottle(onDrag)
 
 const _attributes = computed(() => props.node?.attrs)
 
-const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
+// const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
 
 /**
  * 根节点样式
@@ -454,39 +437,22 @@ defineExpose()
           :auto-resize="false"
           :show-line="selected"
         >
-          <NodeEdit
-            ref="nodeEditRef"
-            v-model:visible="visible.dialog"
-            v-model:form-data="formData"
-            :extra-props="{
-              getTop,
-              updateAttributes,
+          <span
+            :class="[
+              '!overflow-hidden inline-block w-full h-full text-0 float-real-content',
+              FLOAT_REAL_CONTENT_CLASS_NAME,
+            ]"
+            :style="{
+              textDecoration: _rootStyle.textDecoration,
+              backgroundColor: _rootStyle.backgroundColor,
             }"
-            @visible-change="onVisibleChange"
           >
-            <span
-              class="!overflow-hidden inline-block w-full h-full"
-              :style="{
-                textDecoration: _rootStyle.textDecoration,
-                backgroundColor: _rootStyle.backgroundColor,
-              }"
-            >
-              <span
-                class="opacity-100 w-0px h-0px inline-block overflow-hidden"
-              >
-                <input v-if="inputVisible" ref="inputRef" />
-              </span>
-              <text class="hidden">{{ _text }}</text>
-              <span
-                class="print-hidden text-placeholder"
-                :style="{
-                  textDecoration: _rootStyle.textDecoration,
-                  color: _rootStyle.color,
-                }"
-                >{{ props.node.attrs?.placeholder }}</span
-              >
+            <span class="opacity-100 w-0px h-0px inline-block overflow-hidden">
+              <input v-if="inputVisible" ref="inputRef" />
             </span>
-          </NodeEdit>
+
+            <span v-html="testSignSvgRaw"></span>
+          </span>
         </LineWrap>
       </Drager>
     </span>
@@ -497,14 +463,14 @@ defineExpose()
 <style lang="less">
 // 分页
 .sf-with-pagination {
-  [compname='compTextDrag'] {
+  [compname='compSign'] {
     .es-drager {
       margin-top: calc(-1 * var(--umo-page-margin-top));
     }
   }
 }
 
-[compname='compTextDrag'] {
+[compname='compSign'] {
   height: 0;
   width: 100%;
   position: absolute;
@@ -521,10 +487,6 @@ defineExpose()
     color: #9ba3b0;
   }
 
-  //& > * {
-  //  transform: translate(0, 0) !important;
-  //}
-
   .drager-wrap {
     transform: translate3d(0, var(--y), 0);
     display: inline-flex;
@@ -534,11 +496,15 @@ defineExpose()
     top: 0;
   }
 
+  .es-drager-dot-handle {
+    display: none;
+  }
+
   .es-drager {
     cursor: move;
     position: absolute;
     z-index: 1000;
-    background: #fff;
+    background: transparent;
     &:hover {
       outline: 2px solid var(--umo-primary-color);
       box-shadow: var(--umo-shadow);

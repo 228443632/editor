@@ -53,10 +53,19 @@ import NodeAlign from './node-align'
 import OrderedList from './ordered-list'
 import PageBreak from './page-break'
 import Selection from './selection'
+
+// 分页的
+import PaginationTable from './pagination/extension-table-core'
+import PaginationTableCell from './pagination/extension-table-core/cell'
+import PaginationTableHeader from './pagination/extension-table-core/header'
+import PaginationTableRow from './pagination/extension-table-core/row'
+
+// 非分页表格
 import Table from './table'
 import TableCell from './table/cell'
 import TableHeader from './table/header'
-import TableRow from './table/row'
+import TableRow from '@tiptap/extension-table-row'
+
 // import TableRowGroup from './table/row-group'
 import Tag from './tag'
 import TextAlign from './text-align'
@@ -72,13 +81,6 @@ import PaginationBreak from './pagination/extentsion-pagination-break'
 // 自定义
 import ImageParagraph from './image-paragraph'
 import { cssUtil } from '@/examples/utils/css-util'
-
-// import {
-//   TablePlus,
-//   TableRowPlus,
-//   TableCellPlus,
-//   TableHeaderPlus
-// } from 'tiptap-pagination-plus'
 
 export const getDefaultExtensions = ({
   container,
@@ -180,14 +182,18 @@ export const getDefaultExtensions = ({
       class: 'umo-editor-bookmark',
     }),
 
-    // 表格
-    Table.configure({
-      isEnablePagination: isPagination,
-    }),
-    TableRow,
-    TableHeader,
-    TableCell,
-    // TableRowGroup,
+    isPagination
+      ? [
+          // 表格
+          PaginationTable.configure({
+            isEnablePagination: isPagination,
+          }),
+          PaginationTableRow,
+          PaginationTableHeader,
+          PaginationTableCell,
+          // TableRowGroup,
+        ]
+      : [Table, TableCell, TableRow, TableHeader],
 
     // 页面
     Toc,
@@ -261,11 +267,20 @@ export const getDefaultExtensions = ({
     typeWriter,
     UniqueID.configure({
       attributeName: 'data-id',
-      types: ['heading', 'paragraph', 'table', 'table-cell', 'table-row', 'table-header'],
+      types: [
+        'heading',
+        'paragraph',
+        'table',
+        'table-cell',
+        'table-row',
+        'table-header',
+      ],
       generateID: () => simpleUUID().slice(2, 8),
     }),
     BackgroundColor,
-  ].filter(Boolean)
+  ]
+    .filter(Boolean)
+    .flat(Infinity)
 
   if (isPagination) {
     const configurePageOptions = {
