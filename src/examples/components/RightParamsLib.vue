@@ -72,10 +72,10 @@ const paramsConfig = ref([
             .setCompText(attrs)
             .run()
 
-          const targetDom = document.querySelector(
-            `span[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
+          // const targetDom = document.querySelector(
+          //   `span[data-id="${attrs['data-id']}"]`,
+          // ) as HTMLHtmlElement
+          // targetDom?.click?.()
         },
       },
 
@@ -283,79 +283,6 @@ const paramsConfig = ref([
             fieldName: 'idcard',
             placeholder: '签名'
           }
-        },
-      },
-      {
-        label: '动态表格',
-        value: 'compTable',
-        click() {
-          useMessage('warning', { content: '动态表格暂未开发！' })
-        },
-      },
-      {
-        label: '插入分页',
-        value: 'compBdPage',
-        click() {
-          editor.value
-            .chain()
-            .focus()
-            .insertContentAt(0, {
-              type: 'compBdPage',
-              attrs: {},
-            })
-            .run()
-        },
-      },
-      {
-        label: '模拟删除',
-        value: 'params-comp-table2',
-        click() {
-          editor.value.chain().focus().intentDeleteV2().run()
-        },
-      },
-      {
-        label: '分割线',
-        value: 'params-comp-table4',
-        click() {
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertContent({
-              type: 'compDivider',
-              attrs: {},
-            })
-            .run()
-        },
-      },
-      {
-        label: '插入Float',
-        value: 'params-comp-table4',
-        click() {
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertContent({
-              type: 'compFloat',
-              attrs: {},
-            })
-            .run()
-        },
-      },
-      {
-        label: '不可见块',
-        value: 'params-comp-table3',
-        click() {
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertContentAt(0, {
-              type: COMP_PARAMS_NAME_MAP.compInvisibleBlock,
-              attrs: {},
-            })
-            .run()
         },
       },
     ],

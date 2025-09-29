@@ -138,4 +138,44 @@ export const ExtensionPasteParams = Extension.create({
       }),
     ]
   },
+
+
+  /**
+   * 可选：阻止通过键盘删除（如 Backspace/Delete 键）
+   */
+  addKeyboardShortcuts() {
+    console.log('this', this)
+
+    const preventDelete = () => {
+      // const { selection } = this.editor.state
+      // const { $from, $to } = selection
+      // // const nodePos = this.node.pos
+      // if ($from.pos === $to.pos) {
+      //   // 光标闭合
+      //   if ($from.nodeBefore?.type?.name == 'compText') {
+      //     // this.editor.view.state.tr.setSelection({
+      //     //   anchor: $from.pos,
+      //     //   head: $from.pos,
+      //     // })
+      //     return true // 阻止默认删除行为
+      //   }
+      // } else {
+      //   // 非光标闭合
+      //   this.editor.state.doc.nodesBetween($from.pos, $to.pos, (node) => {
+      //     if (node.type.name === 'compText') {
+      //       return true
+      //     }
+      //   })
+      // }
+      return false // 允许其他区域的删除
+    }
+
+    return {
+      Backspace: () => preventDelete(),
+      'Shift-Backspace': () => preventDelete(),
+      Delete: () => preventDelete(),
+    }
+
+    // 辅助方法：检查是否处于受保护节点内
+  },
 })

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
-import NodeEdit from './components/NodeEdit.vue'
+// import NodeEdit from './components/NodeEdit.vue'
 
 import type { Editor } from '@tiptap/core'
 import { generateFieldName } from '@/examples/utils/common-util'
@@ -27,7 +27,7 @@ const options = inject('options') as Ref<Record<string, any>>
 const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
-const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
+// const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
@@ -43,6 +43,7 @@ function onSelectNode() {
   const { anchor } = editor.value.state.selection
   editor.value
     .chain()
+    .focus()
     .setTextSelection({ from: anchor, to: anchor + props.node.nodeSize })
     .run()
 
@@ -52,13 +53,13 @@ function onSelectNode() {
 }
 
 async function onConfirm() {
-  const [valid, err] = await to(nodeEditRef.value.formRef.validate())
-  if (err || !valid)
-    return useMessage('error', { content: '请检查表单是否填写完整' })
-  const cloneFormData = deepClone(formData.value)
-  console.log('cloneFormData', cloneFormData)
-  updateAttributes(cloneFormData)
-  onClose()
+  // const [valid, err] = await to(nodeEditRef.value.formRef.validate())
+  // if (err || !valid)
+  //   return useMessage('error', { content: '请检查表单是否填写完整' })
+  // const cloneFormData = deepClone(formData.value)
+  // console.log('cloneFormData', cloneFormData)
+  // updateAttributes(cloneFormData)
+  // onClose()
 }
 
 function onClose() {
@@ -129,12 +130,12 @@ provide('NODE_PROPS', props)
     @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
-    <NodeEdit
-      ref="nodeEditRef"
-      v-model:visible="visible.dialog"
-      v-model:form-data="formData"
-      @visible-change="onVisibleChange"
-    ></NodeEdit>
+    <!--    <NodeEdit-->
+    <!--      ref="nodeEditRef"-->
+    <!--      v-model:visible="visible.dialog"-->
+    <!--      v-model:form-data="formData"-->
+    <!--      @visible-change="onVisibleChange"-->
+    <!--    ></NodeEdit>-->
     <!--    &ZeroWidthSpace;-->
   </node-view-wrapper>
 </template>
@@ -153,8 +154,9 @@ provide('NODE_PROPS', props)
   //padding: 0;
   cursor: pointer;
   //border-radius: 2px;
-  &.umo-node-focused.umo-node-focused.umo-node-focused {
-    outline: 2px solid var(--umo-primary-color);
+  &.umo-node-focused.umo-node-focused.umo-node-focused,
+  &.ProseMirror-selectednode{
+    outline: 2px solid var(--umo-primary-color)!important;
   }
   &:hover {
     background-color: #f0f2f7;

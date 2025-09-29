@@ -14,7 +14,7 @@
     v-bind="$attrs"
     :placeholder="t('base.fontSize.text')"
     filterable
-    @menu-click="setFontSize"
+    @menu-click="setFontSizeV2"
   >
   </menus-button>
   <menus-button
@@ -90,24 +90,28 @@ const fontSizes = [
 ]
 
 // 设置字体大小
-const setFontSize = (fontSize: string) => {
-  editor.value?.chain().focus().setFontSize(fontSize).run()
+const setFontSizeV2 = (fontSize: string) => {
+  editor.value?.chain().focus().setFontSizeV2(fontSize).run()
 }
 
 // 增大字号
 const increaseFontSize = () => {
   const { fontSize } = editor.value?.getAttributes('textStyle') ?? {}
+
   if (fontSize) {
     const size = fontSizes.find(({ value }) => value === fontSize)
     if (!size) {
+      const num = ~~parseInt(fontSize)
+      const unit = fontSize.replace(num, '')
+      setFontSizeV2(`${Number(num + 1).toFixed(0)}${unit}`)
       return
     }
     const nextFont = fontSizes.find(({ order }) => order === size.order + 1)
     if (nextFont) {
-      setFontSize(nextFont.value)
+      setFontSizeV2(nextFont.value)
     }
   } else {
-    setFontSize('16px')
+    setFontSizeV2('16px')
   }
 }
 
@@ -117,14 +121,17 @@ const decreaseFontSize = () => {
   if (fontSize) {
     const size = fontSizes.find(({ value }) => value === fontSize)
     if (!size) {
+      const num = ~~parseInt(fontSize)
+      const unit = fontSize.replace(num, '')
+      setFontSizeV2(`${Number(num - 1).toFixed(0)}${unit}`)
       return
     }
     const prevFont = fontSizes.find(({ order }) => order === size.order - 1)
     if (prevFont) {
-      setFontSize(prevFont.value)
+      setFontSizeV2(prevFont.value)
     }
   } else {
-    setFontSize('14px')
+    setFontSizeV2('14px')
   }
 }
 </script>

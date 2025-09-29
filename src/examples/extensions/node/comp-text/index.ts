@@ -39,6 +39,7 @@ export default Node.create({
   content: 'text*', // 允许包含文本内容
   inline: true, // 关键：标记为行内元素[4](@ref)
   defining: true,
+  selectable: true,
   // marks: '',
   atom: true,
 

@@ -5,25 +5,21 @@
  */
 
 import compText from './comp-text'
-import compBdPage from './comp-bd-page'
 import compIntent from './comp-intent'
 import compTextDrag from './comp-text-drag'
 import compTextareaDrag from './comp-textarea-drag'
 import compInvisibleBlock from './comp-invisible-block'
-import compDivider from './comp-divider'
 import compFloat from './comp-float'
 import compSign from './comp-sign'
 import compSeal from './comp-seal'
 
 export default [
   compIntent,
-  compBdPage,
   compText,
   compTextDrag,
   compInvisibleBlock,
   compTextareaDrag,
   compFloat,
-  compDivider,
   compSign,
   compSeal
 ]

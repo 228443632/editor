@@ -11,7 +11,10 @@ import { simpleUUID } from '@/utils/short-id'
 import { tiptapUtil } from '@/examples/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/examples/utils/common-util'
-import { COMP_PARAMS_NAME_MAP, COMP_SEAL_STYLE } from '@/examples/extensions/constant'
+import {
+  COMP_PARAMS_NAME_MAP,
+  COMP_SEAL_STYLE,
+} from '@/examples/extensions/constant'
 
 const { getTop } = useZIndexManage()
 
