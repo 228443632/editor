@@ -406,6 +406,9 @@ devDependencies:
   numeral:
     specifier: 2.0.6
     version: 2.0.6
+  pdfjs-dist:
+    specifier: 5.4.149
+    version: 5.4.149
   postcss:
     specifier: 8.3.3
     version: 8.3.3
@@ -433,9 +436,6 @@ devDependencies:
   tdesign-vue-next:
     specifier: 1.11.5
     version: 1.11.5(vue@3.3.13)
-  tiptap-pagination-plus:
-    specifier: 1.1.2
-    version: 1.1.2
   typescript:
     specifier: 5.5.4
     version: 5.5.4
@@ -481,6 +481,9 @@ devDependencies:
   vue:
     specifier: 3.3.13
     version: 3.3.13(typescript@5.5.4)
+  vue-pdf-embed:
+    specifier: 2.1.3
+    version: 2.1.3(vue@3.3.13)
   vue-tsc:
     specifier: 2.2.10
     version: 2.2.10(typescript@5.5.4)
@@ -1924,7 +1927,6 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-darwin-arm64@0.1.80:
@@ -1933,7 +1935,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-darwin-x64@0.1.80:
@@ -1942,7 +1943,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-arm-gnueabihf@0.1.80:
@@ -1951,7 +1951,6 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-arm64-gnu@0.1.80:
@@ -1960,7 +1959,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-arm64-musl@0.1.80:
@@ -1969,7 +1967,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-riscv64-gnu@0.1.80:
@@ -1978,7 +1975,6 @@ packages:
     cpu: [riscv64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-x64-gnu@0.1.80:
@@ -1987,7 +1983,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-linux-x64-musl@0.1.80:
@@ -1996,7 +1991,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas-win32-x64-msvc@0.1.80:
@@ -2005,7 +1999,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: false
     optional: true
 
   /@napi-rs/canvas@0.1.80:
@@ -2023,7 +2016,6 @@ packages:
       '@napi-rs/canvas-linux-x64-gnu': 0.1.80
       '@napi-rs/canvas-linux-x64-musl': 0.1.80
       '@napi-rs/canvas-win32-x64-msvc': 0.1.80
-    dev: false
     optional: true
 
   /@nodelib/fs.scandir@2.1.5:
@@ -2803,14 +2795,6 @@ packages:
       '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
     dev: false
 
-  /@tiptap/extension-table-cell@2.26.2(@tiptap/core@2.11.5):
-    resolution: {integrity: sha512-A2XThaJBVQvR/nKyUfHwyoSuz/NtwWYDjnGjYtN/+fFCEWx++33HjvtxmCCpGrw5xuE783L4I9cr5Pcrepgy3A==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-    dev: true
-
   /@tiptap/extension-table-header@2.11.5(@tiptap/core@2.11.5):
     resolution: {integrity: sha512-O1iBtzZP1XZDi4h1Xmgq1T63il+fpKPvBIMZ0JJH9TyCw5i5rcrMLL2dyy5zaWK3BFRJuYBNSke4c+VWnr/g6w==}
     peerDependencies:
@@ -2819,14 +2803,6 @@ packages:
       '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
     dev: false
 
-  /@tiptap/extension-table-header@2.26.2(@tiptap/core@2.11.5):
-    resolution: {integrity: sha512-ppiL8aOQuBqy8GjMuVmIWu187rvNwxANCoAE+iGRDTK0y6c27HA+f6Y9n55T9PYqzDs5Z03gIBGhNIyw1lfc5A==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-    dev: true
-
   /@tiptap/extension-table-row@2.11.5(@tiptap/core@2.11.5):
     resolution: {integrity: sha512-+/VWhCuW24BcM5aaIc/f0bC6ZR1Q5gnuqw13MIo7gyPx7iIY6BXK8roGiZSs8wYAN4uBEf3EKFm0bSZwQuAeyg==}
     peerDependencies:
@@ -2834,14 +2810,6 @@ packages:
     dependencies:
       '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
     dev: false
-
-  /@tiptap/extension-table-row@2.26.2(@tiptap/core@2.11.5):
-    resolution: {integrity: sha512-TzQn/KJ7w34oswRP3P1RKwT0qYV6TG+k2iFzKPO7Vxo24debJopqC8C+oP/qw7NJaTyTcEwx+oSavTPILFdxeg==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-    dev: true
 
   /@tiptap/extension-table@2.11.5(@tiptap/core@2.11.5)(@tiptap/pm@2.11.5):
     resolution: {integrity: sha512-NKXLhKWdAdURklm98YkCd2ai4fh8jY8HS/+X2s/2QiQt8Z98CU1keCm35fJEEExM234iB/hCqG5vY4JgTc0Tvw==}
@@ -2852,16 +2820,6 @@ packages:
       '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
       '@tiptap/pm': 2.11.5
     dev: false
-
-  /@tiptap/extension-table@2.26.2(@tiptap/core@2.11.5)(@tiptap/pm@2.11.5):
-    resolution: {integrity: sha512-zqyKRla1Ite8itEwklCBAkXPXg81GzUwLdnKOIMP/HHqMmrDRljHq455uJbzjIOOGt1x5TUcstMOn1V0ABjn5g==}
-    peerDependencies:
-      '@tiptap/core': ^2.7.0
-      '@tiptap/pm': ^2.7.0
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-      '@tiptap/pm': 2.11.5
-    dev: true
 
   /@tiptap/extension-task-item@2.11.5(@tiptap/core@2.11.5)(@tiptap/pm@2.11.5):
     resolution: {integrity: sha512-Xvvww8cleM6fcNejP916vzhL31yJnAmuBvABsOV0kHGtAqkqUVCSDcN/1qjI4ihVNeIWEJBHDczjDfZzvLy1xA==}
@@ -9818,12 +9776,26 @@ packages:
       to-buffer: 1.2.2
     dev: true
 
+  /pdfjs-dist@4.10.38:
+    resolution: {integrity: sha512-/Y3fcFrXEAsMjJXeL9J8+ZG9U01LbuWaYypvDW2ycW1jL269L3js3DVBjDJ0Up9Np1uqDXsDrRihHANhZOlwdQ==}
+    engines: {node: '>=20'}
+    optionalDependencies:
+      '@napi-rs/canvas': 0.1.80
+    dev: true
+
   /pdfjs-dist@5.3.31:
     resolution: {integrity: sha512-EhPdIjNX0fcdwYQO+e3BAAJPXt+XI29TZWC7COhIXs/K0JHcUt1Gdz1ITpebTwVMFiLsukdUZ3u0oTO7jij+VA==}
     engines: {node: '>=20.16.0 || >=22.3.0'}
     optionalDependencies:
       '@napi-rs/canvas': 0.1.80
     dev: false
+
+  /pdfjs-dist@5.4.149:
+    resolution: {integrity: sha512-Xe8/1FMJEQPUVSti25AlDpwpUm2QAVmNOpFP0SIahaPIOKBKICaefbzogLdwey3XGGoaP4Lb9wqiw2e9Jqp0LA==}
+    engines: {node: '>=20.16.0 || >=22.3.0'}
+    optionalDependencies:
+      '@napi-rs/canvas': 0.1.80
+    dev: true
 
   /perfect-debounce@1.0.0:
     resolution: {integrity: sha512-xCy9V055GLEqoFaHoC1SoLIaLmWctgCUaBaWxDZ7/Zx4CTyX7cJQLJOok/orfjZAh9kEYpjJa4d0KcJmCbctZA==}
@@ -11794,17 +11766,6 @@ packages:
       '@tiptap/pm': 2.11.5
     dev: false
 
-  /tiptap-pagination-plus@1.1.2:
-    resolution: {integrity: sha512-nHDIQI/gaNAbnrW3EfvTu9HqzYPXZlsl/AZTl9wISu9jL6UOz1wmhfhbLyf4y7DnfUsDZyFklD4MiJtL7WjUBA==}
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-      '@tiptap/extension-table': 2.26.2(@tiptap/core@2.11.5)(@tiptap/pm@2.11.5)
-      '@tiptap/extension-table-cell': 2.26.2(@tiptap/core@2.11.5)
-      '@tiptap/extension-table-header': 2.26.2(@tiptap/core@2.11.5)
-      '@tiptap/extension-table-row': 2.26.2(@tiptap/core@2.11.5)
-      '@tiptap/pm': 2.11.5
-    dev: true
-
   /to-buffer@1.2.2:
     resolution: {integrity: sha512-db0E3UJjcFhpDhAF4tLo03oli3pwl3dbnzXOUIlRKrp+ldk/VUxzpWYZENsw2SZiuBjHAk7DfB0VU7NKdpb6sw==}
     engines: {node: '>= 0.4'}
@@ -12812,6 +12773,15 @@ packages:
       '@intlify/shared': 10.0.0
       '@vue/devtools-api': 6.6.4
       vue: 3.3.13(typescript@5.5.4)
+
+  /vue-pdf-embed@2.1.3(vue@3.3.13):
+    resolution: {integrity: sha512-EGgZNb8HRrAloBpb8p8CugDpJpoPbQ8CFfAYdWZgq2e5qBMP9JSeLzVQIAJkXsclHXRIS3O9fp3WQbP9T5Inwg==}
+    peerDependencies:
+      vue: ^3.3.0
+    dependencies:
+      pdfjs-dist: 4.10.38
+      vue: 3.3.13(typescript@5.5.4)
+    dev: true
 
   /vue-router@4.3.3(vue@3.3.13):
     resolution: {integrity: sha512-8Q+u+WP4N2SXY38FDcF2H1dUEbYVHVPtPCPZj/GTZx8RCbiB8AtJP9+YIxn4Vs0svMTNQcLIzka4GH7Utkx9xQ==}

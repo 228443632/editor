@@ -78,7 +78,7 @@
 import { TextSelection } from '@tiptap/pm/state'
 import { type Tree } from 'tdesign-vue-next'
 import type { Editor } from '@tiptap/vue-3'
-import { tiptapUtil } from '@/examples/utils/tiptap-util'
+import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 // import { type Ref } from 'vue'
 
 const container = inject('container')

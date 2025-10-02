@@ -6,7 +6,7 @@
 import { type Editor, Extension } from '@tiptap/core'
 import { EditorState, Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet, EditorView } from '@tiptap/pm/view'
-import { rafThrottle } from '@/examples/utils/dom'
+import { rafThrottle } from '@/views/doc-editor/utils/dom'
 import { mountWithCreateApp } from '@/utils/vnode'
 import PaginationBreakWidget from './PaginationBreakWidget.vue'
 

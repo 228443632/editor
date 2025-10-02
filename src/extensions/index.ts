@@ -80,7 +80,7 @@ import PaginationBreak from './pagination/extentsion-pagination-break'
 
 // 自定义
 import ImageParagraph from './image-paragraph'
-import { cssUtil } from '@/examples/utils/css-util'
+import { cssUtil } from '@/views/doc-editor/utils/css-util'
 
 export const getDefaultExtensions = ({
   container,

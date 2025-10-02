@@ -5,8 +5,11 @@
  -->
 <!--setup-->
 <script setup lang="ts">
+// import PdfPreview2 from '@/views/doc-editor/PdfPreview2.vue'
+
 const { proxy } = getCurrentInstance()
-import EditorExample from './examples/index.vue'
+import DocEditor from './views/doc-editor/index.vue'
+import PreviewEditor from './views/preview-editor/index.vue'
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -30,7 +33,8 @@ defineExpose({
 
 <!--render-->
 <template>
-  <EditorExample></EditorExample>
+<!--  <DocEditor></DocEditor>-->
+  <PreviewEditor></PreviewEditor>
 </template>
 
 <!--style-->

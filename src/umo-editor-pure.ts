@@ -14,8 +14,8 @@ import '@/components/container/print.vue'
 import '@/components/editor/index.vue'
 import '@/components/menus/button.vue'
 
-import.meta.glob('@/examples/extensions/**/*.vue', { eager: true })
-import.meta.glob('@/examples/extensions/*.vue', { eager: true })
+import.meta.glob('@/views/doc-editor/extensions/**/*.vue', { eager: true })
+import.meta.glob('@/views/doc-editor/extensions/*.vue', { eager: true })
 import.meta.glob('@/composables/**/*.vue', { eager: true })
 import.meta.glob('@/composables/*.vue', { eager: true })
 

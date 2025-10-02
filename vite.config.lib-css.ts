@@ -69,7 +69,7 @@ export default defineConfig(() => {
         name: pkg.name,
         fileName: 'umo-editor-pure',
       },
-      outDir: 'src/examples/style',
+      outDir: 'src/views/doc-editor/style',
       copyPublicDir: false,
       minify: 'esbuild' as const,
       cssMinify: true,
