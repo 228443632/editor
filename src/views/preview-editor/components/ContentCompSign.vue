@@ -5,11 +5,12 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import { COMP_SEAL_STYLE } from '@/views/doc-editor/extensions/constant.ts'
+import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
-import testSealSvgRaw from '@/assets/images/test-seal.svg?raw'
+import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
+import { noop } from 'sf-utils2'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -30,6 +31,26 @@ const __previewContext__ = inject('__previewContext__') // 预览上下文
 const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
 
 /* 方法 */
+
+/**
+ * 应用到多页
+ */
+const onApplyMultiPage = () => {
+  const nodeDataList = __previewContext__.value.applyMultiPageParamsComp(
+    _nodeData.value,
+  )
+  const currentItem = nodeDataList.find((item) => item.isActive)
+
+  if (currentItem?.nodeData) {
+    setTimeout(() => {
+      // 设置当前选中
+      __previewContext__.value.selectParamsComp(currentItem.nodeData)
+    })
+  }
+  useMessage('success', {
+    content: '应用成功',
+  })
+}
 
 /* 计算 */
 
@@ -77,9 +98,11 @@ defineExpose({
       top: _nodeData.top + 'px',
       left: _nodeData.left + 'px',
     }"
-    @mousedown.stop="onSelectNode"
+    @mousedown.stop="noop"
   >
-    <span class="cursor-pointer !hover:text-[var(--umo-primary-color)] flex-1"
+    <span
+      class="cursor-pointer !hover:text-[var(--umo-primary-color)] flex-1"
+      @click="onApplyMultiPage"
       >应用到多文件多页</span
     >
     <t-icon
@@ -99,10 +122,10 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SEAL_STYLE.width + 'px',
-          height: COMP_SEAL_STYLE.height + 'px',
+          width: COMP_SIGN_STYLE.width + 'px',
+          height: COMP_SIGN_STYLE.height + 'px',
         }"
-        v-html="testSealSvgRaw"
+        v-html="testSignSvgRaw"
       ></div>
     </ContentLineWrap>
   </ContentDragWrap>
@@ -119,7 +142,7 @@ defineExpose({
   align-items: center;
   height: 28px;
   padding: 0 8px;
-  border-radius: 4px;
+  border-radius: 2px;
   color: #666;
   font-size: 12px;
   gap: 12px;

@@ -8,12 +8,12 @@
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import { div } from 'sf-utils2'
-import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
-import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
+import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
 import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 import useAnchor from '@/views/preview-editor/hooks/use-anchor'
+import ContentCompSignDate from '@/views/preview-editor/components/ContentCompSignDate.vue'
 
 /* 状态 */
 const props = defineProps({})
@@ -51,6 +51,19 @@ const { doc } = useVuePdfEmbed({
 })
 console.log('doc', doc, doc.value)
 
+// 全选
+useHotkeys('ctrl+a, command+a', () => {
+  const paramsCompList = __previewContext__.value.paramsCompList
+  if (!paramsCompList?.length) return
+  if (paramsCompList?.length == 1) {
+    __previewContext__.value.selectParamsComp(paramsCompList[0])
+    return
+  }
+  __previewContext__.value.paramsCompList.forEach((item) => {
+    item.isInRect = true
+  })
+})
+
 /* 方法 */
 /**
  * 重置页面交集观察者
@@ -69,6 +82,20 @@ const resetPageIntersectionObserver = () => {
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
+}
+
+/**
+ * 根元素按键事件
+ * @param e
+ */
+const onKeyDownRoot = (e: KeyboardEvent) => {
+  console.log('e.key', e)
+  // 判断按下的键是删除键
+  if (e.key == 'Delete' || e.key == 'Backspace') {
+    // 删除键
+    __previewContext__.value.removeParamsComp()
+    __previewContext__.value.paramsCompList = []
+  }
 }
 
 /* 计算 */
@@ -120,14 +147,14 @@ watch([_initial, _pageNumsList, embedPdfWrapRef], () => {
     }
     __previewContext__.value.anchorInfo = useAnchor({
       target: embedPdfWrapRef,
-      selectors: new Array(totalPageNum - 1).fill(0).map((_, idx) => {
+      selectors: new Array(totalPageNum).fill(0).map((_, idx) => {
         return {
           selector: `.pdf-embed__item.page-num-${idx + 1}`,
           value: idx + 1,
         }
       }),
       defaultValue: 1,
-      offsetTop: -10,
+      offsetTop: -12,
     })
     __previewContext__.value.anchorInfo.init()
   }
@@ -189,8 +216,9 @@ defineExpose({
       !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
     ]"
     tabindex="10"
+    @keydown="onKeyDownRoot"
   >
-    {{ __previewContext__.activeCompParam }}
+    <!--    {{ __previewContext__.activeCompParam }}-->
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
       <!-- 加载成功 -->
       <template v-if="_initial">
@@ -218,21 +246,24 @@ defineExpose({
           <div class="mouse-area__left"></div>
         </div>
 
-        <div
-          v-for="pageNum in _pageNumsList"
-          :key="pageNum"
-          ref="pageRefs"
-          :class="['pdf-embed__item', `page-num-${pageNum}`]"
-          :style="{
-            ..._embedItemStyle,
-          }"
-        >
-          <VuePdfEmbed
-            v-if="pageVisibility[pageNum]"
-            :source="doc"
-            :page="pageNum"
-          />
-        </div>
+        <!-- iframe的  -->
+        <transition-group name="fade" mode="out-in" appear tag="div">
+          <div
+            v-for="pageNum in _pageNumsList"
+            :key="pageNum"
+            ref="pageRefs"
+            :class="['pdf-embed__item', `page-num-${pageNum}`]"
+            :style="{
+              ..._embedItemStyle,
+            }"
+          >
+            <VuePdfEmbed
+              v-if="pageVisibility[pageNum]"
+              :source="doc"
+              :page="pageNum"
+            />
+          </div>
+        </transition-group>
 
         <!-- 参数悬浮 -->
         <template
@@ -248,20 +279,17 @@ defineExpose({
 
           <!-- 签名 -->
           <template v-else-if="item.type == 'compSign'">
-            <div
-              class="absolute"
-              :style="{
-                width: COMP_SIGN_STYLE.width + 'px',
-                height: COMP_SIGN_STYLE.height + 'px',
-                left: item.left + 'px',
-                top: item.top + 'px',
-              }"
-              v-html="testSignSvgRaw"
-            ></div>
+            <ContentCompSign
+              v-model:node-data="__previewContext__.paramsCompList[index]"
+            ></ContentCompSign>
           </template>
 
           <!-- 签署日期 -->
-          <div v-else-if="item.type == 'compSignDate'"></div>
+          <div v-else-if="item.type == 'compSignDate'">
+            <ContentCompSignDate
+              v-model:node-data="__previewContext__.paramsCompList[index]"
+            ></ContentCompSignDate>
+          </div>
         </template>
 
         <t-back-top
@@ -303,6 +331,7 @@ defineExpose({
 </template>
 
 <style lang="less" scoped>
+@import '@/style/transition';
 .pdf-preview__content {
   flex: 1;
   width: 0;

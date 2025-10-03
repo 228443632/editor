@@ -1,13 +1,13 @@
 <!--
- * @Description: 印章
+ * @Description: 签署日期控件
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 02/10/25 PM7:53
  -->
 <!--setup-->
 <script setup lang="ts">
-import { COMP_SEAL_STYLE } from '@/views/doc-editor/extensions/constant.ts'
+import { COMP_SIGN_DATE_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
-import testSealSvgRaw from '@/assets/images/test-seal.svg?raw'
+import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
 import { noop } from 'sf-utils2'
@@ -122,10 +122,10 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SEAL_STYLE.width + 'px',
-          height: COMP_SEAL_STYLE.height + 'px',
+          width: COMP_SIGN_DATE_STYLE.width + 'px',
+          height: COMP_SIGN_DATE_STYLE.height + 'px',
         }"
-        v-html="testSealSvgRaw"
+        v-html="testSignSvgRaw"
       ></div>
     </ContentLineWrap>
   </ContentDragWrap>

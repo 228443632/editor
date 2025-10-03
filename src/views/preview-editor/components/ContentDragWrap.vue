@@ -48,7 +48,7 @@ const onSelectNode = (startE: MouseEvent) => {
     (item) => item.isInRect,
   )
 
-  if (inRectNums?.length >= 1) {
+  if (inRectNums?.length > 1) {
     // 多个
     inRectNums.forEach((item) => {
       def(item, '_snapshotLeft', item.left)
@@ -84,6 +84,12 @@ const onSelectNode = (startE: MouseEvent) => {
 }
 
 /* 计算 */
+/**
+ * 是否当前组件激活
+ */
+const _isActive = computed(() => {
+  return __previewContext__.value.activeCompParam?.key == _nodeData.value.key
+})
 
 /* 监听 */
 

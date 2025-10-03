@@ -12,6 +12,7 @@ import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 import Footer from './components/Footer.vue'
+import { deepClone, uuid } from 'sf-utils2'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -61,6 +62,8 @@ const previewContext = ref({
    * @param nodeData
    */
   removeParamsComp: (nodeData: IParamsCompItem) => {
+    nodeData ||= previewContext.value.activeCompParam
+    if (!nodeData) return
     const idx = previewContext.value.paramsCompList.findIndex(
       (item) => item.key === nodeData.key,
     )
@@ -71,7 +74,64 @@ const previewContext = ref({
    * 应用多页参数组件
    * @param nodeData
    */
-  applyMultiPageParamsComp: (nodeData: IParamsCompItem) => {},
+  applyMultiPageParamsComp: (nodeData: IParamsCompItem) => {
+    const top = nodeData.top
+    console.log(
+      '分页',
+      previewContext.value.getPageNumByTop(top),
+      previewContext.value.getPageOffsetTopByTop(top),
+    )
+    const { offsetTop, pageNum: currentPageNum } =
+      previewContext.value.getPageOffsetTopByTop(top)
+    previewContext.value.removeParamsComp(nodeData)
+
+    const contentPageNums = previewContext.value.contentPageNums
+    return Array.from({ length: contentPageNums }).map((_, idx) => {
+      const pageNum = idx + 1
+      const nodeDataClone = deepClone(nodeData)
+      nodeDataClone.key = uuid()
+      nodeDataClone.top =
+        offsetTop + previewContext.value.getAbsoluteTopByPageNum(pageNum)
+      previewContext.value.paramsCompList.push(nodeDataClone)
+      return {
+        pageNum,
+        nodeData: nodeDataClone,
+        isActive: currentPageNum === pageNum,
+      }
+    })
+  },
+
+  /**
+   * 根据页码获取 绝对top
+   * @param pageNum
+   */
+  getAbsoluteTopByPageNum(pageNum: number) {
+    const mt = 12
+    return (pageNum - 1) * a4._basePx.h + (pageNum - 1) * mt
+  },
+
+  /**
+   * 根据top获取当前所处的页页的偏移量 offsetTop
+   * @param top
+   */
+  getPageOffsetTopByTop(top: number) {
+    const mt = 12
+    const pageNum = previewContext.value.getPageNumByTop(top)
+    return {
+      offsetTop: top - (pageNum - 1) * a4._basePx.h - (pageNum - 1) * mt,
+      pageNum,
+    }
+  },
+
+  /**
+   * 根据top 获取页码
+   * @param top
+   */
+  getPageNumByTop(top: number) {
+    const mt = 12
+    const pageH = a4._basePx.h
+    return Math.ceil((top + mt) / (mt + pageH))
+  },
 
   /**
    * 当前激活的参数组件
@@ -83,11 +143,14 @@ const previewContext = ref({
    * @param nodeData
    */
   selectParamsComp: (nodeData: IParamsCompItem) => {
+    // const isExist = previewContext.value.paramsCompList.some(
+    //   (item) => item.key === nodeData.key,
+    // )
+    // if (!isExist) return
     previewContext.value.activeCompParam = nodeData
     previewContext.value.paramsCompList.forEach((item) => {
       item.isInRect = false
     })
-    console.log('nodeData', nodeData)
   },
 
   /** 是否在拖拽中 */
@@ -199,7 +262,7 @@ provide('__previewContext__', previewContext)
     outline: none;
   }
   .umo-scrollbar {
-    outline: none
+    outline: none;
   }
 }
 

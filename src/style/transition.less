@@ -1,0 +1,83 @@
+/***************************  平面滑动  ********************************/
+.slide-transform-leave-active,
+.slide-transform-enter-active {
+  will-change: opacity, transform;
+  transition: transform, opacity 0.26s  cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-transform-enter-from {
+  position: relative;
+  opacity: 0;
+  transform: translate3d(-20px, 0, 0);
+}
+
+.slide-transform-leave-to {
+  position: relative;
+  opacity: 0;
+  transform: translate3d(20px, 0, 0);
+}
+
+/***************************  淡入淡出  ********************************/
+.fade-transform-enter-active {
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1), border 0s;
+}
+
+.fade-transform-enter-from {
+  position: relative;
+  opacity: 0;
+}
+
+.fade-transform-leave-to {
+  position: relative;
+  opacity: 0;
+}
+
+/***************************  缩放  ********************************/
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.scale-enter-active {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.scale-leave-active {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/***************************  向下  ********************************/
+.dialog-enter-from {
+  transform: translate3d(0, -25px, 0);
+}
+
+.dialog-leave-to {
+  opacity: 0;
+  transform: translate3d(0, -25px, 0);
+}
+
+.dialog-enter-active,
+.dialog-leave-active {
+  transition: transform 0.3s ease, opacity 0.4s ease;
+}
+
+/***************************  面包屑  ********************************/
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+  transition: all 0.5s;
+}
+
+.breadcrumb-enter-from,
+.breadcrumb-leave-active {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.breadcrumb-move {
+  transition: all 0.5s;
+}
+
+.breadcrumb-leave-active {
+  position: absolute;
+}

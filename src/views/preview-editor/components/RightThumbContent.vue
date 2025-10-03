@@ -6,7 +6,7 @@
 <!--default-->
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
-import { div } from 'sf-utils2'
+import { div, debounce } from 'sf-utils2'
 
 const props = defineProps({})
 const emit = defineEmits<{
@@ -24,6 +24,8 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 let pageIntersectionObserver: IntersectionObserver
 const initialProgress = ref(0)
+
+const isWheeling = ref(false)
 
 const { doc } = useVuePdfEmbed({
   source: './2.pdf',
@@ -58,7 +60,37 @@ const resetPageIntersectionObserver = () => {
  */
 const onChooseItem = (pageNum: number) => {
   __activePageNum__.value = pageNum
+  onWheel()
+  pageScrollIntoView(pageNum)
   emit('change', pageNum)
+}
+
+/**
+ * 页面滚动到指定页码
+ * @param pageNum
+ */
+const pageScrollIntoView = (pageNum: number) => {
+  const idx = +pageNum - 1
+  const pageDom = pageRefs.value[idx]
+  if (pageDom) {
+    if (isWheeling.value) return
+    pageDom.scrollIntoView({
+      behavior: 'smooth', // instant
+      block: 'start',
+    })
+  }
+}
+const debouncePageScrollIntoView = debounce(pageScrollIntoView, 500)
+
+/**
+ * 鼠标滚轮滚动事件
+ */
+const onWheel = () => {
+  if (onWheel['timer']) clearTimeout(onWheel['timer'])
+  isWheeling.value = true
+  onWheel['timer'] = setTimeout(() => {
+    isWheeling.value = false
+  }, 500)
 }
 
 /* 计算 */
@@ -94,20 +126,12 @@ watch(_pageNumsList, (newPageNums: number[]) => {
   nextTick(resetPageIntersectionObserver)
 })
 
-/**
- * 监听激活的页码变化，触发页面滚动
- */
-watch(__activePageNum__, (newVal: number) => {
-  const idx = +newVal - 1
-  const pageDom = pageRefs.value[idx]
-  console.log('pageDom', pageDom)
-  if (pageDom) {
-    pageDom.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    })
-  }
-})
+watch(
+  () => __previewContext__.value.anchorInfo?.active,
+  (newVal) => {
+    debouncePageScrollIntoView(newVal)
+  },
+)
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
@@ -115,7 +139,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="preview-thumb">
+  <div class="preview-thumb" @wheel="onWheel">
     <template v-if="_initial">
       <div
         v-for="pageNum in _pageNumsList"

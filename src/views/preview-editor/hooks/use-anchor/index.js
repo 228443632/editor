@@ -11,7 +11,7 @@ import {
   observerElementMutation,
   throttle,
   batchElsPosInContainer,
-  getParentScrollElement
+  getParentScrollElement,
 } from 'sf-utils2'
 
 /**
@@ -36,7 +36,7 @@ export function useAnchor(options = {}) {
     scrollTo: undefined,
     init: undefined,
     updateOptions: undefined,
-    removeEvents: undefined
+    removeEvents: undefined,
   })
 
   let _scrollView = null // 滚动区域
@@ -51,10 +51,11 @@ export function useAnchor(options = {}) {
   function addEvents() {
     const target = get(options.target)
     if (target?.nodeType === 1) {
-      _scrollView && _scrollView.addEventListener('scroll', _throttleScrollContent, false)
+      _scrollView &&
+        _scrollView.addEventListener('scroll', _throttleScrollContent, false)
       _observerMutation = observerElementMutation({
         callback: getPositions,
-        options: { el: target }
+        options: { el: target },
       })
       _observerMutation.start()
       nextTick(() => {
@@ -71,7 +72,9 @@ export function useAnchor(options = {}) {
     const offsetTop = options.offsetTop || 0
     if (_anchorPositions?.length) {
       const scrollTop = _scrollView.scrollTop
-      let idx = _anchorPositions.findLastIndex((v) => scrollTop >= v.top + offsetTop)
+      const idx = _anchorPositions.findLastIndex(
+        (v) => scrollTop >= v.top + offsetTop,
+      )
       if (~idx) anchor.value.active = options.selectors.at(idx)?.value
     }
   }
@@ -81,7 +84,8 @@ export function useAnchor(options = {}) {
    */
   function removeEvents() {
     if (options.target?.nodeType === 1) {
-      _scrollView && _scrollView.removeEventListener('scroll', _throttleScrollContent, false)
+      _scrollView &&
+        _scrollView.removeEventListener('scroll', _throttleScrollContent, false)
       if (_observerMutation) {
         _observerMutation.end()
         _observerMutation = null
@@ -97,8 +101,12 @@ export function useAnchor(options = {}) {
     if (target) {
       _anchorPositions = batchElsPosInContainer({
         els: options.selectors.map((v) => v.selector),
-        scrollDom: _scrollView
-      }).map((v, vi) => ({ ...v, value: options.selectors[vi]?.value, top: v?.top }))
+        scrollDom: _scrollView,
+      }).map((v, vi) => ({
+        ...v,
+        value: options.selectors[vi]?.value,
+        top: v?.top,
+      }))
       // console.log('重新计算位置了', _anchorPositions)
     }
   }
@@ -127,7 +135,7 @@ export function useAnchor(options = {}) {
         scrollElement: _scrollView,
         cb: () => setTimeout(() => (_enableScrollCal = true), 20),
         duration: 500,
-        offsetTop: options.offsetTop
+        offsetTop: options.offsetTop,
       })
     }
   }
@@ -140,7 +148,8 @@ export function useAnchor(options = {}) {
     removeEvents()
     _throttleScrollContent = throttle(onScrollContent, 10)
     const target = get(options.target)
-    if (target?.nodeType !== 1) return console.error(`传入的target函数返回值需为元素节点`)
+    if (target?.nodeType !== 1)
+      return console.error(`传入的target函数返回值需为元素节点`)
     initTarget(target)
     addEvents()
   }
@@ -160,7 +169,7 @@ export function useAnchor(options = {}) {
     scrollTo,
     init,
     updateOptions,
-    removeEvents
+    removeEvents,
   })
 
   watch(
@@ -169,7 +178,7 @@ export function useAnchor(options = {}) {
       nextTick(() => {
         anchor.value.init()
       })
-    }
+    },
   )
 
   onMounted(() => {

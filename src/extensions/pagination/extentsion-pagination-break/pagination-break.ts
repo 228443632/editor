@@ -27,7 +27,7 @@ export const PaginationBreak = Extension.create<PaginationBreakOptions>({
   addOptions() {
     return {
       provider: {
-        layoutSize: {}
+        layoutSize: {},
       },
       /** 每一页 大小*/
       pageHeight: 800,

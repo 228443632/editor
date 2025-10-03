@@ -145,6 +145,8 @@ const dragMethod = {
 
     const viewDom = __previewContext__.value.contentElRef
     viewDom.classList.remove('caret--is-dragging')
+
+    viewDom.focus()
   },
 }
 
@@ -195,9 +197,7 @@ defineExpose({
 <!--render-->
 <template>
   <div class="preview-editor__left">
-    <div class="left__title">
-      文件签署{{ __previewContext__.anchorInfo }}
-    </div>
+    <div class="left__title">文件签署{{ __previewContext__.anchorInfo }}</div>
 
     <!-- 内容区 -->
     <div class="left__content umo-scrollbar">

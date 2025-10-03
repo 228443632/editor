@@ -45,14 +45,14 @@ export function useMouseDragLine(
       isMoving.value = true
     }
 
-    console.log(
-      'mousemove',
-      e,
-      startX.value,
-      startY.value,
-      endX.value,
-      endY.value,
-    )
+    // console.log(
+    //   'mousemove',
+    //   e,
+    //   startX.value,
+    //   startY.value,
+    //   endX.value,
+    //   endY.value,
+    // )
   }
   const throttleMousemove = rafThrottle(mousemove) as typeof mousemove
 
