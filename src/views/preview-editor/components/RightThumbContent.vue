@@ -28,7 +28,7 @@ const initialProgress = ref(0)
 const isWheeling = ref(false)
 
 const { doc } = useVuePdfEmbed({
-  source: './2.pdf',
+  source: './1.pdf',
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
@@ -80,7 +80,7 @@ const pageScrollIntoView = (pageNum: number) => {
     })
   }
 }
-const debouncePageScrollIntoView = debounce(pageScrollIntoView, 500)
+const debouncePageScrollIntoView = debounce(pageScrollIntoView, 200)
 
 /**
  * 鼠标滚轮滚动事件
@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.28);
+  background: rgba(0, 0, 0, 0.5);
   font-size: 12px;
   color: #fff;
 }

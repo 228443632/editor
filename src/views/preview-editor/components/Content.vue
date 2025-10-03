@@ -43,7 +43,7 @@ let pageIntersectionObserver: IntersectionObserver
 const a4 = cssUtil.getPaperSize('A4')
 
 const { doc } = useVuePdfEmbed({
-  source: './2.pdf',
+  source: './1.pdf',
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')

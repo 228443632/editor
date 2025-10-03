@@ -91,6 +91,10 @@ const update = () => {
  * @param e
  */
 function onKeydown(e: KeyboardEvent) {
+  const isCanScroll =
+    __previewContext__.value.activeCompParam?.key == _nodeData.value?.key ||
+    _nodeData.value.isInRect
+  if (!isCanScroll) return
   // keyCode: 40 下 38 上。39 右 37 左
   switch (e.keyCode) {
     case 40: {
