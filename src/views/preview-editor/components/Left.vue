@@ -195,7 +195,9 @@ defineExpose({
 <!--render-->
 <template>
   <div class="preview-editor__left">
-    <div class="left__title">文件签署</div>
+    <div class="left__title">
+      文件签署{{ __previewContext__.anchorInfo }}
+    </div>
 
     <!-- 内容区 -->
     <div class="left__content umo-scrollbar">

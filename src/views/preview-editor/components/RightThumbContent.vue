@@ -32,16 +32,18 @@ const { doc } = useVuePdfEmbed({
     // console.log('c', progress, progress == '1')
   },
 })
-console.log('doc', doc, doc.value)
 
 /* 方法 */
+/**
+ * 重置页面交集观察者
+ */
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const index = pageRefs.value.indexOf(entry.target)
-        const pageNum = pageNums.value[index]
+        const pageNum = _pageNumsList.value[index]
         pageVisibility.value[pageNum] = true
       }
     })
@@ -65,13 +67,13 @@ const onChooseItem = (pageNum: number) => {
  * 是否加载结束
  */
 const _initial = computed(() => {
-  return initialProgress.value == 1.1
+  return initialProgress.value == 1
 })
 
 /**
  * 分页数量
  */
-const pageNums = computed(() =>
+const _pageNumsList = computed(() =>
   doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
 )
 
@@ -87,7 +89,7 @@ watchEffect(() => {
   __previewContext__.value.rightInitial = _initial.value
 })
 
-watch(pageNums, (newPageNums: number[]) => {
+watch(_pageNumsList, (newPageNums: number[]) => {
   pageVisibility.value = { [newPageNums[0]]: true }
   nextTick(resetPageIntersectionObserver)
 })
@@ -116,7 +118,7 @@ onBeforeUnmount(() => {
   <div class="preview-thumb">
     <template v-if="_initial">
       <div
-        v-for="pageNum in pageNums"
+        v-for="pageNum in _pageNumsList"
         :key="pageNum"
         ref="pageRefs"
         :class="[

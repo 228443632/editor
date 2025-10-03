@@ -38,10 +38,17 @@ defineExpose({
     <div
       :class="[
         'right__content umo-scrollbar',
-        !__previewContext__.rightInitial && '!overflow-y-hidden',
+        !__previewContext__.rightInitial &&
+          '!overflow-y-hidden cursor-not-allowed',
       ]"
     >
       <RightThumbContent></RightThumbContent>
+
+      <!--  未初始化  -->
+      <div
+        v-if="!__previewContext__.rightInitial"
+        class="absolute left-0 top-0 h-full w-full z-10 cursor-not-allowed"
+      ></div>
     </div>
   </div>
 </template>
@@ -85,5 +92,6 @@ defineExpose({
   height: 0;
   overflow-y: auto;
   padding: 12px 20px;
+  position: relative;
 }
 </style>

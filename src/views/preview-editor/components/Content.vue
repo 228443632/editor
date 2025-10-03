@@ -13,6 +13,7 @@ import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
 import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
+import useAnchor from '@/views/preview-editor/hooks/use-anchor'
 
 /* 状态 */
 const props = defineProps({})
@@ -60,7 +61,7 @@ const resetPageIntersectionObserver = () => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const index = pageRefs.value.indexOf(entry.target)
-        const pageNum = pageNums.value[index]
+        const pageNum = _pageNumsList.value[index]
         pageVisibility.value[pageNum] = true
       }
     })
@@ -75,7 +76,7 @@ const resetPageIntersectionObserver = () => {
 /**
  * 分页数量
  */
-const pageNums = computed(() =>
+const _pageNumsList = computed(() =>
   doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
 )
 
@@ -101,7 +102,35 @@ const _initial = computed(() => {
 /* 监听 */
 
 watchEffect(() => {
+  __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
+})
+
+watchEffect(() => {
   __previewContext__.value.contentInitial = _initial.value
+})
+
+/**
+ * 监听初始化完成，初始化锚点
+ */
+watch([_initial, _pageNumsList, embedPdfWrapRef], () => {
+  const totalPageNum = _pageNumsList.value.at(-1)
+  if (_initial.value && totalPageNum > 0 && embedPdfWrapRef.value) {
+    if (__previewContext__.value.anchorInfo?.removeEvents) {
+      __previewContext__.value.anchorInfo.removeEvents()
+    }
+    __previewContext__.value.anchorInfo = useAnchor({
+      target: embedPdfWrapRef,
+      selectors: new Array(totalPageNum - 1).fill(0).map((_, idx) => {
+        return {
+          selector: `.pdf-embed__item.page-num-${idx + 1}`,
+          value: idx + 1,
+        }
+      }),
+      defaultValue: 1,
+      offsetTop: -10,
+    })
+    __previewContext__.value.anchorInfo.init()
+  }
 })
 
 /**
@@ -134,13 +163,17 @@ watchEffect(() => {
   })
 })
 
-watch(pageNums, (newPageNums: number[]) => {
+watch(_pageNumsList, (newPageNums: number[]) => {
   pageVisibility.value = { [newPageNums[0]]: true }
   nextTick(resetPageIntersectionObserver)
 })
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
+
+  if (__previewContext__.value.anchorInfo?.removeEvents) {
+    __previewContext__.value.anchorInfo.removeEvents()
+  }
 })
 
 /** 暴露 */
@@ -151,12 +184,12 @@ defineExpose({
 
 <template>
   <div
+    ref="rootRef"
     :class="[
       `pdf-preview__content umo-scrollbar`,
-      !_initial && '!overflow-y-hidden pointer-events-none',
+      !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
     ]"
     tabindex="10"
-    ref="rootRef"
   >
     {{ __previewContext__.activeCompParam }}
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
@@ -187,10 +220,10 @@ defineExpose({
         </div>
 
         <div
-          v-for="pageNum in pageNums"
+          v-for="pageNum in _pageNumsList"
           :key="pageNum"
           ref="pageRefs"
-          class="pdf-embed__item"
+          :class="['pdf-embed__item', `page-num-${pageNum}`]"
           :style="{
             ..._embedItemStyle,
           }"
@@ -236,7 +269,7 @@ defineExpose({
           :visible-height="800"
           :container="() => __previewContext__.contentElRef"
           size="small"
-          :offset="['300px', '30px']"
+          :offset="['300px', '48px']"
         />
       </template>
 
@@ -273,9 +306,9 @@ defineExpose({
 <style lang="less" scoped>
 .pdf-preview__content {
   flex: 1;
+  width: 0;
   overflow: auto;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
   padding: 16px 0;
   scroll-behavior: smooth;
   &.caret--is-dragging {

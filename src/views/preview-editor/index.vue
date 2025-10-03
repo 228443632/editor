@@ -11,6 +11,7 @@ import Left from '@/views/preview-editor/components/Left.vue'
 import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import Footer from './components/Footer.vue'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -98,8 +99,14 @@ const previewContext = ref({
   /** 内容是否加载结束 */
   contentInitial: false,
 
+  /** 内容分页数 */
+  contentPageNums: 0,
+
   /** 右侧是否加载结束 */
-  rightInitial: false
+  rightInitial: false,
+
+  /** 锚点*/
+  anchorInfo: {},
 })
 
 /* 方法 */
@@ -139,6 +146,10 @@ watch(layoutWidth, (val: number) => {
   layoutSize.value.layoutWidth = val
 })
 
+watchEffect(() => {
+  previewContext.value.anchorInfo.active = activePageNum.value
+})
+
 /* 周期 */
 onMounted(() => {})
 
@@ -163,9 +174,13 @@ provide('__previewContext__', previewContext)
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
   >
-    <Left></Left>
-    <Content ref="contentRef"></Content>
-    <Right></Right>
+    <div class="flex-1 h-0 flex">
+      <Left></Left>
+      <Content ref="contentRef"></Content>
+      <Right></Right>
+    </div>
+
+    <Footer class="preview-editor__footer"></Footer>
   </div>
 </template>
 
@@ -176,5 +191,14 @@ provide('__previewContext__', previewContext)
   background-color: var(--umo-container-background);
   height: 100vh;
   width: 100%;
+  flex-direction: column;
+}
+
+.preview-editor__footer {
+  height: 31px;
+  flex: none;
+  width: 100%;
+  background: white;
+  border-top: 1px solid var(--umo-border-color);
 }
 </style>
