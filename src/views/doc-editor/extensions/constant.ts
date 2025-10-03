@@ -92,7 +92,7 @@ export const FLOAT_NODE_TYPE_MAP = {
  */
 export const COMP_SEAL_STYLE = {
   width: 140,
-  height: 140
+  height: 140,
 }
 
 /**
@@ -100,7 +100,7 @@ export const COMP_SEAL_STYLE = {
  */
 export const COMP_SIGN_STYLE = {
   width: 105,
-  height: 28
+  height: 28,
 }
 
 // export type COMP_BOLD_PARAMS = {

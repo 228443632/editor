@@ -15,18 +15,18 @@ import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 
 export interface IDragNodeParamsNode {
   /** node 参数组件类型*/
-  value: string
+  value?: string
   /** 等同于上面*/
-  type: TPrettifyString<keyof typeof COMP_PARAMS_NAME_MAP> | 'textBox'
+  type?: TPrettifyString<keyof typeof COMP_PARAMS_NAME_MAP> | 'textBox'
 
   /** node 参数组件名称*/
-  label: string
+  label?: string
 
   /** 传入的属性 */
-  attrs: Record<string, any>
+  attrs?: Record<string, any>
 
   /** 是否是自定义参数节点 */
-  isCompParams: boolean
+  isCompParams?: boolean
 
   [K: string]: any
 }
@@ -116,7 +116,6 @@ export const ExtensionDragParams = Extension.create({
               },
             })
             .run()
-
 
           // 校验印章
           function validateSeal(editor: Editor) {

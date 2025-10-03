@@ -8,11 +8,32 @@
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import { div } from 'sf-utils2'
+import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
+import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
+import ContentCompSeal from './ContentCompSeal.vue'
+import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
+import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 
+/* 状态 */
 const props = defineProps({})
 const emit = defineEmits([])
+const embedPdfWrapRef = ref<HTMLDivElement>()
+const initialProgress = ref(0)
 
 const __activePageNum__ = inject('__activePageNum__')
+const __previewContext__ = inject('__previewContext__') // 预览上下文
+
+const rootRef = ref<HTMLElement>()
+const {
+  _width: _dragAreaWidth,
+  _height: _dragAreaHeight,
+  _fromX: _dragAreaFromX,
+  _fromY: _dragAreaFromY,
+  isMoving: dragAreaIsMoving,
+  isInRect,
+} = useMouseDragLine(embedPdfWrapRef, {
+  mouseEventContainerRef: rootRef,
+})
 
 const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
@@ -23,19 +44,16 @@ const a4 = cssUtil.getPaperSize('A4')
 const { doc } = useVuePdfEmbed({
   source: './2.pdf',
   onProgress: (progressParams) => {
-    const progress = div(progressParams.loaded / progressParams.total)
-    console.log('c', progress, progress == '1')
+    initialProgress.value = div(progressParams.loaded / progressParams.total)
+    // console.log('c', progress, progress == '1')
   },
 })
 console.log('doc', doc, doc.value)
 
+/* 方法 */
 /**
- * 分页数量
+ * 重置页面交集观察者
  */
-const pageNums = computed(() =>
-  doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
-)
-
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
@@ -47,10 +65,19 @@ const resetPageIntersectionObserver = () => {
       }
     })
   })
-  pageRefs.value.forEach((element) => {
+  pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
 }
+
+/* 计算 */
+
+/**
+ * 分页数量
+ */
+const pageNums = computed(() =>
+  doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
+)
 
 /**
  * 嵌入项每一项样式
@@ -65,6 +92,19 @@ const _embedItemStyle = computed(() => {
 })
 
 /**
+ * 是否加载结束
+ */
+const _initial = computed(() => {
+  return initialProgress.value == 1
+})
+
+/* 监听 */
+
+watchEffect(() => {
+  __previewContext__.value.contentInitial = _initial.value
+})
+
+/**
  * 监听激活的页码变化，触发页面滚动
  */
 watch(__activePageNum__, (newVal: number) => {
@@ -75,6 +115,25 @@ watch(__activePageNum__, (newVal: number) => {
   }
 })
 
+watchEffect(() => {
+  void _dragAreaWidth.value
+  void _dragAreaHeight.value
+  void _dragAreaFromX.value
+  void _dragAreaFromY.value
+  void dragAreaIsMoving.value
+
+  const paramsCompList = __previewContext__.value.paramsCompList || []
+
+  paramsCompList.forEach((item) => {
+    item.bottom = item.top + item.height
+    item.right = item.left + item.width
+    console.log('item', item)
+    if (isInRect(item)) {
+      item.isInRect = true
+    }
+  })
+})
+
 watch(pageNums, (newPageNums: number[]) => {
   pageVisibility.value = { [newPageNums[0]]: true }
   nextTick(resetPageIntersectionObserver)
@@ -83,43 +142,172 @@ watch(pageNums, (newPageNums: number[]) => {
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
 })
+
+/** 暴露 */
+defineExpose({
+  embedPdfWrapRef,
+})
 </script>
 
 <template>
-  <div class="pdf-preview umo-scrollbar">
-    <div class="pdf-embed__wrap">
-      <div
-        v-for="pageNum in pageNums"
-        :key="pageNum"
-        ref="pageRefs"
-        class="pdf-embed__item"
-        :style="{
-          ..._embedItemStyle,
-        }"
-      >
-        <vue-pdf-embed
-          v-if="pageVisibility[pageNum]"
-          :source="doc"
-          :page="pageNum"
+  <div
+    :class="[
+      `pdf-preview__content umo-scrollbar`,
+      !_initial && '!overflow-y-hidden pointer-events-none',
+    ]"
+    tabindex="10"
+    ref="rootRef"
+  >
+    {{ __previewContext__.activeCompParam }}
+    <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
+      <!-- 加载成功 -->
+      <template v-if="_initial">
+        <!--  激活的组件虚线   -->
+        <div :class="[PREVIEW_AUX_LINE_CTOR, 'absolute top-0 left-0']"></div>
+
+        <!--  鼠标选中区域   -->
+        <div
+          v-show="
+            dragAreaIsMoving &&
+            !__previewContext__.activeCompParam?.isEsDragging &&
+            !__previewContext__.isDragging
+          "
+          class="mouse-area"
+          :style="{
+            left: _dragAreaFromX + 'px',
+            top: _dragAreaFromY + 'px',
+            '--w': Math.abs(_dragAreaWidth) + 'px',
+            '--h': Math.abs(_dragAreaHeight) + 'px',
+          }"
+        >
+          <div class="mouse-area__top"></div>
+          <div class="mouse-area__right"></div>
+          <div class="mouse-area__bottom"></div>
+          <div class="mouse-area__left"></div>
+        </div>
+
+        <div
+          v-for="pageNum in pageNums"
+          :key="pageNum"
+          ref="pageRefs"
+          class="pdf-embed__item"
+          :style="{
+            ..._embedItemStyle,
+          }"
+        >
+          <VuePdfEmbed
+            v-if="pageVisibility[pageNum]"
+            :source="doc"
+            :page="pageNum"
+          />
+        </div>
+
+        <!-- 参数悬浮 -->
+        <template
+          v-for="(item, index) in __previewContext__.paramsCompList"
+          :key="item.key"
+        >
+          <!-- 印章 -->
+          <template v-if="item.type == 'compSeal'">
+            <ContentCompSeal
+              v-model:node-data="__previewContext__.paramsCompList[index]"
+            ></ContentCompSeal>
+          </template>
+
+          <!-- 签名 -->
+          <template v-else-if="item.type == 'compSign'">
+            <div
+              class="absolute"
+              :style="{
+                width: COMP_SIGN_STYLE.width + 'px',
+                height: COMP_SIGN_STYLE.height + 'px',
+                left: item.left + 'px',
+                top: item.top + 'px',
+              }"
+              v-html="testSignSvgRaw"
+            ></div>
+          </template>
+
+          <!-- 签署日期 -->
+          <div v-else-if="item.type == 'compSignDate'"></div>
+        </template>
+
+        <t-back-top
+          :visible-height="800"
+          :container="() => __previewContext__.contentElRef"
+          size="small"
+          :offset="['300px', '30px']"
         />
-      </div>
+      </template>
+
+      <!-- 骨架屏 -->
+      <template v-else>
+        <div
+          v-for="pageNum in 3"
+          :key="pageNum"
+          ref="pageRefs"
+          class="pdf-embed__item bg-white py-6 px-4 flex flex-col gap-4"
+          :style="{
+            ..._embedItemStyle,
+            padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
+          }"
+        >
+          <t-skeleton
+            class="w-full"
+            :loading="true"
+            animation="gradient"
+            theme="paragraph"
+          ></t-skeleton>
+          <t-skeleton
+            class="w-full"
+            :loading="true"
+            animation="gradient"
+            theme="paragraph"
+          ></t-skeleton>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
-.pdf-preview {
+.pdf-preview__content {
   flex: 1;
   overflow: auto;
   height: 100vh;
   width: 100vw;
   padding: 16px 0;
   scroll-behavior: smooth;
+  &.caret--is-dragging {
+    .pdf-embed__item {
+      outline: 2px dashed var(--umo-primary-color);
+    }
+  }
+}
+
+.mouse-area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  width: var(--w);
+  height: var(--h);
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.1);
+  border: 1px dashed var(--umo-primary-color);
+  //.mouse-area__top, .mouse-area__bottom {
+  //  width: var(--w);
+  //  height: 1px;
+  //}
+  //
+  //.mouse-area__left, .mouse-area__right {
+  //}
 }
 
 .pdf-embed__wrap {
   width: fit-content;
   margin: 0 auto;
+  position: relative;
 }
 
 .pdf-embed__item {

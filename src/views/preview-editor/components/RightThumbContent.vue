@@ -16,20 +16,25 @@ const emit = defineEmits<{
   (e: 'change', val: any): void
 }>()
 
+/* 状态 */
 const __activePageNum__ = inject('__activePageNum__')
+const __previewContext__ = inject('__previewContext__') // 预览上下文
+
 const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 let pageIntersectionObserver: IntersectionObserver
+const initialProgress = ref(0)
 
 const { doc } = useVuePdfEmbed({
   source: './2.pdf',
   onProgress: (progressParams) => {
-    const progress = div(progressParams.loaded / progressParams.total)
+    initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
   },
 })
 console.log('doc', doc, doc.value)
 
+/* 方法 */
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
@@ -54,6 +59,15 @@ const onChooseItem = (pageNum: number) => {
   emit('change', pageNum)
 }
 
+/* 计算 */
+
+/**
+ * 是否加载结束
+ */
+const _initial = computed(() => {
+  return initialProgress.value == 1.1
+})
+
 /**
  * 分页数量
  */
@@ -66,6 +80,11 @@ const pageNums = computed(() =>
  */
 const _embedItemStyle = computed(() => {
   return {}
+})
+
+/* 监听 */
+watchEffect(() => {
+  __previewContext__.value.rightInitial = _initial.value
 })
 
 watch(pageNums, (newPageNums: number[]) => {
@@ -95,24 +114,49 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="preview-thumb">
-    <div
-      v-for="pageNum in pageNums"
-      :key="pageNum"
-      ref="pageRefs"
-      :class="['pdf-embed__item', __activePageNum__ == pageNum && 'is-active']"
-      :style="{
-        ..._embedItemStyle,
-      }"
-      @click="onChooseItem(pageNum)"
-    >
-      <vue-pdf-embed
-        v-if="pageVisibility[pageNum]"
-        :source="doc"
-        :page="pageNum"
-      />
+    <template v-if="_initial">
+      <div
+        v-for="pageNum in pageNums"
+        :key="pageNum"
+        ref="pageRefs"
+        :class="[
+          'pdf-embed__item',
+          __activePageNum__ == pageNum && 'is-active',
+        ]"
+        :style="{
+          ..._embedItemStyle,
+        }"
+        @click="onChooseItem(pageNum)"
+      >
+        <vue-pdf-embed
+          v-if="pageVisibility[pageNum]"
+          :source="doc"
+          :page="pageNum"
+        />
 
-      <div class="embed__item-num">第 {{ pageNum }} 页</div>
-    </div>
+        <div class="embed__item-num">第 {{ pageNum }} 页</div>
+      </div>
+    </template>
+
+    <!-- 骨架屏   -->
+    <template v-else>
+      <div
+        v-for="pageNum in 8"
+        :key="pageNum"
+        ref="pageRefs"
+        class="pdf-embed__item aspect-item bg-white py-6 px-6 flex flex-col gap-4"
+        :style="{
+          ..._embedItemStyle,
+        }"
+      >
+        <t-skeleton
+          class="w-full"
+          :loading="true"
+          animation="gradient"
+          theme="paragraph"
+        ></t-skeleton>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -164,5 +208,16 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.28);
   font-size: 12px;
   color: #fff;
+}
+
+.aspect-item {
+  aspect-ratio: 794 / 1122;
+}
+
+:deep {
+  .t-skeleton__row {
+    --td-font-size-body-large: 10px;
+    --td-comp-margin-l: 8px;
+  }
 }
 </style>

@@ -3,7 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 23/07/25 PM2:00
  */
-import type { Editor } from '@tiptap/core'
+// import type { Editor } from '@tiptap/core'
 
 type ThrottledFunction<T> = (...args: any[]) => T
 
@@ -25,4 +25,3 @@ export function rafThrottle<T>(fn: ThrottledFunction<T>) {
     }
   }
 }
-

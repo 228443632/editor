@@ -10,6 +10,7 @@ import { useElementSize } from '@vueuse/core'
 import Left from '@/views/preview-editor/components/Left.vue'
 import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
+import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -40,8 +41,79 @@ const layoutSize = ref({
 })
 
 const activePageNum = ref(1)
+const contentRef = ref<InstanceType<typeof Content>>() // 内容
+const previewContext = ref({
+  contentElRef: computed(() => unrefElement(contentRef)),
+
+  /**
+   * 内嵌的pdf包裹容器
+   */
+  embedPdfWrapRef: computed(() => contentRef?.value?.embedPdfWrapRef),
+
+  /**
+   * 参数
+   */
+  paramsCompList: [] as IParamsCompItem[],
+
+  /**
+   * 移除参数组件
+   * @param nodeData
+   */
+  removeParamsComp: (nodeData: IParamsCompItem) => {
+    const idx = previewContext.value.paramsCompList.findIndex(
+      (item) => item.key === nodeData.key,
+    )
+    if (idx >= 0) previewContext.value.paramsCompList.splice(idx, 1)
+  },
+
+  /**
+   * 应用多页参数组件
+   * @param nodeData
+   */
+  applyMultiPageParamsComp: (nodeData: IParamsCompItem) => {},
+
+  /**
+   * 当前激活的参数组件
+   */
+  activeCompParam: undefined,
+
+  /**
+   * 选中参数组件
+   * @param nodeData
+   */
+  selectParamsComp: (nodeData: IParamsCompItem) => {
+    previewContext.value.activeCompParam = nodeData
+    previewContext.value.paramsCompList.forEach((item) => {
+      item.isInRect = false
+    })
+    console.log('nodeData', nodeData)
+  },
+
+  /** 是否在拖拽中 */
+  isDragging: false,
+
+  /** 左侧是否加载结束 */
+  leftInitial: false,
+
+  /** 内容是否加载结束 */
+  contentInitial: false,
+
+  /** 右侧是否加载结束 */
+  rightInitial: false
+})
 
 /* 方法 */
+
+/**
+ * 点击预览的编辑器
+ */
+const onClickPreviewEditor = () => {
+  previewContext.value.activeCompParam = undefined
+  previewContext.value.paramsCompList.forEach((item) => {
+    item.isInRect = false
+  })
+  console.log('点击了预览的编辑器')
+}
 
 /* 计算 */
 /**
@@ -77,13 +149,22 @@ defineExpose({
 
 // 当前激活的页码
 provide('__activePageNum__', activePageNum)
+
+// 预览上下文
+provide('__previewContext__', previewContext)
 </script>
 
 <!--render-->
 <template>
-  <div ref="rootRef" class="preview-editor" :style="_rootStyle">
+  <div
+    ref="rootRef"
+    class="preview-editor"
+    :style="_rootStyle"
+    @mousedown="onClickPreviewEditor"
+    @contextmenu.prevent.stop
+  >
     <Left></Left>
-    <Content></Content>
+    <Content ref="contentRef"></Content>
     <Right></Right>
   </div>
 </template>

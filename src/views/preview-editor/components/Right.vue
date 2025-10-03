@@ -12,6 +12,7 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
+const __previewContext__ = inject('__previewContext__') // 预览上下文
 
 /* 方法 */
 
@@ -32,22 +33,14 @@ defineExpose({
 <template>
   <div class="preview-editor__right">
     <!-- 内容区 -->
-    <div class="right__title">
-      文件列表
-      <!--      <div data-v-8ce415cf="" class="umo-dialog__close">-->
-      <!--        <svg-->
-      <!--          data-v-8ce415cf=""-->
-      <!--          class="umo-icon"-->
-      <!--          aria-hidden="true"-->
-      <!--          width="20"-->
-      <!--          height="20"-->
-      <!--        >-->
-      <!--          <use xlink:href="#umo-icon-close" fill="currentcolor"></use>-->
-      <!--        </svg>-->
-      <!--      </div>-->
-    </div>
+    <div class="right__title">文件列表</div>
 
-    <div class="right__content umo-scrollbar">
+    <div
+      :class="[
+        'right__content umo-scrollbar',
+        !__previewContext__.rightInitial && '!overflow-y-hidden',
+      ]"
+    >
       <RightThumbContent></RightThumbContent>
     </div>
   </div>
