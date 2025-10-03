@@ -33,7 +33,7 @@ defineExpose({
 <template>
   <div class="preview-editor__right">
     <!-- 内容区 -->
-    <div class="right__title">缩略页3列表</div>
+    <div class="right__title">缩略页列表</div>
 
     <div
       :class="[

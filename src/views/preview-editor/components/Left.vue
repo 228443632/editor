@@ -61,11 +61,7 @@ const dragMethod = {
       document.body.append(dragImage)
       dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SEAL_STYLE.width}px; height: ${COMP_SEAL_STYLE.height}px; border: 1px dashed #999;`
       dragImage.innerHTML = testSealImgRaw
-      e.dataTransfer.setDragImage(
-        dragImage,
-        -dragImage.offsetWidth,
-        -dragImage.offsetHeight,
-      )
+      e.dataTransfer.setDragImage(dragImage, 0, 0)
       dragMethod.dragNodeDom.__nodeData.width = COMP_SEAL_STYLE.width
       dragMethod.dragNodeDom.__nodeData.height = COMP_SEAL_STYLE.height
       setTimeout(() => dragImage.remove())
@@ -75,21 +71,13 @@ const dragMethod = {
       document.body.prepend(dragImage)
       dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SIGN_STYLE.width}px; height: ${COMP_SIGN_STYLE.height}px; border: 1px dashed #999;`
       dragImage.innerHTML = testSignImgRaw
-      e.dataTransfer.setDragImage(
-        dragImage,
-        -dragImage.offsetWidth,
-        -dragImage.offsetHeight,
-      )
+      e.dataTransfer.setDragImage(dragImage, 0, 0)
       dragMethod.dragNodeDom.__nodeData.width = COMP_SIGN_STYLE.width
       dragMethod.dragNodeDom.__nodeData.height = COMP_SIGN_STYLE.height
       setTimeout(() => dragImage.remove())
     } else {
       // 设置透明度
-      e.dataTransfer.setDragImage(
-        targetNode,
-        -targetNode.offsetWidth,
-        -targetNode.offsetHeight - 24,
-      )
+      e.dataTransfer.setDragImage(targetNode, 0, 0)
     }
 
     // 设置光标颜色
