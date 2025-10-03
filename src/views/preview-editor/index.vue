@@ -13,6 +13,7 @@ import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 import Footer from './components/Footer.vue'
 import { deepClone, uuid } from 'sf-utils2'
+import Header from './components/Header.vue' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -237,6 +238,7 @@ provide('__previewContext__', previewContext)
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
   >
+    <Header class="preview-editor__header"></Header>
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>

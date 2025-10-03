@@ -143,6 +143,9 @@ defineExpose({
   }
 }
 
+.es-drager {
+  scroll-margin-top: 38px;
+}
 .es-drager.selected.border {
   //outline-style: dashed;
   //outline-width: 1px;

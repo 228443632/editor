@@ -62,7 +62,7 @@ defineExpose({
       var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
         var(--editor-width) - 8px
     ),
-    250px
+    220px
   );
   //background-color: #fff;
   flex: none;

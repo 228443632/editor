@@ -266,9 +266,10 @@ defineExpose({
         </transition-group>
 
         <!-- 参数悬浮 -->
-        <template
+        <div
           v-for="(item, index) in __previewContext__.paramsCompList"
           :key="item.key"
+          :data-id="'id-' + item.key"
         >
           <!-- 印章 -->
           <template v-if="item.type == 'compSeal'">
@@ -285,12 +286,12 @@ defineExpose({
           </template>
 
           <!-- 签署日期 -->
-          <div v-else-if="item.type == 'compSignDate'">
+          <template v-else-if="item.type == 'compSignDate'">
             <ContentCompSignDate
               v-model:node-data="__previewContext__.paramsCompList[index]"
             ></ContentCompSignDate>
-          </div>
-        </template>
+          </template>
+        </div>
 
         <t-back-top
           :visible-height="800"
