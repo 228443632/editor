@@ -156,7 +156,6 @@ watchEffect(() => {
   paramsCompList.forEach((item) => {
     item.bottom = item.top + item.height
     item.right = item.left + item.width
-    console.log('item', item)
     if (isInRect(item)) {
       item.isInRect = true
     }

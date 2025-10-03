@@ -194,6 +194,15 @@ provide('__previewContext__', previewContext)
   flex-direction: column;
 }
 
+:deep {
+  [tabindex]:focus {
+    outline: none;
+  }
+  .umo-scrollbar {
+    outline: none
+  }
+}
+
 .preview-editor__footer {
   height: 31px;
   flex: none;

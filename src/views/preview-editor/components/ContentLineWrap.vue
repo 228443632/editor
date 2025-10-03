@@ -12,8 +12,20 @@ export const PREVIEW_AUX_LINE_CTOR = 'preview-page-content__auxline'
 import type { CSSProperties } from 'vue'
 import { useElementBounding } from '@vueuse/core'
 import { MAX_Z_INDEX } from '@/views/doc-editor/utils/dom'
+import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 
 const props = defineProps({
+  /**
+   * 节点数据
+   */
+  nodeData: {
+    type: Object as PropType<IParamsCompItem>,
+    default: () => ({
+      top: 0,
+      left: 0,
+    }),
+  },
+
   /**
    * 是否展示线
    */
@@ -49,6 +61,8 @@ const props = defineProps({
 const emit = defineEmits({})
 
 /* 状态 */
+const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
+
 const __previewContext__ = inject('__previewContext__') // 预览上下文
 
 const rootRef = ref<HTMLHtmlElement>()
@@ -61,11 +75,53 @@ const rootBound = useElementBounding(rootRef)
 const umoPageContentBound = useElementBounding(_embedPdfWrapRef)
 const updateFlag = ref(0)
 
+const scrollViewRef = computed(() => __previewContext__.value.contentElRef)
+
+useEventListener(scrollViewRef, 'keydown', onKeydown)
+
 /* 方法 */
 
 const update = () => {
   rootBound.update()
   umoPageContentBound.update()
+}
+
+/**
+ * 监听键盘事件
+ * @param e
+ */
+function onKeydown(e: KeyboardEvent) {
+  // keyCode: 40 下 38 上。39 右 37 左
+  switch (e.keyCode) {
+    case 40: {
+      // 下
+      e.preventDefault()
+      _nodeData.value.top = _nodeData.value.top + 1
+      break
+    }
+    case 38: {
+      // 上
+      _nodeData.value.top = _nodeData.value.top - 1
+      e.preventDefault()
+      break
+    }
+
+    case 37: {
+      // 左
+      _nodeData.value.left = _nodeData.value.left - 1
+      e.preventDefault()
+      break
+    }
+    case 39: {
+      // 右
+      _nodeData.value.left = _nodeData.value.left + 1
+      e.preventDefault()
+      break
+    }
+    default: {
+      break
+    }
+  }
 }
 
 /* 计算 */
