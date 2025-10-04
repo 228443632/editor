@@ -1,0 +1,430 @@
+//@import '~@jeplus/hub/src/style/app/variables.less';
+@import '@/style/vars';
+:root {
+  --v-spin-primary-color: @primary-color;
+}
+.spin-popper--initial[data-spin-id] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.v-spin-wrap {
+  position: relative;
+  //content-visibility: auto;
+  & > .spin-popper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+    flex-direction: column;
+    //content-visibility: auto;
+    .loading__text {
+      z-index: 1960;
+      padding-top: 8px;
+      color: var(--v-spin-primary-color);
+      opacity: 0.8;
+    }
+
+    &.is-shape-hidden {
+      .spinner-icon {
+        display: none;
+      }
+    }
+
+    .loading__text--default {
+      font-size: 13px;
+    }
+
+    .loading__text--small {
+      font-size: 12px;
+    }
+
+    .loading__text--large {
+      font-size: 14px;
+    }
+
+    &.spin-popper--horizontal {
+      flex-direction: row;
+
+      .loading__text {
+        padding-top: 0;
+        margin-left: 6px;
+      }
+
+      .spinner-dot {
+        flex: none;
+      }
+    }
+
+    .spinner-icon {
+      z-index: 1960;
+    }
+
+    .spinner-dot {
+      position: relative;
+      display: inline-block;
+      background: transparent;
+      transform: rotate(45deg);
+      animation: ant-rotate 1.2s infinite linear;
+      //content-visibility: auto;
+      i {
+        position: absolute;
+        display: block;
+        background-color: var(--v-spin-primary-color);
+        border-radius: 100%;
+        opacity: 0.4;
+        transform: scale(0.75);
+        animation: ant-spin-move 1s infinite linear alternate;
+        transform-origin: 50% 50%;
+
+        &:nth-child(1) {
+          top: 0;
+          left: 0;
+        }
+
+        &:nth-child(2) {
+          top: 0;
+          right: 0;
+          animation-delay: 0.4s;
+        }
+
+        &:nth-child(3) {
+          right: 0;
+          bottom: 0;
+          animation-delay: 0.8s;
+        }
+
+        &:nth-child(4) {
+          bottom: 0;
+          left: 0;
+          animation-delay: 1.2s;
+        }
+      }
+      @keyframes ant-spin-move {
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes ant-rotate {
+        to {
+          transform: rotate(405deg);
+        }
+      }
+
+      &.spinner-dot--default {
+        width: 20px;
+        height: 20px;
+
+        i {
+          width: 9px;
+          height: 9px;
+        }
+      }
+
+      &.spinner-dot--small {
+        width: 14px;
+        height: 14px;
+
+        i {
+          width: 6px;
+          height: 6px;
+        }
+      }
+
+      &.spinner-dot--large {
+        width: 32px;
+        height: 32px;
+
+        i {
+          width: 14px;
+          height: 14px;
+        }
+      }
+
+      &.spinner-dot--custom {
+        width: 24px;
+        height: 24px;
+
+        i {
+          width: 11px;
+          height: 11px;
+        }
+      }
+    }
+
+    .spinner-rect {
+      position: relative;
+      display: inline-block;
+      background: transparent;
+
+      .cube1,
+      .cube2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-top: -20px;
+        margin-left: -20px;
+        background-color: var(--v-spin-primary-color);
+        animation: cubemove 1.8s infinite ease-in-out;
+      }
+
+      .cube2 {
+        animation-delay: -0.9s;
+      }
+
+      @keyframes cubemove {
+        25% {
+          transform: translateX(28px) rotate(-90deg) scale(0.5);
+        }
+
+        50% {
+          transform: translateX(28px) translateY(28px) rotate(-180deg);
+        }
+
+        75% {
+          transform: translateX(0px) translateY(28px) rotate(-270deg) scale(0.5);
+        }
+
+        100% {
+          transform: rotate(-280deg);
+        }
+      }
+
+      @keyframes cubemove {
+        25% {
+          transform: translateX(28px) rotate(-90deg) scale(0.5);
+        }
+
+        50% {
+          transform: translateX(28px) translateY(28px) rotate(-179deg);
+        }
+
+        50.1% {
+          transform: translateX(28px) translateY(28px) rotate(-180deg);
+        }
+
+        75% {
+          transform: translateX(0px) translateY(28px) rotate(-270deg) scale(0.5);
+        }
+
+        100% {
+          transform: rotate(-280deg);
+        }
+      }
+
+      &.spinner-rect--default {
+        width: 20px;
+        height: 20px;
+
+        .cube1,
+        .cube2 {
+          width: 10px;
+          height: 10px;
+        }
+      }
+
+      &.spinner-rect--small {
+        width: 14px;
+        height: 14px;
+
+        .cube1,
+        .cube2 {
+          width: 8px;
+          height: 8px;
+        }
+      }
+
+      &.spinner-rect--large {
+        width: 26px;
+        height: 26px;
+
+        .cube1,
+        .cube2 {
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+
+    .spinner-circle {
+      width: 30px;
+      height: 30px;
+      animation: loading-rotate 2s linear infinite;
+      @keyframes loading-rotate {
+        100% {
+          transform: rotate(1turn);
+        }
+      }
+
+      .path {
+        stroke-width: 4;
+        stroke-linecap: round;
+
+        &.path-background {
+          stroke: #d8dee1;
+        }
+
+        &.path-loading {
+          animation: loading-dash 1.5s ease-in-out infinite;
+          stroke-dasharray: 90, 150;
+          stroke-dashoffset: 0;
+          stroke: var(--v-spin-primary-color);
+        }
+      }
+
+      &.spinner-circle--default {
+        width: 30px;
+        height: 30px;
+      }
+
+      &.spinner-circle--small {
+        width: 22px;
+        height: 22px;
+      }
+
+      &.spinner-circle--large {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    .spinner-flower {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      vertical-align: middle;
+      //background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgxMDB2MTAwSDB6Ii8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTlFOUU5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAgLTMwKSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iIzk4OTY5NyIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgzMCAxMDUuOTggNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjOUI5OTlBIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDYwIDc1Ljk4IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0EzQTFBMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSg5MCA2NSA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNBQkE5QUEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwIDU4LjY2IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0IyQjJCMiIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgxNTAgNTQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjQkFCOEI5IiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKDE4MCA1MCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDMkMwQzEiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE1MCA0NS45OCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNDQkNCQ0IiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTEyMCA0MS4zNCA2NSkiLz48cmVjdCB3aWR0aD0iNyIgaGVpZ2h0PSIyMCIgeD0iNDYuNSIgeT0iNDAiIGZpbGw9IiNEMkQyRDIiIHJ4PSI1IiByeT0iNSIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDM1IDY1KSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjIwIiB4PSI0Ni41IiB5PSI0MCIgZmlsbD0iI0RBREFEQSIgcng9IjUiIHJ5PSI1IiB0cmFuc2Zvcm09InJvdGF0ZSgtNjAgMjQuMDIgNjUpIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iMjAiIHg9IjQ2LjUiIHk9IjQwIiBmaWxsPSIjRTJFMkUyIiByeD0iNSIgcnk9IjUiIHRyYW5zZm9ybT0icm90YXRlKC0zMCAtNS45OCA2NSkiLz48L3N2Zz4=')
+      background: url('./spin-flower.svg') 0% 0% / 100% no-repeat transparent;
+      animation: u-flower-43f4b26c 1s steps(12) 0s infinite normal none running;
+
+      &.spinner-circular--small {
+        width: 22px;
+        height: 22px;
+      }
+
+      &.spinner-circular--large {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    @keyframes u-flower-43f4b26c {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner-circular {
+      width: 42px;
+      height: 42px;
+      animation: loading-rotate 2s linear infinite;
+
+      .path {
+        animation: loading-dash 1.5s ease-in-out infinite;
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: 0;
+        stroke-width: 2;
+        stroke: var(--v-spin-primary-color);
+        stroke-linecap: round;
+      }
+
+      &.spinner-circular--default {
+        width: 30px;
+        height: 30px;
+      }
+
+      &.spinner-circular--small {
+        width: 22px;
+        height: 22px;
+      }
+
+      &.spinner-circular--large {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+
+  &.v-spin-wrap--card {
+    & > .spin-popper {
+      top: 40%;
+      left: 50%;
+      width: fit-content;
+      height: fit-content;
+      padding: 14px 20px;
+      background-color: #fff;
+      border: 1px solid #e4e7ed;
+      border-radius: 8px;
+      transform: translate(-50%, -50%);
+      box-shadow: 0px 0px 12px rgb(0 0 0 / 12%);
+
+      .loading__text {
+        margin-top: 2px;
+        font-size: 13px;
+      }
+    }
+  }
+
+  .spinner-circle2 {
+    @len: 3px;
+
+    display: inline-block;
+    width: calc(@len + 25px);
+    height: calc(@len + 25px);
+    font-size: 0;
+    background: transparent;
+    border: @len solid #d8dee1;
+    border-radius: 50%;
+    border-top-color: var(--v-spin-primary-color);
+    border-right-color: var(--v-spin-primary-color);
+    animation: circle2 0.8s ease-in-out infinite;
+    box-sizing: border-box;
+    @keyframes circle2 {
+      100% {
+        transform: rotate(1turn);
+      }
+    }
+
+    &.spinner-circle--default {
+      width: calc(@len + 25px);
+      height: calc(@len + 25px);
+    }
+
+    &.spinner-circle--small {
+      width: calc(@len + 19px);
+      height: calc(@len + 19px);
+    }
+
+    &.spinner-circle--large {
+      width: calc(@len + 35px);
+      height: calc(@len + 35px);
+    }
+  }
+
+  & > .spin-popper > .spin-popper--mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1950;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    clear: both;
+    // pointer-events: none;
+    background-color: #ffffffb3;
+    opacity: 1;
+    user-select: none;
+    transition: all 300ms;
+  }
+}

@@ -11,6 +11,7 @@ import UnoCSS from 'unocss/vite'
 import pkg from './package.json'
 import copyright from './src/utils/copyright'
 import path from 'node:path'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 const IS_PRO = process.env.NODE_ENV === 'production'
 
@@ -121,6 +122,7 @@ export default defineConfig(({ mode }) => {
           ReactivityTransform(),
           UnoCSS(),
           ...Object.values(vuePlugins),
+          vueJsx(),
         ],
     css: cssConfig,
     build: isLib

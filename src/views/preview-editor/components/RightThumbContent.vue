@@ -28,7 +28,7 @@ const initialProgress = ref(0)
 const isWheeling = ref(false)
 
 const { doc } = useVuePdfEmbed({
-  source: './1.pdf',
+  source: __previewContext__.value.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
@@ -198,7 +198,7 @@ onBeforeUnmount(() => {
   outline: 1px solid #ddd;
   scroll-margin-block-start: 10px;
   & + .pdf-embed__item {
-    margin-top: 12px;
+    margin-top: var(--per-page-gap);
   }
 
   &:hover {

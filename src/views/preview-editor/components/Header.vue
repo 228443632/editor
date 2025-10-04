@@ -5,6 +5,8 @@
  -->
 <!--setup-->
 <script setup>
+import { sleep } from 'sf-utils2'
+
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
 const emit = defineEmits([])
@@ -18,15 +20,20 @@ const __previewContext__ = inject('__previewContext__') // 预览上下文
 
 const onExport = async () => {
   try {
+    isExporting.value = true
+    await __previewContext__.value.loadAllPdfPagesRaf()
     const content = document.querySelector('.pdf-embed__wrap')
     if (!content) throw new Error('未找到导出内容')
 
-    // 配置选项
+    await sleep()
+
+    // // 配置选项
     const opt = {
       margin: 0,
       filename: 'vue-export-example.pdf',
       html2canvas: { scale: window.devicePixelRatio || 1, useCORS: true },
       jsPDF: { format: 'a4', orientation: 'portrait' },
+      // 核心：配置pagebreak的mode，加入 'avoid-all'
     }
 
     // 执行导出
@@ -35,7 +42,9 @@ const onExport = async () => {
   } catch (err) {
     console.error('导出失败:', err)
   } finally {
-    isExporting.value = false
+    window.requestIdleCallback(() => {
+      isExporting.value = false
+    })
   }
 }
 
@@ -47,6 +56,16 @@ const onLoadAllPdf = async () => {
 /* 计算 */
 
 /* 监听 */
+
+watch(isExporting, () => {
+  if (isExporting.value) {
+    // __previewContext__.value.loading++
+    __previewContext__.value.isExporting = true
+  } else {
+    // __previewContext__.value.loading--
+    __previewContext__.value.isExporting = false
+  }
+})
 
 /* 周期 */
 onMounted(() => {})

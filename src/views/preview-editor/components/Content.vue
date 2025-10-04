@@ -39,6 +39,7 @@ const {
 
 const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
+const pageRendered = ref({})
 let pageIntersectionObserver: IntersectionObserver
 
 const copyContentInfo = ref()
@@ -49,7 +50,7 @@ const { x, y } = usePointer()
 const a4 = cssUtil.getPaperSize('A4')
 
 const { doc } = useVuePdfEmbed({
-  source: './1.pdf',
+  source: __previewContext__.value.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
@@ -181,6 +182,11 @@ const loadAllPdfPagesRaf = async () => {
       await rafPromise()
     }
   }
+  return new Promise((resolve) => {
+    const lastPageNum = _pageNumsList.value.at(-1)
+    if (pageRendered.value[lastPageNum]) return resolve(true)
+    loadAllPdfPagesRaf['_resolve'] = resolve
+  })
 
   function rafPromise() {
     return new Promise((resolve) => {
@@ -190,6 +196,18 @@ const loadAllPdfPagesRaf = async () => {
 }
 
 __previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
+
+/**
+ * 渲染完成
+ */
+const onRendered = (pageNum: number) => {
+  console.log('onRendered', pageNum)
+  pageRendered.value[pageNum] = true
+
+  if (pageNum == _pageNumsList.value.at(-1)) {
+    loadAllPdfPagesRaf['_resolve']?.()
+  }
+}
 
 /**
  * 根元素按键事件
@@ -219,8 +237,11 @@ const _pageNumsList = computed(() =>
  */
 const _embedItemStyle = computed(() => {
   return {
-    width: `${a4._basePx.w}px`,
-    height: `${a4._basePx.h}px`,
+    width: '210mm',
+    height: '297mm',
+    overflow: 'hidden',
+    // width: `${a4._basePx.w}px`,
+    // height: `${a4._basePx.h}px`,
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
     // padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
   }
@@ -321,9 +342,9 @@ defineExpose({
     :class="[
       `pdf-preview__content umo-scrollbar`,
       !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
+      __previewContext__.isExporting && '1is-exporting',
     ]"
     tabindex="10"
-    @keydown2222="onKeyDownRoot"
   >
     <!--    {{ __previewContext__.activeCompParam }}-->
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
@@ -354,29 +375,34 @@ defineExpose({
         </div>
 
         <!-- iframe的  -->
-        <transition-group name="fade" mode="out-in" appear tag="div">
+        <template v-for="(pageNum, index) in _pageNumsList" :key="pageNum">
           <div
-            v-for="pageNum in _pageNumsList"
-            :key="pageNum"
             ref="pageRefs"
-            :class="['pdf-embed__item', `page-num-${pageNum}`]"
-            :style="{
-              ..._embedItemStyle,
-            }"
+            :class="[
+              'pdf-embed__item',
+              `page-num-${pageNum}`,
+              _pageNumsList.length - 1 == index && `is-last`,
+            ]"
+            :style="{ ..._embedItemStyle }"
           >
             <VuePdfEmbed
               v-if="pageVisibility[pageNum]"
               :source="doc"
               :page="pageNum"
+              @rendered="onRendered(pageNum)"
             />
           </div>
-        </transition-group>
+        </template>
 
         <!-- 参数悬浮 -->
         <div
-          v-for="(item, index) in __previewContext__.paramsCompList"
+          v-for="(item, index) in __previewContext__._paramsCompList"
           :key="item.key"
           :data-id="'id-' + item.key"
+          class="content-comp__item"
+          :style="{
+            '--page-num': item.pageNum,
+          }"
         >
           <!-- 印章 -->
           <template v-if="item.type == 'compSeal'">
@@ -414,7 +440,7 @@ defineExpose({
           v-for="pageNum in 3"
           :key="pageNum"
           ref="pageRefs"
-          class="pdf-embed__item bg-white py-6 px-4 flex flex-col gap-4"
+          class="pdf-embed__item bg-white py-6 px-4 flex flex-col gap-4 mb-12px"
           :style="{
             ..._embedItemStyle,
             padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
@@ -452,6 +478,21 @@ defineExpose({
       outline: 2px dashed var(--umo-primary-color);
     }
   }
+
+  &.is-exporting {
+    .pdf-embed__item {
+      margin-top: 0;
+      box-shadow: none;
+    }
+    :deep {
+      .content-comp__item > * {
+        margin-top: calc(0px - ((var(--page-num) - 1) * var(--per-page-gap)));
+      }
+    }
+    .preview-page-content__auxline {
+      opacity: 0;
+    }
+  }
 }
 
 .mouse-area {
@@ -483,9 +524,21 @@ defineExpose({
   margin: 0 auto;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
-  page-break-after: always;
+  break-after: avoid;
   & + .pdf-embed__item {
-    margin-top: 12px;
+    margin-top: var(--per-page-gap);
+  }
+  &.is-last {
+    break-after: auto;
+  }
+}
+
+.page-break {
+  break-after: avoid;
+  height: 0;
+  overflow: hidden;
+  &.is-last {
+    break-after: auto;
   }
 }
 

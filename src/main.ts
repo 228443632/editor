@@ -5,6 +5,7 @@ import 'virtual:svg-icons-register'
 import App from './app.vue'
 import { useUmoEditor } from './components'
 const app = createApp(App)
+import directives from '@/directives'
 
 // import '@shared/base/setup.ts'
 // import '@shared/base/setup.ts'
@@ -12,6 +13,6 @@ const app = createApp(App)
 
 const options = {}
 
-app.use(useUmoEditor, options as UmoEditorOptions)
+app.use(directives).use(useUmoEditor, options as UmoEditorOptions)
 
 app.mount('#app')

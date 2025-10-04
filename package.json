@@ -187,6 +187,7 @@
     "@typescript-eslint/parser": "8.31.0",
     "@unocss/preset-legacy-compat": "66.1.0-beta.12",
     "@vitejs/plugin-vue": "4.6.2",
+    "@vitejs/plugin-vue-jsx": "5.1.1",
     "@vue-macros/reactivity-transform": "1.0.4",
     "@vue-macros/volar": "0.29.1",
     "@vue/eslint-config-prettier": "9.0.0",

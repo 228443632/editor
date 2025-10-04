@@ -41,11 +41,23 @@ const layoutSize = ref({
 
   /** 右侧宽度 */
   rightAsideWidth: 280,
+
+  /** 每页距离大小 */
+  PerPageGap: 12,
 })
 
 const activePageNum = ref(1)
 const contentRef = ref<InstanceType<typeof Content>>() // 内容
 const previewContext = ref({
+  /** 文件来源 */
+  source: './2.pdf',
+
+  /** 是否正在导出中 */
+  isExporting: false,
+
+  /** loading */
+  loading: 0,
+
   contentElRef: computed(() => unrefElement(contentRef)),
 
   /**
@@ -57,6 +69,19 @@ const previewContext = ref({
    * 参数
    */
   paramsCompList: [] as IParamsCompItem[],
+
+  _paramsCompList: computed(() => {
+    const paramsCompList = previewContext.value.paramsCompList || []
+    return deepClone(paramsCompList).map((item) => {
+      item.isInRect = false
+      const { offsetTop, pageNum } = previewContext.value.getPageOffsetTopByTop(
+        item.top,
+      )
+      item.offsetTop = offsetTop
+      item.pageNum = pageNum
+      return item
+    })
+  }),
 
   /**
    * 移除参数组件
@@ -107,7 +132,7 @@ const previewContext = ref({
    * @param pageNum
    */
   getAbsoluteTopByPageNum(pageNum: number) {
-    const mt = 12
+    const mt = layoutSize.value.PerPageGap
     return (pageNum - 1) * a4._basePx.h + (pageNum - 1) * mt
   },
 
@@ -116,7 +141,7 @@ const previewContext = ref({
    * @param top
    */
   getPageOffsetTopByTop(top: number) {
-    const mt = 12
+    const mt = layoutSize.value.PerPageGap
     const pageNum = previewContext.value.getPageNumByTop(top)
     return {
       offsetTop: top - (pageNum - 1) * a4._basePx.h - (pageNum - 1) * mt,
@@ -129,7 +154,7 @@ const previewContext = ref({
    * @param top
    */
   getPageNumByTop(top: number) {
-    const mt = 12
+    const mt = layoutSize.value.PerPageGap
     const pageH = a4._basePx.h
     return Math.ceil((top + mt) / (mt + pageH))
   },
@@ -205,6 +230,7 @@ const _rootStyle = computed(() => {
     '--padding-bottom': '16px',
     '--padding-left': '16px',
     '--padding-right': '16px',
+    '--per-page-gap': `${layoutSize.value.PerPageGap}px`,
   }
 })
 
@@ -225,6 +251,9 @@ defineExpose({
   $: proxy.$,
 })
 
+// 尺寸大小
+provide('__layoutSize__', layoutSize)
+
 // 当前激活的页码
 provide('__activePageNum__', activePageNum)
 
@@ -235,8 +264,14 @@ provide('__previewContext__', previewContext)
 <!--render-->
 <template>
   <div
+    v-spin="{
+      loading: previewContext.loading > 0,
+      size: 'small',
+      showLoadingText: false,
+      mask: true,
+    }"
     ref="rootRef"
-    class="preview-editor"
+    :class="['preview-editor', previewContext.isExporting && 'is-exporting']"
     :style="_rootStyle"
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
