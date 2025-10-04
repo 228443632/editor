@@ -59,7 +59,7 @@ export function useMouseDragLine(
   const mouseup = (e: MouseEvent) => {
     if (!_containerEl.value) return
     _mEventContainerEl.value.removeEventListener('mousemove', throttleMousemove)
-    _mEventContainerEl.value.removeEventListener('mouseup', mouseup)
+    document.body.removeEventListener('mouseup', mouseup)
     endX.value = e.clientX - containerBound.left.value
     endY.value = e.clientY - containerBound.top.value
     console.log('卸载了')
@@ -82,14 +82,14 @@ export function useMouseDragLine(
       'mousemove',
       throttleMousemove,
     )
-    _mEventContainerEl.value.addEventListener('mouseup', mouseup)
+    document.body.addEventListener('mouseup', mouseup)
   }
 
   const click = (e: MouseEvent) => {
     if (e.target !== _containerEl.value) return
     console.log('click', e)
     _mEventContainerEl.value.removeEventListener('mousemove', throttleMousemove)
-    _mEventContainerEl.value.removeEventListener('mouseup', mouseup)
+    document.body.removeEventListener('mouseup', mouseup)
   }
 
   watch([containerRef, mouseEventContainerRef], () => {
@@ -134,7 +134,7 @@ export function useMouseDragLine(
       mouseEventContainer.removeEventListener('click', click)
       mouseEventContainer.removeEventListener('mousedown', mousedown)
       mouseEventContainer.removeEventListener('mousemove', throttleMousemove)
-      mouseEventContainer.removeEventListener('mouseup', mouseup)
+      document.body.removeEventListener('mouseup', mouseup)
     }
   }
 
