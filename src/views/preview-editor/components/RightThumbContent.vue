@@ -191,7 +191,7 @@ onBeforeUnmount(() => {
 }
 
 .pdf-embed__item {
-  max-width: 150px;
+  max-width: 120px;
   margin: 0 auto;
   cursor: pointer;
   position: relative;

@@ -56,14 +56,15 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 .preview-editor__right {
-  width: clamp(
-    var(--right-aside-width),
-    calc(
-      var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
-        var(--editor-width) - 8px
-    ),
-    220px
-  );
+  //width: clamp(
+  //  var(--right-aside-width),
+  //  calc(
+  //    var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
+  //      var(--editor-width) - 8px
+  //  ),
+  //  220px
+  //);
+  width: 200px;
   //background-color: #fff;
   flex: none;
   height: 100%;

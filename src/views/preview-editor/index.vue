@@ -12,7 +12,7 @@ import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 import Footer from './components/Footer.vue'
-import { deepClone, uuid } from 'sf-utils2'
+import { deepClone, noop, uuid } from 'sf-utils2'
 import Header from './components/Header.vue' // 头部
 
 const { proxy } = getCurrentInstance()
@@ -171,6 +171,9 @@ const previewContext = ref({
 
   /** 锚点*/
   anchorInfo: {},
+
+  /** 一次性加载所有pdf页面，主要是为了导出功能*/
+  loadAllPdfPagesRaf: noop,
 })
 
 /* 方法 */

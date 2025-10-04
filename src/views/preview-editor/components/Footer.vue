@@ -128,7 +128,11 @@ defineExpose({
                 </div>
               </template>
               <div v-else class="min-h-100px flex-center text-12px">
-                <t-empty />
+                <t-empty>
+                  <template #title
+                    ><span class="text-12px">暂无数据</span></template
+                  >
+                </t-empty>
               </div>
             </div>
           </div>

@@ -7,13 +7,14 @@
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { div } from 'sf-utils2'
+import { deepClone, div, getAbsOffsetTop, uuid } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
 import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 import useAnchor from '@/views/preview-editor/hooks/use-anchor'
 import ContentCompSignDate from '@/views/preview-editor/components/ContentCompSignDate.vue'
+import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 
 /* 状态 */
 const props = defineProps({})
@@ -40,6 +41,11 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 let pageIntersectionObserver: IntersectionObserver
 
+const copyContentInfo = ref()
+
+const activeElement = useActiveElement()
+const { x, y } = usePointer()
+
 const a4 = cssUtil.getPaperSize('A4')
 
 const { doc } = useVuePdfEmbed({
@@ -50,9 +56,16 @@ const { doc } = useVuePdfEmbed({
   },
 })
 console.log('doc', doc, doc.value)
+const { registerHotKeys } = useHotKeysV2({
+  filter: () => {
+    if (!activeElement.value) return false
+    if (rootRef.value.contains(activeElement.value)) return true
+    return false
+  },
+})
 
 // 全选
-useHotkeys('ctrl+a, command+a', () => {
+registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
   const paramsCompList = __previewContext__.value.paramsCompList
   if (!paramsCompList?.length) return
   if (paramsCompList?.length == 1) {
@@ -63,6 +76,75 @@ useHotkeys('ctrl+a, command+a', () => {
     item.isInRect = true
   })
 })
+
+// 拷贝
+registerHotKeys('ctrl+c, command+c', copy)
+function copy() {
+  const inRectNums = __previewContext__.value.paramsCompList
+    .filter((item) => item.isInRect)
+    .concat(__previewContext__.value.activeCompParam)
+    .filter(Boolean)
+  if (inRectNums?.length) {
+    copyContentInfo.value = inRectNums.map((item) => item)
+  }
+}
+
+// 粘贴
+registerHotKeys('ctrl+v, command+v', paste)
+function paste() {
+  const inScrollViewOffsetTop = getAbsOffsetTop(
+    embedPdfWrapRef.value,
+    rootRef.value,
+  )
+  const scrollViewFitTop = rootRef.value.getBoundingClientRect().top // 根元素距离视口顶部的距离
+  const scrollTop = rootRef.value.scrollTop
+  const offsetY = y.value + scrollTop - scrollViewFitTop - inScrollViewOffsetTop
+
+  const { left, top, right, bottom } =
+    embedPdfWrapRef.value.getBoundingClientRect()
+  if (
+    x.value >= left &&
+    y.value >= top &&
+    x.value <= right &&
+    y.value <= bottom
+  ) {
+    // 在其范围内
+    const list = copyContentInfo.value || []
+    const minTop = Math.min(...list.map((item) => item.top))
+    const minLeft = Math.min(...list.map((item) => item.left))
+    list.forEach((item) => {
+      const itemClone = deepClone(item)
+      itemClone.top = offsetY + (item.top - minTop)
+      itemClone.left = x.value - left + (item.left - minLeft)
+      itemClone.isInRect = false
+      itemClone.key = uuid()
+      __previewContext__.value.paramsCompList.push(itemClone)
+    })
+  }
+}
+
+// 剪切
+registerHotKeys('ctrl+x, command+x', () => {
+  // 删除
+  del()
+
+  // 粘贴
+  paste()
+})
+
+// 撤回
+registerHotKeys('ctrl+z, command+z', () => {
+  useMessage('warning', { content: '暂不支持撤回操作' })
+})
+
+// 删除
+registerHotKeys('backspace, delete', del)
+function del() {
+  // 删除键
+  __previewContext__.value.removeParamsComp()
+  __previewContext__.value.paramsCompList =
+    __previewContext__.value.paramsCompList.filter((item) => !item.isInRect)
+}
 
 /* 方法 */
 /**
@@ -83,6 +165,31 @@ const resetPageIntersectionObserver = () => {
     pageIntersectionObserver.observe(element)
   })
 }
+
+/**
+ * 一次性加载所有页面
+ */
+const loadAllPdfPagesRaf = async () => {
+  const maxPageNum = _pageNumsList.value.at(-1)
+  const existMaxPageNum = Math.max(
+    ...Object.keys(pageVisibility.value).map((key) => +key),
+  )
+  if (existMaxPageNum < maxPageNum) {
+    for (let i = existMaxPageNum + 1; i <= maxPageNum; i++) {
+      pageVisibility.value[i] = true
+      await nextTick()
+      await rafPromise()
+    }
+  }
+
+  function rafPromise() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(resolve)
+    })
+  }
+}
+
+__previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
 
 /**
  * 根元素按键事件
@@ -216,7 +323,7 @@ defineExpose({
       !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
     ]"
     tabindex="10"
-    @keydown="onKeyDownRoot"
+    @keydown2222="onKeyDownRoot"
   >
     <!--    {{ __previewContext__.activeCompParam }}-->
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
@@ -376,6 +483,7 @@ defineExpose({
   margin: 0 auto;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
+  page-break-after: always;
   & + .pdf-embed__item {
     margin-top: 12px;
   }
