@@ -407,7 +407,8 @@ watch(
         var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
           var(--editor-width) - 8px
       ),
-      400px
+      // 修改宽度
+      240px
     );
   }
 }

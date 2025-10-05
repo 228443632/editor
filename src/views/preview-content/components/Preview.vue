@@ -5,12 +5,29 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import Content from './components/Content.vue'
-import { noop, sleep } from 'sf-utils2'
-import paramsCompList from './components/mock.ts'
+import Content from './Content.vue'
+import { noop } from 'sf-utils2'
+import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/preview-editor/utils/commons.ts'
+import dayjs from 'dayjs'
 
-const props = defineProps({})
+const props = defineProps({
+  /**
+   * 模式
+   */
+  model: {
+    type: String as PropType<'preview' | 'download'>,
+    default: 'preview',
+  },
+
+  /**
+   * 原始pdf文件
+   */
+  source: {
+    type: String,
+    default: () => '',
+  },
+})
 const emit = defineEmits({})
 
 /* 状态 */
@@ -18,7 +35,7 @@ const rootRef = ref<HTMLElement>()
 const contentRef = ref<InstanceType<typeof Content>>()
 const previewContext = ref({
   /** 文件来源 */
-  source: './2.pdf',
+  source: props.source,
 
   /** 加载 */
   loading: 0,
@@ -41,7 +58,7 @@ const previewContext = ref({
 /**
  * 导出pdf
  */
-const onExportPdf = async () => {
+const exportPdf = async (filename?: string) => {
   try {
     if (!previewContext.value.contentInitial) return
     if (previewContext.value.loading > 0) return
@@ -57,7 +74,7 @@ const onExportPdf = async () => {
     // 配置选项
     const opt = {
       margin: 0,
-      filename: 'vue-export-example.pdf',
+      filename: filename || `${dayjs().format('YYYY_MM_DD_HH_mm_ss')}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: window.devicePixelRatio || 1,
@@ -77,8 +94,10 @@ const onExportPdf = async () => {
       .save()
 
     console.log('导出成功')
+    useMessage('success', { content: '导出成功' })
   } catch (err) {
     console.error('导出失败:', err)
+    useMessage('error', { content: '导出失败' })
   } finally {
     window.requestIdleCallback(() => {
       previewContext.value.loading--
@@ -102,18 +121,27 @@ watch(
   () => previewContext.value.contentInitial,
   (newVal) => {
     if (newVal) {
-      void onExportPdf()
+      // void onExportPdf()
     }
   },
 )
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  // 初始化成功
+  window.dispatchEvent(new CustomEvent('editor-ready'))
+})
 
 /* 暴露 */
-defineExpose({})
+defineExpose({
+  exportPdf,
+
+  previewContext,
+})
 
 // 注入
+provide('__previewContext__', previewContext)
+
 provide('__previewContext__', previewContext)
 </script>
 
@@ -121,33 +149,33 @@ provide('__previewContext__', previewContext)
 <template>
   <div
     ref="rootRef"
-    :class="[
-      'preview-page umo-scrollbar',
-      previewContext.isExporting ? 'is-exporting' : '',
-    ]"
     v-spin.fullscreen="{
       loading: previewContext.loading > 0 || !previewContext.contentInitial,
       size: 'small',
       showLoadingText: false,
       mask: true,
     }"
+    :class="[
+      'preview-page umo-scrollbar',
+      previewContext.isExporting ? 'is-exporting' : '',
+    ]"
   >
-    <div class="flex-none">
-      <t-button @click="onExportPdf">导出</t-button>
-    </div>
-    <!-- 内容区 -->
-    <Content
-      :source="previewContext.source"
-      :params-comp-list="_paramsCompList"
-      ref="contentRef"
-    ></Content>
+    <div class="preview-page__inner">
+      <!-- 内容区 -->
+      <Content
+        ref="contentRef"
+        :source="previewContext.source"
+        :params-comp-list="_paramsCompList"
+        :model="model"
+      ></Content>
 
-    <t-back-top
-      :visible-height="800"
-      :container="() => rootRef"
-      size="small"
-      :offset="['300px', '48px']"
-    />
+      <t-back-top
+        :visible-height="800"
+        :container="() => rootRef"
+        size="small"
+        :offset="['48px', '48px']"
+      />
+    </div>
   </div>
 </template>
 
@@ -163,5 +191,8 @@ provide('__previewContext__', previewContext)
   padding: 16px 0;
   overflow-y: auto;
   background-color: var(--umo-container-background);
+}
+
+.preview-page__inner {
 }
 </style>

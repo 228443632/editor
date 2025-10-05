@@ -285,20 +285,20 @@
             <menus-toolbar-page-toggle-toc />
           </div>
           <!-- 页边距  -->
-<!--          <div class="umo-virtual-group">-->
-<!--            <div class="umo-virtual-group-row">-->
-<!--              &lt;!&ndash;  页边距 &ndash;&gt;-->
-<!--              <menus-toolbar-page-margin />-->
-<!--              <div>-->
-<!--                <div class="umo-virtual-group-row">-->
-<!--                  <menus-toolbar-page-size />-->
-<!--                </div>-->
-<!--                <div class="umo-virtual-group-row">-->
-<!--                  <menus-toolbar-page-orientation />-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
+          <!--          <div class="umo-virtual-group">-->
+          <!--            <div class="umo-virtual-group-row">-->
+          <!--              &lt;!&ndash;  页边距 &ndash;&gt;-->
+          <!--              <menus-toolbar-page-margin />-->
+          <!--              <div>-->
+          <!--                <div class="umo-virtual-group-row">-->
+          <!--                  <menus-toolbar-page-size />-->
+          <!--                </div>-->
+          <!--                <div class="umo-virtual-group-row">-->
+          <!--                  <menus-toolbar-page-orientation />-->
+          <!--                </div>-->
+          <!--              </div>-->
+          <!--            </div>-->
+          <!--          </div>-->
           <div class="umo-virtual-group">
             <!--  分隔符 -->
             <menus-toolbar-page-break />
@@ -420,7 +420,7 @@ const changeMenu = async (menu: string) => {
 }
 .umo-scrollable-container {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px 10px;
   box-sizing: border-box;
 }
 .umo-ribbon-container {

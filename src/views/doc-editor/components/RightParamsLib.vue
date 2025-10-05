@@ -13,7 +13,13 @@ import type { IDragNodeParamsNode } from '@/views/doc-editor/extensions/extensio
 import type { Node } from 'prosemirror-model'
 import { cssUtil } from '@/views/doc-editor/utils/css-util'
 import { type Editor } from '@tiptap/core'
-import { arrayToObj, blobSaveAs, deepClone, parseJsonNoError } from 'sf-utils2'
+import {
+  arrayToObj,
+  blobSaveAs,
+  deepClone,
+  parseJsonNoError,
+  isFunction,
+} from 'sf-utils2'
 import FillFormParamsAE from './FillFormParamsAE.vue'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import {
@@ -26,7 +32,15 @@ import testSealImgRaw from '@/assets/images/test-seal.svg?raw'
 import testSignImg from '@/assets/images/test-sign.svg'
 import testSignImgRaw from '@/assets/images/test-sign.svg?raw'
 
-const props = defineProps({})
+const props = defineProps({
+  /**
+   * 右侧参数库字段
+   */
+  rightTpFields: {
+    type: Array,
+    default: () => [],
+  },
+})
 const emit = defineEmits({})
 
 /* 状态 */
@@ -38,227 +52,7 @@ const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const isDragging = ref(false)
 const fillFormParamsAERef = ref<InstanceType<typeof FillFormParamsAE>>()
 
-const paramsConfig = ref([
-  {
-    label: '文本',
-    children: [
-      {
-        label: '普通文本',
-        value: 'compText',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == 'compText'
-          })
-        },
-        getAttrs() {
-          const compTexts = this.getCompTexts()
-          const cssText = tiptapUtil.getStyleBySelection(editor.value)
-          console.log('cssText', cssText)
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            cssText,
-            // placeholder: `普通文本${compTexts.length + 1}`,
-            placeholder: `普通文本`,
-          }
-        },
-        click() {
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .setCompText(attrs)
-            .run()
-
-          // const targetDom = document.querySelector(
-          //   `span[data-id="${attrs['data-id']}"]`,
-          // ) as HTMLHtmlElement
-          // targetDom?.click?.()
-        },
-      },
-
-      {
-        label: '姓名',
-        value: 'compText',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == 'compText'
-          })
-        },
-        getAttrs() {
-          const compTexts = this.getCompTexts()
-          const cssText = tiptapUtil.getStyleBySelection(editor.value)
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'name',
-            placeholder: `姓名${compTexts.length + 1}`,
-            cssText,
-            // placeholder: `姓名`,
-          }
-        },
-        click() {
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .setCompText(attrs)
-            .run()
-
-          const targetDom = document.querySelector(
-            `span[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
-        },
-      },
-
-      {
-        label: '手机号',
-        value: 'compText',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == 'compText'
-          })
-        },
-        getAttrs() {
-          const compTexts = this.getCompTexts()
-          const cssText = tiptapUtil.getStyleBySelection(editor.value)
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'mobile',
-            // placeholder: `手机号${compTexts.length + 1}`,
-            placeholder: `手机号`,
-            cssText,
-          }
-        },
-        click() {
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .setCompText(attrs)
-            .run()
-
-          const targetDom = document.querySelector(
-            `span[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
-        },
-      },
-
-      {
-        label: '身份证',
-        value: 'compText',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == 'compText'
-          })
-        },
-        getAttrs() {
-          const compTexts = this.getCompTexts()
-          const cssText = tiptapUtil.getStyleBySelection(editor.value)
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'idcard',
-            // placeholder: `身份证${compTexts.length + 1}`,
-            placeholder: `身份证`,
-            cssText,
-          }
-        },
-        click() {
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .setCompText(attrs)
-            .run()
-
-          const targetDom = document.querySelector(
-            `span[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
-        },
-      },
-
-      {
-        label: '文本悬浮',
-        value: 'compTextDrag',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == COMP_PARAMS_NAME_MAP.compTextDrag
-          })
-        },
-        getAttrs() {
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'idcard',
-            // placeholder: `文本悬浮${compTexts.length + 1}`,
-            placeholder: `文本悬浮`,
-          }
-        },
-        click() {
-          const state = editor.value.state
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertCompTextDrag({
-              type: COMP_PARAMS_NAME_MAP.compTextDrag,
-              attrs,
-            })
-            .run()
-
-          const targetDom = document.querySelector(
-            `[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
-        },
-      },
-
-      {
-        label: '文本悬浮2',
-        value: 'compTextareaDrag',
-        draggable: true,
-        getCompTexts() {
-          return __compNodeList__.value.filter((item: { node: Node }) => {
-            return item.node.type.name == COMP_PARAMS_NAME_MAP.compTextareaDrag
-          })
-        },
-        getAttrs() {
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'idcard',
-            // placeholder: `文本悬浮${compTexts.length + 1}`,
-            placeholder: `文本悬浮2`,
-          }
-        },
-        click() {
-          const attrs = this.getAttrs()
-          editor.value
-            .chain()
-            .focus()
-            .deleteSelection()
-            .insertCompTextareaDrag({
-              attrs,
-            })
-            .run()
-
-          const targetDom = document.querySelector(
-            `[data-id="${attrs['data-id']}"]`,
-          ) as HTMLHtmlElement
-          targetDom?.click?.()
-        },
-      },
-    ],
-  },
+const defaultTpFields = ref([
   {
     label: '其他',
     children: [
@@ -269,7 +63,7 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
-            placeholder: '印章'
+            placeholder: '印章',
           }
         },
       },
@@ -280,7 +74,7 @@ const paramsConfig = ref([
           return {
             'data-id': commonUtil.simpleUUID(),
             fieldName: 'idcard',
-            placeholder: '签名'
+            placeholder: '签名',
           }
         },
       },
@@ -380,11 +174,80 @@ const paramsConfig = ref([
 ])
 
 /* 方法 */
+
+/**
+ * 参数配置
+ */
+const _tpFields = computed(() => {
+  return [
+    ...deepClone(props.rightTpFields).map((item) => {
+      item.uid = commonUtil.simpleUUID()
+      if (Array.isArray(item.children)) {
+        item.children = item.children.map((cItem) => {
+          return {
+            uid: commonUtil.simpleUUID(),
+            label: cItem.label,
+            value: cItem.value,
+            draggable: true,
+            getCompTexts() {
+              return __compNodeList__.value.filter((item: { node: Node }) => {
+                return item.node.type.name == 'compText'
+              })
+            },
+            getAttrs() {
+              // const compTexts = this.getCompTexts()
+              const cssText = tiptapUtil.getStyleBySelection(editor.value)
+              return {
+                'data-id': commonUtil.simpleUUID(),
+                fieldName: 'name',
+                placeholder: cItem.label,
+                cssText,
+                // placeholder: `姓名`,
+              }
+            },
+            click() {
+              if (cItem.value == COMP_PARAMS_NAME_MAP.compText) {
+                const attrs = this.getAttrs()
+                editor.value
+                  .chain()
+                  .focus()
+                  .deleteSelection()
+                  .setCompText(attrs)
+                  .run()
+              } else {
+                useMessage('warning', { content: `支持类型${cItem.value}控件` })
+              }
+            },
+          }
+        })
+      }
+      return item
+    }),
+    ...defaultTpFields.value.map((item) => {
+      item.uid ||= commonUtil.simpleUUID()
+      if (Array.isArray(item.children)) {
+        item.children = item.children.map((cItem) => {
+          cItem.uid ||= commonUtil.simpleUUID()
+          return cItem
+        })
+      }
+      return item
+    }),
+  ]
+})
+
 /**
  * 隐藏
  */
 function onClose() {
   page.value.showRightSlot = false
+}
+
+/**
+ * 点击模版字段
+ */
+const onClickTpField = (cItem) => {
+  if (isFunction(cItem.click)) cItem.click(cItem)
 }
 
 /**
@@ -432,8 +295,8 @@ const dragMethod = {
       dragImage.style.cssText =
         'position: fixed; left: -9999px; top: -9999px; z-index: -100'
       dragImage.innerHTML = testSealImgRaw
-      dragImage.style.width = COMP_SEAL_STYLE.width + 'px'
-      dragImage.style.height = COMP_SEAL_STYLE.height + 'px'
+      dragImage.style.width = `${COMP_SEAL_STYLE.width}px`
+      dragImage.style.height = `${COMP_SEAL_STYLE.height}px`
       dragImage.style.border = '2px dashed var(--umo-primary-color)'
       e.dataTransfer.setDragImage(
         dragImage,
@@ -448,8 +311,8 @@ const dragMethod = {
       dragImage.style.cssText =
         'position: fixed; left: -9999px; top: -9999px; z-index: -100'
       dragImage.innerHTML = testSignImgRaw
-      dragImage.style.width = COMP_SIGN_STYLE.width + 'px'
-      dragImage.style.height = COMP_SIGN_STYLE.height + 'px'
+      dragImage.style.width = `${COMP_SIGN_STYLE.width}px`
+      dragImage.style.height = `${COMP_SIGN_STYLE.height}px`
       dragImage.style.border = '2px dashed var(--umo-primary-color)'
       e.dataTransfer.setDragImage(
         dragImage,
@@ -543,25 +406,21 @@ defineExpose({
     </div>
 
     <div class="umo-pr-content umo-scrollbar">
-      <section
-        v-for="(item, index) in paramsConfig"
-        :key="index"
-        class="umo-pr-group"
-      >
+      <section v-for="item in _tpFields" :key="item.uid" class="umo-pr-group">
         <div class="umo-pr-group__title">{{ item.label }}</div>
 
         <ul class="grid 2xl:grid-cols-3 container grid-cols-2 gap-12px !mt-8px">
           <li
-            v-for="(cItem, cIndex) in item.children"
-            :key="cIndex"
+            v-for="cItem in item.children"
+            :key="cItem.uid"
             :class="[
               'umo-pr-group__item',
               cItem.class,
               cItem.type && `is-${cItem.type}`,
             ]"
             v-bind="cItem"
-            @click="() => cItem.click?.(cItem)"
-            @dragstart="(event) => dragMethod.dragStart(cItem, event)"
+            @click="onClickTpField(cItem)"
+            @dragstart="dragMethod.dragStart(cItem, $event)"
             @dragend="dragMethod.dragend"
           >
             <template v-if="cItem.type == 'seal'">
@@ -624,7 +483,7 @@ defineExpose({
     flex: 1;
     height: 0;
     overflow-y: auto;
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
 
   .umo-pr-group {

@@ -21,8 +21,8 @@ export const routes = [
     component: () => import('@/views/doc-editor/index.vue'),
   },
   {
-    path: '/preview-result',
-    meta: { title: '预览结果' },
-    component: () => import('@/views/preview-result/index.vue'),
+    path: '/preview-content',
+    meta: { title: '预览内容' },
+    component: () => import('@/views/preview-content/index.vue'),
   },
 ]

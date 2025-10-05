@@ -136,7 +136,6 @@
 <script setup lang="ts">
 import type { DropdownOption } from 'tdesign-vue-next'
 
-import { timeAgo } from '@/utils/time-ago'
 const emits = defineEmits(['menu-change'])
 
 const container = inject('container')

@@ -129,33 +129,33 @@
 
     <!-- 右侧  -->
     <div class="umo-status-bar-right">
-      <tooltip
-        :content="
-          page.preview?.enabled ? t('preview.disable') : t('preview.title')
-        "
-      >
-        <t-button
-          class="umo-status-bar-button"
-          :class="{ active: page.preview?.enabled }"
-          variant="text"
-          size="small"
-          @click="togglePreview"
-        >
-          <icon name="preview" />
-        </t-button>
-      </tooltip>
-      <tooltip
-        :content="`${fullscreen?.isFullscreen ? t('fullscreen.disable') : t('fullscreen.title')} (${getShortcut('Ctrl+F11')})`"
-      >
-        <t-button
-          class="umo-status-bar-button"
-          variant="text"
-          size="small"
-          @click="toggleFullscreen"
-        >
-          <icon :name="fullscreen ? 'full-screen-exit' : 'full-screen'" />
-        </t-button>
-      </tooltip>
+      <!--      <tooltip-->
+      <!--        :content="-->
+      <!--          page.preview?.enabled ? t('preview.disable') : t('preview.title')-->
+      <!--        "-->
+      <!--      >-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          :class="{ active: page.preview?.enabled }"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          @click="togglePreview"-->
+      <!--        >-->
+      <!--          <icon name="preview" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
+      <!--      <tooltip-->
+      <!--        :content="`${fullscreen?.isFullscreen ? t('fullscreen.disable') : t('fullscreen.title')} (${getShortcut('Ctrl+F11')})`"-->
+      <!--      >-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          @click="toggleFullscreen"-->
+      <!--        >-->
+      <!--          <icon :name="fullscreen ? 'full-screen-exit' : 'full-screen'" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
       <div class="umo-status-bar-split"></div>
       <div class="umo-zoom-level-bar">
         <tooltip :content="`${t('zoom.zoomOut')} (${getShortcut('Ctrl-')})`">
@@ -473,8 +473,8 @@ watch(
 // 多语言
 const langs = [
   { content: '🇨🇳 简体中文', value: 'zh-CN' },
-  { content: '🇱🇷 English', value: 'en-US' },
-  { content: '🇷🇺 Русский', value: 'ru-RU' },
+  // { content: '🇱🇷 English', value: 'en-US' },
+  // { content: '🇷🇺 Русский', value: 'ru-RU' },
 ]
 const setLocale = inject('setLocale') as (value: SupportedLocale) => void
 

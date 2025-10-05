@@ -38,7 +38,7 @@ const layoutSize = ref({
   leftAsideLeft: undefined,
 
   /** 左侧边栏与左侧边栏之间的间隔 */
-  leftAsideGap: 24,
+  leftAsideGap: 16,
 
   /** 右侧宽度 */
   rightAsideWidth: 280,
@@ -227,7 +227,12 @@ watchEffect(() => {
 })
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  // 初始化成功
+  window.dispatchEvent(
+    new CustomEvent('editor-ready'),
+  )
+})
 
 /* 暴露 */
 defineExpose({
@@ -242,6 +247,12 @@ provide('__activePageNum__', activePageNum)
 
 // 预览上下文
 provide('__previewContext__', previewContext)
+
+window['pagePreviewEditor'] = {
+  previewContext,
+  layoutSize,
+  activePageNum
+}
 </script>
 
 <!--render-->

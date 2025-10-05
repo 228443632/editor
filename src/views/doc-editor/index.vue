@@ -1,29 +1,29 @@
 <template>
   <div class="doc-editor">
-    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">
-      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>
-      <t-button size="small" @click="testEditorFunc('demo002')"
-        >点击demo002</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"
-        >光标字大小</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('demo004')"
-        >设置属性不在选区</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('demoInTable')"
-        >在表格中</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"
-        >删除行</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('wrapTrTable')"
-        >手动添加包裹</t-button
-      >
-      <t-button size="small" @click="testEditorFunc('truncate001')"
-        >截取</t-button
-      >
-    </div>
+    <!--    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo002')"-->
+    <!--        >点击demo002</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"-->
+    <!--        >光标字大小</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo004')"-->
+    <!--        >设置属性不在选区</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('demoInTable')"-->
+    <!--        >在表格中</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"-->
+    <!--        >删除行</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('wrapTrTable')"-->
+    <!--        >手动添加包裹</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('truncate001')"-->
+    <!--        >截取</t-button-->
+    <!--      >-->
+    <!--    </div>-->
     <umo-editor ref="umoEditorRef" v-bind="options">
       <!-- 基础工具   -->
       <template #toolbar_base>
@@ -37,7 +37,7 @@
 
       <!--  内容右侧  -->
       <template #container-page-right>
-        <RightParamsLib></RightParamsLib>
+        <RightParamsLib :rightTpFields="rightTpFields"></RightParamsLib>
       </template>
     </umo-editor>
   </div>
@@ -90,6 +90,8 @@ const globalBizState = ref({
   nodeActive: undefined,
 })
 useZIndexManage(editorRef, { autoCalcInitial: true })
+
+const { proxy } = getCurrentInstance()
 
 provide('__compNodeList__', nodeList)
 provide('__globalBizState__', globalBizState)
@@ -154,7 +156,7 @@ const options = $ref(
       },
       document: {
         title: '合同低码平台',
-        content: localStorage.getItem('document.content') ?? template01,
+        content: undefined,
         // content: '<p><strong>AB<span style="color: red;">C</span></strong></p>',
         // content: '<p><strong>ABC</strong></p><p>，</p>',
         /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
@@ -244,6 +246,8 @@ const options = $ref(
   ),
 )
 
+const rightTpFields = ref([]) // 右侧参数字段
+
 watch(umoEditorRef, () => {
   editorRef.value = window.editor = umoEditorRef.value.useEditor()
 
@@ -261,9 +265,13 @@ watch(umoEditorRef, () => {
     editorRef.value.view.dom.focus = () => undefined
 
     editorRef.value.commands.focus = () => true
+
+    // 初始化成功
+    window.dispatchEvent(
+      new CustomEvent('editor-ready', { detail: editorRef.value }),
+    )
   })
 
-  // TODO
   // editorRef.value.on('update', ({ editor }) => {
   //   console.log('update', editor)
   // })
@@ -272,15 +280,19 @@ watch(umoEditorRef, () => {
   //   console.log('create', editor)
   //   const positionList = editor.view.dom.__pageNumPosList as Array
   //
-  //   // const
-  //
   //
   // })
 })
 
 console.log('编辑器【options】', options)
-
 const testEditorFunc = testEditor(window.editor)
+
+window['pageDocEditor'] = {
+  editorRef,
+
+  /** 右侧 参数属性*/
+  rightTpFields
+}
 </script>
 
 <style>

@@ -182,13 +182,13 @@ const layoutSize = ref({
   editorLeft: undefined,
 
   /** 左侧边栏宽度 老的 286*/
-  leftAsideWidth: 250,
+  leftAsideWidth: 220,
 
   /** 左侧距离左侧距离*/
   leftAsideLeft: undefined,
 
   /** 左侧边栏与左侧边栏之间的间隔 */
-  leftAsideGap: 24,
+  leftAsideGap: 16,
 
   /** 右侧宽度 */
   rightAsideWidth: 280,
@@ -196,8 +196,8 @@ const layoutSize = ref({
   /** 分页数据 */
   pagination: {
     total: 1,
-    pageNum: 1
-  }
+    pageNum: 1,
+  },
 })
 const layoutDom = ref({
   /** 页面内容容器 */

@@ -101,7 +101,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    base: '/',
+    base: '/lowcode-tp-editor/',
     optimizeDeps: {
       include: [
         // '@shared/base/element-plus-enhancer',

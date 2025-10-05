@@ -9,14 +9,22 @@ import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
 import { arrayToObj, div } from 'sf-utils2'
-import ContentCompSign from '@/views/preview-result/components/ContentCompSign.vue'
-import ContentCompSignDate from '@/views/preview-result/components/ContentCompSignDate.vue'
-import ContentCompSeal from '@/views/preview-result/components/ContentCompSeal.vue'
+import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
+import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
+import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
+  /**
+   * 模式
+   */
+  model: {
+    type: String as PropType<'preview' | 'download'>,
+    default: 'preview',
+  },
+
   /**
    * pdf 来源
    */
@@ -41,19 +49,29 @@ const pageVisibility = ref({}) // 页面可见性
 const pageRendered = ref({})
 let pageIntersectionObserver: IntersectionObserver
 
-const __previewContext__ = inject('__previewContext__')
+const __previewContext__ = inject('__previewContext__', ref({}))
+const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
 const initialProgress = ref(0)
 const a4 = cssUtil.getPaperSize('A4')
+const scaleFactor = ref(0)
+const rootRef = ref<HTMLDivElement>()
 
 /**
  * 嵌入项每一项样式
  */
 const _embedItemStyle = computed(() => {
+  if (props.model == 'download') {
+    return {
+      width: '210mm',
+      height: '297mm',
+    }
+  }
   return {
-    // width: '210mm',
-    // height: '297mm',
-    width: `${a4._basePx.w}px`,
-    height: `${a4._basePx.h}px`,
+    width: '450px',
+    // height: '100%',
+    maxWidth: '210mm',
+    maxHeight: '297mm',
+    ...__previewPdfStyle__.value,
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
     // padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
   }
@@ -127,6 +145,14 @@ const onRendered = (pageNum: number) => {
   console.log('onRendered', pageNum)
   pageRendered.value[pageNum] = true
 
+  nextTick(() => {
+    scaleFactor.value =
+      rootRef.value
+        .querySelector('.vue-pdf-embed__page')
+        .style.getPropertyValue('--scale-factor') || 1
+    console.log('scaleFactor.value', scaleFactor.value)
+  })
+
   const isRenderSuccess =
     _pageNumsList.value?.length &&
     _pageNumsList.value.every((pageNum) => pageRendered.value[pageNum])
@@ -191,7 +217,12 @@ defineExpose({
 <!--render-->
 <template>
   <div
-    class="pdf-embed__wrap"
+    ref="rootRef"
+    :class="[
+      'pdf-embed__wrap',
+      props.model == 'preview' && 'is-preview',
+      props.model == 'download' && 'is-download',
+    ]"
     :style="{
       '--per-page-gap': __previewContext__.isExporting ? '0px' : '12px',
     }"
@@ -228,6 +259,7 @@ defineExpose({
               // top: item.top - (item.pageNum - 1) * 12 + 'px',
               top: item.offsetTop + 'px',
               left: item.left + 'px',
+              transform: `scale(${scaleFactor})`,
             }"
           >
             <!-- 印章 -->
@@ -266,6 +298,7 @@ defineExpose({
     break-after: auto;
     position: absolute;
     z-index: 10;
+    transform-origin: 0 0;
   }
 }
 
