@@ -346,7 +346,7 @@ defineExpose({
     ]"
     tabindex="10"
   >
-    <!--    {{ __previewContext__.activeCompParam }}-->
+        {{ __previewContext__._paramsCompList }}
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
       <!-- 加载成功 -->
       <template v-if="_initial">
@@ -531,18 +531,5 @@ defineExpose({
   &.is-last {
     break-after: auto;
   }
-}
-
-.page-break {
-  break-after: avoid;
-  height: 0;
-  overflow: hidden;
-  &.is-last {
-    break-after: auto;
-  }
-}
-
-.vue-pdf-embed__page {
-  box-shadow: 0 2px 8px 4px rgba(0, 0, 0, 0.1);
 }
 </style>

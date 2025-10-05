@@ -10,6 +10,7 @@
 const { proxy } = getCurrentInstance()
 import DocEditor from './views/doc-editor/index.vue'
 import PreviewEditor from './views/preview-editor/index.vue'
+import PreviewResult from './views/preview-result/index.vue'
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -34,9 +35,10 @@ defineExpose({
 <!--render-->
 <template>
 <!--  <DocEditor></DocEditor>-->
-  <PreviewEditor></PreviewEditor>
+<!--  <PreviewEditor></PreviewEditor>-->
+  <PreviewResult></PreviewResult>
 </template>
 
 <!--style-->
-<style scoped lang="less">
+<style lang="less">
 </style>

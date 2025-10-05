@@ -13,7 +13,8 @@ import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
 import Footer from './components/Footer.vue'
 import { deepClone, noop, uuid } from 'sf-utils2'
-import Header from './components/Header.vue' // 头部
+import Header from './components/Header.vue'
+import { pageUtils } from '@/views/preview-editor/utils/commons.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -43,12 +44,15 @@ const layoutSize = ref({
   rightAsideWidth: 280,
 
   /** 每页距离大小 */
-  PerPageGap: 12,
+  PerPageGap: pageUtils.perPageGap,
 })
 
 const activePageNum = ref(1)
 const contentRef = ref<InstanceType<typeof Content>>() // 内容
 const previewContext = ref({
+  /** 分页方法*/
+  pageUtils,
+
   /** 文件来源 */
   source: './2.pdf',
 
@@ -72,15 +76,7 @@ const previewContext = ref({
 
   _paramsCompList: computed(() => {
     const paramsCompList = previewContext.value.paramsCompList || []
-    return deepClone(paramsCompList).map((item) => {
-      item.isInRect = false
-      const { offsetTop, pageNum } = previewContext.value.getPageOffsetTopByTop(
-        item.top,
-      )
-      item.offsetTop = offsetTop
-      item.pageNum = pageNum
-      return item
-    })
+    return pageUtils.expandCompParams(paramsCompList)
   }),
 
   /**
@@ -131,33 +127,18 @@ const previewContext = ref({
    * 根据页码获取 绝对top
    * @param pageNum
    */
-  getAbsoluteTopByPageNum(pageNum: number) {
-    const mt = layoutSize.value.PerPageGap
-    return (pageNum - 1) * a4._basePx.h + (pageNum - 1) * mt
-  },
-
+  getAbsoluteTopByPageNum: pageUtils.getAbsoluteTopByPageNum,
   /**
    * 根据top获取当前所处的页页的偏移量 offsetTop
    * @param top
    */
-  getPageOffsetTopByTop(top: number) {
-    const mt = layoutSize.value.PerPageGap
-    const pageNum = previewContext.value.getPageNumByTop(top)
-    return {
-      offsetTop: top - (pageNum - 1) * a4._basePx.h - (pageNum - 1) * mt,
-      pageNum,
-    }
-  },
+  getPageOffsetTopByTop: pageUtils.getPageOffsetTopByTop,
 
   /**
    * 根据top 获取页码
    * @param top
    */
-  getPageNumByTop(top: number) {
-    const mt = layoutSize.value.PerPageGap
-    const pageH = a4._basePx.h
-    return Math.ceil((top + mt) / (mt + pageH))
-  },
+  getPageNumByTop: pageUtils.getPageNumByTop,
 
   /**
    * 当前激活的参数组件
