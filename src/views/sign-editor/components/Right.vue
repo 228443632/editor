@@ -31,7 +31,7 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div class="preview-editor__right">
+  <div class="sign-editor__right">
     <!-- 内容区 -->
     <div class="right__title">缩略页列表</div>
 
@@ -55,7 +55,7 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
-.preview-editor__right {
+.sign-editor__right {
   //width: clamp(
   //  var(--right-aside-width),
   //  calc(

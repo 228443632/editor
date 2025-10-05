@@ -16,9 +16,9 @@ export const routes = [
     component: () => import('@/views/doc-editor/index.vue'),
   },
   {
-    path: '/preview-editor',
+    path: '/sign-editor',
     meta: { title: '预览编辑器' },
-    component: () => import('@/views/doc-editor/index.vue'),
+    component: () => import('@/views/sign-editor/index.vue'),
   },
   {
     path: '/preview-content',

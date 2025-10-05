@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
@@ -122,8 +122,8 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SIGN_STYLE.width + 'px',
-          height: COMP_SIGN_STYLE.height + 'px',
+          width: COMP_SIGN_STYLE.width * __previewContext__.scaleFactor + 'px',
+          height: COMP_SIGN_STYLE.height * __previewContext__.scaleFactor + 'px',
         }"
         v-html="testSignSvgRaw"
       ></div>

@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import Drager from 'es-drager'
 import { rafThrottle, def } from 'sf-utils2'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.js'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({

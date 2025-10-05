@@ -5,7 +5,7 @@
  */
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import { deepClone } from 'sf-utils2'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const a4 = cssUtil.getPaperSize('A4')
 

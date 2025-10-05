@@ -3,6 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 20/07/25 AM1:23
  */
+import {cssUtil} from '@/views/doc-editor/utils/css-util.ts'
 
 const DEFAULT_STYLE_CONFIG = {
   /** 加粗*/
@@ -91,8 +92,8 @@ export const FLOAT_NODE_TYPE_MAP = {
  * 电子签章样式
  */
 export const COMP_SEAL_STYLE = {
-  width: 140,
-  height: 140,
+  width: cssUtil.mmToPx(40), // 140
+  height: cssUtil.mmToPx(40), // 140
 }
 
 /**

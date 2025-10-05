@@ -5,12 +5,9 @@
  -->
 <!--setup-->
 <script setup>
-import { sleep } from 'sf-utils2'
-
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
 const emit = defineEmits([])
-import html2pdf from 'html2pdf.js'
 
 /* 状态 */
 const isExporting = ref(false)
@@ -50,8 +47,10 @@ const onExport = async () => {
       .save()
 
     console.log('导出成功')
+    useMessage('success', { content: '导出成功' })
   } catch (err) {
     console.error('导出失败:', err)
+    useMessage('error', { content: '导出失败' })
   } finally {
     window.requestIdleCallback(() => {
       isExporting.value = false
@@ -89,8 +88,8 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div class="preview-editor__header">
-    <t-button :loading="isExporting" type="primary" @click="onExport"
+  <div class="sign-editor__header">
+    <t-button :loading="isExporting" type="button" @click="onExport"
       >导出pdf</t-button
     >
     <t-button @click="onLoadAllPdf">一次性加载所有</t-button>
@@ -99,7 +98,7 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
-.preview-editor__header {
+.sign-editor__header {
   width: 100%;
   flex: none;
   background: #fff;

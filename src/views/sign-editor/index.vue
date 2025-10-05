@@ -7,14 +7,14 @@
 <script setup lang="ts">
 import Content from './components/Content.vue'
 import { useElementSize } from '@vueuse/core'
-import Left from '@/views/preview-editor/components/Left.vue'
+import Left from '@/views/sign-editor/components/Left.vue'
 import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import Footer from './components/Footer.vue'
 import { deepClone, noop, uuid } from 'sf-utils2'
 import Header from './components/Header.vue'
-import { pageUtils } from '@/views/preview-editor/utils/commons.ts' // 头部
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -50,11 +50,14 @@ const layoutSize = ref({
 const activePageNum = ref(1)
 const contentRef = ref<InstanceType<typeof Content>>() // 内容
 const previewContext = ref({
+  /** 缩小/放大比例*/
+  scaleFactor: 0,
+
   /** 分页方法*/
   pageUtils,
 
   /** 文件来源 */
-  source: './2.pdf',
+  source: './4.pdf',
 
   /** 是否正在导出中 */
   isExporting: false,
@@ -229,9 +232,7 @@ watchEffect(() => {
 /* 周期 */
 onMounted(() => {
   // 初始化成功
-  window.dispatchEvent(
-    new CustomEvent('editor-ready'),
-  )
+  window.dispatchEvent(new CustomEvent('editor-ready'))
 })
 
 /* 暴露 */
@@ -251,39 +252,39 @@ provide('__previewContext__', previewContext)
 window['pagePreviewEditor'] = {
   previewContext,
   layoutSize,
-  activePageNum
+  activePageNum,
 }
 </script>
 
 <!--render-->
 <template>
   <div
+    ref="rootRef"
     v-spin="{
       loading: previewContext.loading > 0,
       size: 'small',
       showLoadingText: false,
       mask: true,
     }"
-    ref="rootRef"
-    :class="['preview-editor', previewContext.isExporting && 'is-exporting']"
+    :class="['sign-editor', previewContext.isExporting && 'is-exporting']"
     :style="_rootStyle"
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
   >
-    <Header class="preview-editor__header"></Header>
+    <Header class="sign-editor__header"></Header>
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>
       <Right></Right>
     </div>
 
-    <Footer class="preview-editor__footer"></Footer>
+    <Footer class="sign-editor__footer"></Footer>
   </div>
 </template>
 
 <!--style-->
 <style scoped lang="less">
-.preview-editor {
+.sign-editor {
   display: flex;
   background-color: var(--umo-container-background);
   height: 100vh;
@@ -300,7 +301,7 @@ window['pagePreviewEditor'] = {
   }
 }
 
-.preview-editor__footer {
+.sign-editor__footer {
   height: 31px;
   flex: none;
   width: 100%;

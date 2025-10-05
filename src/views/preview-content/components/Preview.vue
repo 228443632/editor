@@ -8,7 +8,7 @@
 import Content from './Content.vue'
 import { noop } from 'sf-utils2'
 import paramsCompList from './mock.ts'
-import { pageUtils } from '@/views/preview-editor/utils/commons.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import dayjs from 'dayjs'
 
 const props = defineProps({

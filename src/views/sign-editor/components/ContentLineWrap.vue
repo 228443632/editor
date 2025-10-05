@@ -12,7 +12,7 @@ export const PREVIEW_AUX_LINE_CTOR = 'preview-page-content__auxline'
 import type { CSSProperties } from 'vue'
 import { useElementBounding } from '@vueuse/core'
 import { MAX_Z_INDEX } from '@/views/doc-editor/utils/dom'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const props = defineProps({
   /**

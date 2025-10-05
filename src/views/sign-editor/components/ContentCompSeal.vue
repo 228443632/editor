@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { COMP_SEAL_STYLE } from '@/views/doc-editor/extensions/constant.ts'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import testSealSvgRaw from '@/assets/images/test-seal.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
@@ -122,8 +122,11 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SEAL_STYLE.width + 'px',
-          height: COMP_SEAL_STYLE.height + 'px',
+          width:
+            COMP_SEAL_STYLE.width * __previewContext__.scaleFactor + 'px',
+          height:
+            COMP_SEAL_STYLE.height * __previewContext__.scaleFactor +
+            'px',
         }"
         v-html="testSealSvgRaw"
       ></div>

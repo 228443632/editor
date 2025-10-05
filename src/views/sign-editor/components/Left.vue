@@ -184,7 +184,7 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div class="preview-editor__left">
+  <div class="sign-editor__left">
     <div class="left__title">文件签署</div>
 
     <!-- 内容区 -->
@@ -224,7 +224,7 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
-.preview-editor__left {
+.sign-editor__left {
   background: transparent;
   border-right: solid 1px var(--umo-border-color);
   width: var(--left-aside-width);

@@ -12,8 +12,8 @@ import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
 import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
-import useAnchor from '@/views/preview-editor/hooks/use-anchor'
-import ContentCompSignDate from '@/views/preview-editor/components/ContentCompSignDate.vue'
+import useAnchor from '@/views/sign-editor/hooks/use-anchor'
+import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignDate.vue'
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 // import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 // import 'vue-pdf-embed/dist/styles/textLayer.css'
@@ -208,6 +208,13 @@ __previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
  */
 const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
+
+  nextTick(() => {
+    __previewContext__.value.scaleFactor =
+      rootRef.value
+        .querySelector('.vue-pdf-embed__page')
+        .style.getPropertyValue('--scale-factor') || 1
+  })
 
   const isRenderSuccess =
     _pageNumsList.value?.length &&
