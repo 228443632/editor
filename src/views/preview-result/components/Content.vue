@@ -206,7 +206,8 @@ defineExpose({
             class="content-comp__item"
             :style="{
               '--page-num': item.pageNum,
-              top: item.top - (item.pageNum - 1) * 12 + 'px',
+              // top: item.top - (item.pageNum - 1) * 12 + 'px',
+              top: item.offsetTop + 'px',
               left: item.left + 'px',
             }"
           >

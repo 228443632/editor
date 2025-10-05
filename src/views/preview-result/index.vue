@@ -23,6 +23,9 @@ const previewContext = ref({
   /** 加载 */
   loading: 0,
 
+  /** 是否处于打印中*/
+  isExporting: false,
+
   /** 内容是否加载结束 */
   contentInitial: false,
 
@@ -42,6 +45,7 @@ const onExportPdf = async () => {
   try {
     if (previewContext.value.loading > 0) return
     previewContext.value.loading++
+    previewContext.value.isExporting = true
     const { default: html2pdf } = await import('html2pdf.js')
 
     await previewContext.value.loadAllPdfPagesRaf()
@@ -54,14 +58,14 @@ const onExportPdf = async () => {
     const opt = {
       margin: 0,
       filename: 'vue-export-example.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      // image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: window.devicePixelRatio || 1,
         useCORS: true,
         letterRendering: true,
       },
       jsPDF: { format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ["css", "legacy"] },
+      pagebreak: { mode: ['css', 'legacy'] },
       // 核心：配置pagebreak的mode，加入 'avoid-all'
     }
 
@@ -77,6 +81,7 @@ const onExportPdf = async () => {
   } finally {
     window.requestIdleCallback(() => {
       previewContext.value.loading--
+      previewContext.value.isExporting = false
     })
   }
 }
@@ -106,7 +111,10 @@ provide('__previewContext__', previewContext)
 <template>
   <div
     ref="rootRef"
-    class="preview-page umo-scrollbar"
+    :class="[
+      'preview-page umo-scrollbar',
+      // previewContext.isExporting ? 'is-exporting' : '',
+    ]"
     v-spin.fullscreen="{
       loading: previewContext.loading > 0,
       size: 'small',
@@ -145,5 +153,12 @@ provide('__previewContext__', previewContext)
   padding: 16px 0;
   overflow-y: auto;
   background-color: var(--umo-container-background);
+  &.is-exporting {
+    :deep {
+      .pdf-embed__wrap {
+        --per-page-gap: 0;
+      }
+    }
+  }
 }
 </style>
