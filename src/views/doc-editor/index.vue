@@ -117,7 +117,40 @@ const options = $ref(
       toolbar: {
         // defaultMode: 'classic',
         // menus: ['base'],
-        // disableMenuItems: [''],
+        disableMenuItems: [
+          'video',
+          'audio',
+          'file',
+          'code-block',
+          'math',
+          'tag',
+          'columns',
+          'callout',
+          'bookmark',
+          'hard-break',
+          'toc',
+          'textBox',
+          'template',
+          'webPage',
+
+          // 工具全部隐藏
+          'qrcode',
+          'barcode',
+          'signature',
+          'seal',
+          'diagrams',
+          'echarts',
+          'mermaid',
+
+          // 页面
+          'watermark',
+          'background',
+          'preview',
+
+          // 导出
+          'share',
+          'embed',
+        ],
       },
       document: {
         title: '合同低码平台',

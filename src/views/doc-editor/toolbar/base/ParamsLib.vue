@@ -39,7 +39,7 @@ defineExpose({
 <!--render-->
 <template>
   <!-- editor?.isEmpty -->
-  <menus-button text="参数库" ico="params-lib" huge @menu-click="onClick">
+  <menus-button text="模版字段" ico="params-lib" huge @menu-click="onClick">
   </menus-button>
 </template>
 

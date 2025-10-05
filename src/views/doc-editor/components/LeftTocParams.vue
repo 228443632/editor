@@ -15,7 +15,10 @@ import {
 
 import useEditorEvent from '@/composables/useEditorEvent'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
-import { COMP_PARAMS_NAME_MAP, FLOAT_REAL_CONTENT_CLASS_NAME } from '@/views/doc-editor/extensions/constant.ts'
+import {
+  COMP_PARAMS_NAME_MAP,
+  FLOAT_REAL_CONTENT_CLASS_NAME,
+} from '@/views/doc-editor/extensions/constant.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -182,7 +185,7 @@ watch(__compNodeList__, (newVal) => {
   const paramsTab = page.value.tocTabsOptions.find(
     (item) => item.value == 'params',
   )
-  paramsTab.label = ['参数', newVal.length ? `(${newVal.length})` : '']
+  paramsTab.label = ['模版字段', newVal.length ? `(${newVal.length})` : '']
     .filter(Boolean)
     .join(' ')
 })

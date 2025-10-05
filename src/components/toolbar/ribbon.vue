@@ -110,12 +110,12 @@
           <div class="umo-virtual-group">
             <!-- 导入 word -->
             <menus-toolbar-base-import-word />
-            <!-- markdown -->
-            <menus-toolbar-base-markdown v-if="!disableItem('markdown')" />
+            <!-- markdown--隐藏 -->
+            <!--  <menus-toolbar-base-markdown v-if="!disableItem('markdown')" />-->
             <!-- 查找替换 -->
             <menus-toolbar-base-search-replace />
-            <!-- 打印 -->
-            <menus-toolbar-base-print v-if="!disableItem('print')" />
+            <!-- 打印--隐藏 -->
+            <!--  <menus-toolbar-base-print v-if="!disableItem('print')" />-->
           </div>
           <div class="virtual-group is-slot umo-virtual-group">
             <!-- 插槽 -->
@@ -126,20 +126,20 @@
         <!-- 插入  -->
         <template v-if="currentMenu === 'insert'">
           <div class="umo-virtual-group">
-            <!--  链接 -->
-            <menus-toolbar-insert-link v-if="!disableItem('link')" />
+            <!--  链接-隐藏 -->
+            <!-- <menus-toolbar-insert-link v-if="!disableItem('link')" />-->
             <!--  图片 -->
             <menus-toolbar-insert-image v-if="!disableItem('image')" />
-            <!--  视频 -->
+            <!--  视频-隐藏 -->
             <menus-toolbar-insert-video v-if="!disableItem('video')" />
             <!--  音频 -->
             <menus-toolbar-insert-audio v-if="!disableItem('audio')" />
             <!--  文件 -->
             <menus-toolbar-insert-file v-if="!disableItem('file')" />
-            <!--  代码块 -->
-            <menus-toolbar-insert-code-block
-              v-if="!disableItem('code-block')"
-            />
+            <!--  代码块-隐藏 -->
+            <!--            <menus-toolbar-insert-code-block-->
+            <!--              v-if="!disableItem('code-block')"-->
+            <!--            />-->
             <!--  特殊字符 -->
             <menus-toolbar-insert-symbol v-if="!disableItem('symbol')" />
             <!--  日期 -->
@@ -159,7 +159,7 @@
             <!--  高亮块 -->
             <menus-toolbar-insert-callout v-if="!disableItem('callout')" />
             <!--  提及某人 -->
-<!--            <menus-toolbar-insert-mention v-if="!disableItem('mention')" />-->
+            <!--            <menus-toolbar-insert-mention v-if="!disableItem('mention')" />-->
             <!--  书签 -->
             <menus-toolbar-insert-bookmark v-if="!disableItem('bookmark')" />
           </div>
@@ -267,7 +267,7 @@
             <!-- <menus-toolbar-tools-mind-map v-if="!disableItem('mind-map')" /> -->
             <menus-toolbar-tools-mermaid v-if="!disableItem('mermaid')" />
           </div>
-          <div class="umo-virtual-group">
+          <div class="umo-virtual-group !border-l-0">
             <!--  中文大小写 -->
             <menus-toolbar-tools-chinese-case
               v-if="!disableItem('chineseCase')"
@@ -280,23 +280,25 @@
 
         <!-- 页面  -->
         <template v-if="currentMenu === 'page'">
+          <!-- 目录  -->
           <div class="umo-virtual-group">
             <menus-toolbar-page-toggle-toc />
           </div>
-          <div class="umo-virtual-group">
-            <div class="umo-virtual-group-row">
-              <!--  页边距 -->
-              <menus-toolbar-page-margin />
-              <div>
-                <div class="umo-virtual-group-row">
-                  <menus-toolbar-page-size />
-                </div>
-                <div class="umo-virtual-group-row">
-                  <menus-toolbar-page-orientation />
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- 页边距  -->
+<!--          <div class="umo-virtual-group">-->
+<!--            <div class="umo-virtual-group-row">-->
+<!--              &lt;!&ndash;  页边距 &ndash;&gt;-->
+<!--              <menus-toolbar-page-margin />-->
+<!--              <div>-->
+<!--                <div class="umo-virtual-group-row">-->
+<!--                  <menus-toolbar-page-size />-->
+<!--                </div>-->
+<!--                <div class="umo-virtual-group-row">-->
+<!--                  <menus-toolbar-page-orientation />-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
           <div class="umo-virtual-group">
             <!--  分隔符 -->
             <menus-toolbar-page-break />

@@ -125,10 +125,6 @@
     <menus-bubble-node-delete />
   </template>
   <template v-else>
-    <template v-if="options.ai?.assistant?.enabled">
-      <menus-bubble-assistant />
-      <div class="umo-bubble-menu-divider"></div>
-    </template>
     <menus-toolbar-base-font-size :select="false" />
     <div
       v-if="

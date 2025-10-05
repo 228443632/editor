@@ -31,100 +31,100 @@
         <slot :name="`toolbar_${item}`" v-bind="props" />
       </template>
     </toolbar-classic>
-    <div class="umo-toolbar-actions" :class="$toolbar.mode">
-      <t-popup
-        v-if="options.document.readOnly !== true"
-        v-model="statusPopup"
-        :attach="container"
-        trigger="click"
-        placement="bottom-right"
-        @visible-change="(visible: boolean) => (statusPopup = visible)"
-      >
-        <t-button
-          class="umo-toolbar-actions-button"
-          variant="text"
-          size="small"
-          :class="{ active: statusPopup }"
-        >
-          <span class="umo-status">
-            <span
-              class="umo-status-online"
-              :class="{ offline: !online }"
-            ></span>
-            <span class="umo-status-saved button-text">
-              <span
-                v-if="savedAt"
-                v-text="t('save.savedAtText', { time: timeAgo(savedAt) })"
-              ></span>
-              <span v-else class="unsaved" v-text="t('save.unsaved')"></span>
-            </span>
-          </span>
-        </t-button>
-        <template #content>
-          <div class="umo-document-status-container umo-status">
-            <div>
-              {{ t('save.network') }}
-              {{ online ? t('save.online') : t('save.offline') }}
-            </div>
-            <div>
-              {{ t('save.savedAt') }}
-              <span
-                v-if="savedAt"
-                v-text="t('save.savedAtText', { time: timeAgo(savedAt) })"
-              ></span>
-              <span v-else v-text="t('save.unsaved')"></span>
-            </div>
-            <div class="umo-document-button-container">
-              <t-button
-                size="small"
-                @click="saveContent"
-                v-text="t('save.text')"
-              ></t-button>
-              <t-button
-                size="small"
-                variant="outline"
-                @click="setContentFromCache"
-                v-text="t('save.cache.text')"
-              >
-              </t-button>
-            </div>
-          </div>
-        </template>
-      </t-popup>
-      <t-dropdown
-        trigger="click"
-        size="small"
-        placement="bottom-right"
-        :popup-props="{
-          destroyOnClose: true,
-          attach: container,
-        }"
-        @click="toggleToolbarMode"
-      >
-        <t-button
-          class="umo-toolbar-actions-button"
-          variant="text"
-          size="small"
-        >
-          <icon name="expand-down" />
-          <span class="umo-button-text">{{ t('toolbar.toggle') }}</span>
-        </t-button>
-        <template #dropdown>
-          <t-dropdown-menu
-            v-for="item in editorModeOptions"
-            :key="item.value as string"
-            :content="item.label"
-            :value="item.value"
-            :divider="item.divider"
-            :active="item.value === $toolbar.mode"
-          >
-            <template #prefixIcon>
-              <icon :name="item.prefixIcon" />
-            </template>
-          </t-dropdown-menu>
-        </template>
-      </t-dropdown>
-    </div>
+    <!--    <div class="umo-toolbar-actions" :class="$toolbar.mode">-->
+    <!--      <t-popup-->
+    <!--        v-if="options.document.readOnly !== true"-->
+    <!--        v-model="statusPopup"-->
+    <!--        :attach="container"-->
+    <!--        trigger="click"-->
+    <!--        placement="bottom-right"-->
+    <!--        @visible-change="(visible: boolean) => (statusPopup = visible)"-->
+    <!--      >-->
+    <!--        <t-button-->
+    <!--          class="umo-toolbar-actions-button"-->
+    <!--          variant="text"-->
+    <!--          size="small"-->
+    <!--          :class="{ active: statusPopup }"-->
+    <!--        >-->
+    <!--          <span class="umo-status">-->
+    <!--            <span-->
+    <!--              class="umo-status-online"-->
+    <!--              :class="{ offline: !online }"-->
+    <!--            ></span>-->
+    <!--            <span class="umo-status-saved button-text">-->
+    <!--              <span-->
+    <!--                v-if="savedAt"-->
+    <!--                v-text="t('save.savedAtText', { time: timeAgo(savedAt) })"-->
+    <!--              ></span>-->
+    <!--              <span v-else class="unsaved" v-text="t('save.unsaved')"></span>-->
+    <!--            </span>-->
+    <!--          </span>-->
+    <!--        </t-button>-->
+    <!--        <template #content>-->
+    <!--          <div class="umo-document-status-container umo-status">-->
+    <!--            <div>-->
+    <!--              {{ t('save.network') }}-->
+    <!--              {{ online ? t('save.online') : t('save.offline') }}-->
+    <!--            </div>-->
+    <!--            <div>-->
+    <!--              {{ t('save.savedAt') }}-->
+    <!--              <span-->
+    <!--                v-if="savedAt"-->
+    <!--                v-text="t('save.savedAtText', { time: timeAgo(savedAt) })"-->
+    <!--              ></span>-->
+    <!--              <span v-else v-text="t('save.unsaved')"></span>-->
+    <!--            </div>-->
+    <!--            <div class="umo-document-button-container">-->
+    <!--              <t-button-->
+    <!--                size="small"-->
+    <!--                @click="saveContent"-->
+    <!--                v-text="t('save.text')"-->
+    <!--              ></t-button>-->
+    <!--              <t-button-->
+    <!--                size="small"-->
+    <!--                variant="outline"-->
+    <!--                @click="setContentFromCache"-->
+    <!--                v-text="t('save.cache.text')"-->
+    <!--              >-->
+    <!--              </t-button>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </template>-->
+    <!--      </t-popup>-->
+    <!--&lt;!&ndash;      <t-dropdown&ndash;&gt;-->
+    <!--&lt;!&ndash;        trigger="click"&ndash;&gt;-->
+    <!--&lt;!&ndash;        size="small"&ndash;&gt;-->
+    <!--&lt;!&ndash;        placement="bottom-right"&ndash;&gt;-->
+    <!--&lt;!&ndash;        :popup-props="{&ndash;&gt;-->
+    <!--&lt;!&ndash;          destroyOnClose: true,&ndash;&gt;-->
+    <!--&lt;!&ndash;          attach: container,&ndash;&gt;-->
+    <!--&lt;!&ndash;        }"&ndash;&gt;-->
+    <!--&lt;!&ndash;        @click="toggleToolbarMode"&ndash;&gt;-->
+    <!--&lt;!&ndash;      >&ndash;&gt;-->
+    <!--&lt;!&ndash;        <t-button&ndash;&gt;-->
+    <!--&lt;!&ndash;          class="umo-toolbar-actions-button"&ndash;&gt;-->
+    <!--&lt;!&ndash;          variant="text"&ndash;&gt;-->
+    <!--&lt;!&ndash;          size="small"&ndash;&gt;-->
+    <!--&lt;!&ndash;        >&ndash;&gt;-->
+    <!--&lt;!&ndash;          <icon name="expand-down" />&ndash;&gt;-->
+    <!--&lt;!&ndash;          <span class="umo-button-text">{{ t('toolbar.toggle') }}</span>&ndash;&gt;-->
+    <!--&lt;!&ndash;        </t-button>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <template #dropdown>&ndash;&gt;-->
+    <!--&lt;!&ndash;          <t-dropdown-menu&ndash;&gt;-->
+    <!--&lt;!&ndash;            v-for="item in editorModeOptions"&ndash;&gt;-->
+    <!--&lt;!&ndash;            :key="item.value as string"&ndash;&gt;-->
+    <!--&lt;!&ndash;            :content="item.label"&ndash;&gt;-->
+    <!--&lt;!&ndash;            :value="item.value"&ndash;&gt;-->
+    <!--&lt;!&ndash;            :divider="item.divider"&ndash;&gt;-->
+    <!--&lt;!&ndash;            :active="item.value === $toolbar.mode"&ndash;&gt;-->
+    <!--&lt;!&ndash;          >&ndash;&gt;-->
+    <!--&lt;!&ndash;            <template #prefixIcon>&ndash;&gt;-->
+    <!--&lt;!&ndash;              <icon :name="item.prefixIcon" />&ndash;&gt;-->
+    <!--&lt;!&ndash;            </template>&ndash;&gt;-->
+    <!--&lt;!&ndash;          </t-dropdown-menu>&ndash;&gt;-->
+    <!--&lt;!&ndash;        </template>&ndash;&gt;-->
+    <!--&lt;!&ndash;      </t-dropdown>&ndash;&gt;-->
+    <!--    </div>-->
   </div>
   <tooltip v-else :content="t('toolbar.show')" placement="bottom-right">
     <div class="umo-show-toolbar" @click="$toolbar.show = true">

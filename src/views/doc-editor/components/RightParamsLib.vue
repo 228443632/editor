@@ -535,7 +535,7 @@ defineExpose({
 <template>
   <div class="umo-pr-container">
     <div class="umo-pr-title">
-      参数库
+      模版字段
 
       <div class="umo-dialog__close" @click="onClose">
         <icon name="close" size="20" />

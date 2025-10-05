@@ -31,7 +31,7 @@ import Bookmark from './bookmark'
 import BreakMarks from './break-marks'
 import BulletList from './bullet-list'
 import Callout from './callout'
-import CodeBlock from './code-block'
+// import CodeBlock from './code-block'
 import Datetime from './datetime'
 import Echarts from './echarts'
 import File from './file'
@@ -170,7 +170,7 @@ export const getDefaultExtensions = ({
     Audio,
     File,
     TextBox,
-    CodeBlock,
+    // CodeBlock,
     hr,
     Iframe,
     Mathematics,

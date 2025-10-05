@@ -200,9 +200,11 @@ onClickOutside(
       }
       &.h2 {
         font-size: 14px;
+        height: unset;
       }
       &.h3 {
         font-size: 13px;
+        height: unset;
       }
       &.h4 {
         font-size: 12px;
