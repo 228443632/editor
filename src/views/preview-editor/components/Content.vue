@@ -15,6 +15,8 @@ import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 import useAnchor from '@/views/preview-editor/hooks/use-anchor'
 import ContentCompSignDate from '@/views/preview-editor/components/ContentCompSignDate.vue'
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
+// import 'vue-pdf-embed/dist/styles/annotationLayer.css'
+// import 'vue-pdf-embed/dist/styles/textLayer.css'
 
 /* 状态 */
 const props = defineProps({})
@@ -23,6 +25,7 @@ const embedPdfWrapRef = ref<HTMLDivElement>()
 const initialProgress = ref(0)
 
 const __activePageNum__ = inject('__activePageNum__')
+const __layoutSize__ = inject('__layoutSize__')
 const __previewContext__ = inject('__previewContext__') // 预览上下文
 
 const rootRef = ref<HTMLElement>()
@@ -173,7 +176,8 @@ const resetPageIntersectionObserver = () => {
 const loadAllPdfPagesRaf = async () => {
   const maxPageNum = _pageNumsList.value.at(-1)
   const existMaxPageNum = Math.max(
-    ...Object.keys(pageVisibility.value).map((key) => +key),
+    ...Object.keys(pageVisibility.value).map((key) => +key || 0),
+    0,
   )
   if (existMaxPageNum < maxPageNum) {
     for (let i = existMaxPageNum + 1; i <= maxPageNum; i++) {
@@ -183,8 +187,10 @@ const loadAllPdfPagesRaf = async () => {
     }
   }
   return new Promise((resolve) => {
-    const lastPageNum = _pageNumsList.value.at(-1)
-    if (pageRendered.value[lastPageNum]) return resolve(true)
+    const isRenderSuccess =
+      _pageNumsList.value?.length &&
+      _pageNumsList.value.every((pageNum) => pageRendered.value[pageNum])
+    if (isRenderSuccess) return resolve(true)
     loadAllPdfPagesRaf['_resolve'] = resolve
   })
 
@@ -201,10 +207,13 @@ __previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
  * 渲染完成
  */
 const onRendered = (pageNum: number) => {
-  console.log('onRendered', pageNum)
   pageRendered.value[pageNum] = true
 
-  if (pageNum == _pageNumsList.value.at(-1)) {
+  const isRenderSuccess =
+    _pageNumsList.value?.length &&
+    _pageNumsList.value.every((pageNum) => pageRendered.value[pageNum])
+
+  if (isRenderSuccess) {
     loadAllPdfPagesRaf['_resolve']?.()
   }
 }
@@ -251,7 +260,7 @@ const _embedItemStyle = computed(() => {
  * 是否加载结束
  */
 const _initial = computed(() => {
-  return initialProgress.value == 1
+  return initialProgress.value == 1 && _pageNumsList.value.length > 0
 })
 
 /* 监听 */
@@ -342,11 +351,11 @@ defineExpose({
     :class="[
       `pdf-preview__content umo-scrollbar`,
       !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
-      __previewContext__.isExporting && '1is-exporting',
+      __previewContext__.isExporting && 'is-exporting',
     ]"
     tabindex="10"
   >
-        {{ __previewContext__._paramsCompList }}
+    <!--    {{ __previewContext__._paramsCompList }}-->
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
       <!-- 加载成功 -->
       <template v-if="_initial">
@@ -402,6 +411,7 @@ defineExpose({
           class="content-comp__item"
           :style="{
             '--page-num': item.pageNum,
+            '--mt': -((item.pageNum - 1) * __layoutSize__.perPageGap) + 'px',
           }"
         >
           <!-- 印章 -->
@@ -486,7 +496,7 @@ defineExpose({
     }
     :deep {
       .content-comp__item > * {
-        margin-top: calc(0px - ((var(--page-num) - 1) * var(--per-page-gap)));
+        margin-top: var(--mt);
       }
     }
     .preview-page-content__auxline {

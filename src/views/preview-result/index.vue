@@ -43,28 +43,28 @@ const previewContext = ref({
  */
 const onExportPdf = async () => {
   try {
+    if (!previewContext.value.contentInitial) return
     if (previewContext.value.loading > 0) return
     previewContext.value.loading++
     previewContext.value.isExporting = true
-    const { default: html2pdf } = await import('html2pdf.js')
 
     await previewContext.value.loadAllPdfPagesRaf()
     const contentDom = unrefElement(contentRef)
     if (!contentDom) throw new Error('未找到导出内容')
 
-    await sleep()
+    const { default: html2pdf } = await import('html2pdf.js')
 
-    // // 配置选项
+    // 配置选项
     const opt = {
       margin: 0,
       filename: 'vue-export-example.pdf',
-      // image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 0.98 },
       html2canvas: {
         scale: window.devicePixelRatio || 1,
         useCORS: true,
         letterRendering: true,
       },
-      jsPDF: { format: 'a4', orientation: 'portrait' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['css', 'legacy'] },
       // 核心：配置pagebreak的mode，加入 'avoid-all'
     }
@@ -75,6 +75,7 @@ const onExportPdf = async () => {
       .set(opt)
       .from(contentDom)
       .save()
+
     console.log('导出成功')
   } catch (err) {
     console.error('导出失败:', err)
@@ -97,6 +98,15 @@ const _paramsCompList = computed(() => {
 
 /* 监听 */
 
+watch(
+  () => previewContext.value.contentInitial,
+  (newVal) => {
+    if (newVal) {
+      void onExportPdf()
+    }
+  },
+)
+
 /* 周期 */
 onMounted(() => {})
 
@@ -113,10 +123,10 @@ provide('__previewContext__', previewContext)
     ref="rootRef"
     :class="[
       'preview-page umo-scrollbar',
-      // previewContext.isExporting ? 'is-exporting' : '',
+      previewContext.isExporting ? 'is-exporting' : '',
     ]"
     v-spin.fullscreen="{
-      loading: previewContext.loading > 0,
+      loading: previewContext.loading > 0 || !previewContext.contentInitial,
       size: 'small',
       showLoadingText: false,
       mask: true,
@@ -153,12 +163,5 @@ provide('__previewContext__', previewContext)
   padding: 16px 0;
   overflow-y: auto;
   background-color: var(--umo-container-background);
-  &.is-exporting {
-    :deep {
-      .pdf-embed__wrap {
-        --per-page-gap: 0;
-      }
-    }
-  }
 }
 </style>

@@ -35,8 +35,8 @@ defineExpose({
 <!--render-->
 <template>
 <!--  <DocEditor></DocEditor>-->
-<!--  <PreviewEditor></PreviewEditor>-->
-  <PreviewResult></PreviewResult>
+  <PreviewEditor></PreviewEditor>
+<!--  <PreviewResult></PreviewResult>-->
 </template>
 
 <!--style-->

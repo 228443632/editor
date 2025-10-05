@@ -44,7 +44,7 @@ const layoutSize = ref({
   rightAsideWidth: 280,
 
   /** 每页距离大小 */
-  PerPageGap: pageUtils.perPageGap,
+  perPageGap: pageUtils.perPageGap,
 })
 
 const activePageNum = ref(1)
@@ -211,7 +211,9 @@ const _rootStyle = computed(() => {
     '--padding-bottom': '16px',
     '--padding-left': '16px',
     '--padding-right': '16px',
-    '--per-page-gap': `${layoutSize.value.PerPageGap}px`,
+    '--per-page-gap': previewContext.value.isExporting
+      ? '0px'
+      : `${layoutSize.value.perPageGap}px`,
   }
 })
 

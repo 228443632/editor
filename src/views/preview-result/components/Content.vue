@@ -6,11 +6,14 @@
 <!--setup-->
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
+import 'vue-pdf-embed/dist/styles/annotationLayer.css'
+import 'vue-pdf-embed/dist/styles/textLayer.css'
 import { arrayToObj, div } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-result/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-result/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-result/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -40,16 +43,17 @@ let pageIntersectionObserver: IntersectionObserver
 
 const __previewContext__ = inject('__previewContext__')
 const initialProgress = ref(0)
+const a4 = cssUtil.getPaperSize('A4')
 
 /**
  * 嵌入项每一项样式
  */
 const _embedItemStyle = computed(() => {
   return {
-    width: '210mm',
-    height: '297mm',
-    // width: `${a4._basePx.w}px`,
-    // height: `${a4._basePx.h}px`,
+    // width: '210mm',
+    // height: '297mm',
+    width: `${a4._basePx.w}px`,
+    height: `${a4._basePx.h}px`,
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
     // padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
   }
@@ -58,8 +62,9 @@ const _embedItemStyle = computed(() => {
 const { doc } = useVuePdfEmbed({
   source: props.source,
   onProgress: (progressParams) => {
-    initialProgress.value = div(progressParams.loaded / progressParams.total)
-    // console.log('c', progress, progress == '1')
+    window.requestAnimationFrame(() => {
+      initialProgress.value = div(progressParams.loaded / progressParams.total)
+    })
   },
 })
 
@@ -89,7 +94,8 @@ const resetPageIntersectionObserver = () => {
 const loadAllPdfPagesRaf = async () => {
   const maxPageNum = _pageNumsList.value.at(-1)
   const existMaxPageNum = Math.max(
-    ...Object.keys(pageVisibility.value).map((key) => +key),
+    ...Object.keys(pageVisibility.value).map((key) => +key || 0),
+    0,
   )
   if (existMaxPageNum < maxPageNum) {
     for (let i = existMaxPageNum + 1; i <= maxPageNum; i++) {
@@ -99,8 +105,10 @@ const loadAllPdfPagesRaf = async () => {
     }
   }
   return new Promise((resolve) => {
-    const lastPageNum = _pageNumsList.value.at(-1)
-    if (pageRendered.value[lastPageNum]) return resolve(true)
+    const isRenderSuccess =
+      _pageNumsList.value?.length &&
+      _pageNumsList.value.every((pageNum) => pageRendered.value[pageNum])
+    if (isRenderSuccess) return resolve(true)
     loadAllPdfPagesRaf['_resolve'] = resolve
   })
 
@@ -119,7 +127,11 @@ const onRendered = (pageNum: number) => {
   console.log('onRendered', pageNum)
   pageRendered.value[pageNum] = true
 
-  if (pageNum == _pageNumsList.value.at(-1)) {
+  const isRenderSuccess =
+    _pageNumsList.value?.length &&
+    _pageNumsList.value.every((pageNum) => pageRendered.value[pageNum])
+
+  if (isRenderSuccess) {
     loadAllPdfPagesRaf['_resolve']?.()
   }
 }
@@ -137,7 +149,7 @@ const _pageNumsList = computed(() =>
  * 是否加载结束
  */
 const _initial = computed(() => {
-  return initialProgress.value == 1
+  return initialProgress.value == 1 && _pageNumsList.value.length > 0
 })
 
 /**
@@ -178,7 +190,12 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div class="pdf-embed__wrap">
+  <div
+    class="pdf-embed__wrap"
+    :style="{
+      '--per-page-gap': __previewContext__.isExporting ? '0px' : '12px',
+    }"
+  >
     <!-- 内容区 -->
     <!-- iframe的  -->
     <template v-for="(pageNum, index) in _pageNumsList" :key="pageNum">
@@ -195,6 +212,8 @@ defineExpose({
           v-if="pageVisibility[pageNum]"
           :source="doc"
           :page="pageNum"
+          annotation-layer
+          text-layer
           @rendered="onRendered(pageNum)"
         />
 
@@ -246,7 +265,7 @@ defineExpose({
   .content-comp__item {
     break-after: auto;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
   }
 }
 
@@ -254,8 +273,9 @@ defineExpose({
   margin: 0 auto;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
-  break-after: page;
+  //break-after: page;
   break-inside: avoid;
+  position: relative;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }

@@ -22,22 +22,33 @@ const onExport = async () => {
   try {
     isExporting.value = true
     await __previewContext__.value.loadAllPdfPagesRaf()
-    const content = document.querySelector('.pdf-embed__wrap')
-    if (!content) throw new Error('未找到导出内容')
+    const contentDom = unrefElement(__previewContext__.value.embedPdfWrapRef)
+    if (!contentDom) throw new Error('未找到导出内容')
 
-    await sleep()
+    const { default: html2pdf } = await import('html2pdf.js')
 
-    // // 配置选项
+    // 配置选项
     const opt = {
       margin: 0,
       filename: 'vue-export-example.pdf',
-      html2canvas: { scale: window.devicePixelRatio || 1, useCORS: true },
-      jsPDF: { format: 'a4', orientation: 'portrait' },
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: window.devicePixelRatio || 1,
+        useCORS: true,
+        letterRendering: true,
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] },
       // 核心：配置pagebreak的mode，加入 'avoid-all'
     }
 
     // 执行导出
-    await html2pdf().set(opt).from(content).save()
+    await html2pdf()
+      // @ts-expect-error
+      .set(opt)
+      .from(contentDom)
+      .save()
+
     console.log('导出成功')
   } catch (err) {
     console.error('导出失败:', err)
@@ -59,10 +70,10 @@ const onLoadAllPdf = async () => {
 
 watch(isExporting, () => {
   if (isExporting.value) {
-    // __previewContext__.value.loading++
+    __previewContext__.value.loading++
     __previewContext__.value.isExporting = true
   } else {
-    // __previewContext__.value.loading--
+    __previewContext__.value.loading--
     __previewContext__.value.isExporting = false
   }
 })
