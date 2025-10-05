@@ -33,6 +33,7 @@ const emit = defineEmits({})
 /* 状态 */
 const rootRef = ref<HTMLElement>()
 const contentRef = ref<InstanceType<typeof Content>>()
+console.log('props.source', props.source)
 const previewContext = ref({
   /** 文件来源 */
   source: props.source,
@@ -128,8 +129,6 @@ watch(
 
 /* 周期 */
 onMounted(() => {
-  // 初始化成功
-  window.dispatchEvent(new CustomEvent('editor-ready'))
 })
 
 /* 暴露 */

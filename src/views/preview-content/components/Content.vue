@@ -150,7 +150,6 @@ const onRendered = (pageNum: number) => {
       rootRef.value
         .querySelector('.vue-pdf-embed__page')
         .style.getPropertyValue('--scale-factor') || 1
-    console.log('scaleFactor.value', scaleFactor.value)
   })
 
   const isRenderSuccess =

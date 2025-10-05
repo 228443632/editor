@@ -23,12 +23,13 @@ model.value ||= 'preview'
 const source = ref(route.query.source as string)
 
 const downloadPreviewRef = ref<InstanceType<typeof Preview>>()
+const updateFlag = ref(0)
 
 /* 方法 */
 /**
  * 导出pdf
  */
-const exportPdf = async (filename?: string) => {
+const exportPdf = async (filename?: string = '导出.pdf') => {
   isShowDownload.value = true
   await nextTick()
 
@@ -46,11 +47,16 @@ const previewPdfStyle = ref({})
 /* 计算 */
 
 /* 监听 */
+watch(source, () => {
+  updateFlag.value++
+})
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  window.dispatchEvent(new CustomEvent('editor-ready'))
 
-source.value = './2.pdf'
+  source.value = './4.pdf'
+})
 
 /* 暴露 */
 defineExpose({
@@ -77,7 +83,7 @@ window['pagePreviewContent'] = {
 
 <!--render-->
 <template>
-  <div v-if="source" class="contents">
+  <div v-if="source" class="contents" :key="updateFlag">
     <div class="sticky top-0 z-10">
       <t-button @click="exportPdf">导出</t-button>
     </div>
