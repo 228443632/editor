@@ -8,9 +8,6 @@
 // import PdfPreview2 from '@/views/doc-editor/PdfPreview2.vue'
 
 const { proxy } = getCurrentInstance()
-import DocEditor from './views/doc-editor/index.vue'
-import PreviewEditor from './views/preview-editor/index.vue'
-import PreviewResult from './views/preview-result/index.vue'
 
 const props = defineProps({})
 const emit = defineEmits({})
@@ -34,11 +31,14 @@ defineExpose({
 
 <!--render-->
 <template>
-<!--  <DocEditor></DocEditor>-->
-  <PreviewEditor></PreviewEditor>
-<!--  <PreviewResult></PreviewResult>-->
+  <router-view></router-view>
 </template>
 
 <!--style-->
 <style lang="less">
+#app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
 </style>

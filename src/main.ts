@@ -6,6 +6,7 @@ import App from './app.vue'
 import { useUmoEditor } from './components'
 const app = createApp(App)
 import directives from '@/directives'
+import router from './router'
 
 // import '@shared/base/setup.ts'
 // import '@shared/base/setup.ts'
@@ -13,6 +14,9 @@ import directives from '@/directives'
 
 const options = {}
 
-app.use(directives).use(useUmoEditor, options as UmoEditorOptions)
+app
+  .use(directives)
+  .use(router)
+  .use(useUmoEditor, options as UmoEditorOptions)
 
 app.mount('#app')
