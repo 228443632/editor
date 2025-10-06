@@ -156,8 +156,8 @@ importers:
         specifier: 4.2.0
         version: 4.2.0
       dom-to-image-more:
-        specifier: 3.4.3
-        version: 3.4.3
+        specifier: 3.7.1
+        version: 3.7.1
       es-drager:
         specifier: 1.2.11
         version: 1.2.11(vue@3.3.13(typescript@5.5.4))
@@ -179,6 +179,9 @@ importers:
       jsbarcode:
         specifier: 3.11.6
         version: 3.11.6
+      jspdf:
+        specifier: 3.0.3
+        version: 3.0.3
       katex:
         specifier: 0.16.11
         version: 0.16.11
@@ -188,6 +191,9 @@ importers:
       mermaid:
         specifier: 11.2.0
         version: 11.2.0
+      modern-screenshot:
+        specifier: 4.6.6
+        version: 4.6.6
       nzh:
         specifier: 1.0.13
         version: 1.0.13
@@ -3837,8 +3843,8 @@ packages:
   dom-serializer@2.0.0:
     resolution: {integrity: sha512-wIkAryiqt/nV5EQKqQpo3SToSOV9J0DnbJqwK7Wv/Trc92zIAYZ4FlMu+JPFW1DfGFt81ZTCGgDEabffXeLyJg==}
 
-  dom-to-image-more@3.4.3:
-    resolution: {integrity: sha512-FBXKHDfoLqYwlSc4Eqe5bWGpN1XZQ6luUXVstqTpQSisaXf7brIDkjx41qqqMelwv+qOOip10Aa5sjZB5DlfqQ==}
+  dom-to-image-more@3.7.1:
+    resolution: {integrity: sha512-XajsuvCLnPVuYFsFOuGuTvFogMTZEQmYLlySPoDRNZWUk953CIoUTS2rqXpwyFjqDgi2fC+Wk9GSlL1UbAvfbw==}
 
   domain-browser@4.22.0:
     resolution: {integrity: sha512-IGBwjF7tNk3cwypFNH/7bfzBcgSCbaMOD3GsaY1AU/JRrnHnYgEM0+9kQt52iZxjNsjBtJYtao146V+f8jFZNw==}
@@ -5370,6 +5376,9 @@ packages:
 
   mlly@1.8.0:
     resolution: {integrity: sha512-l8D9ODSRWLe2KHJSifWGwBqpTZXIXTeo8mlKjY+E2HAakaTeNpqAyBZ8GSqLzHgw4XmHmC8whvpjJNMbFZN7/g==}
+
+  modern-screenshot@4.6.6:
+    resolution: {integrity: sha512-8tF0xEpe7yx37mK95UcIghSCWYeu628K2hLJl+ZNY2ANmRzYLlRLpquPHAQcL8keF6BoeEzTEw4GrgmUpGuZ8w==}
 
   mrmime@2.0.1:
     resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
@@ -9236,7 +9245,7 @@ snapshots:
       '@umoteam/viewer': 0.1.9(prosemirror-model@1.25.1)(prosemirror-state@1.4.3)(prosemirror-view@1.39.2)(typescript@5.5.4)(vue@3.3.13(typescript@5.5.4))
       '@vueuse/core': 11.3.0(vue@3.3.13(typescript@5.5.4))
       buffer-image-size: 0.6.4
-      dom-to-image-more: 3.4.3
+      dom-to-image-more: 3.7.1
       es-drager: 1.2.11(vue@3.3.13(typescript@5.5.4))
       file-saver: 2.0.5
       file64: 1.0.4
@@ -11182,7 +11191,7 @@ snapshots:
       domhandler: 5.0.3
       entities: 4.5.0
 
-  dom-to-image-more@3.4.3: {}
+  dom-to-image-more@3.7.1: {}
 
   domain-browser@4.22.0: {}
 
@@ -12995,6 +13004,8 @@ snapshots:
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.1
+
+  modern-screenshot@4.6.6: {}
 
   mrmime@2.0.1: {}
 

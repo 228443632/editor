@@ -20,5 +20,7 @@ declare module 'dom-to-image-more' {
   export function toBlob(node: HTMLElement, options?: any): Promise<Blob>
   export function toJpeg(node: HTMLElement, options?: any): Promise<Blob>
   export function toPng(node: HTMLElement, options?: any): Promise<Blob>
+  export function toSvg(node: HTMLElement, options?: any): Promise<Blob>
+  export function toCanvas(node: HTMLElement, options?: any): Promise<Blob>
 }
 declare const echarts: any

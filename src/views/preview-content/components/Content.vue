@@ -12,7 +12,7 @@ import { arrayToObj, div } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 
 const { proxy } = getCurrentInstance()
@@ -55,6 +55,7 @@ const initialProgress = ref(0)
 const a4 = cssUtil.getPaperSize('A4')
 const scaleFactor = ref(0)
 const rootRef = ref<HTMLDivElement>()
+const dpr = ref(window.devicePixelRatio)
 
 /**
  * 嵌入项每一项样式
@@ -210,6 +211,8 @@ onBeforeUnmount(() => {
 /* 暴露 */
 defineExpose({
   $: proxy.$,
+
+  _pageNumsList,
 })
 </script>
 
@@ -221,6 +224,7 @@ defineExpose({
       'pdf-embed__wrap',
       props.model == 'preview' && 'is-preview',
       props.model == 'download' && 'is-download',
+      __previewContext__.isExporting && 'is-exporting',
     ]"
     :style="{
       '--per-page-gap': __previewContext__.isExporting ? '0px' : '12px',
@@ -244,6 +248,7 @@ defineExpose({
           :page="pageNum"
           annotation-layer
           text-layer
+          :scale="dpr * 2"
           @rendered="onRendered(pageNum)"
         />
 
@@ -299,14 +304,20 @@ defineExpose({
     z-index: 10;
     transform-origin: 0 0;
   }
+  &.is-exporting {
+    .pdf-embed__item {
+      box-shadow: none;
+    }
+  }
 }
 
 .pdf-embed__item {
   margin: 0 auto;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
-  //break-after: page;
-  break-inside: avoid;
+  break-after: page;
+  //break-inside: avoid;
+  background: white;
   position: relative;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);

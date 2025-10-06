@@ -50,7 +50,8 @@ const saveImage = async ({
       blob,
       `${filename}${devicePixelRatio > 1 ? `@${devicePixelRatio}x` : ''}.${value}`,
     )
-  } catch {
+  } catch(e) {
+    console.log(e)
     const dialog = useAlert({
       attach: container,
       theme: 'warning',

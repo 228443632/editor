@@ -29,15 +29,22 @@ const updateFlag = ref(0)
 /**
  * 导出pdf
  */
-const exportPdf = async (filename?: string = '导出.pdf') => {
+const exportPdf = async (filename?: string) => {
   isShowDownload.value = true
   await nextTick()
 
+  if (downloadPreviewRef.value.previewContext?.contentInitial) {
+    await to(downloadPreviewRef.value.exportPdf(filename))
+    return
+  }
+
   const watcher = watch(
     () => downloadPreviewRef.value.previewContext?.contentInitial,
-    async () => {
-      await to(downloadPreviewRef.value.exportPdf(filename))
-      watcher()
+    async (newVal) => {
+      if (newVal) {
+        await to(downloadPreviewRef.value.exportPdf(filename))
+        watcher()
+      }
     },
   )
 }

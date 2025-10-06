@@ -10,6 +10,13 @@ import { noop } from 'sf-utils2'
 import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import dayjs from 'dayjs'
+import { jsPDF } from 'jspdf'
+import domtoimage from 'dom-to-image-more'
+import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
+// import { saveAs } from 'file-saver'
+import modernScreenshot from 'modern-screenshot'
+
+console.log('domtoimage', domtoimage)
 
 const props = defineProps({
   /**
@@ -53,6 +60,7 @@ const previewContext = ref({
   /** 一次性加载所有pdf页面，主要是为了导出功能*/
   loadAllPdfPagesRaf: noop,
 })
+const a4 = cssUtil.getPaperSize('A4')
 
 /* 方法 */
 
@@ -68,31 +76,58 @@ const exportPdf = async (filename?: string) => {
 
     await previewContext.value.loadAllPdfPagesRaf()
     const contentDom = unrefElement(contentRef)
-    if (!contentDom) throw new Error('未找到导出内容')
+    const pagesDomList = Array.from(
+      contentDom.querySelectorAll('.pdf-embed__item'),
+    ) as HTMLElement[]
+    if (!pagesDomList?.length) throw new Error('未找到导出内容')
 
-    const { default: html2pdf } = await import('html2pdf.js')
+    // 配置A4尺寸参数
+    const a4Width = 210 // A4宽度(mm)
+    const a4Height = 297 // A4高度(mm)
+    const margin = 0 // 页边距(mm)
+    const pdf = new jsPDF('p', 'mm', 'a4')
 
-    // 配置选项
-    const opt = {
-      margin: 0,
-      filename: filename || `${dayjs().format('YYYY_MM_DD_HH_mm_ss')}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: window.devicePixelRatio || 1,
-        useCORS: true,
-        letterRendering: true,
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] },
-      // 核心：配置pagebreak的mode，加入 'avoid-all'
+    const scale = window.devicePixelRatio * 2
+
+    // 2. 循环处理每个页面，单独生成图片并添加到PDF
+    for (let i = 0; i < pagesDomList.length; i++) {
+      const pageDom = pagesDomList[i]
+      // 确保当前页元素可见（避免隐藏元素渲染异常）
+      pageDom.style.width = `${a4Width - margin * 2}mm` // 匹配A4宽度
+
+      // 3. 为当前页生成高清图片（单独渲染）
+      const dataUrl = await modernScreenshot.domToPng(pageDom, {
+        type: 'image/png', // 优先用PNG保证文字清晰度
+        quality: 0.95, // 高质量参数（PNG接近无损）
+        scale, // 应用设备像素比缩放
+        backgroundColor: '#ffffff',
+        workerNumber: 2, // 多线程加速渲染
+        debug: false, // 生产环境关闭调试
+      })
+
+      // 4. 计算当前页尺寸映射（px → mm）
+      const contentWidth = pageDom.offsetWidth // 当前页宽度(px)
+      const contentHeight = pageDom.offsetHeight // 当前页高度(px)
+      const scaledWidth = contentWidth * scale // 缩放后宽度(px)
+      const scaleToPdf = (a4Width - margin * 2) / scaledWidth // px转mm系数
+      const pageHeightMm = contentHeight * scale * scaleToPdf // 当前页高度(mm)
+
+      // 5. 添加新页面（第一页无需添加）
+      if (i > 0) pdf.addPage()
+
+      // 6. 精准添加当前页到PDF（位置居中对齐）
+      pdf.addImage(
+        dataUrl,
+        'PNG', // 明确指定格式
+        margin, // x坐标（左对齐，留边距）
+        margin, // y坐标（上对齐，留边距）
+        a4Width - margin * 2, // 宽度严格匹配A4
+        pageHeightMm, // 高度自适应当前页内容
+        undefined,
+        'FAST', // 快速渲染模式（保证质量的同时提升速度）
+      )
     }
-
-    // 执行导出
-    await html2pdf()
-      // @ts-expect-error
-      .set(opt)
-      .from(contentDom)
-      .save()
+    pdf.save(filename || `${dayjs().format('YYYYMMDDHHmmss')}.png`)
 
     console.log('导出成功')
     useMessage('success', { content: '导出成功' })
@@ -128,8 +163,7 @@ watch(
 )
 
 /* 周期 */
-onMounted(() => {
-})
+onMounted(() => {})
 
 /* 暴露 */
 defineExpose({
