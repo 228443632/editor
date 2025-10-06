@@ -5,6 +5,8 @@
  -->
 <!--setup-->
 <script setup>
+import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf'
+
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
 const emit = defineEmits([])
@@ -20,32 +22,10 @@ const onExport = async () => {
     isExporting.value = true
     await __previewContext__.value.loadAllPdfPagesRaf()
     const contentDom = unrefElement(__previewContext__.value.embedPdfWrapRef)
-    if (!contentDom) throw new Error('未找到导出内容')
-
-    const { default: html2pdf } = await import('html2pdf.js')
-
-    // 配置选项
-    const opt = {
-      margin: 0,
-      filename: 'vue-export-example.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: window.devicePixelRatio || 1,
-        useCORS: true,
-        letterRendering: true,
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] },
-      // 核心：配置pagebreak的mode，加入 'avoid-all'
-    }
-
-    // 执行导出
-    await html2pdf()
-      // @ts-expect-error
-      .set(opt)
-      .from(contentDom)
-      .save()
-
+    const pagesDomList = Array.from(
+      contentDom.querySelectorAll('.pdf-embed__item'),
+    )
+    await exportPDFWorker(pagesDomList)
     console.log('导出成功')
     useMessage('success', { content: '导出成功' })
   } catch (err) {

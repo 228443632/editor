@@ -15,8 +15,8 @@ import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 import useAnchor from '@/views/sign-editor/hooks/use-anchor'
 import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignDate.vue'
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
-// import 'vue-pdf-embed/dist/styles/annotationLayer.css'
-// import 'vue-pdf-embed/dist/styles/textLayer.css'
+import 'vue-pdf-embed/dist/styles/annotationLayer.css'
+import 'vue-pdf-embed/dist/styles/textLayer.css'
 
 /* 状态 */
 const props = defineProps({})
@@ -404,6 +404,8 @@ defineExpose({
             <VuePdfEmbed
               v-if="pageVisibility[pageNum]"
               :source="doc"
+              annotation-layer
+              text-layer
               :page="pageNum"
               @rendered="onRendered(pageNum)"
             />

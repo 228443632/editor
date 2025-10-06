@@ -248,7 +248,7 @@ defineExpose({
           :page="pageNum"
           annotation-layer
           text-layer
-          :scale="dpr * 2"
+          :scale="dpr"
           @rendered="onRendered(pageNum)"
         />
 

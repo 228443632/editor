@@ -251,3 +251,12 @@ export const commonUtil = {
 
   generateFieldName,
 }
+
+
+
+/**
+ * 判断是否被嵌入到iframe中
+ */
+export function isInIframe() {
+  return window.self !== window.top
+}

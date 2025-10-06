@@ -8,6 +8,7 @@
 import Preview from './components/Preview.vue'
 import { useRoute } from 'vue-router'
 import { to } from 'sf-utils2'
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -62,7 +63,9 @@ watch(source, () => {
 onMounted(() => {
   window.dispatchEvent(new CustomEvent('editor-ready'))
 
-  source.value = './4.pdf'
+  if (!isInIframe()) {
+    source.value = './4.pdf'
+  }
 })
 
 /* 暴露 */

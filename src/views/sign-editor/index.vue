@@ -14,7 +14,8 @@ import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import Footer from './components/Footer.vue'
 import { deepClone, noop, uuid } from 'sf-utils2'
 import Header from './components/Header.vue'
-import { pageUtils } from '@/views/sign-editor/utils/commons.ts' // 头部
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -57,7 +58,7 @@ const previewContext = ref({
   pageUtils,
 
   /** 文件来源 */
-  source: './4.pdf',
+  source: undefined,
 
   /** 是否正在导出中 */
   isExporting: false,
@@ -233,6 +234,10 @@ watchEffect(() => {
 onMounted(() => {
   // 初始化成功
   window.dispatchEvent(new CustomEvent('editor-ready'))
+
+  if (!isInIframe()) {
+    previewContext.value.source = './3.pdf'
+  }
 })
 
 /* 暴露 */
@@ -259,6 +264,7 @@ window['pagePreviewEditor'] = {
 <!--render-->
 <template>
   <div
+    v-if="previewContext.source"
     ref="rootRef"
     v-spin="{
       loading: previewContext.loading > 0,
