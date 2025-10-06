@@ -17,6 +17,7 @@ import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignD
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
+// import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 /* 状态 */
 const props = defineProps({})
@@ -26,7 +27,7 @@ const initialProgress = ref(0)
 
 const __activePageNum__ = inject('__activePageNum__')
 const __layoutSize__ = inject('__layoutSize__')
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 const rootRef = ref<HTMLElement>()
 const {
@@ -53,7 +54,7 @@ const { x, y } = usePointer()
 const a4 = cssUtil.getPaperSize('A4')
 
 const { doc } = useVuePdfEmbed({
-  source: __previewContext__.value.source,
+  source: __signContext__.value.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
@@ -70,13 +71,13 @@ const { registerHotKeys } = useHotKeysV2({
 
 // 全选
 registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
-  const paramsCompList = __previewContext__.value.paramsCompList
+  const paramsCompList = __signContext__.value.paramsCompList
   if (!paramsCompList?.length) return
   if (paramsCompList?.length == 1) {
-    __previewContext__.value.selectParamsComp(paramsCompList[0])
+    __signContext__.value.selectParamsComp(paramsCompList[0])
     return
   }
-  __previewContext__.value.paramsCompList.forEach((item) => {
+  __signContext__.value.paramsCompList.forEach((item) => {
     item.isInRect = true
   })
 })
@@ -84,9 +85,9 @@ registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
 // 拷贝
 registerHotKeys('ctrl+c, command+c', copy)
 function copy() {
-  const inRectNums = __previewContext__.value.paramsCompList
+  const inRectNums = __signContext__.value.paramsCompList
     .filter((item) => item.isInRect)
-    .concat(__previewContext__.value.activeCompParam)
+    .concat(__signContext__.value.activeCompParam)
     .filter(Boolean)
   if (inRectNums?.length) {
     copyContentInfo.value = inRectNums.map((item) => item)
@@ -122,7 +123,7 @@ function paste() {
       itemClone.left = x.value - left + (item.left - minLeft)
       itemClone.isInRect = false
       itemClone.key = uuid()
-      __previewContext__.value.paramsCompList.push(itemClone)
+      __signContext__.value.paramsCompList.push(itemClone)
     })
   }
 }
@@ -145,9 +146,9 @@ registerHotKeys('ctrl+z, command+z', () => {
 registerHotKeys('backspace, delete', del)
 function del() {
   // 删除键
-  __previewContext__.value.removeParamsComp()
-  __previewContext__.value.paramsCompList =
-    __previewContext__.value.paramsCompList.filter((item) => !item.isInRect)
+  __signContext__.value.removeParamsComp()
+  __signContext__.value.paramsCompList =
+    __signContext__.value.paramsCompList.filter((item) => !item.isInRect)
 }
 
 /* 方法 */
@@ -201,7 +202,7 @@ const loadAllPdfPagesRaf = async () => {
   }
 }
 
-__previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
+__signContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
 
 /**
  * 渲染完成
@@ -210,7 +211,7 @@ const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
 
   nextTick(() => {
-    __previewContext__.value.scaleFactor =
+    __signContext__.value.scaleFactor =
       rootRef.value
         .querySelector('.vue-pdf-embed__page')
         .style.getPropertyValue('--scale-factor') || 1
@@ -234,12 +235,21 @@ const onKeyDownRoot = (e: KeyboardEvent) => {
   // 判断按下的键是删除键
   if (e.key == 'Delete' || e.key == 'Backspace') {
     // 删除键
-    __previewContext__.value.removeParamsComp()
-    __previewContext__.value.paramsCompList = []
+    __signContext__.value.removeParamsComp()
+    __signContext__.value.paramsCompList = []
   }
 }
 
 /* 计算 */
+
+/**
+ * 参数组件列表
+ */
+// const _paramsCompList$pageNum = computed(() => {
+//   return arrayToObj(props.paramsCompList, 'pageNum', {
+//     valueType: 'array',
+//   }) as Record<string, IParamsCompItem[]>
+// })
 
 /**
  * 分页数量
@@ -273,11 +283,11 @@ const _initial = computed(() => {
 /* 监听 */
 
 watchEffect(() => {
-  __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
+  __signContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
 watchEffect(() => {
-  __previewContext__.value.contentInitial = _initial.value
+  __signContext__.value.contentInitial = _initial.value
 })
 
 /**
@@ -286,10 +296,10 @@ watchEffect(() => {
 watch([_initial, _pageNumsList, embedPdfWrapRef], () => {
   const totalPageNum = _pageNumsList.value.at(-1)
   if (_initial.value && totalPageNum > 0 && embedPdfWrapRef.value) {
-    if (__previewContext__.value.anchorInfo?.removeEvents) {
-      __previewContext__.value.anchorInfo.removeEvents()
+    if (__signContext__.value.anchorInfo?.removeEvents) {
+      __signContext__.value.anchorInfo.removeEvents()
     }
-    __previewContext__.value.anchorInfo = useAnchor({
+    __signContext__.value.anchorInfo = useAnchor({
       target: embedPdfWrapRef,
       selectors: new Array(totalPageNum).fill(0).map((_, idx) => {
         return {
@@ -300,7 +310,7 @@ watch([_initial, _pageNumsList, embedPdfWrapRef], () => {
       defaultValue: 1,
       offsetTop: -12,
     })
-    __previewContext__.value.anchorInfo.init()
+    __signContext__.value.anchorInfo.init()
   }
 })
 
@@ -322,7 +332,7 @@ watchEffect(() => {
   void _dragAreaFromY.value
   void dragAreaIsMoving.value
 
-  const paramsCompList = __previewContext__.value.paramsCompList || []
+  const paramsCompList = __signContext__.value.paramsCompList || []
 
   paramsCompList.forEach((item) => {
     item.bottom = item.top + item.height
@@ -341,8 +351,8 @@ watch(_pageNumsList, (newPageNums: number[]) => {
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
 
-  if (__previewContext__.value.anchorInfo?.removeEvents) {
-    __previewContext__.value.anchorInfo.removeEvents()
+  if (__signContext__.value.anchorInfo?.removeEvents) {
+    __signContext__.value.anchorInfo.removeEvents()
   }
 })
 
@@ -358,11 +368,11 @@ defineExpose({
     :class="[
       `pdf-preview__content umo-scrollbar`,
       !_initial && '!overflow-y-hidden pointer-events-none cursor-not-allowed',
-      __previewContext__.isExporting && 'is-exporting',
+      __signContext__.isExporting && 'is-exporting',
     ]"
     tabindex="10"
   >
-    <!--    {{ __previewContext__._paramsCompList }}-->
+    <!--    {{ __signContext__._paramsCompList }}-->
     <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
       <!-- 加载成功 -->
       <template v-if="_initial">
@@ -373,8 +383,8 @@ defineExpose({
         <div
           v-show="
             dragAreaIsMoving &&
-            !__previewContext__.activeCompParam?.isEsDragging &&
-            !__previewContext__.isDragging
+            !__signContext__.activeCompParam?.isEsDragging &&
+            !__signContext__.isDragging
           "
           class="mouse-area"
           :style="{
@@ -414,7 +424,7 @@ defineExpose({
 
         <!-- 参数悬浮 -->
         <div
-          v-for="(item, index) in __previewContext__._paramsCompList"
+          v-for="(item, index) in __signContext__._paramsCompList"
           :key="item.key"
           :data-id="'id-' + item.key"
           class="content-comp__item"
@@ -426,28 +436,28 @@ defineExpose({
           <!-- 印章 -->
           <template v-if="item.type == 'compSeal'">
             <ContentCompSeal
-              v-model:node-data="__previewContext__.paramsCompList[index]"
+              v-model:node-data="__signContext__.paramsCompList[index]"
             ></ContentCompSeal>
           </template>
 
           <!-- 签名 -->
           <template v-else-if="item.type == 'compSign'">
             <ContentCompSign
-              v-model:node-data="__previewContext__.paramsCompList[index]"
+              v-model:node-data="__signContext__.paramsCompList[index]"
             ></ContentCompSign>
           </template>
 
           <!-- 签署日期 -->
           <template v-else-if="item.type == 'compSignDate'">
             <ContentCompSignDate
-              v-model:node-data="__previewContext__.paramsCompList[index]"
+              v-model:node-data="__signContext__.paramsCompList[index]"
             ></ContentCompSignDate>
           </template>
         </div>
 
         <t-back-top
           :visible-height="800"
-          :container="() => __previewContext__.contentElRef"
+          :container="() => __signContext__.contentElRef"
           size="small"
           :offset="['300px', '48px']"
         />
@@ -541,6 +551,7 @@ defineExpose({
 
 .pdf-embed__item {
   margin: 0 auto;
+  user-select: none;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
   break-after: avoid;

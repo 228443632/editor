@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant.ts'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 
 const { proxy } = getCurrentInstance()

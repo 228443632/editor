@@ -3,7 +3,7 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 20/07/25 AM1:23
  */
-import {cssUtil} from '@/views/doc-editor/utils/css-util.ts'
+import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 
 const DEFAULT_STYLE_CONFIG = {
   /** 加粗*/
@@ -37,7 +37,6 @@ export const COMP_PARAMS_NAME_MAP = {
   compText: 'compText',
   compTextDrag: 'compTextDrag',
   imageParagraph: 'imageParagraph',
-  compInvisibleBlock: 'compInvisibleBlock',
   compTextareaDrag: 'compTextareaDrag',
   compSign: 'compSign',
   compSeal: 'compSeal',
@@ -58,10 +57,6 @@ export const COMP_PARAMS_CONFIG_MAP = {
   },
   imageParagraph: {
     name: 'imageParagraph',
-    ...DEFAULT_STYLE_CONFIG,
-  },
-  compInvisibleBlock: {
-    name: 'compInvisibleBlock',
     ...DEFAULT_STYLE_CONFIG,
   },
   compTextareaDrag: {

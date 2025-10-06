@@ -23,9 +23,9 @@ const emit = defineEmits([])
 
 /* 状态 */
 const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 const attrs = useAttrs()
-const scrollViewRef = computed(() => __previewContext__.value.contentElRef)
+const scrollViewRef = computed(() => __signContext__.value.contentElRef)
 
 /* 方法 */
 
@@ -44,7 +44,7 @@ const rafThrottleOnDrag = rafThrottle(onDrag)
  * 选择节点
  */
 const onSelectNode = (startE: MouseEvent) => {
-  const inRectNums = __previewContext__.value.paramsCompList.filter(
+  const inRectNums = __signContext__.value.paramsCompList.filter(
     (item) => item.isInRect,
   )
 
@@ -58,7 +58,7 @@ const onSelectNode = (startE: MouseEvent) => {
     scrollViewRef.value.addEventListener('mouseup', mouseup)
     return
   }
-  __previewContext__.value.selectParamsComp(_nodeData.value)
+  __signContext__.value.selectParamsComp(_nodeData.value)
 
   function mousemove(e: MouseEvent) {
     const diffX = e.clientX - startE.clientX
@@ -88,7 +88,7 @@ const onSelectNode = (startE: MouseEvent) => {
  * 是否当前组件激活
  */
 const _isActive = computed(() => {
-  return __previewContext__.value.activeCompParam?.key == _nodeData.value.key
+  return __signContext__.value.activeCompParam?.key == _nodeData.value.key
 })
 
 /* 监听 */

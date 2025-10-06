@@ -12,7 +12,7 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 /* 方法 */
 
@@ -38,7 +38,7 @@ defineExpose({
     <div
       :class="[
         'right__content umo-scrollbar',
-        !__previewContext__.rightInitial &&
+        !__signContext__.rightInitial &&
           '!overflow-y-hidden cursor-not-allowed',
       ]"
     >
@@ -46,7 +46,7 @@ defineExpose({
 
       <!--  未初始化  -->
       <div
-        v-if="!__previewContext__.rightInitial"
+        v-if="!__signContext__.rightInitial"
         class="absolute left-0 top-0 h-full w-full z-10 cursor-not-allowed"
       ></div>
     </div>

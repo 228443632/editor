@@ -22,7 +22,7 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 const isDragging = ref(false)
 
 const dragMethod = {
@@ -81,7 +81,7 @@ const dragMethod = {
     }
 
     // 设置光标颜色
-    const viewDom = __previewContext__.value.contentElRef
+    const viewDom = __signContext__.value.contentElRef
     console.log('viewDom', viewDom)
     viewDom.classList.add('caret--is-dragging')
   },
@@ -106,14 +106,14 @@ const dragMethod = {
     const { top, left } = getPos(e.clientX, e.clientY)
 
     if (dragMethod.dragNodeDom.__nodeData?.type) {
-      __previewContext__.value.paramsCompList.push({
+      __signContext__.value.paramsCompList.push({
         ...(dragMethod.dragNodeDom.__nodeData || {}),
         key: uuid(),
         top,
         left,
       })
-      __previewContext__.value.selectParamsComp(
-        __previewContext__.value.paramsCompList.at(-1),
+      __signContext__.value.selectParamsComp(
+        __signContext__.value.paramsCompList.at(-1),
       )
     }
   },
@@ -131,7 +131,7 @@ const dragMethod = {
     dragMethod.dragNodeDom.classList.remove('is-dragging')
     dragMethod.dragNodeDom = null
 
-    const viewDom = __previewContext__.value.contentElRef
+    const viewDom = __signContext__.value.contentElRef
     viewDom.classList.remove('caret--is-dragging')
 
     viewDom.focus()
@@ -139,7 +139,7 @@ const dragMethod = {
 }
 
 const _embedPdfWrapRef = computed(
-  () => __previewContext__.value.embedPdfWrapRef,
+  () => __signContext__.value.embedPdfWrapRef,
 )
 
 useEventListener(_embedPdfWrapRef, 'drop', dragMethod.drop)
@@ -153,7 +153,7 @@ useEventListener(_embedPdfWrapRef, 'dragover', dragMethod.dragover)
  * @param y
  */
 const getPos = (x: number, y: number) => {
-  const pdfWraDom = __previewContext__.value.embedPdfWrapRef
+  const pdfWraDom = __signContext__.value.embedPdfWrapRef
   if (pdfWraDom) {
     const pdfWraDomRect = pdfWraDom.getBoundingClientRect()
     const { left, top } = pdfWraDomRect
@@ -170,7 +170,7 @@ const getPos = (x: number, y: number) => {
 /* 监听 */
 
 watchEffect(isDragging, (newVal) => {
-  __previewContext__.value.isDragging = newVal
+  __signContext__.value.isDragging = newVal
 })
 
 /* 周期 */
@@ -192,7 +192,7 @@ defineExpose({
       <!-- 印章 -->
       <div
         class="left__content-item"
-        :draggable="__previewContext__.contentInitial"
+        :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSeal' }, $event)"
         @dragend="dragMethod.dragend"
       >
@@ -202,7 +202,7 @@ defineExpose({
       <!-- 签名 -->
       <div
         class="left__content-item"
-        :draggable="__previewContext__.contentInitial"
+        :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSign' }, $event)"
         @dragend="dragMethod.dragend"
       >
@@ -212,7 +212,7 @@ defineExpose({
       <!-- 签署日期 -->
       <div
         class="left__content-item"
-        :draggable="__previewContext__.contentInitial"
+        :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSignDate' }, $event)"
         @dragend="dragMethod.dragend"
       >

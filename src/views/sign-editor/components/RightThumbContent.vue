@@ -18,7 +18,7 @@ const emit = defineEmits<{
 
 /* 状态 */
 const __activePageNum__ = inject('__activePageNum__')
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
@@ -28,7 +28,7 @@ const initialProgress = ref(0)
 const isWheeling = ref(false)
 
 const { doc } = useVuePdfEmbed({
-  source: __previewContext__.value.source,
+  source: __signContext__.value.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
     // console.log('c', progress, progress == '1')
@@ -118,7 +118,7 @@ const _embedItemStyle = computed(() => {
 
 /* 监听 */
 watchEffect(() => {
-  __previewContext__.value.rightInitial = _initial.value
+  __signContext__.value.rightInitial = _initial.value
 })
 
 watch(_pageNumsList, (newPageNums: number[]) => {
@@ -127,7 +127,7 @@ watch(_pageNumsList, (newPageNums: number[]) => {
 })
 
 watch(
-  () => __previewContext__.value.anchorInfo?.active,
+  () => __signContext__.value.anchorInfo?.active,
   (newVal) => {
     debouncePageScrollIntoView(newVal)
   },

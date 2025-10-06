@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { COMP_SEAL_STYLE } from '@/views/doc-editor/extensions/constant.js'
 import testSealSvgRaw from '@/assets/images/test-seal.svg?raw'
-import type { IParamsCompItem } from '@/views/preview-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({

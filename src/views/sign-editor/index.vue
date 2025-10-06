@@ -50,7 +50,7 @@ const layoutSize = ref({
 
 const activePageNum = ref(1)
 const contentRef = ref<InstanceType<typeof Content>>() // 内容
-const previewContext = ref({
+const signContext = ref({
   /** 缩小/放大比例*/
   scaleFactor: 0,
 
@@ -79,7 +79,7 @@ const previewContext = ref({
   paramsCompList: [] as IParamsCompItem[],
 
   _paramsCompList: computed(() => {
-    const paramsCompList = previewContext.value.paramsCompList || []
+    const paramsCompList = signContext.value.paramsCompList || []
     return pageUtils.expandCompParams(paramsCompList)
   }),
 
@@ -88,12 +88,12 @@ const previewContext = ref({
    * @param nodeData
    */
   removeParamsComp: (nodeData: IParamsCompItem) => {
-    nodeData ||= previewContext.value.activeCompParam
+    nodeData ||= signContext.value.activeCompParam
     if (!nodeData) return
-    const idx = previewContext.value.paramsCompList.findIndex(
+    const idx = signContext.value.paramsCompList.findIndex(
       (item) => item.key === nodeData.key,
     )
-    if (idx >= 0) previewContext.value.paramsCompList.splice(idx, 1)
+    if (idx >= 0) signContext.value.paramsCompList.splice(idx, 1)
   },
 
   /**
@@ -104,21 +104,21 @@ const previewContext = ref({
     const top = nodeData.top
     console.log(
       '分页',
-      previewContext.value.getPageNumByTop(top),
-      previewContext.value.getPageOffsetTopByTop(top),
+      signContext.value.getPageNumByTop(top),
+      signContext.value.getPageOffsetTopByTop(top),
     )
     const { offsetTop, pageNum: currentPageNum } =
-      previewContext.value.getPageOffsetTopByTop(top)
-    previewContext.value.removeParamsComp(nodeData)
+      signContext.value.getPageOffsetTopByTop(top)
+    signContext.value.removeParamsComp(nodeData)
 
-    const contentPageNums = previewContext.value.contentPageNums
+    const contentPageNums = signContext.value.contentPageNums
     return Array.from({ length: contentPageNums }).map((_, idx) => {
       const pageNum = idx + 1
       const nodeDataClone = deepClone(nodeData)
       nodeDataClone.key = uuid()
       nodeDataClone.top =
-        offsetTop + previewContext.value.getAbsoluteTopByPageNum(pageNum)
-      previewContext.value.paramsCompList.push(nodeDataClone)
+        offsetTop + signContext.value.getAbsoluteTopByPageNum(pageNum)
+      signContext.value.paramsCompList.push(nodeDataClone)
       return {
         pageNum,
         nodeData: nodeDataClone,
@@ -154,12 +154,12 @@ const previewContext = ref({
    * @param nodeData
    */
   selectParamsComp: (nodeData: IParamsCompItem) => {
-    // const isExist = previewContext.value.paramsCompList.some(
+    // const isExist = signContext.value.paramsCompList.some(
     //   (item) => item.key === nodeData.key,
     // )
     // if (!isExist) return
-    previewContext.value.activeCompParam = nodeData
-    previewContext.value.paramsCompList.forEach((item) => {
+    signContext.value.activeCompParam = nodeData
+    signContext.value.paramsCompList.forEach((item) => {
       item.isInRect = false
     })
   },
@@ -192,8 +192,8 @@ const previewContext = ref({
  * 点击预览的编辑器
  */
 const onClickPreviewEditor = () => {
-  previewContext.value.activeCompParam = undefined
-  previewContext.value.paramsCompList.forEach((item) => {
+  signContext.value.activeCompParam = undefined
+  signContext.value.paramsCompList.forEach((item) => {
     item.isInRect = false
   })
   console.log('点击了预览的编辑器')
@@ -215,7 +215,7 @@ const _rootStyle = computed(() => {
     '--padding-bottom': '16px',
     '--padding-left': '16px',
     '--padding-right': '16px',
-    '--per-page-gap': previewContext.value.isExporting
+    '--per-page-gap': signContext.value.isExporting
       ? '0px'
       : `${layoutSize.value.perPageGap}px`,
   }
@@ -227,7 +227,7 @@ watch(layoutWidth, (val: number) => {
 })
 
 watchEffect(() => {
-  previewContext.value.anchorInfo.active = activePageNum.value
+  signContext.value.anchorInfo.active = activePageNum.value
 })
 
 /* 周期 */
@@ -236,7 +236,7 @@ onMounted(() => {
   window.dispatchEvent(new CustomEvent('editor-ready'))
 
   if (!isInIframe()) {
-    previewContext.value.source = './3.pdf'
+    signContext.value.source = './3.pdf'
   }
 })
 
@@ -252,10 +252,10 @@ provide('__layoutSize__', layoutSize)
 provide('__activePageNum__', activePageNum)
 
 // 预览上下文
-provide('__previewContext__', previewContext)
+provide('__signContext__', signContext)
 
-window['pagePreviewEditor'] = {
-  previewContext,
+window['pageSignEditor'] = {
+  signContext,
   layoutSize,
   activePageNum,
 }
@@ -264,15 +264,15 @@ window['pagePreviewEditor'] = {
 <!--render-->
 <template>
   <div
-    v-if="previewContext.source"
+    v-if="signContext.source"
     ref="rootRef"
     v-spin="{
-      loading: previewContext.loading > 0,
+      loading: signContext.loading > 0,
       size: 'small',
       showLoadingText: false,
       mask: true,
     }"
-    :class="['sign-editor', previewContext.isExporting && 'is-exporting']"
+    :class="['sign-editor', signContext.isExporting && 'is-exporting']"
     :style="_rootStyle"
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop

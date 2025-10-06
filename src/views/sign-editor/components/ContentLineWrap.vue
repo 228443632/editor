@@ -63,19 +63,19 @@ const emit = defineEmits({})
 /* 状态 */
 const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
 
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 const rootRef = ref<HTMLHtmlElement>()
 const _embedPdfWrapRef = computed(
-  () => __previewContext__.value.embedPdfWrapRef,
+  () => __signContext__.value.embedPdfWrapRef,
 ) // 预览内容容器
-// const scrollViewRef = computed(() => __previewContext__.value.contentElRef)
+// const scrollViewRef = computed(() => __signContext__.value.contentElRef)
 const rootBound = useElementBounding(rootRef)
 
 const umoPageContentBound = useElementBounding(_embedPdfWrapRef)
 const updateFlag = ref(0)
 
-const scrollViewRef = computed(() => __previewContext__.value.contentElRef)
+const scrollViewRef = computed(() => __signContext__.value.contentElRef)
 
 useEventListener(scrollViewRef, 'keydown', onKeydown)
 
@@ -92,7 +92,7 @@ const update = () => {
  */
 function onKeydown(e: KeyboardEvent) {
   const isCanScroll =
-    __previewContext__.value.activeCompParam?.key == _nodeData.value?.key ||
+    __signContext__.value.activeCompParam?.key == _nodeData.value?.key ||
     _nodeData.value.isInRect
   if (!isCanScroll) return
   // keyCode: 40 下 38 上。39 右 37 左

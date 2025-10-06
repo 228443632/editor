@@ -27,7 +27,7 @@ const emit = defineEmits([])
 /* 状态 */
 const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
 const divRef = ref<HTMLElement>()
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
 
 /* 方法 */
@@ -36,7 +36,7 @@ const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
  * 应用到多页
  */
 const onApplyMultiPage = () => {
-  const nodeDataList = __previewContext__.value.applyMultiPageParamsComp(
+  const nodeDataList = __signContext__.value.applyMultiPageParamsComp(
     _nodeData.value,
   )
   const currentItem = nodeDataList.find((item) => item.isActive)
@@ -44,7 +44,7 @@ const onApplyMultiPage = () => {
   if (currentItem?.nodeData) {
     setTimeout(() => {
       // 设置当前选中
-      __previewContext__.value.selectParamsComp(currentItem.nodeData)
+      __signContext__.value.selectParamsComp(currentItem.nodeData)
     })
   }
   useMessage('success', {
@@ -58,7 +58,7 @@ const onApplyMultiPage = () => {
  * 是否当前组件激活
  */
 const _isActive = computed(() => {
-  return __previewContext__.value.activeCompParam?.key == _nodeData.value.key
+  return __signContext__.value.activeCompParam?.key == _nodeData.value.key
 })
 
 /* 监听 */
@@ -109,7 +109,7 @@ defineExpose({
       name="delete"
       size="14px"
       class="cursor-pointer flex-none !hover:text-[var(--umo-primary-color)]"
-      @click="__previewContext__.removeParamsComp(_nodeData)"
+      @click="__signContext__.removeParamsComp(_nodeData)"
     ></t-icon>
   </div>
 
@@ -123,9 +123,9 @@ defineExpose({
         ref="divRef"
         :style="{
           width:
-            COMP_SEAL_STYLE.width * __previewContext__.scaleFactor + 'px',
+            COMP_SEAL_STYLE.width * __signContext__.scaleFactor + 'px',
           height:
-            COMP_SEAL_STYLE.height * __previewContext__.scaleFactor +
+            COMP_SEAL_STYLE.height * __signContext__.scaleFactor +
             'px',
         }"
         v-html="testSealSvgRaw"

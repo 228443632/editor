@@ -17,7 +17,7 @@ export const routes = [
   },
   {
     path: '/sign-editor',
-    meta: { title: '预览编辑器' },
+    meta: { title: '签名/盖章' },
     component: () => import('@/views/sign-editor/index.vue'),
   },
   {

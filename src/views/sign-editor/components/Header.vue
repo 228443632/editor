@@ -13,15 +13,15 @@ const emit = defineEmits([])
 
 /* 状态 */
 const isExporting = ref(false)
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 /* 方法 */
 
 const onExport = async () => {
   try {
     isExporting.value = true
-    await __previewContext__.value.loadAllPdfPagesRaf()
-    const contentDom = unrefElement(__previewContext__.value.embedPdfWrapRef)
+    await __signContext__.value.loadAllPdfPagesRaf()
+    const contentDom = unrefElement(__signContext__.value.embedPdfWrapRef)
     const pagesDomList = Array.from(
       contentDom.querySelectorAll('.pdf-embed__item'),
     )
@@ -39,7 +39,7 @@ const onExport = async () => {
 }
 
 const onLoadAllPdf = async () => {
-  await __previewContext__.value.loadAllPdfPagesRaf()
+  await __signContext__.value.loadAllPdfPagesRaf()
   console.log('加载结束')
 }
 
@@ -49,11 +49,11 @@ const onLoadAllPdf = async () => {
 
 watch(isExporting, () => {
   if (isExporting.value) {
-    __previewContext__.value.loading++
-    __previewContext__.value.isExporting = true
+    __signContext__.value.loading++
+    __signContext__.value.isExporting = true
   } else {
-    __previewContext__.value.loading--
-    __previewContext__.value.isExporting = false
+    __signContext__.value.loading--
+    __signContext__.value.isExporting = false
   }
 })
 

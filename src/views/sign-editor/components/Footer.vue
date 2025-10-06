@@ -10,7 +10,7 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
-const __previewContext__ = inject('__previewContext__') // 预览上下文
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 const showUseWidget = ref(false)
 
@@ -21,8 +21,8 @@ const showUseWidget = ref(false)
  * @param item
  */
 const onChooseUseWidgetItem = (item) => {
-  __previewContext__.value.selectParamsComp(item)
-  const contentEl = __previewContext__.value.contentElRef
+  __signContext__.value.selectParamsComp(item)
+  const contentEl = __signContext__.value.contentElRef
   const target = contentEl.querySelector(`[data-id="id-${item.key}"]`)
   if (target) {
     console.log('target', target)
@@ -59,10 +59,10 @@ const onVisibleChange = (visible) => {
  * @private
  */
 const _useWidgetList = computed(() => {
-  const paramsCompList = __previewContext__.value.paramsCompList || []
+  const paramsCompList = __signContext__.value.paramsCompList || []
   return paramsCompList.map((item) => {
     const { offsetTop, pageNum } =
-      __previewContext__.value.getPageOffsetTopByTop(item.top)
+      __signContext__.value.getPageOffsetTopByTop(item.top)
     const compNameMap = {
       compSign: '签名',
       compSeal: '印章',
@@ -118,7 +118,7 @@ defineExpose({
                   :key="item.key"
                   :class="[
                     'use-widget__item',
-                    __previewContext__.activeCompParam?.key == item.key &&
+                    __signContext__.activeCompParam?.key == item.key &&
                       'is-active',
                   ]"
                   @click="onChooseUseWidgetItem(item)"
@@ -140,12 +140,12 @@ defineExpose({
       </t-popup>
       <span
         >当前页：<span class="font-bold">{{
-          __previewContext__?.anchorInfo?.active
+          __signContext__?.anchorInfo?.active
         }}</span></span
       >
       <span
         >总页数：<span class="font-bold">{{
-          __previewContext__.contentPageNums
+          __signContext__.contentPageNums
         }}</span></span
       >
     </div>
