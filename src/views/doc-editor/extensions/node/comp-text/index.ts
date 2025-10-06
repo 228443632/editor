@@ -33,6 +33,11 @@ declare module '@tiptap/core' {
 
 export const NAME = 'compText'
 
+/**
+ * 解析HTML规则
+ */
+export const COMP_TEXT_PARSE_HTML = `span[compname="${NAME}"][data-id]`
+
 export default Node.create({
   name: NAME,
   group: 'inline',

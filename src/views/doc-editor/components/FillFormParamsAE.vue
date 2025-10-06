@@ -66,7 +66,7 @@ function onDownHtml() {
     useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
     return
   }
-  const html = printRef.value.getIframeCode(fillFieldData)
+  const html = printRef.value.getPrintPageHtml(fillFieldData)
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -78,7 +78,7 @@ function onDownHtml() {
  * 导出html
  */
 function onDownTemplateHtml() {
-  const html = printRef.value.getIframeCode(null)
+  const html = printRef.value.getPrintPageHtml(null)
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })

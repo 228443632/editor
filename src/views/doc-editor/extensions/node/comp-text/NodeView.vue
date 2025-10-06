@@ -128,6 +128,7 @@ provide('NODE_PROPS', props)
     compname="comp-text"
     :style="_rootStyle"
     @click="onSelectNode"
+    :bordertype="node?.attrs?.borderType"
   >
     <text class="hidden">{{ _text }}</text>
     <!--    <NodeEdit-->
@@ -150,10 +151,7 @@ provide('NODE_PROPS', props)
   text-align: left;
   text-indent: 0;
   border-bottom: 1px solid var(--umo-node-text-border-color);
-  //padding: 0 2px;
-  //padding: 0;
   cursor: pointer;
-  //border-radius: 2px;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode{
     outline: 2px solid var(--umo-primary-color)!important;
@@ -173,15 +171,12 @@ provide('NODE_PROPS', props)
 
 /** 隐藏 */
 :root[mode='print'] {
-  .umo-node-view2[data-u='comp-text'] {
+  .umo-node-view2[compname='comp-text'] {
     --umo-node-text-border-color: currentColor;
     //--umo-node-text-border-color: red;
-    //padding: 0;
     &:after {
       content: '';
     }
-  }
-  span[data-id][iscompparams] {
     &[bordertype='none'] {
       border-bottom: none;
     }
@@ -189,7 +184,7 @@ provide('NODE_PROPS', props)
 }
 
 /*render node*/
-span[data-id][iscompparams] {
+span[data-id][compname] {
   &[bordertype='underline'] {
     border-bottom: 1px solid var(--umo-node-text-border-color);
   }

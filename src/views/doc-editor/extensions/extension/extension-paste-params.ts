@@ -10,6 +10,7 @@ import { Plugin, PluginKey } from 'prosemirror-state'
 import type { EditorView } from 'prosemirror-view'
 import { DOMParser as DOMParser2 } from 'prosemirror-model'
 import { debounce } from 'sf-utils2'
+import { simpleUUID } from '@/utils/short-id'
 
 import { Fragment } from 'prosemirror-model'
 import { useMessage } from '@/composables/dialog'
@@ -45,6 +46,13 @@ export const ExtensionPasteParams = Extension.create({
         // 遍历所有文本节点
         // @ts-expect-error
         while ((currentNode = walker.nextNode())) {
+          if (currentNode.getAttribute('data-id')) {
+            const compName = currentNode.getAttribute('compname')
+            if (compName) {
+              currentNode.setAttribute('data-id', simpleUUID())
+            }
+          }
+
           // 忽略空白文本节点
           if (currentNode['style'].fontFamily) {
             currentNode['style'].fontFamily = ''
@@ -138,7 +146,6 @@ export const ExtensionPasteParams = Extension.create({
       }),
     ]
   },
-
 
   /**
    * 可选：阻止通过键盘删除（如 Backspace/Delete 键）

@@ -10,7 +10,7 @@ import '@/assets/styles/prosemirror.less'
 
 // 为了方便编译
 import '@/components/container/page.vue'
-import '@/components/container/print.vue'
+// import '@/components/container/print.vue'
 import '@/components/editor/index.vue'
 import '@/components/menus/button.vue'
 
@@ -49,6 +49,6 @@ export {
   Textarea,
   Slider,
   Tooltip,
-  Tree,
+  // Tree,
   // Watermark,
 } from 'tdesign-vue-next/esm/index'

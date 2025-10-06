@@ -63,6 +63,7 @@ import { testEditor } from '@/views/doc-editor/utils/test'
 import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -270,6 +271,20 @@ watch(umoEditorRef, () => {
     window.dispatchEvent(
       new CustomEvent('editor-ready', { detail: editorRef.value }),
     )
+
+    if (!isInIframe()) {
+      rightTpFields.value = [
+        {
+          label: '文本',
+          children: [
+            {
+              label: '身份证',
+              value: 'compText',
+            },
+          ]
+        }
+      ]
+    }
   })
 
   // editorRef.value.on('update', ({ editor }) => {
@@ -291,7 +306,7 @@ window['pageDocEditor'] = {
   editorRef,
 
   /** 右侧 参数属性*/
-  rightTpFields
+  rightTpFields,
 }
 </script>
 

@@ -1,15 +1,9 @@
-<template>
-  <iframe ref="iframeRef" class="umo-print-iframe" :srcdoc="iframeCode" />
-</template>
-
 <script setup lang="ts">
 /* eslint-disable */
 import umoEditorPureCss from '@/views/doc-editor/style/umo-editor-pure.css?raw'
 
 const container = inject('container')
 const editor = inject('editor')
-const printing = inject('printing')
-const exportFile = inject('exportFile')
 const page = inject('page')
 const options = inject('options')
 
@@ -18,6 +12,9 @@ import { isPlainObject } from '@tiptap/core'
 
 const iframeRef = ref<HTMLIFrameElement>()
 const iframeCode = ref('')
+const isShowIframe = ref(false)
+
+
 const getStylesHtml = () => {
   return Array.from(document.querySelectorAll('link, style'))
     .map((item) => item.outerHTML)
@@ -63,14 +60,21 @@ const prepareEchartsForPrint = (htmlContent: any) => {
   return tempDiv.innerHTML
 }
 
-const defaultLineHeight = $computed(
+/**
+ * 默认lineHeight
+ */
+const defaultLineHeight = computed(
   () =>
     options.value.dicts?.lineHeights.find(
       (item: { default: any }) => item.default,
     )?.value,
 )
 
-const getIframeCode = (fillFieldData) => {
+/**
+ * 获取html代码，用于打印
+ * @param fillFieldData
+ */
+const getPrintPageHtml = (fillFieldData = {}) => {
   const { orientation, size, margin, background } = page.value
 
   let body = getContentHtml()
@@ -82,15 +86,13 @@ const getIframeCode = (fillFieldData) => {
   const parser = new DOMParser()
   const doc = parser.parseFromString(body, 'text/html')
 
-  // 删除水印
+  // 1、删除水印
   const watermark = doc.querySelector(
     '.umo-watermark > .umo-page-node-footer+div',
   ) as HTMLHtmlElement
   if (watermark) {
     watermark.remove()
   }
-
-  // 删除水印2
   const umoPageContentDOM = doc.querySelector('.umo-watermark.umo-page-content')
   if (umoPageContentDOM.children) {
     const lastChildDOM = umoPageContentDOM.children[
@@ -105,7 +107,7 @@ const getIframeCode = (fillFieldData) => {
   }
 
   // watermark2DOM
-
+  // 2、删除页头和页脚
   const corners = doc.querySelectorAll(
     '.umo-page-corner',
   ) as unknown as HTMLHtmlElement[]
@@ -122,7 +124,7 @@ const getIframeCode = (fillFieldData) => {
     editorDom.setAttribute('contenteditable', 'false')
   }
 
-  // 删除图片分隔符
+  // 3、删除图片分隔符
   const imgSepList = Array.from(
     doc.querySelectorAll('img.ProseMirror-separator'),
   ) as unknown as HTMLHtmlElement[]
@@ -133,7 +135,7 @@ const getIframeCode = (fillFieldData) => {
     imgSepList.length = 0
   }
 
-  // 删除所有不可见字符
+  // 4、删除所有不可见字符
   const spanCharacterList = Array.from(
     doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
   ) as unknown as HTMLHtmlElement[]
@@ -155,16 +157,44 @@ const getIframeCode = (fillFieldData) => {
   //   brBreakList.length = 0
   // }
 
-  // 是否存在分页
+  // 5、是否存在分页，分页处理逻辑
   const isFrontPagination =
     doc.querySelector('div[data-sf-pagination="true"]') ||
     doc.querySelector('.sf-page-first__header[data-page-num]')
 
   console.log('printScript.toString()', printScript.toString())
 
+  // 6、添加打印脚本
   const scriptListString = [`${printScript.toString()}`]
-    .map((scriptString) => `<script>${scriptString}; \n printScript(); <\/script>`)
+    .map(
+      (scriptString) => `<script>${scriptString}; \n printScript(); <\/script>`,
+    )
     .join('\n')
+
+  // 7、添加打印样式
+  const styleListString = [
+    // ` @media print {
+    //   table {
+    //     page-break-inside: auto;
+    //   }
+    //   tr {
+    //     page-break-inside: auto !important;
+    //   }
+    //   thead {
+    //     display: table-header-group;
+    //   }
+    // }
+    //
+    // @media print {
+    //   table, img, svg {
+    //     page-break-inside: avoid;
+    //   }
+    //
+    //   h1, h2 {
+    //     page-break-after: avoid;
+    //   }
+    // }`
+  ].filter(Boolean).join('\n')
 
   return `
     <!DOCTYPE html>
@@ -202,27 +232,7 @@ const getIframeCode = (fillFieldData) => {
           padding-bottom: 0;
           page-break-after: avoid;
         }
-        // @media print {
-        //   table {
-        //     page-break-inside: auto;
-        //   }
-        //   tr {
-        //     page-break-inside: auto !important;
-        //   }
-        //   thead {
-        //     display: table-header-group;
-        //   }
-        // }
-
-        // @media print {
-        //   table, img, svg {
-        //     page-break-inside: avoid;
-        //   }
-        //
-        //   h1, h2 {
-        //     page-break-after: avoid;
-        //   }
-        // }
+        ${styleListString}
       </style>
       <style>
         span text.hidden {
@@ -237,7 +247,7 @@ const getIframeCode = (fillFieldData) => {
       <div id="sprite-plyr" style="display: none;">
       ${getPlyrSprite()}
       </div>
-      <div class="umo-editor-container" style="line-height: ${defaultLineHeight};" aria-expanded="false">
+      <div class="umo-editor-container" style="line-height: ${defaultLineHeight.value};" aria-expanded="false">
         <div class="tiptap umo-editor" translate="no" style="display: flex; flex-direction: column; align-items: center">
           ${doc.body.innerHTML}
         </div>
@@ -344,36 +354,35 @@ function printScript() {
  */
 const printPage = (fillFieldData = {}) => {
   editor.value?.commands.blur()
-  iframeCode.value = getIframeCode(fillFieldData)
-
-  const dialog = useConfirm({
-    attach: container,
-    theme: 'info',
-    header: printing.value ? t('print.title') : t('export.pdf.title'),
-    body: printing.value ? t('print.message') : t('export.pdf.message'),
-    confirmBtn: printing.value ? t('print.confirm') : t('export.pdf.confirm'),
-    onConfirm() {
-      dialog.destroy()
-      setTimeout(() => {
-        console.log(
-          'debug-172',
-          iframeRef.value.contentWindow.document.documentElement.outerHTML,
-        )
-        iframeRef.value.contentWindow?.print()
-      }, 300)
-    },
-    onClosed() {
-      printing.value = false
-      exportFile.value.pdf = false
-    },
+  iframeCode.value = getPrintPageHtml(fillFieldData)
+  isShowIframe.value = true
+  nextTick(() => {
+    iframeRef.value.onload = () => {
+      console.log(
+        'debug-172',
+        iframeRef.value.contentWindow.document,
+      )
+      iframeRef.value.contentWindow?.print()
+    }
   })
 }
 
 defineExpose({
+  /**
+   * 打印页
+   */
   printPage,
-  getIframeCode,
+
+  /**
+   * 获取
+   */
+  getPrintPageHtml,
 })
 </script>
+
+<template>
+  <iframe v-if="isShowIframe" ref="iframeRef" class="umo-print-iframe" :srcdoc="iframeCode" />
+</template>
 
 <style lang="less" scoped>
 .umo-print-iframe {
