@@ -184,6 +184,7 @@ const _tpFields = computed(() => {
       item.uid = commonUtil.simpleUUID()
       if (Array.isArray(item.children)) {
         item.children = item.children.map((cItem) => {
+          const innerAttrs = cItem.attrs
           return {
             uid: commonUtil.simpleUUID(),
             label: cItem.label,
@@ -199,7 +200,7 @@ const _tpFields = computed(() => {
               const cssText = tiptapUtil.getStyleBySelection(editor.value)
               return {
                 'data-id': commonUtil.simpleUUID(),
-                fieldName: 'name',
+                fieldName: innerAttrs?.fieldName,
                 placeholder: cItem.label,
                 cssText,
                 // placeholder: `姓名`,
@@ -375,6 +376,18 @@ const dragMethod = {
   },
 }
 
+/**
+ * 获取合同字段模版
+ */
+const getCntrctField = () => {
+  // editor.value.state.doc.descendants((node, pos) => {
+  //   if (node.type.name == COMP_PARAMS_NAME_MAP.compText) {
+  //
+  //   }
+  // })
+  return __compNodeList__.value
+}
+
 /* 计算 */
 
 /* 监听 */
@@ -391,6 +404,9 @@ onMounted(() => {
 /* 暴露 */
 defineExpose({
   $: proxy.$,
+
+  /** 获取模版字段 */
+  getCntrctField,
 })
 </script>
 

@@ -6,6 +6,7 @@
       classPrefix: 'umo',
     }"
   >
+    <slot name="hidden"></slot>
     <div
       :id="container.substr(1)"
       ref="layoutUmoEditorContainerRef"
@@ -82,6 +83,7 @@ import {
   isString,
 } from '@tool-belt/type-predicates'
 import domToImage from 'dom-to-image-more'
+// import modernScreenshot from 'modern-screenshot'
 import type {
   DialogOptions,
   GlobalConfigProvider,

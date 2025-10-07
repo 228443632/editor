@@ -56,6 +56,11 @@ const a4 = cssUtil.getPaperSize('A4')
 const scaleFactor = ref(0)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
+const { width: rootWidth } = useElementBounding(rootRef)
+
+const _scalePos = computed(() => {
+  return rootWidth.value / a4._basePx.w
+})
 
 /**
  * 嵌入项每一项样式
@@ -252,7 +257,9 @@ defineExpose({
           @rendered="onRendered(pageNum)"
         />
 
-        <template v-if="_paramsCompList$pageNum[pageNum]?.length">
+        <template
+          v-if="scaleFactor && _paramsCompList$pageNum[pageNum]?.length"
+        >
           <div
             v-for="item in _paramsCompList$pageNum[pageNum]"
             :key="item.key"
@@ -261,9 +268,9 @@ defineExpose({
             :style="{
               '--page-num': item.pageNum,
               // top: item.top - (item.pageNum - 1) * 12 + 'px',
-              top: item.offsetTop + 'px',
-              left: item.left + 'px',
-              transform: `scale(${scaleFactor})`,
+              top: item.offsetTop * +_scalePos + 'px',
+              left: item.left * +_scalePos + 'px',
+              transform: `scale(${_scalePos})`,
             }"
           >
             <!-- 印章 -->

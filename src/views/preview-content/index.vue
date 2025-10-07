@@ -22,6 +22,7 @@ const route = useRoute()
 const model = ref(route.query.model as 'preview' | 'download')
 model.value ||= 'preview'
 const source = ref(route.query.source as string)
+const paramsCompList = ref([])
 
 const downloadPreviewRef = ref<InstanceType<typeof Preview>>()
 const updateFlag = ref(0)
@@ -30,24 +31,28 @@ const updateFlag = ref(0)
 /**
  * 导出pdf
  */
-const exportPdf = async (filename?: string) => {
-  isShowDownload.value = true
-  await nextTick()
+const exportPdf = (filename?: string) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve) => {
+    isShowDownload.value = true
+    await nextTick()
 
-  if (downloadPreviewRef.value.previewContext?.contentInitial) {
-    await to(downloadPreviewRef.value.exportPdf(filename))
-    return
-  }
+    if (downloadPreviewRef.value.previewContext?.contentInitial) {
+      await to(downloadPreviewRef.value.exportPdf(filename))
+      return resolve(true)
+    }
 
-  const watcher = watch(
-    () => downloadPreviewRef.value.previewContext?.contentInitial,
-    async (newVal) => {
-      if (newVal) {
-        await to(downloadPreviewRef.value.exportPdf(filename))
-        watcher()
-      }
-    },
-  )
+    const watcher = watch(
+      () => downloadPreviewRef.value.previewContext?.contentInitial,
+      async (newVal) => {
+        if (newVal) {
+          await to(downloadPreviewRef.value.exportPdf(filename))
+          watcher()
+          resolve(true)
+        }
+      },
+    )
+  })
 }
 
 const previewPdfStyle = ref({})
@@ -77,7 +82,7 @@ defineExpose({
 provide('__previewPdfStyle__', previewPdfStyle)
 
 window['pagePreviewContent'] = {
-  /* 导出 */
+  /** 导出 */
   exportPdf,
 
   /** 模式 */
@@ -88,13 +93,16 @@ window['pagePreviewContent'] = {
 
   /** 预览pdf样式 */
   previewPdfStyle,
+
+  /** 参数组件列表 */
+  paramsCompList,
 }
 </script>
 
 <!--render-->
 <template>
-  <div v-if="source" class="contents" :key="updateFlag">
-    <div class="sticky top-0 z-10">
+  <div v-if="source" :key="updateFlag" class="contents">
+    <div v-if="!isInIframe()" class="sticky top-0 z-10">
       <t-button @click="exportPdf">导出</t-button>
     </div>
 
@@ -103,6 +111,7 @@ window['pagePreviewContent'] = {
       v-if="model == 'preview'"
       :source="source"
       model="preview"
+      :params-comp-list="paramsCompList"
     ></Preview>
 
     <!-- 下载  -->
@@ -111,6 +120,7 @@ window['pagePreviewContent'] = {
       ref="downloadPreviewRef"
       model="download"
       :source="source"
+      :params-comp-list="paramsCompList"
       class="absolute -z-1 opacity-0"
     ></Preview>
   </div>

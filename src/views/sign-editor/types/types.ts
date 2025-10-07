@@ -10,8 +10,6 @@ import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
  */
 export interface IParamsCompItem {
   type?: TPrettifyString<'compSeal' | 'compSign' | 'compSignDate'>
-  x?: number
-  y?: number
   top?: number
   left?: number
 
@@ -27,10 +25,12 @@ export interface IParamsCompItem {
   offsetTop?: number
 
   /** 所处的页码 */
-  pageNum?: string
+  pageNum?: number
 
   /**
    * 是否正在拖拽
    */
-  isEsDragging?:  boolean
+  isEsDragging?: boolean
+
+  [K: string]: any
 }

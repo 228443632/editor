@@ -211,10 +211,10 @@ const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
 
   nextTick(() => {
-    __signContext__.value.scaleFactor =
-      rootRef.value
-        .querySelector('.vue-pdf-embed__page')
-        .style.getPropertyValue('--scale-factor') || 1
+    __signContext__.value.scaleFactor = 1
+    // rootRef.value
+    //   .querySelector('.vue-pdf-embed__page')
+    //   .style.getPropertyValue('--scale-factor') || 1
   })
 
   const isRenderSuccess =

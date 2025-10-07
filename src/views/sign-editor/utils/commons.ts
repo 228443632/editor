@@ -4,7 +4,7 @@
  * @create 02/10/25 PM10:20
  */
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { deepClone } from 'sf-utils2'
+import { deepClone, uuid } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const a4 = cssUtil.getPaperSize('A4')
@@ -51,13 +51,35 @@ export const pageUtils = {
    * 解析参数组件
    * @param paramsCompList
    */
-  expandCompParams(paramsCompList: IParamsCompItem[]) {
-    return deepClone(paramsCompList || []).map((item) => {
+  expandCompParams(paramsCompList: IParamsCompItem[] & { _isSkip?: boolean }) {
+    const paramsCompListClone = deepClone(paramsCompList || [])
+    if (paramsCompList?._isSkip) {
+      delete paramsCompListClone._isSkip
+      return paramsCompListClone
+    }
+    return paramsCompListClone.map((item) => {
       item.isInRect = false
+      item.key ||= uuid()
       const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
       item.offsetTop = offsetTop
       item.pageNum = pageNum
       return item
     }) as IParamsCompItem[]
+  },
+
+  /**
+   * 逆向解析参数组件
+   * @param paramsCompList
+   */
+  reverseExpandCompParams(paramsCompList: IParamsCompItem[]) {
+    return paramsCompList.map((item) => {
+      item.isInRect = false
+      item.key ||= uuid()
+      item.top =
+        (item.pageNum - 1) * pageUtils.perPageGap +
+        (item.pageNum - 1) * a4._basePx.h +
+        item.offsetTop
+      return item
+    })
   },
 }

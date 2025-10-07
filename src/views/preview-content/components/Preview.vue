@@ -7,14 +7,11 @@
 <script setup lang="ts">
 import Content from './Content.vue'
 import { noop } from 'sf-utils2'
-import paramsCompList from './mock.ts'
+// import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
-import dayjs from 'dayjs'
-import { jsPDF } from 'jspdf'
 import domtoimage from 'dom-to-image-more'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 // import { saveAs } from 'file-saver'
-import modernScreenshot from 'modern-screenshot'
 import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
 
 console.log('domtoimage', domtoimage)
@@ -35,6 +32,14 @@ const props = defineProps({
     type: String,
     default: () => '',
   },
+
+  /**
+   * 参数组件列表
+   */
+  paramsCompList: {
+    type: Array,
+    default: () => [],
+  }
 })
 const emit = defineEmits({})
 
@@ -97,7 +102,7 @@ const exportPdf = async (filename?: string) => {
  * 获取参数组件列表
  */
 const _paramsCompList = computed(() => {
-  return pageUtils.expandCompParams(paramsCompList as any)
+  return pageUtils.expandCompParams(props.paramsCompList as any)
 })
 
 /* 计算 */

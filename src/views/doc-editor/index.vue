@@ -1,48 +1,9 @@
-<template>
-  <div class="doc-editor">
-    <!--    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo002')"-->
-    <!--        >点击demo002</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"-->
-    <!--        >光标字大小</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo004')"-->
-    <!--        >设置属性不在选区</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('demoInTable')"-->
-    <!--        >在表格中</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"-->
-    <!--        >删除行</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('wrapTrTable')"-->
-    <!--        >手动添加包裹</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('truncate001')"-->
-    <!--        >截取</t-button-->
-    <!--      >-->
-    <!--    </div>-->
-    <umo-editor ref="umoEditorRef" v-bind="options">
-      <!-- 基础工具   -->
-      <template #toolbar_base>
-        <ParamsLib></ParamsLib>
-      </template>
-
-      <!--  TOC 内容  -->
-      <template #toc-content-params>
-        <LeftTocParams></LeftTocParams>
-      </template>
-
-      <!--  内容右侧  -->
-      <template #container-page-right>
-        <RightParamsLib :rightTpFields="rightTpFields"></RightParamsLib>
-      </template>
-    </umo-editor>
-  </div>
-</template>
-
+<!--
+ * @Description: 编辑器
+ * @Author 卞鹏飞 <228443632@qq.com>
+ * @create 04/09/24 PM12:55
+ -->
+<!--setup-->
 <script setup lang="ts">
 import { shortId } from '@/utils/short-id'
 import ParamsLib from './toolbar/base/ParamsLib.vue'
@@ -58,12 +19,13 @@ import { debounce, hasOwn } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
-import { template01 } from '@/views/doc-editor/template/demo01'
+// import { template01 } from '@/views/doc-editor/template/demo01'
 import { testEditor } from '@/views/doc-editor/utils/test'
 import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+import Print from '@/views/doc-editor/components/Print.vue'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -84,6 +46,8 @@ const IS_DEV = process.env.NODE_ENV === 'development'
 
 const umoEditorRef = ref(null)
 const editorRef = ref<Editor>()
+const rightParamsLibRef = ref<InstanceType<typeof RightParamsLib>>()
+const printRef = ref<InstanceType<typeof Print>>()
 
 const nodeList = ref([])
 const globalBizState = ref({
@@ -281,8 +245,8 @@ watch(umoEditorRef, () => {
               label: '身份证',
               value: 'compText',
             },
-          ]
-        }
+          ],
+        },
       ]
     }
   })
@@ -307,8 +271,67 @@ window['pageDocEditor'] = {
 
   /** 右侧 参数属性*/
   rightTpFields,
+
+  /** 打印实例 */
+  printRef,
+
+  /** 右侧模版字段库组件实例 */
+  rightParamsLibRef,
 }
 </script>
+
+<!-- render -->
+<template>
+  <div class="doc-editor">
+    <!--    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo002')"-->
+    <!--        >点击demo002</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"-->
+    <!--        >光标字大小</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('demo004')"-->
+    <!--        >设置属性不在选区</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('demoInTable')"-->
+    <!--        >在表格中</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"-->
+    <!--        >删除行</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('wrapTrTable')"-->
+    <!--        >手动添加包裹</t-button-->
+    <!--      >-->
+    <!--      <t-button size="small" @click="testEditorFunc('truncate001')"-->
+    <!--        >截取</t-button-->
+    <!--      >-->
+    <!--    </div>-->
+    <umo-editor ref="umoEditorRef" v-bind="options">
+      <template #hidden>
+        <Print ref="printRef"></Print>
+      </template>
+
+      <!-- 基础工具   -->
+      <template #toolbar_base>
+        <ParamsLib></ParamsLib>
+      </template>
+
+      <!--  TOC 内容  -->
+      <template #toc-content-params>
+        <LeftTocParams></LeftTocParams>
+      </template>
+
+      <!--  内容右侧  -->
+      <template #container-page-right>
+        <RightParamsLib
+          :rightTpFields="rightTpFields"
+          ref="rightParamsLibRef"
+        ></RightParamsLib>
+      </template>
+    </umo-editor>
+  </div>
+</template>
 
 <style>
 html,

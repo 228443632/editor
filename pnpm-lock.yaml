@@ -155,6 +155,9 @@ importers:
       crypto-js:
         specifier: 4.2.0
         version: 4.2.0
+      dayjs:
+        specifier: 1.11.7
+        version: 1.11.7
       dom-to-image-more:
         specifier: 3.7.1
         version: 3.7.1
@@ -239,9 +242,6 @@ importers:
       tippy.js:
         specifier: 6.3.7
         version: 6.3.7
-      tiptap-extension-pagination:
-        specifier: 2.1.4
-        version: 2.1.4(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)
       vue-draggable-plus:
         specifier: 0.6.0
         version: 0.6.0(@types/sortablejs@1.15.8)
@@ -369,9 +369,6 @@ importers:
       '@vue/eslint-config-prettier':
         specifier: 9.0.0
         version: 9.0.0(@types/eslint@9.6.1)(eslint@9.14.0(jiti@2.4.2))(prettier@3.3.3)
-      dayjs:
-        specifier: 1.11.7
-        version: 1.11.7
       eslint:
         specifier: 9.14.0
         version: 9.14.0(jiti@2.4.2)
@@ -6734,12 +6731,6 @@ packages:
 
   tippy.js@6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
-
-  tiptap-extension-pagination@2.1.4:
-    resolution: {integrity: sha512-ol7wdiueeufFsafbdhGSj0LSdd4FUrGkYybNf2+Dn1pE28ysSewSp2TDWJxJTjBjNEVoivKWYQYdRLFh+KQHZw==}
-    peerDependencies:
-      '@tiptap/core': ^2.11.5
-      '@tiptap/pm': ^2.11.5
 
   to-buffer@1.2.2:
     resolution: {integrity: sha512-db0E3UJjcFhpDhAF4tLo03oli3pwl3dbnzXOUIlRKrp+ldk/VUxzpWYZENsw2SZiuBjHAk7DfB0VU7NKdpb6sw==}
@@ -14616,11 +14607,6 @@ snapshots:
   tippy.js@6.3.7:
     dependencies:
       '@popperjs/core': 2.11.8
-
-  tiptap-extension-pagination@2.1.4(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5):
-    dependencies:
-      '@tiptap/core': 2.11.5(@tiptap/pm@2.11.5)
-      '@tiptap/pm': 2.11.5
 
   to-buffer@1.2.2:
     dependencies:

@@ -164,6 +164,11 @@ const signContext = ref({
     })
   },
 
+  /**
+   * 反转参数组件, 初始化
+   */
+  initParamsCompList: pageUtils.reverseExpandCompParams,
+
   /** 是否在拖拽中 */
   isDragging: false,
 
@@ -277,7 +282,7 @@ window['pageSignEditor'] = {
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
   >
-    <Header class="sign-editor__header"></Header>
+    <Header v-if="!isInIframe()" class="sign-editor__header"></Header>
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>
