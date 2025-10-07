@@ -24,6 +24,11 @@ export interface IParamsCompItem {
   /** 每一页的相对位置 */
   offsetTop?: number
 
+  /**
+   * 每一页左边距
+   */
+  offsetLeft?: number
+
   /** 所处的页码 */
   pageNum?: number
 

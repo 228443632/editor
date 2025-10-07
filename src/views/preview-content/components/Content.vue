@@ -269,7 +269,7 @@ defineExpose({
               '--page-num': item.pageNum,
               // top: item.top - (item.pageNum - 1) * 12 + 'px',
               top: item.offsetTop * +_scalePos + 'px',
-              left: item.left * +_scalePos + 'px',
+              left: item.offsetLeft * +_scalePos + 'px',
               transform: `scale(${_scalePos})`,
             }"
           >

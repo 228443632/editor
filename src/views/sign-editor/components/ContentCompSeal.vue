@@ -81,7 +81,9 @@ watch([() => _nodeData.value.top, () => _nodeData.value.left], () => {
 })
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+
+})
 
 /* 暴露 */
 defineExpose({
@@ -122,11 +124,8 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width:
-            COMP_SEAL_STYLE.width * __signContext__.scaleFactor + 'px',
-          height:
-            COMP_SEAL_STYLE.height * __signContext__.scaleFactor +
-            'px',
+          width: COMP_SEAL_STYLE.width * __signContext__.scaleFactor + 'px',
+          height: COMP_SEAL_STYLE.height * __signContext__.scaleFactor + 'px',
         }"
         v-html="testSealSvgRaw"
       ></div>

@@ -66,9 +66,7 @@ const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
 const __signContext__ = inject('__signContext__') // 预览上下文
 
 const rootRef = ref<HTMLHtmlElement>()
-const _embedPdfWrapRef = computed(
-  () => __signContext__.value.embedPdfWrapRef,
-) // 预览内容容器
+const _embedPdfWrapRef = computed(() => __signContext__.value.embedPdfWrapRef) // 预览内容容器
 // const scrollViewRef = computed(() => __signContext__.value.contentElRef)
 const rootBound = useElementBounding(rootRef)
 
@@ -199,43 +197,45 @@ defineExpose({
 <template>
   <div ref="rootRef" class="line-wrap" :style="_rootStyle">
     <slot></slot>
-  </div>
 
-  <teleport v-if="showLine" :to="`.${PREVIEW_AUX_LINE_CTOR}`">
-    <section
-      class="contents line-wrap-teleport-02"
-      :style="_lineWrapTeleportStyle"
-    >
-      <section class="line-wrap-clone" :style="_lineWrapCloneStyle" />
-      <div class="line-wrap__left line-wrap__x">
-        <span
-          class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
-          :style="{
-            top: `${parseFloat(_lineWrapTeleportStyle['--lt']) / 2}px`,
-            transform: `translateY(-50%)`,
-          }"
-          >{{ parseFloat(_lineWrapTeleportStyle['--lt']) }}</span
-        >
-      </div>
-      <div class="line-wrap__right line-wrap__x"></div>
-      <div class="line-wrap__top line-wrap__y absolute">
-        <span
-          class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
-          :style="{
-            left: `${parseFloat(_lineWrapTeleportStyle['--ll']) / 2}px`,
-            transform: `translateX(-50%)`,
-          }"
-          >{{ parseFloat(_lineWrapTeleportStyle['--ll']) }}</span
-        >
-      </div>
-      <div class="line-wrap__bottom line-wrap__y"></div>
-    </section>
-  </teleport>
+    <teleport v-if="showLine" :to="`.${PREVIEW_AUX_LINE_CTOR}`">
+      <section
+        class="contents line-wrap-teleport-02"
+        :style="_lineWrapTeleportStyle"
+      >
+        <section class="line-wrap-clone" :style="_lineWrapCloneStyle" />
+        <div class="line-wrap__left line-wrap__x">
+          <span
+            class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
+            :style="{
+              top: `${parseFloat(_lineWrapTeleportStyle['--lt']) / 2}px`,
+              transform: `translateY(-50%)`,
+            }"
+            >{{ parseFloat(_lineWrapTeleportStyle['--lt']) }}</span
+          >
+        </div>
+        <div class="line-wrap__right line-wrap__x"></div>
+        <div class="line-wrap__top line-wrap__y absolute">
+          <span
+            class="whitespace-nowrap rounded-2px text-white text-10px bg-primary px-4px py-2px absolute"
+            :style="{
+              left: `${parseFloat(_lineWrapTeleportStyle['--ll']) / 2}px`,
+              transform: `translateX(-50%)`,
+            }"
+            >{{ parseFloat(_lineWrapTeleportStyle['--ll']) }}</span
+          >
+        </div>
+        <div class="line-wrap__bottom line-wrap__y"></div>
+      </section>
+    </teleport>
+  </div>
 </template>
 
 <!--style-->
 <style lang="less" scoped>
 .line-wrap {
+  width: fit-content;
+  height: fit-content;
 }
 
 @line-color: #999; // #999; eb4f27

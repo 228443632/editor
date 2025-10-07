@@ -78,6 +78,9 @@ const signContext = ref({
    */
   paramsCompList: [] as IParamsCompItem[],
 
+  /**
+   * 参数数据，准确的计算每一页的位置
+   */
   _paramsCompList: computed(() => {
     const paramsCompList = signContext.value.paramsCompList || []
     return pageUtils.expandCompParams(paramsCompList)

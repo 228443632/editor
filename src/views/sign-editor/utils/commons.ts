@@ -62,6 +62,7 @@ export const pageUtils = {
       item.key ||= uuid()
       const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
       item.offsetTop = offsetTop
+      item.offsetLeft = item.left
       item.pageNum = pageNum
       return item
     }) as IParamsCompItem[]
@@ -72,13 +73,14 @@ export const pageUtils = {
    * @param paramsCompList
    */
   reverseExpandCompParams(paramsCompList: IParamsCompItem[]) {
-    return paramsCompList.map((item) => {
+    return deepClone(paramsCompList || []).map((item) => {
       item.isInRect = false
       item.key ||= uuid()
       item.top =
         (item.pageNum - 1) * pageUtils.perPageGap +
         (item.pageNum - 1) * a4._basePx.h +
         item.offsetTop
+      item.left = item.offsetLeft || item.left
       return item
     })
   },

@@ -138,9 +138,7 @@ const dragMethod = {
   },
 }
 
-const _embedPdfWrapRef = computed(
-  () => __signContext__.value.embedPdfWrapRef,
-)
+const _embedPdfWrapRef = computed(() => __signContext__.value.embedPdfWrapRef)
 
 useEventListener(_embedPdfWrapRef, 'drop', dragMethod.drop)
 useEventListener(_embedPdfWrapRef, 'dragover', dragMethod.dragover)

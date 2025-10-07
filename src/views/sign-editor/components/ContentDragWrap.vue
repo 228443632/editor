@@ -113,6 +113,8 @@ defineExpose({
     :snap-to-grid="false"
     :left="Number(_nodeData.left)"
     :top="Number(_nodeData.top)"
+    width="fit-content"
+    height="fit-content"
     :min-width="14"
     :min-height="14"
     :disabled="_nodeData.isInRect"

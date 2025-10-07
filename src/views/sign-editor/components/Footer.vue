@@ -61,8 +61,9 @@ const onVisibleChange = (visible) => {
 const _useWidgetList = computed(() => {
   const paramsCompList = __signContext__.value.paramsCompList || []
   return paramsCompList.map((item) => {
-    const { offsetTop, pageNum } =
-      __signContext__.value.getPageOffsetTopByTop(item.top)
+    const { offsetTop, pageNum } = __signContext__.value.getPageOffsetTopByTop(
+      item.top,
+    )
     const compNameMap = {
       compSign: '签名',
       compSeal: '印章',

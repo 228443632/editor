@@ -45,6 +45,7 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 const pageRendered = ref({})
 let pageIntersectionObserver: IntersectionObserver
+const paramsCompPatchKey = ref(0)
 
 const copyContentInfo = ref()
 
@@ -348,6 +349,12 @@ watch(_pageNumsList, (newPageNums: number[]) => {
   nextTick(resetPageIntersectionObserver)
 })
 
+onMounted(() => {
+  nextTick(() => {
+    // paramsCompPatchKey.value++
+  })
+})
+
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
 
@@ -423,36 +430,38 @@ defineExpose({
         </template>
 
         <!-- 参数悬浮 -->
-        <div
-          v-for="(item, index) in __signContext__._paramsCompList"
-          :key="item.key"
-          :data-id="'id-' + item.key"
-          class="content-comp__item"
-          :style="{
-            '--page-num': item.pageNum,
-            '--mt': -((item.pageNum - 1) * __layoutSize__.perPageGap) + 'px',
-          }"
-        >
-          <!-- 印章 -->
-          <template v-if="item.type == 'compSeal'">
-            <ContentCompSeal
-              v-model:node-data="__signContext__.paramsCompList[index]"
-            ></ContentCompSeal>
-          </template>
+        <div class="contents" :key="paramsCompPatchKey">
+          <div
+            v-for="(item, index) in __signContext__._paramsCompList"
+            :key="item.key"
+            :data-id="'id-' + item.key"
+            class="content-comp__item"
+            :style="{
+              '--page-num': item.pageNum,
+              '--mt': -((item.pageNum - 1) * __layoutSize__.perPageGap) + 'px',
+            }"
+          >
+            <!-- 印章 -->
+            <template v-if="item.type == 'compSeal'">
+              <ContentCompSeal
+                v-model:node-data="__signContext__.paramsCompList[index]"
+              ></ContentCompSeal>
+            </template>
 
-          <!-- 签名 -->
-          <template v-else-if="item.type == 'compSign'">
-            <ContentCompSign
-              v-model:node-data="__signContext__.paramsCompList[index]"
-            ></ContentCompSign>
-          </template>
+            <!-- 签名 -->
+            <template v-else-if="item.type == 'compSign'">
+              <ContentCompSign
+                v-model:node-data="__signContext__.paramsCompList[index]"
+              ></ContentCompSign>
+            </template>
 
-          <!-- 签署日期 -->
-          <template v-else-if="item.type == 'compSignDate'">
-            <ContentCompSignDate
-              v-model:node-data="__signContext__.paramsCompList[index]"
-            ></ContentCompSignDate>
-          </template>
+            <!-- 签署日期 -->
+            <template v-else-if="item.type == 'compSignDate'">
+              <ContentCompSignDate
+                v-model:node-data="__signContext__.paramsCompList[index]"
+              ></ContentCompSignDate>
+            </template>
+          </div>
         </div>
 
         <t-back-top
