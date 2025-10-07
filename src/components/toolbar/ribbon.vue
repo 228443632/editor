@@ -265,7 +265,7 @@
             <menus-toolbar-tools-echarts v-if="!disableItem('echarts')" />
             <!--  Mermaid -->
             <!-- <menus-toolbar-tools-mind-map v-if="!disableItem('mind-map')" /> -->
-            <menus-toolbar-tools-mermaid v-if="!disableItem('mermaid')" />
+<!--            <menus-toolbar-tools-mermaid v-if="!disableItem('mermaid')" />-->
           </div>
           <div class="umo-virtual-group !border-l-0">
             <!--  中文大小写 -->

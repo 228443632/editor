@@ -2,7 +2,7 @@
   <menus-toolbar-tools-qrcode v-if="type === 'qrcode'" :content="content" />
   <menus-toolbar-tools-barcode v-if="type === 'barcode'" :content="content" />
   <menus-toolbar-tools-diagrams v-if="type === 'diagrams'" :content="content" />
-  <menus-toolbar-tools-mermaid v-if="type === 'mermaid'" :content="content" />
+<!--  <menus-toolbar-tools-mermaid v-if="type === 'mermaid'" :content="content" />-->
 </template>
 
 <script setup lang="ts">

@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 // import {useVModel} from '@vueuse/core'
-import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
+// import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
 import type { TableProps, TableRowData } from 'tdesign-vue-next'
 import Print from './Print.vue'
 import { saveAs } from 'file-saver'
@@ -134,10 +134,10 @@ defineExpose({
         required-mark
         :rules="[{ required: true, message: '必填', type: 'error' }]"
       >
-        <JSEditor
-          v-model="formData.configValue"
-          class="h-60 border-1 border-solid border-[var(--td-component-border)] w-full overflow-hidden pr-3"
-        ></JSEditor>
+        <!--        <JSEditor-->
+        <!--          v-model="formData.configValue"-->
+        <!--          class="h-60 border-1 border-solid border-[var(&#45;&#45;td-component-border)] w-full overflow-hidden pr-3"-->
+        <!--        ></JSEditor>-->
       </t-form-item>
     </t-form>
 

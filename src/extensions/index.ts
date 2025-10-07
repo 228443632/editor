@@ -17,7 +17,7 @@ import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 import type { Editor, Extension } from '@tiptap/vue-3'
 import { ColumnsExtension as Columns } from '@tiptap-extend/columns'
-import Mathematics from '@tiptap-pro/extension-mathematics'
+// import Mathematics from '@tiptap-pro/extension-mathematics'
 import NodeRange from '@tiptap-pro/extension-node-range'
 import { getHierarchicalIndexes } from '@tiptap-pro/extension-table-of-contents'
 import { TableOfContents } from '@tiptap-pro/extension-table-of-contents'
@@ -173,7 +173,7 @@ export const getDefaultExtensions = ({
     // CodeBlock,
     hr,
     Iframe,
-    Mathematics,
+    // Mathematics,
     Columns,
     Tag,
     Callout,
@@ -305,7 +305,8 @@ export const inputAndPasteRules = (options: any) => {
     !options.value.document?.enableMarkdown ||
     !$document.value?.enableMarkdown
   ) {
-    enableRules = [Mathematics, Typography, Image as unknown as Extension]
+    // enableRules = [Mathematics, Typography, Image as unknown as Extension]
+    enableRules = [Typography, Image as unknown as Extension]
   }
   return enableRules
 }
