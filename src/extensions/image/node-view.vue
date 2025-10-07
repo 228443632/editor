@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import Drager from 'es-drager'
-import { base64ToFile } from 'file64'
+import { base64ToFile, fileToBase64 } from 'file64'
 
 import { shortId } from '@/utils/short-id'
 
@@ -213,6 +213,20 @@ watch(
 watch(
   () => node.attrs.src,
   async (src: string) => {
+    // 处理http:// 开头的图片
+    if (/^https?/.test(src)) {
+      const { id, url } =
+        (await options.value?.onFileUpload?.({ url: src })) ?? {}
+      if (containerRef.value) {
+        updateAttributesWithoutHistory(
+          editor.value,
+          { id, src: url, uploaded: true },
+          getPos(),
+        )
+      }
+      uploadFileMap.value.delete(node.attrs.id)
+      return
+    }
     if (node.attrs.uploaded === false && !error.value) {
       if (src?.startsWith('data:image')) {
         const [data, type] = src.split(';')[0].split(':')

@@ -15,7 +15,7 @@ import { shallowMergeWithArrayOverride } from '@/views/doc-editor/utils/object-u
 
 // extension
 import extensions from './extensions'
-import { debounce, hasOwn } from 'sf-utils2'
+import { debounce, getHttpBlob, hasOwn, to } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
@@ -26,6 +26,7 @@ import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import Print from '@/views/doc-editor/components/Print.vue'
+import { blobToBase64, fileToBase64 } from 'file64'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -175,25 +176,32 @@ const options = $ref(
         if (!file) {
           throw new Error('没有找到要上传的文件')
         }
+
+        // //     const blob = await getHttpBlob(node.attrs.src)
         console.log('onUpload', file)
-        await new Promise((resolve) => setTimeout(resolve, 3000))
+
+        let fileUrl = undefined
+        if (file.url) {
+          const [blob, err] = await to(getHttpBlob(file.url))
+          if (!err && blob) fileUrl = await blobToBase64(blob as Blob)
+        }
 
         return {
           id: shortId(),
-          url: file.url ?? (await fileToBase64(file)),
+          url: fileUrl ?? (await fileToBase64(file)),
           name: file.name,
           type: file.type,
           size: file.size,
         }
 
-        function fileToBase64(file: File) {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader()
-            reader.readAsDataURL(file)
-            reader.onload = () => resolve(reader.result)
-            reader.onerror = (error) => reject(error)
-          })
-        }
+        // function fileToBase64(file: File) {
+        //   return new Promise((resolve, reject) => {
+        //     const reader = new FileReader()
+        //     reader.readAsDataURL(file)
+        //     reader.onload = () => resolve(reader.result)
+        //     reader.onerror = (error) => reject(error)
+        //   })
+        // }
       },
 
       /**
