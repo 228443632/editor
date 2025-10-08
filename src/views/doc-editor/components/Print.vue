@@ -1,37 +1,80 @@
 <script setup lang="ts">
 /* eslint-disable */
 import umoEditorPureCss from '@/views/doc-editor/style/umo-editor-pure.css?raw'
+import { arrayToObj, template, uniq } from 'sf-utils2'
+import { isPlainObject } from '@tiptap/core'
 
 const container = inject('container')
 const editor = inject('editor')
 const page = inject('page')
 const options = inject('options')
-
-import { template } from 'sf-utils2'
-import { isPlainObject } from '@tiptap/core'
+const printing = inject('printing')
+const exportFile = inject('exportFile')
+const getWholeHtml = inject('getWholeHtml')
 
 const iframeRef = ref<HTMLIFrameElement>()
 const iframeCode = ref('')
 const isShowIframe = ref(false)
 
+/**
+ * 获取svg html
+ */
+function getSvgHtml(ids = []) {
+  const svgHtmlDom = Array.from(document.body.children).find(
+    (item) =>
+      item.id == 'umo-icons' &&
+      (item.tagName == 'svg' || item.tagName == 'SVG'),
+  )
+  if (!svgHtmlDom) return ''
 
-const getStylesHtml = () => {
+  const idsMap = arrayToObj(ids)
+  const svgIds = Array.from(svgHtmlDom.querySelectorAll('symbol'))
+    .map((item) => item.id)
+    .filter((item) => idsMap[item])
+  console.log('svgHtmlDom', svgIds)
+
+  const svgHtmlDomClone = svgHtmlDom.cloneNode(false) as HTMLElement
+  svgHtmlDomClone.innerHTML = ''
+
+  Array.from(svgHtmlDom.querySelectorAll('symbol')).forEach((item) => {
+    if (idsMap[item.id]) {
+      svgHtmlDomClone.insertAdjacentHTML('afterbegin', item.outerHTML)
+    }
+  })
+  console.log('svgHtmlDomClone', svgHtmlDomClone.outerHTML)
+  return svgHtmlDomClone?.outerHTML ?? ''
+}
+
+/**
+ * 获取样式html
+ */
+function getStylesHtml() {
   return Array.from(document.querySelectorAll('link, style'))
     .map((item) => item.outerHTML)
     .join('')
 }
 
-const getPlyrSprite = () => {
+/**
+ * 获取所有视频html
+ */
+function getPlyrSprite() {
   return document.querySelector('#sprite-plyr')?.innerHTML ?? ''
 }
 
-const getContentHtml = () => {
+/**
+ * 获取所有html内容
+ */
+function getContentHtml() {
   const originalContent =
     document.querySelector(`${container} .umo-page-content`)?.outerHTML ?? ''
   return prepareEchartsForPrint(originalContent)
 }
-// 因echart依赖于组件动态展示，打印时效果无法通过html实现，所以通过转成图片方式解决
-const prepareEchartsForPrint = (htmlContent: any) => {
+
+/**
+ * 因echart依赖于组件动态展示，打印时效果无法通过html实现，所以通过转成图片方式解决
+ * @param htmlContent
+ */
+function prepareEchartsForPrint(htmlContent: string) {
   // 创建一个临时DOM容器用于处理HTML内容
   const tempDiv = document.createElement('div')
   tempDiv.innerHTML = htmlContent
@@ -74,7 +117,7 @@ const defaultLineHeight = computed(
  * 获取html代码，用于打印
  * @param fillFieldData
  */
-const getPrintPageHtml = (fillFieldData = {}) => {
+function getPrintPageHtml(fillFieldData = {}) {
   const { orientation, size, margin, background } = page.value
 
   let body = getContentHtml()
@@ -171,6 +214,15 @@ const getPrintPageHtml = (fillFieldData = {}) => {
     )
     .join('\n')
 
+  // 7、获取svg代码
+  const svgIds = uniq(
+    Array.from(doc.querySelectorAll('svg > use')).map((item) =>
+      (item.getAttribute('xlink:href') || '').replace(/^#/, ''),
+    ),
+  )
+  const svgHtml = getSvgHtml(svgIds)
+  console.log('svgHtml', svgHtml)
+
   // 7、添加打印样式
   const styleListString = [
     // ` @media print {
@@ -194,13 +246,31 @@ const getPrintPageHtml = (fillFieldData = {}) => {
     //     page-break-after: avoid;
     //   }
     // }`
-  ].filter(Boolean).join('\n')
+  ]
+    .filter(Boolean)
+    .join('\n')
+
+  // 8、移除注释节点
+  const walker = document.createTreeWalker(
+    doc.documentElement,
+    NodeFilter.SHOW_COMMENT,
+    null,
+  )
+
+  let currentNode: HTMLHtmlElement
+  // 遍历所有文本节点
+  // @ts-expect-error
+  while ((currentNode = walker.nextNode())) {
+    if (currentNode.nodeType == Node.COMMENT_NODE) {
+      currentNode.remove()
+    }
+  }
 
   return `
     <!DOCTYPE html>
     <html lang="zh-CN" theme-mode="${options.value.theme}" mode="print">
     <head>
-      <title>${options.value.document?.title}</title>
+      <title></title>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <style>${umoEditorPureCss}</style>
@@ -244,9 +314,8 @@ const getPrintPageHtml = (fillFieldData = {}) => {
       </style>
     </head>
     <body class="is-print preview">
-      <div id="sprite-plyr" style="display: none;">
-      ${getPlyrSprite()}
-      </div>
+      ${svgHtml}
+      <div id="sprite-plyr" style="display: none;">${getPlyrSprite()}</div>
       <div class="umo-editor-container" style="line-height: ${defaultLineHeight.value};" aria-expanded="false">
         <div class="tiptap umo-editor" translate="no" style="display: flex; flex-direction: column; align-items: center">
           ${doc.body.innerHTML}
@@ -358,14 +427,26 @@ const printPage = (fillFieldData = {}) => {
   isShowIframe.value = true
   nextTick(() => {
     iframeRef.value.onload = () => {
-      console.log(
-        'debug-172',
-        iframeRef.value.contentWindow.document,
-      )
+      console.log('debug-172', iframeRef.value.contentWindow.document)
       iframeRef.value.contentWindow?.print()
     }
   })
 }
+
+/**
+ * 获取整个代码
+ */
+getWholeHtml.value = getPrintPageHtml
+
+watch(
+  () => [printing.value, exportFile.value.pdf],
+  (value: [boolean, boolean]) => {
+    if (!value[0] && !value[1]) {
+      return
+    }
+    printPage()
+  },
+)
 
 defineExpose({
   /**
@@ -381,7 +462,12 @@ defineExpose({
 </script>
 
 <template>
-  <iframe v-if="isShowIframe" ref="iframeRef" class="umo-print-iframe" :srcdoc="iframeCode" />
+  <iframe
+    v-if="isShowIframe"
+    ref="iframeRef"
+    class="umo-print-iframe"
+    :srcdoc="iframeCode"
+  />
 </template>
 
 <style lang="less" scoped>
