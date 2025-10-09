@@ -29,7 +29,11 @@ const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
 const divRef = ref<HTMLElement>()
 const __signContext__ = inject('__signContext__') // 预览上下文
 const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
+const contentDragWrapRef = ref<InstanceType<typeof ContentDragWrap>>()
 
+const { width: contentDragWrapWidth } = useElementBounding(
+  computed(() => contentDragWrapRef.value?.dragerRef),
+)
 /* 方法 */
 
 /**
@@ -97,6 +101,8 @@ defineExpose({
     :style="{
       top: _nodeData.top + 'px',
       left: _nodeData.left + 'px',
+      width: contentDragWrapWidth + 'px',
+      '--y': (contentDragWrapRef?.translateY || 0) + 'px'
     }"
     @mousedown.stop="noop"
   >
@@ -105,15 +111,13 @@ defineExpose({
       @click="onApplyMultiPage"
       >应用到多文件多页</span
     >
-    <t-icon
-      name="delete"
-      size="14px"
-      class="cursor-pointer flex-none !hover:text-[var(--umo-primary-color)]"
-      @click="__signContext__.removeParamsComp(_nodeData)"
-    ></t-icon>
   </div>
 
-  <ContentDragWrap v-model:node-data="_nodeData">
+  <ContentDragWrap
+    v-model:node-data="_nodeData"
+    @delete="__signContext__.removeParamsComp(_nodeData)"
+    ref="contentDragWrapRef"
+  >
     <ContentLineWrap
       ref="contentLineWrapRef"
       v-model:node-data="_nodeData"
@@ -135,7 +139,7 @@ defineExpose({
 <style scoped lang="less">
 .e-drager-top__handle {
   white-space: nowrap;
-  transform: translate(0, calc(-100% - 8px));
+  transform: translate3d(-2px, calc(var(--y) + -100% - 8px), 0);
   background: #e5e5e5;
   border: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
@@ -147,18 +151,18 @@ defineExpose({
   font-size: 12px;
   gap: 12px;
   z-index: 10;
-  & > span:first-child {
-    position: relative;
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      right: -7px;
-      width: 1px;
-      height: 10px;
-      background: #bbb;
-    }
-  }
+  //& > span:first-child {
+  //  position: relative;
+  //  &::before {
+  //    content: '';
+  //    position: absolute;
+  //    top: 50%;
+  //    transform: translateY(-50%);
+  //    right: -7px;
+  //    width: 1px;
+  //    height: 10px;
+  //    background: #bbb;
+  //  }
+  //}
 }
 </style>

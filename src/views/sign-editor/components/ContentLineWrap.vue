@@ -241,6 +241,7 @@ defineExpose({
 @line-color: #999; // #999; eb4f27
 
 .line-wrap-teleport-02 {
+  display: none;
   pointer-events: none;
   & > div {
     position: absolute;

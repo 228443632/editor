@@ -31,7 +31,7 @@ const layoutSize = ref({
   layoutWidth: undefined,
 
   /** 左侧边栏宽度 老的 286*/
-  leftAsideWidth: 250,
+  leftAsideWidth: 200,
 
   /** 编辑器宽度*/
   editorWidth: a4._basePx.w,

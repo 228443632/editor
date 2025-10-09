@@ -98,7 +98,7 @@ function onSelectNode() {
 /**
  * 删除自己节点
  */
-async function onDeleteSelf(event) {
+function onDeleteSelf(event) {
   // inputVisible.value = false
   // await nextTick()
   // dragerWrapRef.value.click()
@@ -108,10 +108,7 @@ async function onDeleteSelf(event) {
   const boundRect = inputRef.value.getBoundingClientRect()
 
   // fix 删除节点
-  editor.value
-    .chain()
-    .setNodeSelection(props.getPos())
-    .run()
+  editor.value.chain().setNodeSelection(props.getPos()).run()
 
   editor.value
     .chain()
@@ -119,10 +116,9 @@ async function onDeleteSelf(event) {
     .deleteSelectionNode()
     .run()
 
-    window.requestAnimationFrame(() => {
-      scrollViewRef.value.scrollTop = oldScrollTop
-    })
-
+  window.requestAnimationFrame(() => {
+    scrollViewRef.value.scrollTop = oldScrollTop
+  })
 
   // setTimeout(() => {
   //   const { view } = editor.value

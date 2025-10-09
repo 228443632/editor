@@ -28,7 +28,9 @@ const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
 const divRef = ref<HTMLElement>()
 const __signContext__ = inject('__signContext__') // 预览上下文
 const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
+const contentDragWrapRef = ref<InstanceType<typeof ContentDragWrap>>()
 
+const { width: contentDragWrapWidth } = useElementBounding(contentDragWrapRef)
 /* 方法 */
 
 /**
@@ -112,7 +114,11 @@ defineExpose({
   <!--    ></t-icon>-->
   <!--  </div>-->
 
-  <ContentDragWrap v-model:node-data="_nodeData">
+  <ContentDragWrap
+    ref="contentDragWrapRef"
+    v-model:node-data="_nodeData"
+    @delete="__signContext__.removeParamsComp(_nodeData)"
+  >
     <ContentLineWrap
       ref="contentLineWrapRef"
       v-model:node-data="_nodeData"
@@ -136,7 +142,7 @@ defineExpose({
 <style scoped lang="less">
 .e-drager-top__handle {
   white-space: nowrap;
-  transform: translate(0, calc(-100% - 8px));
+  transform: translate(-2px, calc(-100% - 8px));
   background: #e5e5e5;
   border: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
@@ -148,18 +154,18 @@ defineExpose({
   font-size: 12px;
   gap: 12px;
   z-index: 10;
-  & > span:first-child {
-    position: relative;
-    &::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      right: -7px;
-      width: 1px;
-      height: 10px;
-      background: #bbb;
-    }
-  }
+  //& > span:first-child {
+  //  position: relative;
+  //  &::before {
+  //    content: '';
+  //    position: absolute;
+  //    top: 50%;
+  //    transform: translateY(-50%);
+  //    right: -7px;
+  //    width: 1px;
+  //    height: 10px;
+  //    background: #bbb;
+  //  }
+  //}
 }
 </style>

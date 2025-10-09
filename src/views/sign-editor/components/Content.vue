@@ -521,6 +521,7 @@ defineExpose({
 </template>
 
 <style lang="less" scoped>
+@import '@/style/vars';
 @import '@/style/transition';
 .pdf-preview__content {
   flex: 1;
@@ -559,7 +560,7 @@ defineExpose({
   width: var(--w);
   height: var(--h);
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(@primary-color, 0.08);
   border: 1px dashed var(--umo-primary-color);
   //.mouse-area__top, .mouse-area__bottom {
   //  width: var(--w);

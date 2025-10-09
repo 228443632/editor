@@ -112,7 +112,10 @@ defineExpose({
   <!--    ></t-icon>-->
   <!--  </div>-->
 
-  <ContentDragWrap v-model:node-data="_nodeData">
+  <ContentDragWrap
+    v-model:node-data="_nodeData"
+    @delete="__signContext__.removeParamsComp(_nodeData)"
+  >
     <ContentLineWrap
       ref="contentLineWrapRef"
       v-model:node-data="_nodeData"
@@ -134,7 +137,7 @@ defineExpose({
 <style scoped lang="less">
 .e-drager-top__handle {
   white-space: nowrap;
-  transform: translate(0, calc(-100% - 8px));
+  transform: translate(-2px, calc(-100% - 8px));
   background: #e5e5e5;
   border: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
