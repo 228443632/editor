@@ -91,27 +91,27 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div
-    v-if="_isActive"
-    class="absolute transform e-drager-top__handle shadow-md select-none"
-    :style="{
-      top: _nodeData.top + 'px',
-      left: _nodeData.left + 'px',
-    }"
-    @mousedown.stop="noop"
-  >
-    <span
-      class="cursor-pointer !hover:text-[var(--umo-primary-color)] flex-1"
-      @click="onApplyMultiPage"
-      >应用到多文件多页</span
-    >
-    <t-icon
-      name="delete"
-      size="14px"
-      class="cursor-pointer flex-none !hover:text-[var(--umo-primary-color)]"
-      @click="__signContext__.removeParamsComp(_nodeData)"
-    ></t-icon>
-  </div>
+  <!--  <div-->
+  <!--    v-if="_isActive"-->
+  <!--    class="absolute transform e-drager-top__handle shadow-md select-none"-->
+  <!--    :style="{-->
+  <!--      top: _nodeData.top + 'px',-->
+  <!--      left: _nodeData.left + 'px',-->
+  <!--    }"-->
+  <!--    @mousedown.stop="noop"-->
+  <!--  >-->
+  <!--    <span-->
+  <!--      class="cursor-pointer !hover:text-[var(&#45;&#45;umo-primary-color)] flex-1"-->
+  <!--      @click="onApplyMultiPage"-->
+  <!--      >应用到多文件多页</span-->
+  <!--    >-->
+  <!--    <t-icon-->
+  <!--      name="delete"-->
+  <!--      size="14px"-->
+  <!--      class="cursor-pointer flex-none !hover:text-[var(&#45;&#45;umo-primary-color)]"-->
+  <!--      @click="__signContext__.removeParamsComp(_nodeData)"-->
+  <!--    ></t-icon>-->
+  <!--  </div>-->
 
   <ContentDragWrap v-model:node-data="_nodeData">
     <ContentLineWrap

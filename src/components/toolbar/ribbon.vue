@@ -301,7 +301,7 @@
           <!--          </div>-->
           <div class="umo-virtual-group">
             <!--  分隔符 -->
-            <menus-toolbar-page-break />
+            <menus-toolbar-page-break v-if="!disableItem('pageBreakSymbol')"/>
             <!--  显示换行 -->
             <menus-toolbar-page-break-marks />
             <!--  显示行号 -->

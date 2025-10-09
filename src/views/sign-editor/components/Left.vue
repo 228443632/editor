@@ -8,7 +8,7 @@
 import testSignImgRaw from '@/assets/images/test-sign.svg?raw'
 import testSealImgRaw from '@/assets/images/test-seal.svg?raw'
 import type { IDragNodeParamsNode } from '@/views/doc-editor/extensions/extension/extension-drag-params.ts'
-// import type { TPrettifyString } from 'sf-utils2/types/generic-helper.ts'
+// import type { TObjectValueType } from 'sf-utils2/types/generic-helper.ts'
 import {
   COMP_PARAMS_NAME_MAP,
   COMP_SEAL_STYLE,
@@ -37,6 +37,12 @@ const dragMethod = {
    * @param e
    */
   dragStart(cItem: IDragNodeParamsNode, e: DragEvent) {
+    const valid = validateComp(cItem.type)
+    if (!valid) {
+      e.preventDefault()
+      return
+    }
+
     isDragging.value = true
 
     const nodeData = {
@@ -146,6 +152,35 @@ useEventListener(_embedPdfWrapRef, 'dragover', dragMethod.dragover)
 /* 方法 */
 
 /**
+ * 校验组件
+ */
+const validateComp = (type: IDragNodeParamsNode['type']) => {
+  if (type == COMP_PARAMS_NAME_MAP.compSeal) {
+    // 印章
+    // const compSignList = __signContext__.value._compSealList
+  } else if (type == COMP_PARAMS_NAME_MAP.compSignDate) {
+    // 签署日期
+    const compSignDateList = __signContext__.value._compSignDateList
+    if (compSignDateList?.length >= 1) {
+      useMessage('error', {
+        content: '只能添加一个签署日期',
+      })
+      return false
+    }
+  } else if (type == COMP_PARAMS_NAME_MAP.compSign) {
+    // 签名
+    const compSignList = __signContext__.value._compSignList
+    if (compSignList?.length >= 1) {
+      useMessage('error', {
+        content: '只能添加一个签名',
+      })
+      return false
+    }
+  }
+  return true
+}
+
+/**
  * 确定位置
  * @param x
  * @param y
@@ -204,6 +239,21 @@ defineExpose({
         @dragstart="dragMethod.dragStart({ type: 'compSign' }, $event)"
         @dragend="dragMethod.dragend"
       >
+        <t-tooltip
+          v-if="__signContext__._compSignList?.length >= 1"
+          theme="light"
+          placement="top"
+          :show-arrow="false"
+          destroy-on-close
+          content="签署控件最多只有一个"
+        >
+          <t-icon
+            name="error-circle"
+            class="text-warning absolute left-2 z-1 cursor-help"
+          ></t-icon>
+        </t-tooltip>
+
+        <!--        <info-circle-icon :fill-color='"transparent"' :stroke-color='"currentColor"' :stroke-width="2"/>-->
         <div class="w-88px h-23px rounded-full" v-html="testSignImgRaw" />
       </div>
 
@@ -214,6 +264,20 @@ defineExpose({
         @dragstart="dragMethod.dragStart({ type: 'compSignDate' }, $event)"
         @dragend="dragMethod.dragend"
       >
+        <t-tooltip
+          v-if="__signContext__._compSignDateList?.length >= 1"
+          theme="light"
+          placement="top"
+          content="签署日期控件最多只有一个"
+          :show-arrow="false"
+          destroy-on-close
+        >
+          <t-icon
+            name="error-circle"
+            class="text-warning absolute left-2 z-1 cursor-help"
+          ></t-icon>
+        </t-tooltip>
+
         <div class="h-23px flex-center">签署日期</div>
       </div>
     </div>
@@ -240,7 +304,8 @@ defineExpose({
   justify-content: center;
   cursor: move;
   user-select: none;
-  padding: 8px 0;
+  padding: 8px 20px;
+  position: relative;
   border: 1px solid #e1e4eb;
   border-radius: 4px;
   background: #fff;

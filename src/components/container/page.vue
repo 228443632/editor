@@ -123,7 +123,7 @@
     <!-- 搜索 -->
     <container-search-replace />
     <!-- 打印 -->
-    <container-print />
+    <!--    <container-print />-->
   </div>
 </template>
 

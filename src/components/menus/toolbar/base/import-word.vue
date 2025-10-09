@@ -14,31 +14,27 @@ const editor = inject('editor')
 const options = inject('options')
 const $options = options.value.toolbar.importWord
 
+const mammoth = shallowRef()
+
 // 动态导入 mammoth.js
 onMounted(() => {
-  const mammothScriptElement = document.querySelector('#mammoth-script')
-  if (mammothScriptElement === null && $options.enabled) {
-    const style = document.createElement('script')
-    style.src = `${options.value.cdnUrl}/libs/mammoth/mammoth.browser.min.js`
-    style.id = 'mammoth-script'
-    document.querySelector('head')?.append(style)
-  }
+  // const mammothScriptElement = document.querySelector('#mammoth-script')
+  // if (mammothScriptElement === null && $options.enabled) {
+  //   const style = document.createElement('script')
+  //   style.src = `${options.value.cdnUrl}/libs/mammoth/mammoth.browser.min.js`
+  //   style.id = 'mammoth-script'
+  //   document.querySelector('head')?.append(style)
+  // }
 })
 
-const importWord = () => {
-  // @ts-expect-error, global variable injected by script
-  if (!mammoth) {
-    const dialog = useAlert({
-      attach: container,
-      theme: 'warning',
-      header: t('base.importWord.loadScript.title'),
-      body: t('base.importWord.loadScript.message'),
-      onConfirm() {
-        dialog.destroy()
-      },
-    })
-    return
+const importMammoth = async () => {
+  if (!mammoth.value) {
+    mammoth.value = (await import('mammoth'))?.default
   }
+}
+
+const importWord = async () => {
+  await importMammoth()
   const { open, onChange } = useFileDialog({
     accept: '.docx',
     reset: true,
@@ -95,8 +91,7 @@ const importWord = () => {
       return
     }
 
-    // @ts-expect-error, global variable injected by script
-    if (!mammoth) {
+    if (!mammoth.value) {
       return
     }
     // 使用 Mammoth 导入
@@ -122,8 +117,7 @@ const importWord = () => {
         "p[style-name='code'] => pre.preCode > code:fresh",
       ],
     }
-    // @ts-expect-error, global variable injected by script
-    const { messages, value } = await mammoth.convertToHtml(
+    const { messages, value } = await mammoth.value.convertToHtml(
       { arrayBuffer },
       {
         ...customOptions,

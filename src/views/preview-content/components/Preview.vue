@@ -9,12 +9,9 @@ import Content from './Content.vue'
 import { noop } from 'sf-utils2'
 // import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
-import domtoimage from 'dom-to-image-more'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 // import { saveAs } from 'file-saver'
 import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
-
-console.log('domtoimage', domtoimage)
 
 const props = defineProps({
   /**
@@ -39,7 +36,7 @@ const props = defineProps({
   paramsCompList: {
     type: Array,
     default: () => [],
-  }
+  },
 })
 const emit = defineEmits({})
 

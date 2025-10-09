@@ -17,6 +17,7 @@ import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignD
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 // import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 /* 状态 */
@@ -256,7 +257,7 @@ const onKeyDownRoot = (e: KeyboardEvent) => {
  * 分页数量
  */
 const _pageNumsList = computed(() =>
-  doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
+  doc.value ? [...Array(doc.value?.numPages + 1).keys()].slice(1) : [],
 )
 
 /**
@@ -279,6 +280,20 @@ const _embedItemStyle = computed(() => {
  */
 const _initial = computed(() => {
   return initialProgress.value == 1 && _pageNumsList.value.length > 0
+})
+
+/**
+ * pdf 包裹样式
+ */
+const _pdfEmbedWrapStyle = computed(() => {
+  const [pageDOM] = pageRefs.value
+  if (!pageDOM || !doc.value?.numPages) return {}
+  return {
+    // height: `${
+    //   pageDOM.offsetHeight * doc.value?.numPages +
+    //   pageUtils.perPageGap * (doc.value?.numPages - 1)
+    // }px`,
+  }
 })
 
 /* 监听 */
@@ -380,7 +395,11 @@ defineExpose({
     tabindex="10"
   >
     <!--    {{ __signContext__._paramsCompList }}-->
-    <div ref="embedPdfWrapRef" class="pdf-embed__wrap">
+    <div
+      ref="embedPdfWrapRef"
+      class="pdf-embed__wrap"
+      :style="_pdfEmbedWrapStyle"
+    >
       <!-- 加载成功 -->
       <template v-if="_initial">
         <!--  激活的组件虚线   -->

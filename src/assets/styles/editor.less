@@ -1,8 +1,13 @@
-@import '@/assets/styles/_mixins.less';
+@import './_mixins.less';
 
 :root[mode='print'] {
   .print-hidden {
     display: none;
+  }
+  .is-empty.is-editor-empty {
+    &:after {
+      display: none;
+    }
   }
 }
 

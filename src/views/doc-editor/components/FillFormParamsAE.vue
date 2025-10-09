@@ -8,7 +8,7 @@
 // import {useVModel} from '@vueuse/core'
 // import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
 import type { TableProps, TableRowData } from 'tdesign-vue-next'
-import Print from './Print.vue'
+import type Print from '@/components/container/print.vue'
 import { saveAs } from 'file-saver'
 
 const { proxy } = getCurrentInstance()
@@ -16,10 +16,12 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
-const printRef = ref<InstanceType<typeof Print>>()
 const visible = reactive({
   dialog: false,
 })
+const __printRef__ = inject('__printRef__') as InjectionKey<
+  InstanceType<typeof Print>
+>
 const formData = ref({})
 const tableInfo = ref<TableProps>({
   columns: [
@@ -66,7 +68,7 @@ function onDownHtml() {
     useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
     return
   }
-  const html = printRef.value.getPrintPageHtml(fillFieldData)
+  const html = __printRef__.value.getPrintPageHtml(fillFieldData)
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -78,7 +80,6 @@ function onDownHtml() {
  * 导出html
  */
 function onDownTemplateHtml() {
-  const html = printRef.value.getPrintPageHtml(null)
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -151,7 +152,6 @@ defineExpose({
         >
       </div>
     </template>
-    <Print ref="printRef"></Print>
   </modal>
 </template>
 

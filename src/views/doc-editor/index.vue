@@ -25,7 +25,7 @@ import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
-import Print from '@/views/doc-editor/components/Print.vue'
+import Print from '@/components/container/print.vue'
 import { blobToBase64, fileToBase64 } from 'file64'
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
@@ -114,6 +114,7 @@ const options = $ref(
           'watermark',
           'background',
           'preview',
+          'pageBreakSymbol',
 
           // 导出
           'share',
@@ -174,6 +175,7 @@ const options = $ref(
        */
       async onFileUpload(file: File & { url?: string }) {
         if (!file) {
+          // useMessage('error', { content: '没有找到要上传的文件' })
           throw new Error('没有找到要上传的文件')
         }
 
@@ -182,8 +184,20 @@ const options = $ref(
 
         let fileUrl = undefined
         if (file.url) {
-          const [blob, err] = await to(getHttpBlob(file.url))
-          if (!err && blob) fileUrl = await blobToBase64(blob as Blob)
+          // 发起GET请求（fetch默认是GET方法）
+          const [response, err] = (await to(fetch(file.url))) as unknown as [
+            Response,
+            Error,
+          ]
+          // 检查请求是否成功（状态码200-299）
+          if (!response?.ok || err) {
+            // useMessage('error', { content: '图片转化失败，请手动上传图片' })
+            throw new Error(`图片转化失败，请手动上传图片`)
+          }
+          // 将响应体转换为ArrayBuffer
+          const arrayBuffer = await response.arrayBuffer()
+          const blob = new Blob([arrayBuffer], { type: file.type })
+          fileUrl = await blobToBase64(blob)
         }
 
         return {
@@ -285,7 +299,12 @@ window['pageDocEditor'] = {
 
   /** 右侧模版字段库组件实例 */
   rightParamsLibRef,
+
+  /** 选项*/
+  options,
 }
+
+provide('__printRef__', printRef)
 </script>
 
 <!-- render -->

@@ -15,7 +15,11 @@ import Footer from './components/Footer.vue'
 import { deepClone, noop, uuid } from 'sf-utils2'
 import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
-import { isInIframe } from '@/views/doc-editor/utils/common-util.ts' // 头部
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+import {
+  COMP_PARAMS_CONFIG_MAP,
+  COMP_PARAMS_NAME_MAP,
+} from '@/views/doc-editor/extensions/constant.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -85,6 +89,33 @@ const signContext = ref({
     const paramsCompList = signContext.value.paramsCompList || []
     return pageUtils.expandCompParams(paramsCompList)
   }),
+
+  /**
+   * 签名组件
+   */
+  _compSealList: computed(() =>
+    signContext.value.paramsCompList.filter(
+      (item) => item.type == COMP_PARAMS_NAME_MAP.compSeal,
+    ),
+  ),
+
+  /**
+   * 印章
+   */
+  _compSignList: computed(() => {
+    return signContext.value.paramsCompList.filter((item) => {
+      return item.type == COMP_PARAMS_NAME_MAP.compSign
+    })
+  }),
+
+  /**
+   * 签署日期
+   */
+  _compSignDateList: computed(() =>
+    signContext.value.paramsCompList.filter(
+      (item) => item.type == COMP_PARAMS_NAME_MAP.compSignDate,
+    ),
+  ),
 
   /**
    * 移除参数组件

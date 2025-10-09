@@ -53,35 +53,35 @@ const isDragging = ref(false)
 const fillFormParamsAERef = ref<InstanceType<typeof FillFormParamsAE>>()
 
 const defaultTpFields = ref([
+  // {
+  //   label: '其他',
+  //   children: [
+  //     {
+  //       type: 'seal',
+  //       value: 'compSeal',
+  //       getAttrs() {
+  //         return {
+  //           'data-id': commonUtil.simpleUUID(),
+  //           fieldName: 'idcard',
+  //           placeholder: '印章',
+  //         }
+  //       },
+  //     },
+  //     {
+  //       type: 'sign',
+  //       value: 'compSign',
+  //       getAttrs() {
+  //         return {
+  //           'data-id': commonUtil.simpleUUID(),
+  //           fieldName: 'idcard',
+  //           placeholder: '签名',
+  //         }
+  //       },
+  //     },
+  //   ],
+  // },
   {
-    label: '其他',
-    children: [
-      {
-        type: 'seal',
-        value: 'compSeal',
-        getAttrs() {
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'idcard',
-            placeholder: '印章',
-          }
-        },
-      },
-      {
-        type: 'sign',
-        value: 'compSign',
-        getAttrs() {
-          return {
-            'data-id': commonUtil.simpleUUID(),
-            fieldName: 'idcard',
-            placeholder: '签名',
-          }
-        },
-      },
-    ],
-  },
-  {
-    label: '测试',
+    label: '测试（dev环境可见）',
     children: [
       {
         label: '获取HTML',
@@ -425,7 +425,7 @@ defineExpose({
       <section v-for="item in _tpFields" :key="item.uid" class="umo-pr-group">
         <div class="umo-pr-group__title">{{ item.label }}</div>
 
-        <ul class="grid 2xl:grid-cols-3 container grid-cols-2 gap-12px !mt-8px">
+        <ul class="grid container grid-cols-2 gap-12px !mt-8px">
           <li
             v-for="cItem in item.children"
             :key="cItem.uid"

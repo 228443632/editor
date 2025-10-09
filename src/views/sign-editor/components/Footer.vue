@@ -11,10 +11,20 @@ const emit = defineEmits([])
 
 /* 状态 */
 const __signContext__ = inject('__signContext__') // 预览上下文
+const __activePageNum__ = inject('__activePageNum__')
 
 const showUseWidget = ref(false)
 
+const currentPageNum = ref(__signContext__.value.anchorInfo?.active)
+
 /* 方法 */
+
+/**
+ * 页码
+ */
+const onChangePageNum = () => {
+  __activePageNum__.value = currentPageNum.value
+}
 
 /**
  * 选择使用控件
@@ -129,7 +139,7 @@ defineExpose({
                 </div>
               </template>
               <div v-else class="min-h-100px flex-center text-12px">
-                <t-empty>
+                <t-empty image-style="color: #999">
                   <template #title
                     ><span class="text-12px">暂无数据</span></template
                   >
@@ -149,6 +159,17 @@ defineExpose({
           __signContext__.contentPageNums
         }}</span></span
       >
+      <span class="inline-flex items-center gap-1">
+        <span class="flex-none">跳转至</span>
+        <t-input
+          v-model="currentPageNum"
+          size="small"
+          class="!w-62px"
+          @blur="onChangePageNum"
+          @enter="onChangePageNum"
+        ></t-input>
+        <span>页</span>
+      </span>
     </div>
   </div>
 </template>

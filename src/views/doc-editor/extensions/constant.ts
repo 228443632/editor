@@ -40,6 +40,7 @@ export const COMP_PARAMS_NAME_MAP = {
   compTextareaDrag: 'compTextareaDrag',
   compSign: 'compSign',
   compSeal: 'compSeal',
+  compSignDate: 'compSignDate',
 } as const
 
 /**

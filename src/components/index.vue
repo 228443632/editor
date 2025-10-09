@@ -82,7 +82,6 @@ import {
   isRecord,
   isString,
 } from '@tool-belt/type-predicates'
-import domToImage from 'dom-to-image-more'
 // import modernScreenshot from 'modern-screenshot'
 import type {
   DialogOptions,
@@ -117,8 +116,6 @@ import { shortId } from '@/utils/short-id'
 
 import ruConfig from '../locales/tdesign/ru-RU'
 import { omit } from 'sf-utils2'
-
-const { toBlob, toJpeg, toPng } = domToImage
 
 defineOptions({ name: 'UmoEditor' })
 
@@ -208,6 +205,7 @@ const layoutDom = ref({
 // const bookmark = ref(false)
 const destroyed = ref(false)
 const tocActive = ref('params') // 目录选中值
+const modernScreenshot = shallowRef()
 
 const getWholeHtml = ref<
   (
@@ -727,6 +725,12 @@ const setDocument = (params: DocumentOptions) => {
   }
 }
 
+const importModernScreenshot = async () => {
+  if (!modernScreenshot.value) {
+    modernScreenshot.value = (await import('modern-screenshot'))?.default
+  }
+}
+
 // Content Methods
 const setContent = (
   content: SetContentType,
@@ -823,6 +827,7 @@ const getI18n = () => i18n
 
 // Export Methods
 const getImage = async (format: 'blob' | 'jpeg' | 'png' = 'blob') => {
+  await importModernScreenshot()
   const { zoomLevel } = page.value
   try {
     page.value.zoomLevel = 100
@@ -830,13 +835,13 @@ const getImage = async (format: 'blob' | 'jpeg' | 'png' = 'blob') => {
       `${container} .umo-page-content`,
     ) as HTMLElement
     if (format === 'blob') {
-      return await toBlob(node)
+      return await modernScreenshot.value.domToBlob(node)
     }
     if (format === 'jpeg') {
-      return await toJpeg(node)
+      return await modernScreenshot.value.domToJpeg(node)
     }
     if (format === 'png') {
-      return await toPng(node)
+      return await modernScreenshot.value.domToPng(node)
     }
   } catch {
     throw new Error(t('export.image.error.message'))

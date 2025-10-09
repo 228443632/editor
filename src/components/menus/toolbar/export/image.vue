@@ -10,19 +10,27 @@
 </template>
 
 <script setup lang="ts">
-import domtoimage from 'dom-to-image-more'
+// import domtoimage from 'dom-to-image-more'
 import { saveAs } from 'file-saver'
 
-const { toBlob } = domtoimage
+// const { toBlob } = domtoimage
 const container = inject('container')
 const exportFile = inject('exportFile')
 const page = inject('page')
 const options = inject('options')
 
+const modernScreenshot = shallowRef()
+
 const formats = [
   { content: t('export.image.png'), value: 'png' },
   { content: t('export.image.jpg'), value: 'jpg' },
 ]
+
+const importModernScreenshot = async () => {
+  if (!modernScreenshot.value) {
+    modernScreenshot.value = (await import('modern-screenshot'))?.default
+  }
+}
 
 const saveImage = async ({
   content,
@@ -34,6 +42,7 @@ const saveImage = async ({
   if (!content) {
     return
   }
+  await importModernScreenshot()
   const { zoomLevel } = page.value
   exportFile.value.image = true
   try {
@@ -42,7 +51,9 @@ const saveImage = async ({
     const node = document.querySelector(
       `${container} .umo-page-content`,
     ) as HTMLElement
-    const blob = await toBlob(node, { scale: devicePixelRatio })
+    const blob = await modernScreenshot.value.domToBlob(node, {
+      scale: devicePixelRatio,
+    })
     const { title } = options.value.document ?? {}
     const filename =
       title !== '' ? options.value?.document?.title : t('document.untitled')
@@ -50,7 +61,7 @@ const saveImage = async ({
       blob,
       `${filename}${devicePixelRatio > 1 ? `@${devicePixelRatio}x` : ''}.${value}`,
     )
-  } catch(e) {
+  } catch (e) {
     console.log(e)
     const dialog = useAlert({
       attach: container,

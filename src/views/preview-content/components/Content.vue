@@ -14,6 +14,7 @@ import ContentCompSignDate from '@/views/preview-content/components/ContentCompS
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -80,6 +81,20 @@ const _embedItemStyle = computed(() => {
     ...__previewPdfStyle__.value,
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
     // padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
+  }
+})
+
+/**
+ * 根节点样式
+ */
+const _rootStyle = computed(() => {
+  const [pageDOM] = pageRefs.value
+  if (!pageDOM || !doc.value?.numPages) return {}
+  return {
+    // height: `${
+    //   pageDOM.offsetHeight * doc.value.numPages +
+    //   pageUtils.perPageGap * (doc.value.numPages - 1)
+    // }px`,
   }
 })
 
@@ -233,6 +248,7 @@ defineExpose({
     ]"
     :style="{
       '--per-page-gap': __previewContext__.isExporting ? '0px' : '12px',
+      ..._rootStyle,
     }"
   >
     <!-- 内容区 -->
