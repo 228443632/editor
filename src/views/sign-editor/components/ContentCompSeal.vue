@@ -31,9 +31,6 @@ const __signContext__ = inject('__signContext__') // 预览上下文
 const contentLineWrapRef = ref<InstanceType<typeof ContentLineWrap>>()
 const contentDragWrapRef = ref<InstanceType<typeof ContentDragWrap>>()
 
-const { width: contentDragWrapWidth } = useElementBounding(
-  computed(() => contentDragWrapRef.value?.dragerRef),
-)
 /* 方法 */
 
 /**
@@ -101,8 +98,8 @@ defineExpose({
     :style="{
       top: _nodeData.top + 'px',
       left: _nodeData.left + 'px',
-      width: contentDragWrapWidth + 'px',
-      '--y': (contentDragWrapRef?.translateY || 0) + 'px',
+      width: contentDragWrapRef?.dragerWidth + 'px',
+      '--y': (_nodeData.translateY || 0) + 'px',
     }"
     @mousedown.stop="noop"
   >
@@ -114,9 +111,9 @@ defineExpose({
   </div>
 
   <ContentDragWrap
+    ref="contentDragWrapRef"
     v-model:node-data="_nodeData"
     @delete="__signContext__.removeParamsComp(_nodeData)"
-    ref="contentDragWrapRef"
   >
     <ContentLineWrap
       ref="contentLineWrapRef"

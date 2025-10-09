@@ -58,11 +58,13 @@ export function useMouseDragLine(
 
   const mouseup = (e: MouseEvent) => {
     if (!_containerEl.value) return
-    _mEventContainerEl.value.removeEventListener('mousemove', throttleMousemove)
+    _mouseEventContainerEl.value.removeEventListener(
+      'mousemove',
+      throttleMousemove,
+    )
     document.body.removeEventListener('mouseup', mouseup)
     endX.value = e.clientX - containerBound.left.value
     endY.value = e.clientY - containerBound.top.value
-    console.log('卸载了')
     setTimeout(async () => {
       isMoving.value = false
       await Promise.resolve()
@@ -77,7 +79,6 @@ export function useMouseDragLine(
     if (!_containerEl.value) return
     startX.value = e.clientX - containerBound.left.value
     startY.value = e.clientY - containerBound.top.value
-    console.log('卸载了开始')
     mouseEventContainerRef.value.addEventListener(
       'mousemove',
       throttleMousemove,
@@ -87,8 +88,10 @@ export function useMouseDragLine(
 
   const click = (e: MouseEvent) => {
     if (e.target !== _containerEl.value) return
-    console.log('click', e)
-    _mEventContainerEl.value.removeEventListener('mousemove', throttleMousemove)
+    _mouseEventContainerEl.value.removeEventListener(
+      'mousemove',
+      throttleMousemove,
+    )
     document.body.removeEventListener('mouseup', mouseup)
   }
 
@@ -100,7 +103,7 @@ export function useMouseDragLine(
   const _height = computed<number>(() => endY.value - startY.value)
 
   const _containerEl = computed(() => unrefElement(containerRef))
-  const _mEventContainerEl = computed(() =>
+  const _mouseEventContainerEl = computed(() =>
     unrefElement(mouseEventContainerRef),
   )
 

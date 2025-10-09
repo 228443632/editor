@@ -30,12 +30,28 @@ export const pageUtils = {
    */
   getPageOffsetTopByTop(top: number) {
     const mt = pageUtils.perPageGap
-    const pageNum = pageUtils.getPageNumByTop(top)
+    let pageNum = pageUtils.getPageNumByTop(top)
+    if (pageNum < 1) pageNum = 1
     return {
       offsetTop: top - (pageNum - 1) * a4._basePx.h - (pageNum - 1) * mt,
       pageNum,
     }
   },
+
+  /**
+   * 根据top获取当前所处的页页的偏移量 offsetTop
+   * @param top
+   * TODO
+   */
+  // getPageOffsetTopByY(top: number) {
+  //   const mt = pageUtils.perPageGap
+  //   let pageNum = pageUtils.getPageNumByTop(top)
+  //   if (pageNum < 1) pageNum = 1
+  //   return {
+  //     offsetTop: top - (pageNum - 1) * a4._basePx.h - (pageNum - 1) * mt,
+  //     pageNum,
+  //   }
+  // },
 
   /**
    * 根据top 获取页码
@@ -58,11 +74,17 @@ export const pageUtils = {
       return paramsCompListClone
     }
     return paramsCompListClone.map((item) => {
+      item.translateY = 0
       item.isInRect = false
       item.key ||= uuid()
+      item.width ??= 0
+      item.height ??= 0
       const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
-      item.offsetTop = offsetTop
       item.offsetLeft = item.left
+      item.offsetTop = offsetTop
+
+      item.offsetX = ~~(item.offsetLeft + item.width / 2)
+      item.offsetY = ~~(item.offsetTop + item.height / 2)
       item.pageNum = pageNum
       return item
     }) as IParamsCompItem[]
@@ -81,6 +103,7 @@ export const pageUtils = {
     const retainFieldObj = arrayToObj(retainField)
     return deepClone(paramsCompList || [])
       .map((item) => {
+        item.translateY = 0
         item.isInRect = false
         item.key ||= uuid()
         item.top =
@@ -91,5 +114,28 @@ export const pageUtils = {
         return item
       })
       .filter((item) => retainFieldObj[item.type])
+  },
+
+  /**
+   * 纠正位置
+   * @param item
+   */
+  correctPos(item: IParamsCompItem) {
+    const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
+    const pageWidth = a4._basePx.w
+    const pageHeight = a4._basePx.h
+
+    const right = item.left + item.width
+    const bottom = offsetTop + item.height
+    const left = item.left
+    const top = offsetTop
+
+    if (left < 0) item.left = 0
+    if (top < 0) item.top = pageUtils.getAbsoluteTopByPageNum(pageNum)
+    if (right > pageWidth) item.left = pageWidth - item.width
+    if (bottom > pageHeight)
+      item.top =
+        pageHeight - item.height + pageUtils.getAbsoluteTopByPageNum(pageNum)
+    return item
   },
 }

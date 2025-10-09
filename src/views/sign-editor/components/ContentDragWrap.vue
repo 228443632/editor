@@ -8,6 +8,7 @@
 import Drager from 'es-drager'
 import { rafThrottle, def } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -18,16 +19,35 @@ const props = defineProps({
     type: Object as PropType<IParamsCompItem>,
     default: () => ({}),
   },
+
+  /**
+   * 是否校准位置
+   */
+  isCorrectPos: {
+    type: Boolean,
+    default: true,
+  },
+
+  /**
+   * 是否展示删除
+   */
+  isShowDelete: {
+    type: Boolean,
+    default: true,
+  },
 })
 const emit = defineEmits(['delete'])
 
 /* 状态 */
 const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
+_nodeData.value.translateX ??= 0
+_nodeData.value.translateY ??= 0
 const __signContext__ = inject('__signContext__') // 预览上下文
 const attrs = useAttrs()
 const scrollViewRef = computed(() => __signContext__.value.contentElRef)
 const dragerRef = ref<InstanceType<typeof Drager>>()
-const translateY = ref(0)
+const { width: dragerWidth, height: dragerHeight } =
+  useElementBounding(dragerRef)
 
 /* 方法 */
 
@@ -46,39 +66,57 @@ const rafThrottleOnDrag = rafThrottle(onDrag)
  * 选择节点
  */
 const onSelectNode = (startE: MouseEvent) => {
-  const inRectNums = __signContext__.value.paramsCompList.filter(
+  const inRectList = __signContext__.value.paramsCompList.filter(
     (item) => item.isInRect,
   )
 
-  if (inRectNums?.length > 1) {
-    // 多个
-    inRectNums.forEach((item) => {
-      def(item, '_snapshotLeft', item.left)
-      def(item, '_snapshotTop', item.top)
-    })
-    scrollViewRef.value.addEventListener('mousemove', mousemove)
-    scrollViewRef.value.addEventListener('mouseup', mouseup)
-    return
-  }
-  __signContext__.value.selectParamsComp(_nodeData.value)
+  onDragStart()
 
+  scrollViewRef.value.addEventListener('mousemove', mousemove)
+  document.body.addEventListener('mouseup', mouseup)
+
+  inRectList.forEach((item) => {
+    def(item, '_snapshotLeft', item.left)
+    def(item, '_snapshotTop', item.top)
+  })
+
+  if (inRectList?.length > 1) {
+    // 多个
+  } else {
+    __signContext__.value.selectParamsComp(_nodeData.value)
+  }
+
+  /**
+   * 鼠标移动
+   * @param e
+   */
   function mousemove(e: MouseEvent) {
     const diffX = e.clientX - startE.clientX
     const diffY = e.clientY - startE.clientY
     updateInRectTopLeft(diffX, diffY)
   }
 
+  /**
+   * 拖拽结束
+   * @param e
+   */
   function mouseup(e: MouseEvent) {
     scrollViewRef.value.removeEventListener('mousemove', mousemove)
-    scrollViewRef.value.removeEventListener('mouseup', mouseup)
+    document.body.removeEventListener('mouseup', mouseup)
 
     const diffX = e.clientX - startE.clientX
     const diffY = e.clientY - startE.clientY
     updateInRectTopLeft(diffX, diffY)
+    onDragEnd()
   }
 
+  /**
+   * 批量更新 位置 left top
+   * @param diffX
+   * @param diffY
+   */
   function updateInRectTopLeft(diffX: number, diffY: number) {
-    inRectNums.forEach((item) => {
+    inRectList.forEach((item) => {
       item.left = item._snapshotLeft + diffX
       item.top = item._snapshotTop + diffY
     })
@@ -93,20 +131,32 @@ function onScroll(event: Event) {
   const target = scrollViewRef.value as HTMLElement
   if (onScroll._oldScrollTop === target.scrollTop) return
   const diffH = target.scrollTop - onScroll._oldScrollTop
-  // _nodeData.value.top = _nodeData.value.top + diffH
-  translateY.value = translateY.value + diffH
+
+  // update
+  _nodeData.value.translateY = _nodeData.value.translateY + diffH
+  __signContext__.value.paramsCompList.forEach((item) => {
+    if (item.isInRect && item.key != _nodeData.value.key) {
+      item.translateY = item.translateY + diffH
+    }
+  })
   onScroll._oldScrollTop = target.scrollTop
 }
 onScroll._oldScrollTop = scrollViewRef.value.scrollTop
-
 const rafThrottleOnScroll = rafThrottle(onScroll)
 
+/**
+ * 添加滚动监听
+ */
 function addScrollListener() {
   if (!scrollViewRef.value) return
   removeScrollListener()
   onScroll._oldScrollTop = scrollViewRef.value.scrollTop
   scrollViewRef.value.addEventListener('scroll', rafThrottleOnScroll)
 }
+
+/**
+ * 移除滚动监听
+ */
 function removeScrollListener() {
   if (!scrollViewRef.value) return
   scrollViewRef.value.removeEventListener('scroll', rafThrottleOnScroll)
@@ -123,9 +173,26 @@ function onDragStart() {
  * 拖拽结束
  */
 function onDragEnd() {
-  _nodeData.value.top = _nodeData.value.top + translateY.value
-  translateY.value = 0
+  _nodeData.value.top = _nodeData.value.top + _nodeData.value.translateY
+  _nodeData.value.translateY = 0
   removeScrollListener()
+
+  correctPosList()
+}
+
+/**
+ * 调整正确位置
+ */
+function correctPosList() {
+  // 更正位置
+  if (props.isCorrectPos) {
+    pageUtils.correctPos(_nodeData.value)
+    inRectParamsList.value.forEach((item) => {
+      if (item.key != _nodeData.value.key) {
+        pageUtils.correctPos(item)
+      }
+    })
+  }
 }
 
 /* 计算 */
@@ -136,7 +203,19 @@ const _isActive = computed(() => {
   return __signContext__.value.activeCompParam?.key == _nodeData.value.key
 })
 
+/**
+ * 处于rect内
+ */
+const inRectParamsList = computed(() =>
+  __signContext__.value.paramsCompList.filter((item) => item.isInRect),
+)
+
 /* 监听 */
+
+watchEffect(() => {
+  _nodeData.value.width = dragerWidth.value || 0
+  _nodeData.value.height = dragerHeight.value || 0
+})
 
 /* 周期 */
 onMounted(() => {})
@@ -147,7 +226,9 @@ defineExpose({
 
   dragerRef,
 
-  translateY
+  dragerWidth,
+
+  dragerHeight,
 })
 </script>
 
@@ -156,7 +237,7 @@ defineExpose({
   <span
     class="e-drager-wrap"
     :style="{
-      '--y': translateY + 'px',
+      '--y': _nodeData.translateY + 'px',
     }"
   >
     <Drager
@@ -173,9 +254,8 @@ defineExpose({
       :min-width="14"
       :min-height="14"
       :disabled="_nodeData.isInRect"
-      @drag-start="onDragStart"
-      @drag-end="onDragEnd"
-      :z-index="10"
+      @dragend="onDragEnd"
+      :z-index="11"
       :class="[
         'is-draggable',
         _isActive ? 'inline-wrap--active' : 'line-wrap--inactive',
@@ -186,13 +266,29 @@ defineExpose({
       @mousedown.stop="onSelectNode"
     >
       <template #default>
-        <span class="line-wrap__delete" @click="emit('delete')">
-          <t-icon name="delete" size="12px" class="text-white"></t-icon>
-        </span>
+        <t-tooltip
+          v-if="isShowDelete"
+          theme="light"
+          placement="top"
+          :show-arrow="false"
+          destroy-on-close
+          content="删除"
+        >
+          <span class="line-wrap__delete" @click="emit('delete')">
+            <t-icon name="delete" size="12px" class="text-white"></t-icon>
+          </span>
+        </t-tooltip>
         <slot></slot>
         <div class="line-wrap__locate">
           <div class="locate__item">X: {{ ~~_nodeData.left }}</div>
           <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>
+
+          <!--           <div class="locate__item">-->
+          <!--            X: {{ ~~_nodeData.left + ~~(dragerWidth / 2) }}-->
+          <!--          </div>-->
+          <!--          <div class="locate__item">-->
+          <!--            Y: {{ ~~_nodeData.top + ~~(dragerHeight / 2) }}-->
+          <!--          </div>-->
         </div>
       </template>
     </Drager>
@@ -212,6 +308,7 @@ defineExpose({
   top: 0;
   width: fit-content;
   height: fit-content;
+  z-index: 11;
 }
 
 :deep {
@@ -233,41 +330,48 @@ defineExpose({
   outline: none;
 }
 
-.es-drager.es-drager.inline-wrap--active {
+.es-drager.es-drager.inline-wrap--active,
+.es-drager.line-wrap--in-rect {
   outline: 2px solid var(--umo-primary-color);
-  box-shadow: 0 0 8px rgba(@primary-color, 0.4);
+  box-shadow: 0 0 10px rgba(@primary-color, 0.6);
   background: white;
 }
 
 .line-wrap--inactive {
   outline: 1px dashed @primary-color;
 }
-.line-wrap--in-rect {
-  outline: solid 2px var(--umo-primary-color);
+
+.line-wrap--in-rect,
+.inline-wrap--active {
+  .line-wrap__locate {
+    background-color: rgba(@primary-color, 1);
+  }
 }
 
 .line-wrap__delete {
   @apply bg-error flex items-center justify-center p-1 rounded-full absolute right-0 top-0;
   transform: translate(50%, -50%);
   cursor: pointer;
-  z-index: 10;
+  z-index: 100;
 }
 
 .line-wrap__locate {
+  white-space: nowrap;
   position: absolute;
   top: calc(100% + 1px);
   left: -1px;
   box-sizing: border-box;
-  width: calc(100% + 2px);
-  padding: 4px 6px;
+  min-width: calc(100% + 2px);
+  padding: 2px 6px;
   font-size: 14px;
   line-height: 20px;
   color: #fff;
+  user-select: none;
   background-color: #595959;
   opacity: 0.9;
   display: flex;
+  gap: 16px;
   flex-direction: row;
-  flex-wrap: wrap;
   .locate__item {
     flex: 1;
     text-align: center;
