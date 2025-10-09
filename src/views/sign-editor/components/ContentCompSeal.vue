@@ -81,9 +81,7 @@ watch([() => _nodeData.value.top, () => _nodeData.value.left], () => {
 })
 
 /* 周期 */
-onMounted(() => {
-
-})
+onMounted(() => {})
 
 /* 暴露 */
 defineExpose({

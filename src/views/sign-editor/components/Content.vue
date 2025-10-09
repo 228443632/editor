@@ -17,7 +17,6 @@ import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignD
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
-import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 // import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 /* 状态 */
@@ -267,7 +266,6 @@ const _embedItemStyle = computed(() => {
   return {
     width: '210mm',
     height: '297mm',
-    overflow: 'hidden',
     // width: `${a4._basePx.w}px`,
     // height: `${a4._basePx.h}px`,
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
@@ -445,11 +443,12 @@ defineExpose({
               :page="pageNum"
               @rendered="onRendered(pageNum)"
             />
+            <div class="pdf-embed__item-pagenum">{{ pageNum }}</div>
           </div>
         </template>
 
         <!-- 参数悬浮 -->
-        <div class="contents" :key="paramsCompPatchKey">
+        <div :key="paramsCompPatchKey" class="contents">
           <div
             v-for="(item, index) in __signContext__._paramsCompList"
             :key="item.key"
@@ -580,6 +579,7 @@ defineExpose({
 .pdf-embed__item {
   margin: 0 auto;
   user-select: none;
+  position: relative;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
   break-after: avoid;
@@ -588,6 +588,21 @@ defineExpose({
   }
   &.is-last {
     break-after: auto;
+  }
+
+  .pdf-embed__item-pagenum {
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 2px 8px;
+    font-size: 14px;
+    position: absolute;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    right: -8px;
+    bottom: 0;
+    transform: translateX(100%);
+    border-radius: 4px;
   }
 }
 </style>

@@ -5,8 +5,7 @@
  */
 import type { Dispatch, Editor } from '@tiptap/core'
 import { PageBreakBaseDom } from '@/views/doc-editor/utils/page-break-base-dom'
-import { addRow } from '@tiptap/pm/tables'
-import { type EditorState, TextSelection } from '@tiptap/pm/state'
+import { type EditorState } from '@tiptap/pm/state'
 
 export class PageBreak extends PageBreakBaseDom {
   constructor(editor: Editor) {

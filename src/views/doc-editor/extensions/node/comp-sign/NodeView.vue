@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, to } from 'sf-utils2'
+import { deepClone } from 'sf-utils2'
 import { getNumString } from 'sf-utils2/lib/_helperNumber'
 import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
 import { onClickOutside } from '@vueuse/core'
@@ -413,6 +413,7 @@ defineExpose()
         :height="Number(_dragAttrs.height)"
         :left="Number(_dragAttrs.left)"
         :top="Number(_dragAttrs.top)"
+        ref="dragerRef"
         :min-width="14"
         :min-height="14"
         :z-index="10"
@@ -427,7 +428,6 @@ defineExpose()
         @drag-start="onDragStart"
         @drag-end="onDragEnd"
         @drag="rafThrottleOnDrag"
-        ref="dragerRef"
         @click.stop="onSelectNode"
       >
         <LineWrap

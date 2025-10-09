@@ -11,7 +11,10 @@ import { simpleUUID } from '@/utils/short-id'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
 import { deepClone } from 'sf-utils2'
 import { updateDefaultObjectValue } from '@/views/doc-editor/utils/common-util'
-import { COMP_PARAMS_NAME_MAP, COMP_SIGN_STYLE } from '@/views/doc-editor/extensions/constant'
+import {
+  COMP_PARAMS_NAME_MAP,
+  COMP_SIGN_STYLE,
+} from '@/views/doc-editor/extensions/constant'
 
 const { getTop } = useZIndexManage()
 

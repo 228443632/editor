@@ -17,5 +17,5 @@ export default [
   compTextDrag,
   compTextareaDrag,
   compSign,
-  compSeal
+  compSeal,
 ]

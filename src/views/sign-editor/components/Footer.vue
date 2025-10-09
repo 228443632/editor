@@ -74,16 +74,27 @@ const _useWidgetList = computed(() => {
     const { offsetTop, pageNum } = __signContext__.value.getPageOffsetTopByTop(
       item.top,
     )
+    //  <icon name="image-failed" class="error-icon" />
     const compNameMap = {
-      compSign: '签名',
-      compSeal: '印章',
-      compSignDate: '签署时间',
+      compSign: {
+        name: '签名',
+        icon: 'icon-sign',
+      },
+      compSeal: {
+        name: '印章',
+        icon: 'icon-seal',
+      },
+      compSignDate: {
+        name: '签署时间',
+        icon: 'icon-sign-date',
+      },
     }
     return {
       ...item,
       pageNum,
       offsetTop,
-      compName: compNameMap[item.type],
+      icon: compNameMap[item.type]?.icon,
+      compName: compNameMap[item.type]?.name,
     }
   })
 })
@@ -134,8 +145,11 @@ defineExpose({
                   ]"
                   @click="onChooseUseWidgetItem(item)"
                 >
-                  <span>{{ index + 1 }}、</span>第{{ item.pageNum }}页
-                  {{ item.compName }}
+                  <span>{{ index + 1 }}.第{{ item.pageNum }}页-</span>
+                  <span>
+                    {{ item.compName }}
+                  </span>
+                  <icon class="text-[#333] ml-1" :name="item.icon" size="12" />
                 </div>
               </template>
               <div v-else class="min-h-100px flex-center text-12px">

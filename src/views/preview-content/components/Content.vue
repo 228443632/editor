@@ -14,7 +14,6 @@ import ContentCompSignDate from '@/views/preview-content/components/ContentCompS
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({

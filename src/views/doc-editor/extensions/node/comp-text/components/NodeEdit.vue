@@ -148,9 +148,9 @@ defineExpose({
                     :value="item.key"
                     class="ml-4px"
                   >
-                <span :style="item.style" class="-ml-2px px-2px">
-                  {{ item.label }}
-                </span>
+                    <span :style="item.style" class="-ml-2px px-2px">
+                      {{ item.label }}
+                    </span>
                   </t-radio>
                 </t-radio-group>
               </t-form-item>
@@ -179,9 +179,9 @@ defineExpose({
             </t-col>
 
             <t-col :span="6">
-                <t-form-item label="样式">
-                  <AppearanceEdit></AppearanceEdit>
-                </t-form-item>
+              <t-form-item label="样式">
+                <AppearanceEdit></AppearanceEdit>
+              </t-form-item>
             </t-col>
           </t-row>
         </t-form>

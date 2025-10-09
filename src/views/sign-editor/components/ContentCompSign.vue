@@ -10,7 +10,6 @@ import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
-import { noop } from 'sf-utils2'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({

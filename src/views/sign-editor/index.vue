@@ -16,10 +16,7 @@ import { deepClone, noop, uuid } from 'sf-utils2'
 import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
-import {
-  COMP_PARAMS_CONFIG_MAP,
-  COMP_PARAMS_NAME_MAP,
-} from '@/views/doc-editor/extensions/constant.ts' // 头部
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})

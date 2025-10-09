@@ -15,7 +15,7 @@ import { shallowMergeWithArrayOverride } from '@/views/doc-editor/utils/object-u
 
 // extension
 import extensions from './extensions'
-import { debounce, getHttpBlob, hasOwn, to } from 'sf-utils2'
+import { debounce, hasOwn, to } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
@@ -352,8 +352,8 @@ provide('__printRef__', printRef)
       <!--  内容右侧  -->
       <template #container-page-right>
         <RightParamsLib
-          :rightTpFields="rightTpFields"
           ref="rightParamsLibRef"
+          :right-tp-fields="rightTpFields"
         ></RightParamsLib>
       </template>
     </umo-editor>

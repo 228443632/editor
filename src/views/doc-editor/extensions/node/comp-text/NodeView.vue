@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone, to } from 'sf-utils2'
+import { deepClone } from 'sf-utils2'
 // import NodeEdit from './components/NodeEdit.vue'
 
 import type { Editor } from '@tiptap/core'
@@ -127,8 +127,8 @@ provide('NODE_PROPS', props)
     :data-placeholder="node?.attrs?.placeholder"
     compname="comp-text"
     :style="_rootStyle"
-    @click="onSelectNode"
     :bordertype="node?.attrs?.borderType"
+    @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
     <!--    <NodeEdit-->
@@ -153,8 +153,8 @@ provide('NODE_PROPS', props)
   border-bottom: 1px solid var(--umo-node-text-border-color);
   cursor: pointer;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
-  &.ProseMirror-selectednode{
-    outline: 2px solid var(--umo-primary-color)!important;
+  &.ProseMirror-selectednode {
+    outline: 2px solid var(--umo-primary-color) !important;
   }
   &:hover {
     background-color: #f0f2f7;

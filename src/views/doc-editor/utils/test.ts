@@ -4,11 +4,7 @@
  * @create 05/07/25 PM1:24
  */
 import type { Editor } from '@tiptap/vue-3'
-import {
-  type EditorState,
-  NodeSelection,
-  TextSelection,
-} from '@tiptap/pm/state'
+import { type EditorState, NodeSelection } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 
 //
@@ -86,8 +82,6 @@ export function testEditor(editorRef: Editor) {
             s.addRange(r)
           }, 500)
         }, 500)
-
-
 
         // const table = document.querySelector('table')
         // window.requestAnimationFrame(() => {

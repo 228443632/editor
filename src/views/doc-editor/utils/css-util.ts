@@ -16,7 +16,7 @@ export const cssUtil = {
         const rules = sheet.cssRules || sheet.rules
         if (rules) {
           Array.from(rules).forEach((rule) => {
-            cssText += rule.cssText + '\n'
+            cssText += `${rule.cssText}\n`
           })
         }
       } catch (e) {
