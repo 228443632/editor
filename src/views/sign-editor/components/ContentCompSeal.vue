@@ -102,7 +102,7 @@ defineExpose({
       top: _nodeData.top + 'px',
       left: _nodeData.left + 'px',
       width: contentDragWrapWidth + 'px',
-      '--y': (contentDragWrapRef?.translateY || 0) + 'px'
+      '--y': (contentDragWrapRef?.translateY || 0) + 'px',
     }"
     @mousedown.stop="noop"
   >
@@ -137,32 +137,5 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
-.e-drager-top__handle {
-  white-space: nowrap;
-  transform: translate3d(-2px, calc(var(--y) + -100% - 8px), 0);
-  background: #e5e5e5;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  height: 28px;
-  padding: 0 8px;
-  border-radius: 2px;
-  color: #666;
-  font-size: 12px;
-  gap: 12px;
-  z-index: 10;
-  //& > span:first-child {
-  //  position: relative;
-  //  &::before {
-  //    content: '';
-  //    position: absolute;
-  //    top: 50%;
-  //    transform: translateY(-50%);
-  //    right: -7px;
-  //    width: 1px;
-  //    height: 10px;
-  //    background: #bbb;
-  //  }
-  //}
-}
+@import './content-comp-style';
 </style>

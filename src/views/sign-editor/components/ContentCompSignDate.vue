@@ -140,32 +140,5 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
-.e-drager-top__handle {
-  white-space: nowrap;
-  transform: translate(-2px, calc(-100% - 8px));
-  background: #e5e5e5;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  height: 28px;
-  padding: 0 8px;
-  border-radius: 2px;
-  color: #666;
-  font-size: 12px;
-  gap: 12px;
-  z-index: 10;
-  //& > span:first-child {
-  //  position: relative;
-  //  &::before {
-  //    content: '';
-  //    position: absolute;
-  //    top: 50%;
-  //    transform: translateY(-50%);
-  //    right: -7px;
-  //    width: 1px;
-  //    height: 10px;
-  //    background: #bbb;
-  //  }
-  //}
-}
+@import './content-comp-style';
 </style>
