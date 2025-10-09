@@ -4,7 +4,7 @@
  * @create 02/10/25 PM10:20
  */
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { deepClone, uuid } from 'sf-utils2'
+import { arrayToObj, deepClone, uuid } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const a4 = cssUtil.getPaperSize('A4')
@@ -71,17 +71,25 @@ export const pageUtils = {
   /**
    * 逆向解析参数组件
    * @param paramsCompList
+   * @param retainField
    */
-  reverseExpandCompParams(paramsCompList: IParamsCompItem[]) {
-    return deepClone(paramsCompList || []).map((item) => {
-      item.isInRect = false
-      item.key ||= uuid()
-      item.top =
-        (item.pageNum - 1) * pageUtils.perPageGap +
-        (item.pageNum - 1) * a4._basePx.h +
-        item.offsetTop
-      item.left = item.offsetLeft || item.left
-      return item
-    })
+  reverseExpandCompParams(
+    paramsCompList: IParamsCompItem[],
+    retainField?: IParamsCompItem['type'][],
+  ) {
+    retainField ||= []
+    const retainFieldObj = arrayToObj(retainField)
+    return deepClone(paramsCompList || [])
+      .map((item) => {
+        item.isInRect = false
+        item.key ||= uuid()
+        item.top =
+          (item.pageNum - 1) * pageUtils.perPageGap +
+          (item.pageNum - 1) * a4._basePx.h +
+          item.offsetTop
+        item.left = item.offsetLeft || item.left
+        return item
+      })
+      .filter((item) => retainFieldObj[item.type])
   },
 }

@@ -27,9 +27,9 @@ const tableInfo = ref<TableProps>({
   columns: [
     { colKey: 'placeholder', title: '名称', minWidth: 100, fixed: 'left' },
     { colKey: 'fieldName', title: '后台映射字段名', minWidth: 200 },
-    { colKey: 'defaultValue', title: '默认值', minWidth: 100 },
+    // { colKey: 'defaultValue', title: '默认值', minWidth: 100 },
     { colKey: 'typeName', title: '元素类型', minWidth: 80 },
-    { colKey: 'desc', title: '填写说明', minWidth: 250 },
+    // { colKey: 'desc', title: '填写说明', minWidth: 250 },
   ],
   size: 'small',
   data: [] as TableRowData,
@@ -54,13 +54,13 @@ function onPreview() {
     return
   }
   console.log(`s`, fillFieldData)
-  printRef.value.printPage(fillFieldData)
+  __printRef__.value.printPage(fillFieldData)
 }
 
 /**
  * 导出html
  */
-function onDownHtml() {
+function onDownHasFillHtml() {
   let fillFieldData = {}
   try {
     fillFieldData = eval(`(${formData.value.configValue})`)
@@ -79,7 +79,8 @@ function onDownHtml() {
 /**
  * 导出html
  */
-function onDownTemplateHtml() {
+function onDownNoFillHtml() {
+  const html = __printRef__.value.getPrintPageHtml()
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -146,8 +147,8 @@ defineExpose({
       <div class="flex items-center justify-end">
         <t-button theme="default" @click="onClose">取消</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
-        <t-button theme="primary" @click="onDownHtml">导出已填充html</t-button>
-        <t-button theme="primary" @click="onDownTemplateHtml"
+        <t-button theme="primary" @click="onDownHasFillHtml">导出已填充html</t-button>
+        <t-button theme="primary" @click="onDownNoFillHtml"
           >导出未填充html</t-button
         >
       </div>

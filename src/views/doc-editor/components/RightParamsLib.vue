@@ -181,28 +181,29 @@ const defaultTpFields = ref([
 const _tpFields = computed(() => {
   return [
     ...deepClone(props.rightTpFields).map((item) => {
-      item.uid = commonUtil.simpleUUID()
+      item.uid ||= commonUtil.simpleUUID()
       if (Array.isArray(item.children)) {
         item.children = item.children.map((cItem) => {
           const innerAttrs = cItem.attrs
           return {
-            uid: commonUtil.simpleUUID(),
+            uid: item.uid,
             label: cItem.label,
             value: cItem.value,
             draggable: true,
             getCompTexts() {
               return __compNodeList__.value.filter((item: { node: Node }) => {
-                return item.node.type.name == 'compText'
+                return item.node.type.name == COMP_PARAMS_NAME_MAP.compText
               })
             },
             getAttrs() {
               // const compTexts = this.getCompTexts()
               const cssText = tiptapUtil.getStyleBySelection(editor.value)
               return {
-                'data-id': commonUtil.simpleUUID(),
-                fieldName: innerAttrs?.fieldName,
+                'data-id': item.uid,
+                // fieldName: innerAttrs?.fieldName,
                 placeholder: cItem.label,
                 cssText,
+                ...(innerAttrs || {}),
                 // placeholder: `姓名`,
               }
             },

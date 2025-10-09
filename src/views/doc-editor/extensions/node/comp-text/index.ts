@@ -88,7 +88,7 @@ export default Node.create({
 
       /** 字段名称 */
       fieldName: {
-        default: 'fieldName',
+        default: '',
       },
 
       /** 备注，填写说明 */

@@ -117,11 +117,11 @@ const defaultLineHeight = computed(
  * 获取html代码，用于打印
  * @param fillFieldData
  */
-function getPrintPageHtml(fillFieldData = {}) {
+function getPrintPageHtml(fillFieldData: object) {
   const { orientation, size, margin, background } = page.value
 
   let body = getContentHtml()
-  if (isPlainObject(fillFieldData)) {
+  if (isPlainObject(fillFieldData) && Object.keys(fillFieldData).length) {
     body = template(body, fillFieldData || {}, {
       tmplRE: /\$\{{2}([.\w[\]\s]+)\}{2}/g as any,
     })
@@ -465,6 +465,7 @@ defineExpose({
    * 获取
    */
   getPrintPageHtml,
+  getTemplateHtml: getPrintPageHtml
 })
 </script>
 
