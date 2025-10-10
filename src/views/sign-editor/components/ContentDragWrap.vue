@@ -178,6 +178,9 @@ function onDragEnd() {
   removeScrollListener()
 
   correctPosList()
+
+  // 添加历史记录
+  __signContext__.value.manalHistory.commit()
 }
 
 /**
@@ -186,10 +189,10 @@ function onDragEnd() {
 function correctPosList() {
   // 更正位置
   if (props.isCorrectPos) {
-    pageUtils.correctPos(_nodeData.value)
+    pageUtils.correctPos(_nodeData.value, __signContext__.value.contentPageNums)
     inRectParamsList.value.forEach((item) => {
       if (item.key != _nodeData.value.key) {
-        pageUtils.correctPos(item)
+        pageUtils.correctPos(item, __signContext__.value.contentPageNums)
       }
     })
   }
@@ -337,7 +340,7 @@ defineExpose({
   background: white;
 }
 
-.line-wrap--inactive {
+.es-drager.line-wrap--inactive.line-wrap--inactive {
   outline: 1px dashed @primary-color;
 }
 

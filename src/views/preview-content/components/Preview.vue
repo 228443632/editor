@@ -174,11 +174,10 @@ provide('__previewContext__', previewContext)
   left: 0;
   top: 0;
   margin: 0 auto;
-  padding: 16px 0;
+  padding: 12px;
   overflow-y: auto;
   background-color: var(--umo-container-background);
 }
 
-.preview-page__inner {
-}
+.preview-page__inner {}
 </style>

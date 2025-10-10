@@ -56,7 +56,7 @@ const a4 = cssUtil.getPaperSize('A4')
 const scaleFactor = ref(0)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
-const { width: rootWidth } = useElementBounding(rootRef)
+// const { width: rootWidth } = useElementBounding(rootRef)
 
 const _scalePos = computed(() => {
   return rootWidth.value / a4._basePx.w
@@ -73,7 +73,6 @@ const _embedItemStyle = computed(() => {
     }
   }
   return {
-    width: '450px',
     // height: '100%',
     maxWidth: '210mm',
     maxHeight: '297mm',
@@ -317,7 +316,7 @@ defineExpose({
 <style scoped lang="less">
 .pdf-embed__wrap {
   --per-page-gap: 12px;
-  width: fit-content;
+  width: 100%;
   margin: 0 auto;
   position: relative;
   .content-comp__item {

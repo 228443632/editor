@@ -12,7 +12,7 @@ import Right from './components/Right.vue'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import Footer from './components/Footer.vue'
-import { deepClone, noop, uuid } from 'sf-utils2'
+import { deepClone, noop, uuid, throttle } from 'sf-utils2'
 import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
@@ -51,6 +51,28 @@ const layoutSize = ref({
 
 const activePageNum = ref(1)
 const contentRef = ref<InstanceType<typeof Content>>() // 内容
+const paramsCompListHistory = ref<{
+  paramsCompList: IParamsCompItem[]
+  activeCompParam: IParamsCompItem
+  scrollTop: number
+}>({
+  paramsCompList: [],
+  activeCompParam: undefined,
+  scrollTop: 0,
+})
+
+const {
+  history,
+  commit,
+  undo,
+  redo,
+  canRedo,
+  canUndo,
+  clear,
+  last,
+  ...manualRefHistoryRest
+} = useManualRefHistory(paramsCompListHistory, { clone: deepClone })
+
 const signContext = ref({
   /** 缩小/放大比例*/
   scaleFactor: 0,
@@ -75,9 +97,44 @@ const signContext = ref({
   embedPdfWrapRef: computed(() => contentRef?.value?.embedPdfWrapRef),
 
   /**
+   * 当前激活的参数组件
+   */
+  activeCompParam: computed<IParamsCompItem>({
+    get() {
+      return paramsCompListHistory.value.activeCompParam
+    },
+    set(val: IParamsCompItem) {
+      paramsCompListHistory.value.activeCompParam = val
+      return true
+    },
+  }),
+
+  /**
+   * 选中参数组件
+   * @param nodeData
+   */
+  selectParamsComp: (nodeData: IParamsCompItem) => {
+    // const isExist = signContext.value.paramsCompList.some(
+    //   (item) => item.key === nodeData.key,
+    // )
+    // if (!isExist) return
+    signContext.value.activeCompParam = nodeData
+    signContext.value.paramsCompList.forEach((item) => {
+      item.isInRect = false
+    })
+  },
+
+  /**
    * 参数
    */
-  paramsCompList: [] as IParamsCompItem[],
+  paramsCompList: computed<IParamsCompItem[]>({
+    get() {
+      return paramsCompListHistory.value.paramsCompList
+    },
+    set(val: IParamsCompItem[]) {
+      paramsCompListHistory.value.paramsCompList = val
+    },
+  }),
 
   /**
    * 参数数据，准确的计算每一页的位置
@@ -124,7 +181,12 @@ const signContext = ref({
     const idx = signContext.value.paramsCompList.findIndex(
       (item) => item.key === nodeData.key,
     )
-    if (idx >= 0) signContext.value.paramsCompList.splice(idx, 1)
+    if (idx >= 0) {
+      signContext.value.paramsCompList.splice(idx, 1)
+
+      // 添加历史记录
+      signContext.value.manalHistory.commit()
+    }
   },
 
   /**
@@ -140,10 +202,13 @@ const signContext = ref({
     )
     const { offsetTop, pageNum: currentPageNum } =
       signContext.value.getPageOffsetTopByTop(top)
+
+    signContext.value.isEnableCommit = false
     signContext.value.removeParamsComp(nodeData)
+    signContext.value.isEnableCommit = true
 
     const contentPageNums = signContext.value.contentPageNums
-    return Array.from({ length: contentPageNums }).map((_, idx) => {
+    const result = Array.from({ length: contentPageNums }).map((_, idx) => {
       const pageNum = idx + 1
       const nodeDataClone = deepClone(nodeData)
       nodeDataClone.key = uuid()
@@ -156,6 +221,11 @@ const signContext = ref({
         isActive: currentPageNum === pageNum,
       }
     })
+    if (result?.length > 0) {
+      // 添加历史记录
+      signContext.value.manalHistory.commit()
+    }
+    return result
   },
 
   /**
@@ -176,29 +246,16 @@ const signContext = ref({
   getPageNumByTop: pageUtils.getPageNumByTop,
 
   /**
-   * 当前激活的参数组件
-   */
-  activeCompParam: undefined,
-
-  /**
-   * 选中参数组件
-   * @param nodeData
-   */
-  selectParamsComp: (nodeData: IParamsCompItem) => {
-    // const isExist = signContext.value.paramsCompList.some(
-    //   (item) => item.key === nodeData.key,
-    // )
-    // if (!isExist) return
-    signContext.value.activeCompParam = nodeData
-    signContext.value.paramsCompList.forEach((item) => {
-      item.isInRect = false
-    })
-  },
-
-  /**
    * 反转参数组件, 初始化
    */
-  initParamsCompList: pageUtils.reverseExpandCompParams,
+  initParamsCompList() {
+    // @ts-expect-error
+    const paramsCompList = pageUtils.reverseExpandCompParams(...arguments)
+    paramsCompList.forEach((item) => {
+      pageUtils.correctPos(item, signContext.value.contentPageNums)
+    })
+    return paramsCompList
+  },
 
   /** 是否在拖拽中 */
   isDragging: false,
@@ -220,6 +277,32 @@ const signContext = ref({
 
   /** 一次性加载所有pdf页面，主要是为了导出功能*/
   loadAllPdfPagesRaf: noop,
+
+  /**
+   * 手动控制历史记录
+   */
+  manalHistory: {
+    isEnableCommit: true,
+    history,
+    commit: throttle(() => {
+      if (!signContext.value.manalHistory.isEnableCommit) return
+      const scrollViewDom = unrefElement(contentRef)
+      paramsCompListHistory.value.scrollTop = scrollViewDom?.scrollTop ?? 0
+      commit()
+    }, 50),
+    undo: () => {
+      const scrollViewDom = unrefElement(contentRef)
+      if (scrollViewDom)
+        scrollViewDom.scrollTop = paramsCompListHistory.value.scrollTop
+      undo()
+    },
+    redo,
+    canRedo,
+    canUndo,
+    clear,
+    last,
+    ...manualRefHistoryRest,
+  },
 })
 
 /* 方法 */

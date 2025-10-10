@@ -119,8 +119,10 @@ export const pageUtils = {
   /**
    * 纠正位置
    * @param item
+   * @param maxPageNum
    */
-  correctPos(item: IParamsCompItem) {
+  correctPos(item: IParamsCompItem, maxPageNum: number) {
+    // const y = ~~(item.top + item.height / 2)
     const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
     const pageWidth = a4._basePx.w
     const pageHeight = a4._basePx.h
@@ -133,9 +135,16 @@ export const pageUtils = {
     if (left < 0) item.left = 0
     if (top < 0) item.top = pageUtils.getAbsoluteTopByPageNum(pageNum)
     if (right > pageWidth) item.left = pageWidth - item.width
-    if (bottom > pageHeight)
-      item.top =
-        pageHeight - item.height + pageUtils.getAbsoluteTopByPageNum(pageNum)
+    if (bottom > pageHeight) {
+      const centerY = offsetTop + item.height / 2
+      if (centerY > pageHeight) {
+        const tmpPageNext = pageNum >= maxPageNum ? maxPageNum : pageNum + 1
+        item.top = pageUtils.getAbsoluteTopByPageNum(tmpPageNext)
+      } else {
+        item.top =
+          pageHeight - item.height + pageUtils.getAbsoluteTopByPageNum(pageNum)
+      }
+    }
     return item
   },
 }

@@ -17,7 +17,7 @@ import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignD
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
-// import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 /* 状态 */
 const props = defineProps({})
@@ -78,9 +78,22 @@ registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
     __signContext__.value.selectParamsComp(paramsCompList[0])
     return
   }
+  let topOneInRectParams: IParamsCompItem
   __signContext__.value.paramsCompList.forEach((item) => {
     item.isInRect = true
+    if (!topOneInRectParams) {
+      topOneInRectParams = item
+    } else {
+      if (topOneInRectParams.top > item.top) {
+        topOneInRectParams = item
+      }
+    }
   })
+
+  if (topOneInRectParams) scrollIntoViewByParamsComp(topOneInRectParams)
+
+  // 添加历史记录
+  __signContext__.value.manalHistory.commit()
 })
 
 // 拷贝
@@ -126,6 +139,9 @@ function paste() {
       itemClone.key = uuid()
       __signContext__.value.paramsCompList.push(itemClone)
     })
+
+    // 添加历史记录
+    __signContext__.value.manalHistory.commit()
   }
 }
 
@@ -136,15 +152,25 @@ registerHotKeys('ctrl+x, command+x', () => {
 
   // 粘贴
   paste()
+
+  // 添加历史记录
+  __signContext__.value.manalHistory.commit()
 })
 
 // 撤回
 registerHotKeys('ctrl+z, command+z', () => {
-  useMessage('warning', { content: '暂不支持撤回操作' })
+  // useMessage('warning', { content: '暂不支持撤回操作' })
+  // 撤回
+  __signContext__.value.manalHistory.undo()
 })
 
 // 删除
-registerHotKeys('backspace, delete', del)
+registerHotKeys('backspace, delete', () => {
+  del()
+
+  // 添加历史记录
+  __signContext__.value.manalHistory.commit()
+})
 function del() {
   // 删除键
   __signContext__.value.removeParamsComp()
@@ -238,6 +264,32 @@ const onKeyDownRoot = (e: KeyboardEvent) => {
     // 删除键
     __signContext__.value.removeParamsComp()
     __signContext__.value.paramsCompList = []
+  }
+}
+
+/**
+ * 滚动到指定参数组件
+ */
+const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem) => {
+  if (!paramsComp?.key) return
+  const contentEl = __signContext__.value.contentElRef
+  const target = contentEl.querySelector(`[data-id="id-${paramsComp.key}"]`)
+  if (target) {
+    const esDragerDom = target.querySelector('.es-drager')
+    if (esDragerDom) {
+      scrollIntoView(esDragerDom)
+    } else {
+      scrollIntoView(esDragerDom.children[0])
+    }
+  }
+  function scrollIntoView(target: HTMLElement) {
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        // inline: 'center',
+      })
+    }
   }
 }
 
@@ -530,6 +582,7 @@ defineExpose({
   height: 100%;
   padding: 16px 0;
   scroll-behavior: smooth;
+  overflow-x: hidden;
   &.caret--is-dragging {
     .pdf-embed__item {
       outline: 2px dashed var(--umo-primary-color);

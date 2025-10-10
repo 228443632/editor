@@ -16,6 +16,7 @@ import {
 } from '@/views/doc-editor/extensions/constant.ts'
 import { useEventListener } from '@vueuse/core'
 import { uuid } from 'sf-utils2'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -112,15 +113,19 @@ const dragMethod = {
     const { top, left } = getPos(e.clientX, e.clientY)
 
     if (dragMethod.dragNodeDom.__nodeData?.type) {
-      __signContext__.value.paramsCompList.push({
+      const tmpNodeData = {
         ...(dragMethod.dragNodeDom.__nodeData || {}),
         key: uuid(),
         top,
         left,
-      })
+      }
+      pageUtils.correctPos(tmpNodeData, __signContext__.value.contentPageNums)
+      __signContext__.value.paramsCompList.push(tmpNodeData)
       __signContext__.value.selectParamsComp(
         __signContext__.value.paramsCompList.at(-1),
       )
+      // 添加历史记录
+      __signContext__.value.manalHistory.commit()
     }
   },
 
