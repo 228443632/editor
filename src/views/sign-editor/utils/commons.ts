@@ -101,6 +101,7 @@ export const pageUtils = {
   ) {
     retainField ||= []
     const retainFieldObj = arrayToObj(retainField)
+    console.log('retainFieldObj', retainFieldObj)
     return deepClone(paramsCompList || [])
       .map((item) => {
         item.translateY = 0

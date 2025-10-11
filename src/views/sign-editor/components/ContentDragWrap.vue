@@ -357,6 +357,11 @@ defineExpose({
   transform: translate(50%, -50%);
   cursor: pointer;
   z-index: 100;
+  transition: all 0.3s ease-in-out;
+  opacity: 0;
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .line-wrap__locate {

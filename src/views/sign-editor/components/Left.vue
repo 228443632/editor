@@ -292,7 +292,7 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 .sign-editor__left {
-  background: transparent;
+  background: #fff;
   border-right: solid 1px var(--umo-border-color);
   width: var(--left-aside-width);
   box-sizing: border-box;
@@ -311,14 +311,15 @@ defineExpose({
   user-select: none;
   padding: 8px 20px;
   position: relative;
-  border: 1px solid #e1e4eb;
+  border: 1px dashed #ddd;
   border-radius: 4px;
   background: #fff;
   & + .left__content-item {
     margin-top: 12px;
   }
   &.is-dragging {
-    outline: 1px solid var(--umo-primary-color);
+    border-color: var(--umo-primary-color);
+    //outline: 1px solid var(--umo-primary-color);
   }
 }
 
@@ -341,5 +342,8 @@ defineExpose({
   height: 0;
   overflow-y: auto;
   padding: 16px;
+}
+
+.sign-date {
 }
 </style>

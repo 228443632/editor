@@ -251,14 +251,7 @@ const signContext = ref({
   /**
    * 反转参数组件, 初始化
    */
-  initParamsCompList() {
-    // @ts-expect-error
-    const paramsCompList = pageUtils.reverseExpandCompParams(...arguments)
-    paramsCompList.forEach((item) => {
-      pageUtils.correctPos(item, signContext.value.contentPageNums)
-    })
-    return paramsCompList
-  },
+  initParamsCompList:  pageUtils.reverseExpandCompParams,
 
   /** 是否在拖拽中 */
   isDragging: false,

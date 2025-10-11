@@ -56,7 +56,7 @@ const a4 = cssUtil.getPaperSize('A4')
 const scaleFactor = ref(0)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
-// const { width: rootWidth } = useElementBounding(rootRef)
+const { width: rootWidth } = useElementBounding(rootRef)
 
 const _scalePos = computed(() => {
   return rootWidth.value / a4._basePx.w

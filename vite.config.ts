@@ -12,7 +12,7 @@ import pkg from './package.json'
 import copyright from './src/utils/copyright'
 import path from 'node:path'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import { visualizer } from 'rollup-plugin-visualizer'
+// import { visualizer } from 'rollup-plugin-visualizer'
 import usePluginImport from 'vite-plugin-importer'
 
 const IS_PRO = process.env.NODE_ENV === 'production'
@@ -125,18 +125,18 @@ export default defineConfig(({ mode }) => {
           UnoCSS(),
           ...Object.values(vuePlugins),
           vueJsx(),
-          visualizer({
-            filename: './node_modules/.cache/visualizer/stats.html',
-            open: true,
-            gzipSize: true,
-            brotliSize: true,
+          // visualizer({
+          //   filename: './node_modules/.cache/visualizer/stats.html',
+          //   open: true,
+          //   gzipSize: true,
+          //   brotliSize: true,
+          // }),
+          usePluginImport({
+            // 配置 UI 库的按需导入规则
+            libraryName: 'sf-utils',
+            libraryDirectory: 'es',
+            style: false, // 自动导入样式（true 为 less，'css' 为 css）
           }),
-        usePluginImport({
-          // 配置 UI 库的按需导入规则
-          libraryName: 'sf-utils',
-          libraryDirectory: 'es',
-          style: false, // 自动导入样式（true 为 less，'css' 为 css）
-        }),
         ],
     css: cssConfig,
     build: isLib

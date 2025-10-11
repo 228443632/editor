@@ -201,12 +201,14 @@ const _tpFields = computed(() => {
             getAttrs() {
               // const compTexts = this.getCompTexts()
               const cssText = tiptapUtil.getStyleBySelection(editor.value)
+              const uid = commonUtil.simpleUUID()
               return {
-                'data-id': item.uid,
+                'data-id': uid,
                 // fieldName: innerAttrs?.fieldName,
                 placeholder: cItem.label,
                 cssText,
                 ...(innerAttrs || {}),
+                uid,
                 // placeholder: `姓名`,
               }
             },

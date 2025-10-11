@@ -305,10 +305,11 @@ function getPrintPageHtml(fillFieldData: object) {
         ${styleListString}
       </style>
       <style>
-        span text.hidden {
+        [mode='print'] span text.hidden {
           display: inline;
         }
-        .no-print {
+
+        [mode='print'] .no-print {
           display: none;
         }
       </style>

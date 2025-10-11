@@ -2,6 +2,7 @@
   "name": "@umoteam/editor",
   "version": "6.1.1",
   "scripts": {
+    "build:app": "pnpm build:lib-css && pnpm build",
     "build:lib": "vite build --mode lib",
     "build:lib-css": "vite build -c vite.config.lib-css.ts",
     "build": "vite build --mode dev",

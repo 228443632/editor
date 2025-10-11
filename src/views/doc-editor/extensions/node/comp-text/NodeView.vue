@@ -124,7 +124,7 @@ provide('NODE_PROPS', props)
       `umo-node-border--${node?.attrs?.borderType}`,
     ]"
     :data-id="_attributes['data-id']"
-    :data-placeholder="node?.attrs?.placeholder"
+    :data-placeholder="`【${node?.attrs?.placeholder}】`"
     compname="comp-text"
     :style="_rootStyle"
     :bordertype="node?.attrs?.borderType"
@@ -150,7 +150,7 @@ provide('NODE_PROPS', props)
   min-height: 1em;
   text-align: left;
   text-indent: 0;
-  border-bottom: 1px solid var(--umo-node-text-border-color);
+  //border-bottom: 1px solid var(--umo-node-text-border-color);
   cursor: pointer;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode {

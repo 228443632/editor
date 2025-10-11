@@ -117,7 +117,7 @@ export function useAnchor(options = {}) {
   function initTarget(target) {
     target ||= get(options.target)
     if (target?.nodeType === 1) {
-      _scrollView = getParentScrollElement(target)
+      _scrollView = target || getParentScrollElement(target)
     }
   }
 

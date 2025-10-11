@@ -175,13 +175,13 @@ defineExpose({
       >
       <span class="inline-flex items-center gap-1">
         <span class="flex-none">跳转至</span>
-        <t-input
+        <TInput
           v-model="currentPageNum"
           size="small"
           class="!w-62px"
           @blur="onChangePageNum"
           @enter="onChangePageNum"
-        ></t-input>
+        ></TInput>
         <span>页</span>
       </span>
     </div>

@@ -62,7 +62,7 @@ export const defaultOptions = {
     content: '',
     placeholder: {
       en_US: 'Please enter the document content...',
-      zh_CN: '请输入文档内容...',
+      zh_CN: '请输入模版内容...',
       ru_RU: 'Пожалуйста, введите содержимое документа...',
     },
     enableSpellcheck: true,

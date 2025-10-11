@@ -7,7 +7,14 @@
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { deepClone, div, getAbsOffsetTop, uuid } from 'sf-utils2'
+import {
+  deepClone,
+  div,
+  getAbsOffsetTop,
+  uuid,
+  rafThrottle,
+  toFixed,
+} from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
@@ -46,6 +53,9 @@ const pageVisibility = ref({}) // 页面可见性
 const pageRendered = ref({})
 let pageIntersectionObserver: IntersectionObserver
 const paramsCompPatchKey = ref(0)
+const scrollViewPercent = ref(0)
+const scrollViewTop = ref(0)
+const { height: rootHeight } = useElementBounding(rootRef)
 
 const copyContentInfo = ref()
 
@@ -293,6 +303,24 @@ const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem) => {
   }
 }
 
+/**
+ * 滚动
+ * @param e
+ */
+const onScroll = (e: Event) => {
+  const target = e.target as HTMLDivElement
+  const scrollHeight = target.scrollHeight
+  scrollViewTop.value = target.scrollTop
+  scrollViewPercent.value = +div(scrollViewTop.value, scrollHeight)
+}
+
+/**
+ * 节流滚动
+ */
+const throttleScroll = rafThrottle(onScroll)
+
+useEventListener(rootRef, 'scroll', throttleScroll)
+
 /* 计算 */
 
 /**
@@ -359,14 +387,14 @@ watchEffect(() => {
 /**
  * 监听初始化完成，初始化锚点
  */
-watch([_initial, _pageNumsList, embedPdfWrapRef], () => {
+watch([_initial, _pageNumsList, embedPdfWrapRef, rootRef], () => {
   const totalPageNum = _pageNumsList.value.at(-1)
   if (_initial.value && totalPageNum > 0 && embedPdfWrapRef.value) {
     if (__signContext__.value.anchorInfo?.removeEvents) {
       __signContext__.value.anchorInfo.removeEvents()
     }
     __signContext__.value.anchorInfo = useAnchor({
-      target: embedPdfWrapRef,
+      target: rootRef,
       selectors: new Array(totalPageNum).fill(0).map((_, idx) => {
         return {
           selector: `.pdf-embed__item.page-num-${idx + 1}`,
@@ -444,6 +472,15 @@ defineExpose({
     ]"
     tabindex="10"
   >
+    <div
+      class="pdf-embed__item-pagenum"
+      :style="{
+        '--top': scrollViewTop + 'px',
+        '--y': scrollViewPercent * rootHeight + 'px',
+      }"
+    >
+      {{ __signContext__?.anchorInfo?.active }}
+    </div>
     <!--    {{ __signContext__._paramsCompList }}-->
     <div
       ref="embedPdfWrapRef"
@@ -495,7 +532,6 @@ defineExpose({
               :page="pageNum"
               @rendered="onRendered(pageNum)"
             />
-            <div class="pdf-embed__item-pagenum">{{ pageNum }}</div>
           </div>
         </template>
 
@@ -582,6 +618,7 @@ defineExpose({
   height: 100%;
   padding: 16px 0;
   scroll-behavior: smooth;
+  position: relative;
   overflow-x: hidden;
   &.caret--is-dragging {
     .pdf-embed__item {
@@ -643,20 +680,33 @@ defineExpose({
   &.is-last {
     break-after: auto;
   }
+}
 
-  .pdf-embed__item-pagenum {
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
-    padding: 2px 8px;
-    font-size: 14px;
+.pdf-embed__item-pagenum {
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 8px 14px;
+  font-size: 14px;
+  position: absolute;
+  display: inline-flex;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  right: 8px;
+  top: var(--top);
+  transform: translate3d(0, var(--y), 0);
+  border-radius: 4px;
+  &:after {
+    content: '';
     position: absolute;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    right: -8px;
-    bottom: 0;
-    transform: translateX(100%);
-    border-radius: 4px;
+    width: 0;
+    height: 0;
+    top: 50%;
+    transform: translate3d(100%, -50%, 0);
+    right: 0;
+    border: 6px solid transparent;
+    border-left-color: rgba(0, 0, 0, 0.9);
+    transition: all 0.3s;
   }
 }
 </style>
