@@ -342,6 +342,7 @@ defineExpose({
 
 .es-drager.line-wrap--inactive.line-wrap--inactive {
   outline: 1px dashed @primary-color;
+  background-color: rgba(@primary-color, 0.04);
 }
 
 .line-wrap--in-rect,

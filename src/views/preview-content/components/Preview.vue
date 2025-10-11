@@ -109,8 +109,9 @@ const _paramsCompList = computed(() => {
 watch(
   () => previewContext.value.contentInitial,
   (newVal) => {
-    if (newVal) {
+    if (newVal && props.model == 'preview') {
       // void onExportPdf()
+      window['pagePreviewContent']?.callMounted?.()
     }
   },
 )

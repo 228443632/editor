@@ -91,6 +91,7 @@ import type {
 import enConfig from 'tdesign-vue-next/esm/locale/en_US'
 import cnConfig from 'tdesign-vue-next/esm/locale/zh_CN'
 import { useElementSize } from '@vueuse/core'
+import { isFunction } from 'sf-utils2'
 
 import { getSelectionNode, getSelectionText } from '@/extensions/selection'
 import { i18n } from '@/i18n'
@@ -917,6 +918,19 @@ const saveContent = async (showMessage = true) => {
   if (options.value.document?.readOnly) {
     return
   }
+  if (isFunction(options.value?.onBeforeSave)) {
+    const success = await options.value?.onBeforeSave?.(
+      {
+        html: editor.value?.getHTML(),
+        json: editor.value?.getJSON(),
+        text: editor.value?.getText(),
+      },
+      page.value,
+      $document.value,
+    )
+    if (!success) return
+  }
+
   const commonMsgOption = {
     placement: 'top',
     offset: [0, 0],

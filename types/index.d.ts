@@ -272,6 +272,7 @@ export interface UmoEditorOptions {
   // feat
   // onPaste?: TOnPasteFunction
   onSave?: OnSaveFunction
+  onBeforeSave?: OnSaveFunction
   onFileUpload?: (file: File) => Promise<{ id: string; url: string }>
   onFileDelete?: CallableFunction
 

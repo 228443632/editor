@@ -99,9 +99,8 @@ const _rootStyle = computed(() => {
 const { doc } = useVuePdfEmbed({
   source: props.source,
   onProgress: (progressParams) => {
-    window.requestAnimationFrame(() => {
-      initialProgress.value = div(progressParams.loaded / progressParams.total)
-    })
+    initialProgress.value = div(progressParams.loaded / progressParams.total)
+    console.log('initialProgress.value', initialProgress.value)
   },
 })
 

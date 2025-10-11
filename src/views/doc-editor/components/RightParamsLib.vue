@@ -31,6 +31,7 @@ import testSealImg from '@/assets/images/test-seal.svg'
 import testSealImgRaw from '@/assets/images/test-seal.svg?raw'
 import testSignImg from '@/assets/images/test-sign.svg'
 import testSignImgRaw from '@/assets/images/test-sign.svg?raw'
+import profile from '@/profile.ts'
 
 const props = defineProps({
   /**
@@ -52,51 +53,52 @@ const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const isDragging = ref(false)
 const fillFormParamsAERef = ref<InstanceType<typeof FillFormParamsAE>>()
 
-const defaultTpFields = ref([
-  // {
-  //   label: '其他',
-  //   children: [
-  //     {
-  //       type: 'seal',
-  //       value: 'compSeal',
-  //       getAttrs() {
-  //         return {
-  //           'data-id': commonUtil.simpleUUID(),
-  //           fieldName: 'idcard',
-  //           placeholder: '印章',
-  //         }
-  //       },
-  //     },
-  //     {
-  //       type: 'sign',
-  //       value: 'compSign',
-  //       getAttrs() {
-  //         return {
-  //           'data-id': commonUtil.simpleUUID(),
-  //           fieldName: 'idcard',
-  //           placeholder: '签名',
-  //         }
-  //       },
-  //     },
-  //   ],
-  // },
-  {
-    label: '测试（dev环境可见）',
-    children: [
-      {
-        label: '获取HTML',
-        value: '1002',
-        async click() {
-          useMessage('loading', { content: '正在导出中', closeBtn: true })
-          // const body = onGetHtml()
-          const body = (
-            document.querySelector(
-              '.umo-zoomable-container.umo-scrollbar',
-            ) as HTMLElement
-          ).outerHTML
-          const css = await cssUtil.getCssAll()
-          // const css = cssUtil.getAllCSSRules()
-          const html = commonUtil.trimSpace(`
+const defaultTpFields = ref(
+  [
+    // {
+    //   label: '其他',
+    //   children: [
+    //     {
+    //       type: 'seal',
+    //       value: 'compSeal',
+    //       getAttrs() {
+    //         return {
+    //           'data-id': commonUtil.simpleUUID(),
+    //           fieldName: 'idcard',
+    //           placeholder: '印章',
+    //         }
+    //       },
+    //     },
+    //     {
+    //       type: 'sign',
+    //       value: 'compSign',
+    //       getAttrs() {
+    //         return {
+    //           'data-id': commonUtil.simpleUUID(),
+    //           fieldName: 'idcard',
+    //           placeholder: '签名',
+    //         }
+    //       },
+    //     },
+    //   ],
+    // },
+    profile.IS_DEV && {
+      label: '测试（dev环境可见）',
+      children: [
+        {
+          label: '获取HTML',
+          value: '1002',
+          async click() {
+            useMessage('loading', { content: '正在导出中', closeBtn: true })
+            // const body = onGetHtml()
+            const body = (
+              document.querySelector(
+                '.umo-zoomable-container.umo-scrollbar',
+              ) as HTMLElement
+            ).outerHTML
+            const css = await cssUtil.getCssAll()
+            // const css = cssUtil.getAllCSSRules()
+            const html = commonUtil.trimSpace(`
 <!doctype html>
 <html lang="zh-CN">
   <head>
@@ -121,57 +123,58 @@ const defaultTpFields = ref([
    </body>
  </html>
         `)
-          MessagePlugin.closeAll()
-          console.log('html', html)
-          blobSaveAs(new Blob([html], { type: 'text/html' }), '合同模版.html')
-          useMessage('info', {
-            // content: '获取html代码成功，请查看控制台日志！',
-            content: '导出成功！',
-          })
-        },
-      },
-      {
-        label: '模拟数据填充',
-        value: '模拟数据填充',
-        click() {
-          const mockJson = {
-            name: '张三',
-            mobile: '19166662333', //
-            idcard: '341210199909091010', //
-          }
-
-          fillFormParamsAERef.value.visible.dialog = true
-          nextTick(() => {
-            const data = deepClone(
-              __compNodeList__.value.map((item) => ({
-                ...item.node?.attrs,
-                typeName: '普通文本',
-              })),
-            )
-            fillFormParamsAERef.value.tableInfo.data = data
-            const dataObj$FieldName = arrayToObj(data, 'fieldName', {
-              valueType: 'array',
+            MessagePlugin.closeAll()
+            console.log('html', html)
+            blobSaveAs(new Blob([html], { type: 'text/html' }), '合同模版.html')
+            useMessage('info', {
+              // content: '获取html代码成功，请查看控制台日志！',
+              content: '导出成功！',
             })
-            const configString = Object.keys(dataObj$FieldName)
-              .map((key, index, list) => {
-                const comment = (dataObj$FieldName[key] || [])
-                  .map((cItem) => cItem.placeholder)
-                  .join('，')
-                const dot = index == list.length - 1 ? '' : ','
-                return `  ${key}: '${mockJson[key] || ''}'${dot} // ${comment}`
-              })
-              .join('\n')
-            fillFormParamsAERef.value.formData.configValue = [
-              `{`,
-              configString,
-              '}',
-            ].join('\n')
-          })
+          },
         },
-      },
-    ],
-  },
-])
+        {
+          label: '模拟数据填充',
+          value: '模拟数据填充',
+          click() {
+            const mockJson = {
+              name: '张三',
+              mobile: '19166662333', //
+              idcard: '341210199909091010', //
+            }
+
+            fillFormParamsAERef.value.visible.dialog = true
+            nextTick(() => {
+              const data = deepClone(
+                __compNodeList__.value.map((item) => ({
+                  ...item.node?.attrs,
+                  typeName: '普通文本',
+                })),
+              )
+              fillFormParamsAERef.value.tableInfo.data = data
+              const dataObj$FieldName = arrayToObj(data, 'fieldName', {
+                valueType: 'array',
+              })
+              const configString = Object.keys(dataObj$FieldName)
+                .map((key, index, list) => {
+                  const comment = (dataObj$FieldName[key] || [])
+                    .map((cItem) => cItem.placeholder)
+                    .join('，')
+                  const dot = index == list.length - 1 ? '' : ','
+                  return `  ${key}: '${mockJson[key] || ''}'${dot} // ${comment}`
+                })
+                .join('\n')
+              fillFormParamsAERef.value.formData.configValue = [
+                `{`,
+                configString,
+                '}',
+              ].join('\n')
+            })
+          },
+        },
+      ],
+    },
+  ].filter(Boolean),
+)
 
 /* 方法 */
 

@@ -122,6 +122,9 @@ const signContext = ref({
     signContext.value.paramsCompList.forEach((item) => {
       item.isInRect = false
     })
+
+    // 添加历史记录
+    signContext.value.manalHistory.commit()
   },
 
   /**
@@ -315,7 +318,8 @@ const onClickPreviewEditor = () => {
   signContext.value.paramsCompList.forEach((item) => {
     item.isInRect = false
   })
-  console.log('点击了预览的编辑器')
+  // 添加历史记录
+  signContext.value.manalHistory.commit()
 }
 
 /* 计算 */
@@ -352,7 +356,9 @@ watchEffect(() => {
 /* 周期 */
 onMounted(() => {
   // 初始化成功
-  window.dispatchEvent(new CustomEvent('editor-ready'))
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('editor-ready'))
+  })
 
   if (!isInIframe()) {
     signContext.value.source = './3.pdf'

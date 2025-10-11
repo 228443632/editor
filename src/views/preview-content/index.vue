@@ -25,6 +25,7 @@ const source = ref(route.query.source as string)
 const paramsCompList = ref([])
 
 const downloadPreviewRef = ref<InstanceType<typeof Preview>>()
+const previewRef = ref<InstanceType<typeof Preview>>()
 const updateFlag = ref(0)
 
 /* 方法 */
@@ -66,7 +67,9 @@ watch(source, () => {
 
 /* 周期 */
 onMounted(() => {
-  window.dispatchEvent(new CustomEvent('editor-ready'))
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('editor-ready'))
+  })
 
   if (!isInIframe()) {
     source.value = './4.pdf'
@@ -96,6 +99,13 @@ window['pagePreviewContent'] = {
 
   /** 参数组件列表 */
   paramsCompList,
+
+  /**
+   * 是否内容初始化
+   */
+  isContentInitial: computed(
+    () => previewRef.value.previewContext?.contentInitial,
+  ),
 }
 </script>
 
@@ -112,6 +122,7 @@ window['pagePreviewContent'] = {
       :source="source"
       model="preview"
       :params-comp-list="paramsCompList"
+      ref="previewRef"
     ></Preview>
 
     <!-- 下载  -->

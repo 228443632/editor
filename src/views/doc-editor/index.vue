@@ -43,7 +43,7 @@ import { blobToBase64, fileToBase64 } from 'file64'
 //   paragraph: {...} //<p>
 //   text: {...} //文本
 // }
-const IS_DEV = process.env.NODE_ENV === 'development'
+// const IS_DEV = process.env.NODE_ENV === 'development'
 
 const umoEditorRef = ref(null)
 const editorRef = ref<Editor>()
@@ -153,22 +153,28 @@ const options = $ref(
       },
 
       /**
-       * 富文本内容保存
+       * 富文本内容保存之前
        * @param content
        */
-      async onSave(content: { html: string }) {
-        localStorage.setItem('document.content', content?.html)
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            const success = true
-            if (success) {
-              resolve('操作成功')
-            } else {
-              reject(new Error('操作失败'))
-            }
-          }, 500)
-        })
+      async onBeforeSave(content: { html: string }) {
+        const callOnSave = window['pageDocEditor']?.callOnSave
+        if (callOnSave) {
+          await callOnSave(content?.html)
+        }
+        // localStorage.setItem('document.content', content?.html)
+        // return new Promise((resolve, reject) => {
+        //   setTimeout(() => {
+        //     const success = true
+        //     if (success) {
+        //       resolve('操作成功')
+        //     } else {
+        //       reject(new Error('操作失败'))
+        //     }
+        //   }, 500)
+        // })
+        return false
       },
+
       /**
        * 文件上传
        * @param file
@@ -254,9 +260,11 @@ watch(umoEditorRef, () => {
     editorRef.value.commands.focus = () => true
 
     // 初始化成功
-    window.dispatchEvent(
-      new CustomEvent('editor-ready', { detail: editorRef.value }),
-    )
+    setTimeout(() => {
+      window.dispatchEvent(
+        new CustomEvent('editor-ready', { detail: editorRef.value }),
+      )
+    })
 
     if (!isInIframe()) {
       rightTpFields.value = [

@@ -146,6 +146,11 @@ const defaultOptions: UmoEditorOptions = {
       reject(new Error('Key "onSave": Please set the save method'))
     })
   },
+  async onBeforeSave() {
+    return await new Promise((resolve) => {
+      resolve(false)
+    })
+  },
   async onFileUpload(file: File) {
     return await new Promise((_, reject) => {
       if (!file) {
@@ -934,6 +939,13 @@ const ojbectSchema = new ObjectSchema({
   translations: {
     merge: 'replace',
     validate: 'object',
+    required: false,
+  },
+  onBeforeSave: {
+    merge: 'replace',
+    validate(value) {
+      return true
+    },
     required: false,
   },
   onSave: {
