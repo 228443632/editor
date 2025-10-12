@@ -209,10 +209,12 @@ const getPos = (x: number, y: number) => {
  * 组件类型映射
  */
 const _compTypeListMap = computed(() => {
-  return arrayToObj(__signContext__.value.compTypeList) as Record<
-    string,
-    string
-  >
+  // return arrayToObj(__signContext__.value.compTypeList) as Record<
+  //   string,
+  //   string
+  // >
+  //
+  return COMP_PARAMS_NAME_MAP
 })
 
 /* 监听 */

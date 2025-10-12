@@ -248,7 +248,6 @@ const signContext = ref({
    */
   getPageNumByTop: pageUtils.getPageNumByTop,
 
-
   /** 组件类型集合 */
   compTypeList: [] as string[],
 
@@ -364,7 +363,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './3.pdf'
+    signContext.value.source = './4.pdf'
   }
 })
 

@@ -23,7 +23,26 @@ const currentPageNum = ref(__signContext__.value.anchorInfo?.active)
  * 页码
  */
 const onChangePageNum = () => {
+  if (currentPageNum.value <= 1) {
+    currentPageNum.value = 1
+  } else if (currentPageNum.value >= __signContext__.value.contentPageNums) {
+    currentPageNum.value = __signContext__.value.contentPageNums
+  }
   __activePageNum__.value = currentPageNum.value
+}
+
+/**
+ * 上一页
+ */
+const onPrev = () => {
+  __activePageNum__.value = __signContext__.value.anchorInfo?.active - 1
+}
+
+/**
+ * 下一页
+ */
+const onNext = () => {
+  __activePageNum__.value = __signContext__.value.anchorInfo?.active + 1
 }
 
 /**
@@ -113,7 +132,7 @@ defineExpose({
 <!--render-->
 <template>
   <div class="comp__footer">
-    <div class="flex items-center gap-4">
+    <div class="flex items-center w-full justify-between gap-4">
       <t-popup
         trigger="click"
         placement="top-left"
@@ -163,27 +182,58 @@ defineExpose({
           </div>
         </template>
       </t-popup>
-      <span
-        >当前页：<span class="font-bold">{{
-          __signContext__?.anchorInfo?.active
-        }}</span></span
-      >
-      <span
-        >总页数：<span class="font-bold">{{
-          __signContext__.contentPageNums
-        }}</span></span
-      >
-      <span class="inline-flex items-center gap-1">
-        <span class="flex-none">跳转至</span>
-        <TInput
-          v-model="currentPageNum"
+      <div class="flex items-center gap-3 comp__footer__rt">
+        <span
+          >当前页：<span class="font-bold">{{
+            __signContext__?.anchorInfo?.active
+          }}</span></span
+        >
+        <span
+          >总页数：<span class="font-bold">{{
+            __signContext__.contentPageNums
+          }}</span></span
+        >
+        <t-button
+          type="button"
           size="small"
-          class="!w-62px"
-          @blur="onChangePageNum"
-          @enter="onChangePageNum"
-        ></TInput>
-        <span>页</span>
-      </span>
+          variant="text"
+          :disabled="__signContext__?.anchorInfo?.active <= 1"
+          class="!-ml-2px"
+          @click="onPrev"
+        >
+          <span class="inline-flex items-center gap-1 cursor-pointer">
+            <t-icon name="arrow-left"> </t-icon>上一页
+          </span>
+        </t-button>
+
+        <t-button
+          type="button"
+          size="small"
+          variant="text"
+          :disabled="
+            __signContext__?.anchorInfo?.active >=
+            __signContext__.contentPageNums
+          "
+          class="!-ml-4px"
+          @click="onNext"
+        >
+          <span class="inline-flex items-center gap-1 cursor-pointer">
+            下一页 <t-icon name="arrow-right"> </t-icon>
+          </span>
+        </t-button>
+
+        <span class="hover:text-primary inline-flex items-center gap-1">
+          <span class="flex-none">跳转至</span>
+          <TInput
+            v-model="currentPageNum"
+            size="small"
+            class="!w-62px"
+            @blur="onChangePageNum"
+            @enter="onChangePageNum"
+          ></TInput>
+          <span>页</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -228,6 +278,12 @@ defineExpose({
       background: #f2f3fe;
       color: var(--umo-primary-color);
     }
+  }
+}
+
+.comp__footer__rt {
+  & > * {
+    padding: 0 4px;
   }
 }
 </style>

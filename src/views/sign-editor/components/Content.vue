@@ -13,7 +13,6 @@ import {
   getAbsOffsetTop,
   uuid,
   rafThrottle,
-  throttle,
   toFixed,
 } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
@@ -519,7 +518,7 @@ defineExpose({
           <div
             ref="pageRefs"
             :class="[
-              'pdf-embed__item',
+              'pdf-embed__item is-fade',
               `page-num-${pageNum}`,
               _pageNumsList.length - 1 == index && `is-last`,
             ]"
@@ -672,14 +671,30 @@ defineExpose({
   margin: 0 auto;
   user-select: none;
   position: relative;
+  //width: 100vw;
+  background: white;
+  aspect-ratio: 210 / 297;
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
   break-after: avoid;
+  content-visibility: auto;
+  contain-intrinsic-size: 210mm 297mm;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }
   &.is-last {
     break-after: auto;
+  }
+  &.is-fade {
+    animation: fade-animation 0.8s;
+    @keyframes fade-animation {
+      0% {
+        opacity: 0.2;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
   }
 }
 
@@ -690,7 +705,7 @@ defineExpose({
   width: 50px;
   height: 50px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 18px;
   display: inline-flex;
   justify-content: center;
   align-items: center;

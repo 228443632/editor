@@ -7,7 +7,6 @@
 <script setup lang="ts">
 import { COMP_SIGN_DATE_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
-import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
 
@@ -110,8 +109,9 @@ defineExpose({
           height:
             COMP_SIGN_DATE_STYLE.height * __signContext__.scaleFactor + 'px',
         }"
-        v-html="testSignSvgRaw"
-      ></div>
+      >
+        <div class="flex-center h-full">签署日期</div>
+      </div>
     </ContentLineWrap>
   </ContentDragWrap>
 </template>

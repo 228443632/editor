@@ -46,8 +46,9 @@ defineExpose({
       width: COMP_SIGN_DATE_STYLE.width + 'px',
       height: COMP_SIGN_DATE_STYLE.height + 'px',
     }"
-    v-html="testSignSvgRaw"
-  ></div>
+  >
+    <div class="flex-center h-full">签署日期</div>
+  </div>
 </template>
 
 <!--style-->

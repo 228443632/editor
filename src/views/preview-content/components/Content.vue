@@ -103,7 +103,7 @@ const { doc } = useVuePdfEmbed({
   source: props.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
-    console.log('initialProgress.value', initialProgress.value)
+    // console.log('initialProgress.value', initialProgress.value)
   },
 })
 
@@ -182,6 +182,13 @@ const onRendered = (pageNum: number) => {
   }
 }
 
+/**
+ * 内部链接点击
+ */
+const onInternalLinkClicked = (...args) => {
+  console.log('args', args)
+}
+
 /* 计算 */
 
 /**
@@ -257,7 +264,7 @@ defineExpose({
       <div
         ref="pageRefs"
         :class="[
-          'pdf-embed__item',
+          'pdf-embed__item is-fade',
           `page-num-${pageNum}`,
           _pageNumsList.length - 1 == index && `is-last`,
         ]"
@@ -271,6 +278,8 @@ defineExpose({
           text-layer
           :scale="dpr"
           @rendered="onRendered(pageNum)"
+          @link-clicked="onInternalLinkClicked"
+          @internal-link-clicked="onInternalLinkClicked"
         />
 
         <template
@@ -349,6 +358,22 @@ defineExpose({
   }
   &.is-last {
     break-after: auto;
+  }
+  &.is-fade {
+    animation: fade-animation 0.8s;
+    @keyframes fade-animation {
+      0% {
+        opacity: 0.2;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+  }
+  :deep {
+    a {
+      pointer-events: none;
+    }
   }
 }
 </style>

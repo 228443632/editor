@@ -43,6 +43,7 @@ const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
+      console.log('entry.isIntersecting', entry.isIntersecting)
       if (entry.isIntersecting) {
         const index = pageRefs.value.indexOf(entry.target)
         const pageNum = _pageNumsList.value[index]
@@ -50,7 +51,7 @@ const resetPageIntersectionObserver = () => {
       }
     })
   })
-  pageRefs.value.forEach((element) => {
+  pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
 }
@@ -113,7 +114,10 @@ const _pageNumsList = computed(() =>
  * 嵌入项每一项样式
  */
 const _embedItemStyle = computed(() => {
-  return {}
+  return {
+    // width: '210mm',
+    // height: '297mm',
+  }
 })
 
 /* 监听 */
@@ -161,6 +165,9 @@ onBeforeUnmount(() => {
         />
 
         <div class="embed__item-num">第 {{ pageNum }} 页</div>
+
+
+
       </div>
     </template>
 
@@ -192,11 +199,16 @@ onBeforeUnmount(() => {
 
 .pdf-embed__item {
   max-width: 120px;
+  width: 100vw;
+  aspect-ratio: 210 / 297;
   margin: 0 auto;
   cursor: pointer;
   position: relative;
   outline: 1px solid #ddd;
+  background: #fff;
   scroll-margin-block-start: 10px;
+  content-visibility: auto;
+  contain-intrinsic-size: 210mm 297mm;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }
