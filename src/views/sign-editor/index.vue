@@ -248,10 +248,20 @@ const signContext = ref({
    */
   getPageNumByTop: pageUtils.getPageNumByTop,
 
+
+  /** 组件类型集合 */
+  compTypeList: [] as string[],
+
   /**
    * 反转参数组件, 初始化
    */
-  initParamsCompList:  pageUtils.reverseExpandCompParams,
+  initParamsCompList: (
+    paramsCompList: IParamsCompItem[],
+    retainField?: IParamsCompItem['type'][],
+  ) => {
+    signContext.value.compTypeList = deepClone(retainField)
+    return pageUtils.reverseExpandCompParams(paramsCompList, retainField)
+  },
 
   /** 是否在拖拽中 */
   isDragging: false,
@@ -376,6 +386,7 @@ window['pageSignEditor'] = {
   signContext,
   layoutSize,
   activePageNum,
+  pageUtils,
 }
 </script>
 

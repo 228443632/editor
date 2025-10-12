@@ -13,6 +13,7 @@ import {
   getAbsOffsetTop,
   uuid,
   rafThrottle,
+  throttle,
   toFixed,
 } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
@@ -311,7 +312,7 @@ const onScroll = (e: Event) => {
   const target = e.target as HTMLDivElement
   const scrollHeight = target.scrollHeight
   scrollViewTop.value = target.scrollTop
-  scrollViewPercent.value = +div(scrollViewTop.value, scrollHeight)
+  scrollViewPercent.value = +toFixed(+div(scrollViewTop.value, scrollHeight), 4)
 }
 
 /**
@@ -475,16 +476,16 @@ defineExpose({
     <div
       class="pdf-embed__item-pagenum"
       :style="{
-        '--top': scrollViewTop + 'px',
-        '--y': scrollViewPercent * rootHeight + 'px',
+        '--y': ~~(scrollViewPercent * rootHeight) + 'px',
       }"
     >
       {{ __signContext__?.anchorInfo?.active }}
     </div>
+
     <!--    {{ __signContext__._paramsCompList }}-->
     <div
       ref="embedPdfWrapRef"
-      class="pdf-embed__wrap"
+      class="pdf-embed__wrap !-mt-50px"
       :style="_pdfEmbedWrapStyle"
     >
       <!-- 加载成功 -->
@@ -683,19 +684,23 @@ defineExpose({
 }
 
 .pdf-embed__item-pagenum {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  padding: 8px 14px;
-  font-size: 14px;
-  position: absolute;
+  //padding: 8px 14px;
+  width: 50px;
+  height: 50px;
+  font-weight: bold;
+  font-size: 16px;
   display: inline-flex;
-  display: none;
   justify-content: center;
   align-items: center;
-  right: 8px;
-  top: var(--top);
-  transform: translate3d(0, var(--y), 0);
+  left: 100%;
+  z-index: 10;
+  top: var(--y);
+  position: sticky;
+  transform: translate3d(-8px, 0, 0);
   border-radius: 4px;
+  //transition: top 0.2s;
   &:after {
     content: '';
     position: absolute;

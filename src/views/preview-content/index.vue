@@ -9,6 +9,7 @@ import Preview from './components/Preview.vue'
 import { useRoute } from 'vue-router'
 import { to } from 'sf-utils2'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -72,7 +73,8 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    source.value = './4.pdf'
+    source.value = './2.pdf'
+    // paramsCompList.value._isSkip = true
   }
 })
 
@@ -106,6 +108,8 @@ window['pagePreviewContent'] = {
   isContentInitial: computed(
     () => previewRef.value.previewContext?.contentInitial,
   ),
+
+  pageUtils,
 }
 </script>
 

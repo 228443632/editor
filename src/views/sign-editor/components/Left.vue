@@ -15,7 +15,7 @@ import {
   COMP_SIGN_STYLE,
 } from '@/views/doc-editor/extensions/constant.ts'
 import { useEventListener } from '@vueuse/core'
-import { uuid } from 'sf-utils2'
+import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
@@ -205,6 +205,16 @@ const getPos = (x: number, y: number) => {
 
 /* 计算 */
 
+/**
+ * 组件类型映射
+ */
+const _compTypeListMap = computed(() => {
+  return arrayToObj(__signContext__.value.compTypeList) as Record<
+    string,
+    string
+  >
+})
+
 /* 监听 */
 
 watchEffect(isDragging, (newVal) => {
@@ -229,6 +239,7 @@ defineExpose({
     <div class="left__content umo-scrollbar">
       <!-- 印章 -->
       <div
+        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSeal]"
         class="left__content-item"
         :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSeal' }, $event)"
@@ -239,6 +250,7 @@ defineExpose({
 
       <!-- 签名 -->
       <div
+        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSign]"
         class="left__content-item"
         :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSign' }, $event)"
@@ -264,6 +276,7 @@ defineExpose({
 
       <!-- 签署日期 -->
       <div
+        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSignDate]"
         class="left__content-item"
         :draggable="__signContext__.contentInitial"
         @dragstart="dragMethod.dragStart({ type: 'compSignDate' }, $event)"

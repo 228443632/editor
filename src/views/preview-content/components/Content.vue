@@ -53,13 +53,16 @@ const __previewContext__ = inject('__previewContext__', ref({}))
 const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
 const initialProgress = ref(0)
 const a4 = cssUtil.getPaperSize('A4')
-const scaleFactor = ref(0)
+// const scaleFactor = ref(1)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
 const { width: rootWidth } = useElementBounding(rootRef)
+const { width: pageItemWidth } = useElementBounding(
+  computed(() => pageRefs.value?.[0]),
+)
 
 const _scalePos = computed(() => {
-  return rootWidth.value / a4._basePx.w
+  return pageItemWidth.value / a4._basePx.w
 })
 
 /**
@@ -163,12 +166,12 @@ const onRendered = (pageNum: number) => {
   console.log('onRendered', pageNum)
   pageRendered.value[pageNum] = true
 
-  nextTick(() => {
-    scaleFactor.value =
-      rootRef.value
-        .querySelector('.vue-pdf-embed__page')
-        .style.getPropertyValue('--scale-factor') || 1
-  })
+  // nextTick(() => {
+  //   scaleFactor.value =
+  //     rootRef.value
+  //       .querySelector('.vue-pdf-embed__page')
+  //       .style.getPropertyValue('--scale-factor') || 1
+  // })
 
   const isRenderSuccess =
     _pageNumsList.value?.length &&
@@ -271,7 +274,9 @@ defineExpose({
         />
 
         <template
-          v-if="scaleFactor && _paramsCompList$pageNum[pageNum]?.length"
+          v-if="
+            _paramsCompList$pageNum[pageNum]?.length && pageVisibility[pageNum]
+          "
         >
           <div
             v-for="item in _paramsCompList$pageNum[pageNum]"
