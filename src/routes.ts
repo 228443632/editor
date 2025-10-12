@@ -11,6 +11,11 @@ export const routes = [
     redirect: '/doc-editor',
   },
   {
+    path: '/test',
+    meta: { title: '测试' },
+    component: () => import('@/views/test/index.vue'),
+  },
+  {
     path: '/doc-editor',
     meta: { title: '编辑器' },
     component: () => import('@/views/doc-editor/index.vue'),
