@@ -6,7 +6,12 @@
 <!--default-->
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
-import { div, debounce } from 'sf-utils2'
+import { div, debounce, arrayToObj } from 'sf-utils2'
+import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
+import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
+import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
+import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 
 const props = defineProps({})
 const emit = defineEmits<{
@@ -24,6 +29,11 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 let pageIntersectionObserver: IntersectionObserver
 const initialProgress = ref(0)
+const a4 = cssUtil.getPaperSize('A4')
+const { width: pageItemWidth } = useElementBounding(
+  computed(() => pageRefs.value?.[0]),
+)
+
 
 const isWheeling = ref(false)
 
@@ -96,6 +106,19 @@ const onWheel = () => {
 
 /* 计算 */
 
+const _scalePos = computed(() => {
+  return pageItemWidth.value / a4._basePx.w
+})
+
+/**
+ * 参数组件列表
+ */
+const _paramsCompList$pageNum = computed(() => {
+  return arrayToObj(__signContext__.value._paramsCompList, 'pageNum', {
+    valueType: 'array',
+  }) as Record<string, IParamsCompItem[]>
+})
+
 /**
  * 是否加载结束
  */
@@ -166,8 +189,44 @@ onBeforeUnmount(() => {
 
         <div class="embed__item-num">第 {{ pageNum }} 页</div>
 
+        <template
+          v-if="
+            _paramsCompList$pageNum[pageNum]?.length && pageVisibility[pageNum]
+          "
+        >
+          <div
+            v-for="item in _paramsCompList$pageNum[pageNum]"
+            :key="item.key"
+            :data-id="'id-' + item.key"
+            class="content-comp__item"
+            :style="{
+              '--page-num': item.pageNum,
+              // top: item.top - (item.pageNum - 1) * 12 + 'px',
+              top: item.offsetTop * +_scalePos + 'px',
+              left: item.offsetLeft * +_scalePos + 'px',
+              transform: `scale(${_scalePos})`,
+            }"
+          >
+            <!-- 印章 -->
+            <ContentCompSeal
+              v-if="item.type == 'compSeal'"
+              :node-data="item"
+            ></ContentCompSeal>
 
+            <!-- 签名 -->
+            <ContentCompSign
+              v-else-if="item.type == 'compSign'"
+              :node-data="item"
+            >
+            </ContentCompSign>
 
+            <!-- 签署日期 -->
+            <ContentCompSignDate
+              v-else-if="item.type == 'compSignDate'"
+              :node-data="item"
+            ></ContentCompSignDate>
+          </div>
+        </template>
       </div>
     </template>
 
@@ -209,6 +268,15 @@ onBeforeUnmount(() => {
   scroll-margin-block-start: 10px;
   content-visibility: auto;
   contain-intrinsic-size: 210mm 297mm;
+  overflow: hidden;
+
+  .content-comp__item {
+    break-after: auto;
+    position: absolute;
+    z-index: 10;
+    transform-origin: 0 0;
+  }
+
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }
