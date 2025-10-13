@@ -161,7 +161,7 @@ registerHotKeys('ctrl+x, command+x', () => {
   del()
 
   // 粘贴
-  paste()
+  copy()
 
   // 添加历史记录
   __signContext__.value.manalHistory.commit()

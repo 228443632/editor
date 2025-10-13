@@ -17,6 +17,7 @@ import {
 import { useEventListener } from '@vueuse/core'
 import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -209,12 +210,14 @@ const getPos = (x: number, y: number) => {
  * 组件类型映射
  */
 const _compTypeListMap = computed(() => {
-  // return arrayToObj(__signContext__.value.compTypeList) as Record<
-  //   string,
-  //   string
-  // >
-  //
-  return COMP_PARAMS_NAME_MAP
+  if (!isInIframe()) {
+    // 不是嵌入iframe中，展示全部
+    return COMP_PARAMS_NAME_MAP
+  }
+  return arrayToObj(__signContext__.value.compTypeList) as Record<
+    string,
+    string
+  >
 })
 
 /* 监听 */

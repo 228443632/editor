@@ -44,3 +44,5 @@ types/components-pure.d.ts
 .DS_Store
 Thumbs.db
 umo-editor-pure.js
+
+lowcode-tp-editor

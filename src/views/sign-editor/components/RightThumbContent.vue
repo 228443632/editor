@@ -53,7 +53,7 @@ const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      console.log('entry.isIntersecting', entry.isIntersecting)
+      // console.log('entry.isIntersecting', entry.isIntersecting)
       if (entry.isIntersecting) {
         const index = pageRefs.value.indexOf(entry.target)
         const pageNum = _pageNumsList.value[index]
