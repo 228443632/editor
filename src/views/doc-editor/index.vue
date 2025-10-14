@@ -85,8 +85,8 @@ const options = $ref(
         isPagination: false, // 开启分页
         extensions,
         toolbar: {
-          // defaultMode: 'classic',
-          // menus: ['base'],
+          defaultMode: 'ribbon',
+          menus: ['base', 'insert', 'table', 'tools'],
           disableMenuItems: [
             'video',
             'audio',
@@ -102,6 +102,12 @@ const options = $ref(
             'textBox',
             'template',
             'webPage',
+
+            // 插入
+            'video',
+            'chineseDate',
+            'emoji',
+            'hr',
 
             // 工具全部隐藏
             'qrcode',
@@ -251,41 +257,39 @@ const rightTpFields = ref([]) // 右侧参数字段
 watch(umoEditorRef, () => {
   editorRef.value = window.editor = umoEditorRef.value.useEditor()
 
-  window.requestAnimationFrame(() => {
-    // 聚焦override
-    const originFocusCommands = editorRef.value.commandManager.rawCommands.focus
-    editorRef.value.commandManager.rawCommands.focus = function () {
-      const node = tiptapUtil.getSelectionNode(editorRef.value)
-      if (COMP_PARAMS_NAME_MAP.compTextDrag === node?.type.name) {
-        return () => false
-      }
-      return () => true
-      // return originFocusCommands.call(this, ...arguments)
+  // 聚焦override
+  const originFocusCommands = editorRef.value.commandManager.rawCommands.focus
+  editorRef.value.commandManager.rawCommands.focus = function () {
+    const node = tiptapUtil.getSelectionNode(editorRef.value)
+    if (COMP_PARAMS_NAME_MAP.compTextDrag === node?.type.name) {
+      return () => false
     }
-    editorRef.value.view.dom.focus = () => undefined
+    return () => true
+    // return originFocusCommands.call(this, ...arguments)
+  }
+  editorRef.value.view.dom.focus = () => undefined
 
-    editorRef.value.commands.focus = () => true
+  editorRef.value.commands.focus = () => true
 
-    // 初始化成功
-    setTimeout(() => {
-      window.dispatchEvent(
-        new CustomEvent('editor-ready', { detail: editorRef.value }),
-      )
-    })
+  if (!isInIframe()) {
+    rightTpFields.value = [
+      {
+        label: '文本',
+        children: [
+          {
+            label: '身份证',
+            value: 'compText',
+          },
+        ],
+      },
+    ]
+  }
 
-    if (!isInIframe()) {
-      rightTpFields.value = [
-        {
-          label: '文本',
-          children: [
-            {
-              label: '身份证',
-              value: 'compText',
-            },
-          ],
-        },
-      ]
-    }
+  // 初始化成功
+  setTimeout(() => {
+    window.dispatchEvent(
+      new CustomEvent('editor-ready', { detail: editorRef.value }),
+    )
   })
 
   // editorRef.value.on('update', ({ editor }) => {

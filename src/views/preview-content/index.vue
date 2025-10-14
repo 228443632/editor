@@ -86,7 +86,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    source.value = './2.pdf'
+    source.value = './pdfs/3.pdf'
     // paramsCompList.value._isSkip = true
 
     initParamsCompList([
@@ -140,10 +140,10 @@ window['pagePreviewContent'] = {
     <!--预览  -->
     <Preview
       v-if="model == 'preview'"
+      ref="previewRef"
       :source="source"
       model="preview"
       :params-comp-list="paramsCompList"
-      ref="previewRef"
     ></Preview>
 
     <!-- 下载  -->

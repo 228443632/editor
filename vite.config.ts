@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
       name: pkg.name,
       fileName: 'umo-editor',
     },
-    outDir: 'lowcode-tp-editor',
+    // outDir: 'lowcode-tp-editor',
     copyPublicDir: false,
     minify: 'esbuild' as const,
     cssMinify: true,

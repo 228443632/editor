@@ -120,6 +120,8 @@ const defaultLineHeight = computed(
 function getPrintPageHtml(fillFieldData: object) {
   const { orientation, size, margin, background } = page.value
 
+  console.log('page', page.value)
+
   let body = getContentHtml()
   if (isPlainObject(fillFieldData) && Object.keys(fillFieldData).length) {
     body = template(body, fillFieldData || {}, {

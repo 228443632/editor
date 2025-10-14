@@ -19,7 +19,6 @@ import { useEventListener } from '@vueuse/core'
 import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
-import dayjs from 'dayjs'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -181,18 +180,18 @@ const validateComp = (type: IDragNodeParamsNode['type']) => {
   } else if (type == COMP_PARAMS_NAME_MAP.compSignDate) {
     // 签署日期
     const compSignDateList = __signContext__.value._compSignDateList
-    if (compSignDateList?.length >= 1) {
+    if (compSignDateList?.length >= COMP_SIGN_DATE_STYLE.limit) {
       useMessage('error', {
-        content: '只能添加一个签署日期',
+        content: `只能添加 ${COMP_SIGN_DATE_STYLE.limit} 个签署日期`,
       })
       return false
     }
   } else if (type == COMP_PARAMS_NAME_MAP.compSign) {
     // 签名
     const compSignList = __signContext__.value._compSignList
-    if (compSignList?.length >= 1) {
+    if (compSignList?.length >= COMP_SIGN_STYLE.limit) {
       useMessage('error', {
-        content: '只能添加一个签名',
+        content: `只能添加 ${COMP_SIGN_STYLE.limit} 个签名`,
       })
       return false
     }
@@ -276,12 +275,12 @@ defineExpose({
         @dragend="dragMethod.dragend"
       >
         <t-tooltip
-          v-if="__signContext__._compSignList?.length >= 1"
+          v-if="__signContext__._compSignList?.length >= COMP_SIGN_STYLE.limit"
           theme="light"
           placement="top"
           :show-arrow="false"
           destroy-on-close
-          content="签署控件最多只有一个"
+          :content="`签署控件最多只有 ${COMP_SIGN_STYLE.limit} 个`"
         >
           <t-icon
             name="error-circle"
@@ -302,10 +301,13 @@ defineExpose({
         @dragend="dragMethod.dragend"
       >
         <t-tooltip
-          v-if="__signContext__._compSignDateList?.length >= 1"
+          v-if="
+            __signContext__._compSignDateList?.length >=
+            COMP_SIGN_DATE_STYLE.limit
+          "
           theme="light"
           placement="top"
-          content="签署日期控件最多只有一个"
+          :content="`签署日期控件最多只有 ${COMP_SIGN_DATE_STYLE.limit} 个`"
           :show-arrow="false"
           destroy-on-close
         >

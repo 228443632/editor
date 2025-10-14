@@ -81,6 +81,21 @@ const exportPdf = async (filename?: string) => {
     const pagesDomList = Array.from(
       contentDom.querySelectorAll('.pdf-embed__item'),
     ) as HTMLElement[]
+
+    // domToPng(contentDom, {
+    //   type: 'image/png', // 优先用PNG保证文字清晰度
+    //   quality: 1, // 高质量参数（PNG接近无损）
+    //   scale: 2, // 应用设备像素比缩放
+    //   workerNumber: navigator.hardwareConcurrency || 2, // 利用CPU核心数
+    //   backgroundColor: '#ffffff',
+    //   debug: false, // 生产环境关闭调试
+    // }).then((dataUrl) => {
+    //   const link = document.createElement('a')
+    //   link.download = 'screenshot.png'
+    //   link.href = dataUrl
+    //   link.click()
+    // })
+
     if (!pagesDomList?.length) throw new Error('未找到导出内容')
     await exportPDFWorker(pagesDomList, filename)
     useMessage('success', { content: '导出成功' })
@@ -104,6 +119,14 @@ const _paramsCompList = computed(() => {
 })
 
 /* 计算 */
+/**
+ * loading 状态
+ */
+const _loading = computed(() => {
+  return (
+    previewContext.value.loading > 0 || !previewContext.value.contentInitial
+  )
+})
 
 /* 监听 */
 
@@ -138,7 +161,7 @@ provide('__previewContext__', previewContext)
   <div
     ref="rootRef"
     v-spin.fullscreen="{
-      loading: previewContext.loading > 0 || !previewContext.contentInitial,
+      loading: _loading,
       size: 'small',
       showLoadingText: false,
       mask: true,

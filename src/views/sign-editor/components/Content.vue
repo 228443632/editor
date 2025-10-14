@@ -25,6 +25,12 @@ import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import {
+  COMP_PARAMS_NAME_MAP,
+  COMP_SEAL_STYLE,
+  COMP_SIGN_DATE_STYLE,
+  COMP_SIGN_STYLE,
+} from '@/views/doc-editor/extensions/constant.ts'
 
 /* 状态 */
 const props = defineProps({})
@@ -57,7 +63,7 @@ const scrollViewPercent = ref(0)
 const scrollViewTop = ref(0)
 const { height: rootHeight } = useElementBounding(rootRef)
 
-const copyContentInfo = ref()
+const copyContentInfo = ref([])
 
 const activeElement = useActiveElement()
 const { x, y } = usePointer()
@@ -121,6 +127,45 @@ function copy() {
 // 粘贴
 registerHotKeys('ctrl+v, command+v', paste)
 function paste() {
+  if (!copyContentInfo.value?.length) {
+    return
+  }
+
+  const countMap = {}
+  const isError = copyContentInfo.value.some((item) => {
+    countMap[item.type] ||= 0
+    if (item.type == COMP_PARAMS_NAME_MAP.compSeal) {
+      countMap[item.type]++
+      if (countMap[item.type] >= COMP_SEAL_STYLE.limit) {
+        useMessage('warning', {
+          content: `签章数量不能超过${COMP_SEAL_STYLE.limit}个`,
+        })
+        return true
+      }
+      // 签章
+    } else if (item.type == COMP_PARAMS_NAME_MAP.compSign) {
+      // 签名
+      countMap[item.type]++
+      if (countMap[item.type] >= COMP_SIGN_STYLE.limit) {
+        useMessage('warning', {
+          content: `签名数量不能超过${COMP_SIGN_STYLE.limit}个`,
+        })
+        return true
+      }
+    } else if (item.type == COMP_PARAMS_NAME_MAP.compSignDate) {
+      // 签署日期
+      countMap[item.type]++
+      if (countMap[item.type] >= COMP_SIGN_DATE_STYLE.limit) {
+        useMessage('warning', {
+          content: `签署日期数量不能超过${COMP_SIGN_DATE_STYLE.limit}个`,
+        })
+        return true
+      }
+    }
+    return false
+  })
+  if (isError) return
+
   const inScrollViewOffsetTop = getAbsOffsetTop(
     embedPdfWrapRef.value,
     rootRef.value,

@@ -365,7 +365,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './4.pdf'
+    signContext.value.source = './pdfs/3.pdf'
   }
 })
 

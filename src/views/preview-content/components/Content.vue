@@ -346,6 +346,22 @@ defineExpose({
       box-shadow: none;
     }
   }
+
+  &.is-preview {
+    .pdf-embed__item {
+      &.is-fade {
+        animation: fade-animation 0.8s;
+        @keyframes fade-animation {
+          0% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
 }
 
 .pdf-embed__item {
@@ -362,17 +378,6 @@ defineExpose({
   }
   &.is-last {
     break-after: auto;
-  }
-  &.is-fade {
-    animation: fade-animation 0.8s;
-    @keyframes fade-animation {
-      0% {
-        opacity: 0.2;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
   }
   :deep {
     a {

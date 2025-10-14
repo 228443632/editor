@@ -90,6 +90,7 @@ export const FLOAT_NODE_TYPE_MAP = {
 export const COMP_SEAL_STYLE = {
   width: cssUtil.mmToPx(40), // 140
   height: cssUtil.mmToPx(40), // 140
+  limit: 99999,
 }
 
 /**
@@ -98,6 +99,7 @@ export const COMP_SEAL_STYLE = {
 export const COMP_SIGN_DATE_STYLE = {
   width: 170,
   height: 28,
+  limit: 1,
 }
 
 /**
@@ -108,6 +110,7 @@ export const COMP_SIGN_STYLE = {
   // height: 28,
   width: 112,
   height: 59,
+  limit: 1,
 }
 
 // export type COMP_BOLD_PARAMS = {
