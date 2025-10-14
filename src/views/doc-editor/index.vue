@@ -15,7 +15,7 @@ import { shallowMergeWithArrayOverride } from '@/views/doc-editor/utils/object-u
 
 // extension
 import extensions from './extensions'
-import { debounce, hasOwn, to } from 'sf-utils2'
+import { debounce, hasOwn, to, deepMerge } from 'sf-utils2'
 
 // types
 import type { Editor } from '@tiptap/vue-3'
@@ -27,6 +27,7 @@ import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import Print from '@/components/container/print.vue'
 import { blobToBase64, fileToBase64 } from 'file64'
+
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
 // import type { Node as TNode } from 'prosemirror-model'
@@ -79,163 +80,169 @@ const debounceSelectionChange = debounce(selectionChange, 100)
 const options = $ref(
   shallowMergeWithArrayOverride(
     { ...defaultOptions },
-    {
-      isPagination: false, // 开启分页
-      extensions,
-      toolbar: {
-        // defaultMode: 'classic',
-        // menus: ['base'],
-        disableMenuItems: [
-          'video',
-          'audio',
-          'file',
-          'code-block',
-          'math',
-          'tag',
-          'columns',
-          'callout',
-          'bookmark',
-          'hard-break',
-          'toc',
-          'textBox',
-          'template',
-          'webPage',
+    deepMerge(
+      {
+        isPagination: false, // 开启分页
+        extensions,
+        toolbar: {
+          // defaultMode: 'classic',
+          // menus: ['base'],
+          disableMenuItems: [
+            'video',
+            'audio',
+            'file',
+            'code-block',
+            'math',
+            'tag',
+            'columns',
+            'callout',
+            'bookmark',
+            'hard-break',
+            'toc',
+            'textBox',
+            'template',
+            'webPage',
 
-          // 工具全部隐藏
-          'qrcode',
-          'barcode',
-          'signature',
-          'seal',
-          'diagrams',
-          'echarts',
-          'mermaid',
+            // 工具全部隐藏
+            'qrcode',
+            'barcode',
+            'signature',
+            'seal',
+            'diagrams',
+            'echarts',
+            'mermaid',
 
-          // 页面
-          'watermark',
-          'background',
-          'preview',
-          'pageBreakSymbol',
+            // 页面
+            'watermark',
+            'background',
+            'preview',
+            'pageBreakSymbol',
 
-          // 导出
-          'share',
-          'embed',
-        ],
-      },
-      document: {
-        title: '合同低码平台',
-        content: undefined,
-        // content: '<p><strong>AB<span style="color: red;">C</span></strong></p>',
-        // content: '<p><strong>ABC</strong></p><p>，</p>',
-        /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
-        editorProps: {
-          // handleDrop(
-          //   view: EditorView,
-          //   event: DragEvent,
-          //   moved: boolean,
-          // ) {
-          //   return true // 返回 true 表示已处理，阻止默认行为
-          // },
+            // 导出
+            'share',
+            'embed',
+          ],
         },
-      },
-      page: {
-        showRightSlot: true,
-        showBookmark: false,
-        // watermark: {
-        //   // text: `开发环境 ${window.location.host}`,
-        // },
-        tocTabsOptions: [{ label: '参数', value: 'params' }],
-      },
-      // templates,
-      cdnUrl: undefined,
-      shareUrl: undefined,
-      file: {
-        allowedMimeTypes: [],
-      },
+        document: {
+          title: '合同低码平台',
+          content: undefined,
+          // content: '<p><strong>AB<span style="color: red;">C</span></strong></p>',
+          // content: '<p><strong>ABC</strong></p><p>，</p>',
+          /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
+          editorProps: {
+            // handleDrop(
+            //   view: EditorView,
+            //   event: DragEvent,
+            //   moved: boolean,
+            // ) {
+            //   return true // 返回 true 表示已处理，阻止默认行为
+            // },
+          },
+        },
+        page: {
+          showRightSlot: true,
+          showBookmark: false,
+          // watermark: {
+          //   // text: `开发环境 ${window.location.host}`,
+          // },
+          tocTabsOptions: [{ label: '参数', value: 'params' }],
+        },
+        // templates,
+        cdnUrl: undefined,
+        shareUrl: undefined,
+        file: {
+          allowedMimeTypes: [],
+        },
 
-      /**
-       * 富文本内容保存之前
-       * @param content
-       */
-      async onBeforeSave(content: { html: string }) {
-        const callOnSave = window['pageDocEditor']?.callOnSave
-        if (callOnSave) {
-          await callOnSave(content?.html)
-        }
-        // localStorage.setItem('document.content', content?.html)
-        // return new Promise((resolve, reject) => {
-        //   setTimeout(() => {
-        //     const success = true
-        //     if (success) {
-        //       resolve('操作成功')
-        //     } else {
-        //       reject(new Error('操作失败'))
-        //     }
-        //   }, 500)
-        // })
-        return false
-      },
-
-      /**
-       * 文件上传
-       * @param file
-       */
-      async onFileUpload(file: File & { url?: string }) {
-        if (!file) {
-          // useMessage('error', { content: '没有找到要上传的文件' })
-          throw new Error('没有找到要上传的文件')
-        }
-
-        // //     const blob = await getHttpBlob(node.attrs.src)
-        console.log('onUpload', file)
-
-        let fileUrl = undefined
-        if (file.url) {
-          // 发起GET请求（fetch默认是GET方法）
-          const [response, err] = (await to(fetch(file.url))) as unknown as [
-            Response,
-            Error,
-          ]
-          // 检查请求是否成功（状态码200-299）
-          if (!response?.ok || err) {
-            // useMessage('error', { content: '图片转化失败，请手动上传图片' })
-            throw new Error(`图片转化失败，请手动上传图片`)
+        /**
+         * 富文本内容保存之前
+         * @param content
+         */
+        async onBeforeSave(content: { html: string }) {
+          const callOnSave = window['pageDocEditor']?.callOnSave
+          if (callOnSave) {
+            await callOnSave(content?.html)
           }
-          // 将响应体转换为ArrayBuffer
-          const arrayBuffer = await response.arrayBuffer()
-          const blob = new Blob([arrayBuffer], { type: file.type })
-          fileUrl = await blobToBase64(blob)
-        }
+          // localStorage.setItem('document.content', content?.html)
+          // return new Promise((resolve, reject) => {
+          //   setTimeout(() => {
+          //     const success = true
+          //     if (success) {
+          //       resolve('操作成功')
+          //     } else {
+          //       reject(new Error('操作失败'))
+          //     }
+          //   }, 500)
+          // })
+          return false
+        },
 
-        return {
-          id: shortId(),
-          url: fileUrl ?? (await fileToBase64(file)),
-          name: file.name,
-          type: file.type,
-          size: file.size,
-        }
+        /**
+         * 文件上传
+         * @param file
+         */
+        async onFileUpload(file: File & { url?: string }) {
+          if (!file) {
+            // useMessage('error', { content: '没有找到要上传的文件' })
+            throw new Error('没有找到要上传的文件')
+          }
 
-        // function fileToBase64(file: File) {
-        //   return new Promise((resolve, reject) => {
-        //     const reader = new FileReader()
-        //     reader.readAsDataURL(file)
-        //     reader.onload = () => resolve(reader.result)
-        //     reader.onerror = (error) => reject(error)
-        //   })
-        // }
+          // //     const blob = await getHttpBlob(node.attrs.src)
+          console.log('onUpload', file)
+
+          let fileUrl = undefined
+          if (file.url) {
+            // 发起GET请求（fetch默认是GET方法）
+            const [response, err] = (await to(fetch(file.url))) as unknown as [
+              Response,
+              Error,
+            ]
+            // 检查请求是否成功（状态码200-299）
+            if (!response?.ok || err) {
+              // useMessage('error', { content: '图片转化失败，请手动上传图片' })
+              throw new Error(`图片转化失败，请手动上传图片`)
+            }
+            // 将响应体转换为ArrayBuffer
+            const arrayBuffer = await response.arrayBuffer()
+            const blob = new Blob([arrayBuffer], { type: file.type })
+            fileUrl = await blobToBase64(blob)
+          }
+
+          return {
+            id: shortId(),
+            url: fileUrl ?? (await fileToBase64(file)),
+            name: file.name,
+            type: file.type,
+            size: file.size,
+          }
+
+          // function fileToBase64(file: File) {
+          //   return new Promise((resolve, reject) => {
+          //     const reader = new FileReader()
+          //     reader.readAsDataURL(file)
+          //     reader.onload = () => resolve(reader.result)
+          //     reader.onerror = (error) => reject(error)
+          //   })
+          // }
+        },
+
+        /**
+         * 文件删除
+         * @param id
+         * @param url
+         */
+        onFileDelete(id: string, url: string) {
+          console.log(id, url)
+        },
+
+        /** 事件 */
+        'onChanged:selection': debounceSelectionChange,
       },
-
       /**
-       * 文件删除
-       * @param id
-       * @param url
+       * 编辑器属性
        */
-      onFileDelete(id: string, url: string) {
-        console.log(id, url)
-      },
-
-      /** 事件 */
-      'onChanged:selection': debounceSelectionChange,
-    },
+      window['pageDocEditor']?.editorOptions || {},
+    ),
   ),
 )
 

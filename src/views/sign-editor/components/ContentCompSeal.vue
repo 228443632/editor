@@ -8,9 +8,9 @@
 import { COMP_SEAL_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import testSealSvgRaw from '@/assets/images/test-seal.svg?raw'
+import multiPageSealIcon from '@/assets/images/multi-page-seal.svg?raw'
 import ContentLineWrap from './ContentLineWrap.vue'
 import ContentDragWrap from './ContentDragWrap.vue'
-import { noop } from 'sf-utils2'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -96,23 +96,23 @@ defineExpose({
 
 <!--render-->
 <template>
-  <div
-    v-if="_isActive"
-    class="absolute transform e-drager-top__handle shadow-md select-none"
-    :style="{
-      top: _nodeData.top + 'px',
-      left: _nodeData.left + 'px',
-      width: contentDragWrapRef?.dragerWidth + 'px',
-      '--y': (_nodeData.translateY || 0) + 'px',
-    }"
-    @mousedown.stop="noop"
-  >
-    <span
-      class="cursor-pointer !hover:text-[var(--umo-primary-color)] flex-1"
-      @click="onApplyMultiPage"
-      >应用到多文件多页</span
-    >
-  </div>
+  <!--  <div-->
+  <!--    v-if="_isActive"-->
+  <!--    class="absolute transform e-drager-top__handle shadow-md select-none"-->
+  <!--    :style="{-->
+  <!--      top: _nodeData.top + 'px',-->
+  <!--      left: _nodeData.left + 'px',-->
+  <!--      width: contentDragWrapRef?.dragerWidth + 'px',-->
+  <!--      '&#45;&#45;y': (_nodeData.translateY || 0) + 'px',-->
+  <!--    }"-->
+  <!--    @mousedown.stop="noop"-->
+  <!--  >-->
+  <!--    <span-->
+  <!--      class="cursor-pointer !hover:text-[var(&#45;&#45;umo-primary-color)] flex-1"-->
+  <!--      @click="onApplyMultiPage"-->
+  <!--      >应用到多文件多页</span-->
+  <!--    >-->
+  <!--  </div>-->
 
   <ContentDragWrap
     ref="contentDragWrapRef"
@@ -124,6 +124,26 @@ defineExpose({
       v-model:node-data="_nodeData"
       :show-line="_isActive"
     >
+      <div class="e-drager-top__tag">印章</div>
+      <t-tooltip
+        v-if="_isActive"
+        theme="light"
+        placement="top"
+        :show-arrow="false"
+        destroy-on-close
+        content="应用到多页"
+      >
+        <div
+          class="w-21px h-21px flex-center text-white rounded-full bg-primary absolute top-0px right-1 icon-apply-multi"
+          @click="onApplyMultiPage"
+          @mousedown.stop="noop"
+        >
+          <div
+            class="w-12px h-12px flex-center"
+            v-html="multiPageSealIcon"
+          ></div>
+        </div>
+      </t-tooltip>
       <div
         ref="divRef"
         :style="{
@@ -139,4 +159,10 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 @import './content-comp-style';
+
+.icon-apply-multi {
+  transform: translate3d(-50%, -50%, 0);
+  z-index: 1;
+  cursor: pointer;
+}
 </style>

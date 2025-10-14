@@ -99,8 +99,8 @@ const exportPdf = async (filename?: string) => {
  * 获取参数组件列表
  */
 const _paramsCompList = computed(() => {
-  // return pageUtils.expandCompParams(props.paramsCompList as any)
-  return props.paramsCompList
+  return pageUtils.expandCompParams(props.paramsCompList as any)
+  // return props.paramsCompList
 })
 
 /* 计算 */

@@ -9,7 +9,6 @@ import Content from './components/Content.vue'
 import { useElementSize } from '@vueuse/core'
 import Left from '@/views/sign-editor/components/Left.vue'
 import Right from './components/Right.vue'
-import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import Footer from './components/Footer.vue'
 import { deepClone, noop, uuid, throttle } from 'sf-utils2'
@@ -23,7 +22,7 @@ const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
-const a4 = cssUtil.getPaperSize('A4')
+const a4 = pageUtils.a4
 const rootRef = ref<HTMLDivElement>()
 const { width: layoutWidth } = useElementSize(rootRef)
 const layoutSize = ref({
@@ -259,7 +258,10 @@ const signContext = ref({
     retainField?: IParamsCompItem['type'][],
   ) => {
     signContext.value.compTypeList = deepClone(retainField)
-    return pageUtils.reverseExpandCompParams(paramsCompList, retainField)
+    signContext.value.paramsCompList = pageUtils.reverseExpandCompParams(
+      paramsCompList,
+      retainField,
+    )
   },
 
   /** 是否在拖拽中 */

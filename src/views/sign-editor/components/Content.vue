@@ -6,7 +6,6 @@
 <!--default-->
 <script setup lang="ts">
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
-import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import {
   deepClone,
   div,
@@ -25,6 +24,7 @@ import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 /* 状态 */
 const props = defineProps({})
@@ -62,7 +62,7 @@ const copyContentInfo = ref()
 const activeElement = useActiveElement()
 const { x, y } = usePointer()
 
-const a4 = cssUtil.getPaperSize('A4')
+const a4 = pageUtils.a4
 
 const { doc } = useVuePdfEmbed({
   source: __signContext__.value.source,

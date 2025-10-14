@@ -30,7 +30,6 @@ const page = inject('page')
 const editor = inject('editor')
 // const tocActive = inject('tocActive')
 
-// TODO
 // tocActive.value = 'dir'
 const { addListenerEvent } = useEditorEvent(editor)
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>

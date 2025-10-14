@@ -12,12 +12,14 @@ import type { IDragNodeParamsNode } from '@/views/doc-editor/extensions/extensio
 import {
   COMP_PARAMS_NAME_MAP,
   COMP_SEAL_STYLE,
+  COMP_SIGN_DATE_STYLE,
   COMP_SIGN_STYLE,
 } from '@/views/doc-editor/extensions/constant.ts'
 import { useEventListener } from '@vueuse/core'
 import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+import dayjs from 'dayjs'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -83,6 +85,18 @@ const dragMethod = {
       dragMethod.dragNodeDom.__nodeData.width = COMP_SIGN_STYLE.width
       dragMethod.dragNodeDom.__nodeData.height = COMP_SIGN_STYLE.height
       setTimeout(() => dragImage.remove())
+    } else if (cItem.type == COMP_PARAMS_NAME_MAP.compSignDate) {
+      // 签名
+      const dragImage = document.createElement('div')
+      document.body.prepend(dragImage)
+      dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SIGN_DATE_STYLE.width}px; height: ${COMP_SIGN_DATE_STYLE.height}px; border: 1px dashed #999;`
+      // dragImage.innerHTML = dayjs().format('YYYY年MM月DD日')
+      dragImage.innerHTML = '签署日期'
+      dragImage.classList.add('flex-center')
+      e.dataTransfer.setDragImage(dragImage, 0, 0)
+      dragMethod.dragNodeDom.__nodeData.width = COMP_SIGN_DATE_STYLE.width
+      dragMethod.dragNodeDom.__nodeData.height = COMP_SIGN_DATE_STYLE.height
+      setTimeout(() => dragImage.remove())
     } else {
       // 设置透明度
       e.dataTransfer.setDragImage(targetNode, 0, 0)
@@ -90,7 +104,7 @@ const dragMethod = {
 
     // 设置光标颜色
     const viewDom = __signContext__.value.contentElRef
-    console.log('viewDom', viewDom)
+    // console.log('viewDom', viewDom)
     viewDom.classList.add('caret--is-dragging')
   },
 

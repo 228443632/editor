@@ -257,7 +257,6 @@ defineExpose({
       :min-width="14"
       :min-height="14"
       :disabled="_nodeData.isInRect"
-      @dragend="onDragEnd"
       :z-index="11"
       :class="[
         'is-draggable',
@@ -265,6 +264,7 @@ defineExpose({
         _nodeData.isInRect && 'line-wrap--in-rect',
       ]"
       v-bind="attrs"
+      @dragend="onDragEnd"
       @drag="rafThrottleOnDrag"
       @mousedown.stop="onSelectNode"
     >
@@ -278,20 +278,20 @@ defineExpose({
           content="删除"
         >
           <span class="line-wrap__delete" @click="emit('delete')">
-            <t-icon name="delete" size="12px" class="text-white"></t-icon>
+            <t-icon name="delete" size="13px" class="text-white"></t-icon>
           </span>
         </t-tooltip>
         <slot></slot>
         <div class="line-wrap__locate">
-          <div class="locate__item">X: {{ ~~_nodeData.left }}</div>
-          <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>
+          <!--          <div class="locate__item">X: {{ ~~_nodeData.left }}</div>-->
+          <!--          <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>-->
 
-          <!--           <div class="locate__item">-->
-          <!--            X: {{ ~~_nodeData.left + ~~(dragerWidth / 2) }}-->
-          <!--          </div>-->
-          <!--          <div class="locate__item">-->
-          <!--            Y: {{ ~~_nodeData.top + ~~(dragerHeight / 2) }}-->
-          <!--          </div>-->
+          <div class="locate__item">
+            X: {{ ~~_nodeData.left + ~~(dragerWidth / 2) }}
+          </div>
+          <div class="locate__item">
+            Y: {{ ~~_nodeData.top + ~~(dragerHeight / 2) }}
+          </div>
         </div>
       </template>
     </Drager>
@@ -358,10 +358,7 @@ defineExpose({
   cursor: pointer;
   z-index: 100;
   transition: all 0.3s ease-in-out;
-  opacity: 0;
-  &:hover {
-    opacity: 1;
-  }
+  opacity: 1;
 }
 
 .line-wrap__locate {

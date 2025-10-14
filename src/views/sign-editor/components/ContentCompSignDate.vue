@@ -101,6 +101,7 @@ defineExpose({
       v-model:node-data="_nodeData"
       :show-line="_isActive"
     >
+      <div class="e-drager-top__tag">签署日期</div>
       <div
         ref="divRef"
         :style="{

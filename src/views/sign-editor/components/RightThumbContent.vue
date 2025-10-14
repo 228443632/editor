@@ -11,7 +11,7 @@ import ContentCompSign from '@/views/preview-content/components/ContentCompSign.
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
-import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const props = defineProps({})
 const emit = defineEmits<{
@@ -29,11 +29,10 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 let pageIntersectionObserver: IntersectionObserver
 const initialProgress = ref(0)
-const a4 = cssUtil.getPaperSize('A4')
+const a4 = pageUtils.a4
 const { width: pageItemWidth } = useElementBounding(
   computed(() => pageRefs.value?.[0]),
 )
-
 
 const isWheeling = ref(false)
 
@@ -253,6 +252,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="less" scoped>
+@import '@/style/vars';
+
 .preview-thumb {
 }
 
@@ -274,6 +275,8 @@ onBeforeUnmount(() => {
     break-after: auto;
     position: absolute;
     z-index: 10;
+    outline: 1px dashed @primary-color;
+    background-color: rgba(@primary-color, 0.06);
     transform-origin: 0 0;
   }
 

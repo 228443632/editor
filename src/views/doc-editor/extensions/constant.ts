@@ -96,7 +96,7 @@ export const COMP_SEAL_STYLE = {
  * 电子签章签署日期样式
  */
 export const COMP_SIGN_DATE_STYLE = {
-  width: 127,
+  width: 170,
   height: 28,
 }
 
@@ -104,8 +104,10 @@ export const COMP_SIGN_DATE_STYLE = {
  * 签名样式
  */
 export const COMP_SIGN_STYLE = {
-  width: 105,
-  height: 28,
+  // width: 105,
+  // height: 28,
+  width: 112,
+  height: 59,
 }
 
 // export type COMP_BOLD_PARAMS = {

@@ -7,9 +7,11 @@
 <script setup lang="ts">
 import Preview from './components/Preview.vue'
 import { useRoute } from 'vue-router'
-import { to } from 'sf-utils2'
+import { deepClone, to } from 'sf-utils2'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -59,6 +61,17 @@ const exportPdf = (filename?: string) => {
 
 const previewPdfStyle = ref({})
 
+/**
+ * 初始化 组件参数
+ * @param paramsCompListArg
+ */
+function initParamsCompList(paramsCompListArg: IParamsCompItem[]) {
+  paramsCompList.value = pageUtils.reverseExpandCompParams(
+    deepClone(paramsCompListArg || []),
+    Object.values(COMP_PARAMS_NAME_MAP),
+  )
+}
+
 /* 计算 */
 
 /* 监听 */
@@ -75,6 +88,10 @@ onMounted(() => {
   if (!isInIframe()) {
     source.value = './2.pdf'
     // paramsCompList.value._isSkip = true
+
+    initParamsCompList([
+      { type: 'compSeal', key: '1', offsetX: 717, offsetY: 1045, pageNum: 1 },
+    ])
   }
 })
 
@@ -99,8 +116,8 @@ window['pagePreviewContent'] = {
   /** 预览pdf样式 */
   previewPdfStyle,
 
-  /** 参数组件列表 */
-  paramsCompList,
+  /** 初始化参数 */
+  initParamsCompList,
 
   /**
    * 是否内容初始化

@@ -13,7 +13,7 @@ import ContentCompSign from '@/views/preview-content/components/ContentCompSign.
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
-import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
+import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -52,7 +52,6 @@ let pageIntersectionObserver: IntersectionObserver
 const __previewContext__ = inject('__previewContext__', ref({}))
 const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
 const initialProgress = ref(0)
-const a4 = cssUtil.getPaperSize('A4')
 // const scaleFactor = ref(1)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
@@ -62,7 +61,7 @@ const { width: pageItemWidth } = useElementBounding(
 )
 
 const _scalePos = computed(() => {
-  return pageItemWidth.value / a4._basePx.w
+  return pageItemWidth.value / pageUtils.a4._basePx.w
 })
 
 /**
@@ -327,6 +326,8 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
+@import '@/style/vars';
+
 .pdf-embed__wrap {
   --per-page-gap: 12px;
   width: 100%;
@@ -337,6 +338,8 @@ defineExpose({
     position: absolute;
     z-index: 10;
     transform-origin: 0 0;
+    outline: 1px dashed @primary-color;
+    background-color: rgba(@primary-color, 0.04);
   }
   &.is-exporting {
     .pdf-embed__item {
@@ -353,6 +356,7 @@ defineExpose({
   //break-inside: avoid;
   background: white;
   position: relative;
+  aspect-ratio: 210 / 297;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }
