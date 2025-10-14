@@ -238,7 +238,7 @@ defineExpose({
 <!--render-->
 <template>
   <span
-    class="e-drager-wrap"
+    :class="['e-drager-wrap']"
     :style="{
       '--y': _nodeData.translateY + 'px',
     }"

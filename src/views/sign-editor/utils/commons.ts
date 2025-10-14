@@ -80,35 +80,15 @@ export const pageUtils = {
       return paramsCompListClone
     }
     return paramsCompListClone.map((item) => {
+      pageUtils.safeItem(item)
       item.translateY = 0
       item.isInRect = false
       item.key ||= uuid()
 
-      switch (item.type) {
-        // 签章
-        case COMP_PARAMS_NAME_MAP.compSeal:
-          item.width ??= COMP_SEAL_STYLE.width
-          item.height ??= COMP_SEAL_STYLE.height
-          break
-        // 签名
-        case COMP_PARAMS_NAME_MAP.compSign:
-          item.width ??= COMP_SIGN_STYLE.width
-          item.height ??= COMP_SIGN_STYLE.height
-          break
-        // 签名日期
-        case COMP_PARAMS_NAME_MAP.compSignDate:
-          item.width ??= COMP_SIGN_DATE_STYLE.width
-          item.height ??= COMP_SIGN_DATE_STYLE.height
-          break
-        default:
-          break
-      }
-
-      item.width ??= 0
-      item.height ??= 0
+      pageUtils.fillItemWH(item)
 
       const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
-      item.offsetLeft = item.left
+      item.offsetLeft = item.left ?? 0
       item.offsetTop = offsetTop
 
       item.offsetX = ~~(item.offsetLeft + item.width / 2)
@@ -116,6 +96,50 @@ export const pageUtils = {
       item.pageNum = pageNum
       return item
     }) as IParamsCompItem[]
+  },
+
+  /**
+   * 填充宽高
+   */
+  fillItemWH(item: IParamsCompItem) {
+    switch (item.type) {
+      // 签章
+      case COMP_PARAMS_NAME_MAP.compSeal:
+        item.width ??= COMP_SEAL_STYLE.width
+        item.height ??= COMP_SEAL_STYLE.height
+        break
+      // 签名
+      case COMP_PARAMS_NAME_MAP.compSign:
+        item.width ??= COMP_SIGN_STYLE.width
+        item.height ??= COMP_SIGN_STYLE.height
+        break
+      // 签名日期
+      case COMP_PARAMS_NAME_MAP.compSignDate:
+        item.width ??= COMP_SIGN_DATE_STYLE.width
+        item.height ??= COMP_SIGN_DATE_STYLE.height
+        break
+      default:
+        break
+    }
+    item.width ??= 0
+    item.height ??= 0
+  },
+
+  /**
+   * 默认安全 值
+   * @param item
+   */
+  safeItem(item: IParamsCompItem) {
+    item.top ??= 0
+    item.left ??= 0
+    item.offsetTop ??= 0
+    item.offsetLeft ??= 0
+    item.offsetX ??= 0
+    item.offsetY ??= 0
+    item.translateX ??= 0
+    item.translateY ??= 0
+    item.x ??= 0
+    item.y ??= 0
   },
 
   /**
@@ -127,40 +151,20 @@ export const pageUtils = {
     paramsCompList: IParamsCompItem[],
     retainField?: IParamsCompItem['type'][],
   ) {
-    // offsetX offsetY 一定有
+    // offsetX offsetY pageNum 一定有
     retainField ||= []
     const retainFieldObj = arrayToObj(retainField)
     console.log('retainFieldObj', retainFieldObj)
     return deepClone(paramsCompList || [])
       .map((item) => {
+        pageUtils.safeItem(item)
         item.translateY = 0
         item.isInRect = false
         item.key ||= uuid()
 
-        switch (item.type) {
-          // 签章
-          case COMP_PARAMS_NAME_MAP.compSeal:
-            item.width ??= COMP_SEAL_STYLE.width
-            item.height ??= COMP_SEAL_STYLE.height
-            break
-          // 签名
-          case COMP_PARAMS_NAME_MAP.compSign:
-            item.width ??= COMP_SIGN_STYLE.width
-            item.height ??= COMP_SIGN_STYLE.height
-            break
-          // 签名日期
-          case COMP_PARAMS_NAME_MAP.compSignDate:
-            item.width ??= COMP_SIGN_DATE_STYLE.width
-            item.height ??= COMP_SIGN_DATE_STYLE.height
-            break
-          default:
-            break
-        }
-
-        item.width ??= 0
-        item.height ??= 0
-
-        console.log('item', item)
+        pageUtils.fillItemWH(item)
+        item.offsetX ??= 0
+        item.offsetY ??= 0
 
         item.offsetLeft = ~~(item.offsetX - item.width / 2)
         item.offsetTop = ~~(item.offsetY - item.height / 2)
@@ -169,7 +173,9 @@ export const pageUtils = {
           (item.pageNum - 1) * pageUtils.perPageGap +
           (item.pageNum - 1) * a4._basePx.h +
           item.offsetTop
-        item.left = item.offsetLeft || item.left
+        item.left = item.offsetLeft ?? item.left
+
+        console.log('item', item)
 
         return item
       })

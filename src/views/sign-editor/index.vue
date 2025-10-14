@@ -59,6 +59,7 @@ const paramsCompListHistory = ref<{
   activeCompParam: undefined,
   scrollTop: 0,
 })
+const initial = ref(false)
 
 const {
   history,
@@ -262,6 +263,7 @@ const signContext = ref({
       paramsCompList,
       retainField,
     )
+    initial.value = true
   },
 
   /** 是否在拖拽中 */
@@ -366,6 +368,7 @@ onMounted(() => {
 
   if (!isInIframe()) {
     signContext.value.source = './pdfs/3.pdf'
+    initial.value = true
   }
 })
 
@@ -394,7 +397,7 @@ window['pageSignEditor'] = {
 <!--render-->
 <template>
   <div
-    v-if="signContext.source"
+    v-if="initial && signContext.source"
     ref="rootRef"
     v-spin="{
       loading: signContext.loading > 0,
