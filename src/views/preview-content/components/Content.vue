@@ -8,7 +8,7 @@
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
-import { arrayToObj, div } from 'sf-utils2'
+import { arrayToObj, debounce, div } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
@@ -113,18 +113,22 @@ const { doc } = useVuePdfEmbed({
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const index = pageRefs.value.indexOf(entry.target)
-        const pageNum = _pageNumsList.value[index]
-        pageVisibility.value[pageNum] = true
-      }
-    })
+    debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
 }
+const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const index = pageRefs.value.indexOf(entry.target)
+      const pageNum = _pageNumsList.value[index]
+      pageVisibility.value[pageNum] = true
+    }
+  })
+}
+const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
 
 /**
  * 一次性加载所有页面

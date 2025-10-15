@@ -11,7 +11,7 @@ import { deepClone, to } from 'sf-utils2'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
-import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts'
+// import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -64,11 +64,16 @@ const previewPdfStyle = ref({})
 /**
  * 初始化 组件参数
  * @param paramsCompListArg
+ * @param retainField
  */
-function initParamsCompList(paramsCompListArg: IParamsCompItem[]) {
+function initParamsCompList(
+  paramsCompListArg: IParamsCompItem[],
+  retainField?: IParamsCompItem['type'][],
+) {
   paramsCompList.value = pageUtils.reverseExpandCompParams(
     deepClone(paramsCompListArg || []),
-    Object.values(COMP_PARAMS_NAME_MAP),
+    retainField,
+    // Object.values(COMP_PARAMS_NAME_MAP),
   )
 }
 

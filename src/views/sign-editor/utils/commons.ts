@@ -160,7 +160,7 @@ export const pageUtils = {
         pageUtils.safeItem(item)
         item.translateY = 0
         item.isInRect = false
-        item.key ||= uuid()
+        item.key = uuid()
 
         pageUtils.fillItemWH(item)
         item.offsetX ??= 0

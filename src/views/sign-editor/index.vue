@@ -75,7 +75,7 @@ const {
 
 const signContext = ref({
   /** 缩小/放大比例*/
-  scaleFactor: 0,
+  scaleFactor: 1,
 
   /** 分页方法*/
   pageUtils,
@@ -369,6 +369,17 @@ onMounted(() => {
   if (!isInIframe()) {
     signContext.value.source = './pdfs/3.pdf'
     initial.value = true
+    signContext.value.initParamsCompList(
+      [
+        {
+          type: 'compSign',
+          offsetX: 100,
+          offsetY: 100,
+          key: uuid(),
+        },
+      ],
+      ['compSign', 'compSignDate', 'compSeal'],
+    )
   }
 })
 

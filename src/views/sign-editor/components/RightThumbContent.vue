@@ -51,19 +51,23 @@ const { doc } = useVuePdfEmbed({
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      // console.log('entry.isIntersecting', entry.isIntersecting)
-      if (entry.isIntersecting) {
-        const index = pageRefs.value.indexOf(entry.target)
-        const pageNum = _pageNumsList.value[index]
-        pageVisibility.value[pageNum] = true
-      }
-    })
+    debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
 }
+
+const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const index = pageRefs.value.indexOf(entry.target)
+      const pageNum = _pageNumsList.value[index]
+      pageVisibility.value[pageNum] = true
+    }
+  })
+}
+const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
 
 /**
  * 选择pdf一项

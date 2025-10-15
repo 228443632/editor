@@ -374,7 +374,7 @@ defineExpose({
   color: #fff;
   user-select: none;
   background-color: #595959;
-  opacity: 0.9;
+  opacity: 0;
   display: flex;
   gap: 16px;
   flex-direction: row;

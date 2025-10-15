@@ -45,7 +45,8 @@
             width: pageSize.width + 'cm',
             transform: `scale(${pageOptions.zoomLevel ? pageOptions.zoomLevel / 100 : 1})`,
             '--umo-content-bound-rect-top':
-              (pageContentBoundRect?.top || 110) + 'px',
+              (pageContentBoundRect?.top?.value || 110) + 'px',
+            overflow: 'visible',
           }"
         >
           <div

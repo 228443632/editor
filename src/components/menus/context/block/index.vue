@@ -84,6 +84,12 @@ const dropdownVisible = (visible: boolean) => {
 </script>
 
 <style lang="less">
+:root[mode='print'] {
+  .umo-block-menu-drag-handle {
+    display: none;
+    opacity: 0;
+  }
+}
 .umo-block-menu {
   .umo-menu-button {
     color: var(--umo-text-color-light) !important;

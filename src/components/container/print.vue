@@ -120,7 +120,7 @@ const defaultLineHeight = computed(
 function getPrintPageHtml(fillFieldData: object) {
   const { orientation, size, margin, background } = page.value
 
-  console.log('page', page.value)
+  console.log('page@', margin.top)
 
   let body = getContentHtml()
   if (isPlainObject(fillFieldData) && Object.keys(fillFieldData).length) {
@@ -167,6 +167,7 @@ function getPrintPageHtml(fillFieldData: object) {
   ) as HTMLHtmlElement
   if (editorDom) {
     editorDom.setAttribute('contenteditable', 'false')
+    // editorDom.insertAdjacentHTML('beforeend', '<div></div>')
   }
 
   // 3、删除图片分隔符
@@ -197,7 +198,7 @@ function getPrintPageHtml(fillFieldData: object) {
   // )
   // if (brBreakList) {
   //   brBreakList.forEach((item) => {
-  //     item.remove()
+  //     item.classList.remove('ProseMirror-trailingBreak')
   //   })
   //   brBreakList.length = 0
   // }
@@ -268,6 +269,16 @@ function getPrintPageHtml(fillFieldData: object) {
     }
   }
 
+  // 9、移除拖拽菜单图标
+  const dragMenuHandleDomList = doc.querySelectorAll(
+    '.umo-block-menu-drag-handle',
+  ) as unknown as HTMLHtmlElement[]
+  if (dragMenuHandleDomList?.length) {
+    dragMenuHandleDomList.forEach((dragMenuHandleDom) => {
+      dragMenuHandleDom.remove()
+    })
+  }
+
   return `
     <!DOCTYPE html>
     <html lang="zh-CN" theme-mode="${options.value.theme}" mode="print">
@@ -290,7 +301,7 @@ function getPrintPageHtml(fillFieldData: object) {
         }
         .umo-page-content{
           transform: scale(1) !important;
-          overflow: hidden;
+          overflow: visible !important;
         }
         @page {
           size: ${orientation === 'portrait' ? size?.width : size?.height}cm ${orientation === 'portrait' ? size?.height : size?.width}cm;
@@ -303,6 +314,9 @@ function getPrintPageHtml(fillFieldData: object) {
         @page:last {
           padding-bottom: 0;
           page-break-after: avoid;
+        }
+        tr, td, img {
+          page-break-inside: avoid;
         }
         ${styleListString}
       </style>

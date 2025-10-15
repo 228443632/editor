@@ -257,7 +257,7 @@ defineExpose({
     </VueDraggable>
 
     <div v-else class="flex items-center justify-center text-12px min-h-60px">
-      <div class="text-[var(--umo-text-color-light)]">暂无参数数据</div>
+      <div class="text-[var(--umo-text-color-light)]">暂无模版字段数据</div>
     </div>
   </div>
 </template>

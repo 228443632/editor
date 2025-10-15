@@ -13,6 +13,7 @@ import {
   uuid,
   rafThrottle,
   toFixed,
+  debounce,
 } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
@@ -240,18 +241,23 @@ function del() {
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const index = pageRefs.value.indexOf(entry.target)
-        const pageNum = _pageNumsList.value[index]
-        pageVisibility.value[pageNum] = true
-      }
-    })
+    debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
 }
+
+const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const index = pageRefs.value.indexOf(entry.target)
+      const pageNum = _pageNumsList.value[index]
+      pageVisibility.value[pageNum] = true
+    }
+  })
+}
+const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
 
 /**
  * 一次性加载所有页面
@@ -586,7 +592,12 @@ defineExpose({
             v-for="(item, index) in __signContext__._paramsCompList"
             :key="item.key"
             :data-id="'id-' + item.key"
-            class="content-comp__item"
+            :class="[
+              'content-comp__item',
+              (item.isInRect ||
+                item.key == __signContext__?.activeCompParam?.key) &&
+                'content-comp__item-active',
+            ]"
             :style="{
               '--page-num': item.pageNum,
               '--mt': -((item.pageNum - 1) * __layoutSize__.perPageGap) + 'px',
@@ -704,6 +715,17 @@ defineExpose({
   //
   //.mouse-area__left, .mouse-area__right {
   //}
+}
+
+.content-comp__item-active {
+  .e-drager-wrap {
+    z-index: 100;
+  }
+  :deep {
+    .es-drager {
+      z-index: 100 !important;
+    }
+  }
 }
 
 .pdf-embed__wrap {

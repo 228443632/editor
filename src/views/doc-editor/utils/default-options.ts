@@ -34,10 +34,10 @@ export const defaultOptions = {
   /** 页面配置，详见页面配置。 */
   page: {
     defaultMargin: {
-      left: 3.18,
-      right: 3.18,
-      top: 2.54,
-      bottom: 2.54,
+      left: 2,
+      right: 2,
+      top: 2.5,
+      bottom: 2.5,
     },
     defaultOrientation: 'portrait',
     defaultBackground: '#fff',

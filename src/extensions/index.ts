@@ -266,7 +266,7 @@ export const getDefaultExtensions = ({
     Echarts,
     typeWriter,
     UniqueID.configure({
-      attributeName: 'data-id',
+      attributeName: 'id',
       types: [
         'heading',
         'paragraph',
