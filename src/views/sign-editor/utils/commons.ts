@@ -21,12 +21,6 @@ export const pageUtils = {
 
   a4,
 
-  compOffsetY: {
-    compSign: 0,
-    compSeal: 0,
-    compSignDate: 8,
-  },
-
   /**
    * 根据页码获取 绝对top
    * @param pageNum

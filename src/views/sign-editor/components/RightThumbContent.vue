@@ -30,10 +30,16 @@ const pageVisibility = ref({}) // 页面可见性
 const rootRef = ref<HTMLElement>()
 let pageIntersectionObserver: IntersectionObserver
 const a4 = pageUtils.a4
+
 const { width: pageItemWidth } = useElementBounding(
-  computed(() => pageRefs.value?.[0]),
+  computed(() => {
+    const dom = unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
+    if (dom) return dom.querySelector('canvas')
+    return null
+  }),
 )
-const dpi = window.devicePixelRatio || 1
+
+const dpr = ref(window.devicePixelRatio || 1)
 
 const isWheeling = ref(false)
 const { height: parentHeight } = useElementSize(
@@ -114,7 +120,7 @@ const onWheel = () => {
 /* 计算 */
 
 const _scalePos = computed(() => {
-  return pageItemWidth.value / a4._basePx.w
+  return pageItemWidth.value / pageUtils.a4._basePx.w
 })
 
 /**
@@ -199,7 +205,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
           :source="__signContext__.doc"
           :page="pageNum"
           class="animation-fade"
-          :scale="dpi / 3"
+          :scale="dpr / 3"
         />
 
         <div class="embed__item-num">第 {{ pageNum }} 页</div>

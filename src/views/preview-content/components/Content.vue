@@ -48,6 +48,7 @@ const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
 const pageRendered = ref({})
 let pageIntersectionObserver: IntersectionObserver
+const updateKeyFlag = ref(0)
 
 const __previewContext__ = inject('__previewContext__', ref({}))
 const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
@@ -57,12 +58,23 @@ const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
 const { width: rootWidth } = useElementBounding(rootRef)
 const { width: pageItemWidth } = useElementBounding(
-  computed(() => pageRefs.value?.[0]),
+  computed(() => {
+    const dom = unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
+    if (dom) return dom.querySelector('canvas')
+    return null
+  }),
 )
 
 const _scalePos = computed(() => {
   return pageItemWidth.value / pageUtils.a4._basePx.w
 })
+
+function winResize() {
+  if (props.model == 'preview') {
+    updateKeyFlag.value++
+  }
+}
+const debounceWinResize = debounce(winResize, 500) as typeof winResize
 
 /**
  * 嵌入项每一项样式
@@ -230,6 +242,12 @@ const _paramsCompList$pageNum = computed(() => {
 /* 监听 */
 watchEffect(() => {
   __previewContext__.value.contentInitial = _initial.value
+  if (_initial.value) {
+    nextTick(() => {
+      window.removeEventListener('resize', debounceWinResize)
+      window.addEventListener('resize', debounceWinResize)
+    })
+  }
 })
 
 watch(_pageNumsList, (newPageNums: number[]) => {
@@ -246,6 +264,7 @@ onMounted(() => {})
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
+  window.removeEventListener('resize', debounceWinResize)
 })
 
 /* 暴露 */
@@ -260,6 +279,7 @@ defineExpose({
 <template>
   <div
     ref="rootRef"
+    :key="updateKeyFlag"
     :class="[
       'pdf-embed__wrap',
       props.model == 'preview' && 'is-preview',
@@ -289,8 +309,6 @@ defineExpose({
           :page="pageNum"
           annotation-layer
           text-layer
-          :width="pageUtils.a4._basePx.w"
-          :height="pageUtils.a4._basePx.h"
           :scale="dpr"
           class="animation-fade"
           @rendered="onRendered(pageNum)"
@@ -356,6 +374,7 @@ defineExpose({
     transform-origin: 0 0;
     outline: 1px dashed @primary-color;
     background-color: rgba(@primary-color, 0.04);
+    pointer-events: none;
   }
   &.is-exporting {
     .pdf-embed__item {

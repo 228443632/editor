@@ -70,7 +70,7 @@ const activeElement = useActiveElement()
 const { x, y } = usePointer()
 
 const a4 = pageUtils.a4
-const dpi = window.devicePixelRatio || 1
+const dpr = ref(window.devicePixelRatio || 1)
 
 const { doc } = useVuePdfEmbed({
   source: __signContext__.value.source,
@@ -601,7 +601,7 @@ defineExpose({
               annotation-layer
               :width="a4._basePx.w"
               :height="a4._basePx.h"
-              :scale="dpi"
+              :scale="dpr"
               text-layer
               class="animation-fade"
               :page="pageNum"
