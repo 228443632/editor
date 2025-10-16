@@ -91,7 +91,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    source.value = './pdfs/5.pdf'
+    source.value = './pdfs/4.pdf'
     // paramsCompList.value._isSkip = true
 
     initParamsCompList(

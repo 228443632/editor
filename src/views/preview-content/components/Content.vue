@@ -63,8 +63,6 @@ const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
 // const canvasWidth = ref(undefined)
 // const canvasHeight = ref(undefined)
 
-const scalePos = ref(1)
-
 async function winResize() {
   if (props.model == 'preview') {
     updateKeyFlag.value++
@@ -218,17 +216,17 @@ const onRendered = (pageNum: number) => {
 /**
  * 更新缩放比例
  */
-const updateScalePos = () => {
-  if (props.model == 'download') return
-  const canvasDOMList = Array.from(
-    rootRef.value?.querySelectorAll?.('.vue-pdf-embed__page > canvas') || [],
-  ) as HTMLHtmlElement[]
-  const canvasDOM = canvasDOMList.find((item) => item?.offsetWidth)
-  if (canvasDOM)
-    scalePos.value = canvasDOM?.offsetWidth / pageUtils.a4._basePx.w
-}
+const updateScalePos = () => {}
 
 /* 计算 */
+
+/**
+ * 缩放比例
+ */
+const _scalePos = computed(() => {
+  updateKeyFlag.value
+  return pageItemWidth.value / pageUtils.a4._basePx.w
+})
 
 /**
  * 分页数量
@@ -273,25 +271,8 @@ watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
-/**
- * 页码
- */
-watch([updateKeyFlag, pageItemWidth, pageRendered], () => {
-  nextTick(() => {
-    updateScalePos()
-  })
-})
-
 /* 周期 */
-onMounted(() => {
-  window.requestAnimationFrame(() => {
-    updateScalePos()
-    setTimeout(() => {
-      // fix: 强制刷新一次，防止缩放比例计算错误
-      updateScalePos()
-    }, 20)
-  })
-})
+onMounted(() => {})
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
@@ -339,6 +320,8 @@ defineExpose({
           :source="doc"
           :page="pageNum"
           annotation-layer
+          :width="pageItemWidth"
+          :height="pageItemHeight"
           text-layer
           :scale="dpr"
           @rendered="onRendered(pageNum)"
@@ -357,9 +340,9 @@ defineExpose({
             :style="{
               '--page-num': item.pageNum,
               // top: item.top - (item.pageNum - 1) * 12 + 'px',
-              top: item.offsetTop * +scalePos + 'px',
-              left: item.offsetLeft * +scalePos + 'px',
-              transform: `scale(${scalePos})`,
+              top: item.offsetTop * +_scalePos + 'px',
+              left: item.offsetLeft * +_scalePos + 'px',
+              transform: `scale(${_scalePos})`,
             }"
           >
             <!-- 印章 -->
@@ -412,7 +395,8 @@ defineExpose({
     }
   }
 
-  &.is-preview {}
+  &.is-preview {
+  }
 }
 
 .pdf-embed__item {

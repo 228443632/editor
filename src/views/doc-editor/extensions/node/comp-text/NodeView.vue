@@ -180,12 +180,17 @@ provide('NODE_PROPS', props)
     &[bordertype='none'] {
       border-bottom: none;
     }
-    &.umo-node-focused.umo-node-focused.umo-node-focused.umo-node-focused,
-    &.ProseMirror-selectednode.ProseMirror-selectednode {
-      outline: none !important;
-    }
   }
 }
+
+//:root[mode='preview'] {
+//  .umo-node-view2[compname='comp-text'] {
+//    &.umo-node-focused.umo-node-focused.umo-node-focused,
+//    &.ProseMirror-selectednode {
+//      outline: none !important;
+//    }
+//  }
+//}
 
 /*render node*/
 span[data-id][compname] {

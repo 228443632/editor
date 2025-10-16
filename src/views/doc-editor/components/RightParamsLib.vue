@@ -551,8 +551,7 @@ defineExpose({
         cursor: grab;
       }
       &:hover {
-        color: var(--umo-primary-color);
-        border-color: currentColor;
+        border-color: @primary-color;
       }
     }
   }
