@@ -32,6 +32,7 @@ import testSealImgRaw from '@/assets/images/test-seal.svg?raw'
 import testSignImg from '@/assets/images/test-sign.svg'
 import testSignImgRaw from '@/assets/images/test-sign.svg?raw'
 import profile from '@/profile.ts'
+import textFillIconRaw from '@/assets/images/text-fill-icon.svg?raw'
 
 const props = defineProps({
   /**
@@ -304,7 +305,7 @@ const dragMethod = {
       dragImage.innerHTML = testSealImgRaw
       dragImage.style.width = `${COMP_SEAL_STYLE.width}px`
       dragImage.style.height = `${COMP_SEAL_STYLE.height}px`
-      dragImage.style.border = '2px dashed var(--umo-primary-color)'
+      dragImage.style.border = '1px dashed var(--umo-primary-color)'
       e.dataTransfer.setDragImage(
         dragImage,
         -dragImage.offsetWidth,
@@ -320,7 +321,7 @@ const dragMethod = {
       dragImage.innerHTML = testSignImgRaw
       dragImage.style.width = `${COMP_SIGN_STYLE.width}px`
       dragImage.style.height = `${COMP_SIGN_STYLE.height}px`
-      dragImage.style.border = '2px dashed var(--umo-primary-color)'
+      dragImage.style.border = '1px dashed var(--umo-primary-color)'
       e.dataTransfer.setDragImage(
         dragImage,
         -dragImage.offsetWidth,
@@ -454,8 +455,9 @@ defineExpose({
             </template>
 
             <template v-else>
+              <span class="inline-flex" v-html="textFillIconRaw"></span>
               <!--              <icon size="16" :name="cItem.icon"></icon>-->
-              <span class="ml-4px">{{ cItem.label }}</span>
+              <span class="truncate">{{ cItem.label }}</span>
             </template>
           </li>
         </ul>
@@ -469,6 +471,7 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
+@import '@/style/vars';
 .umo-pr-container {
   padding-top: var(--padding-top);
   background: transparent;
@@ -522,17 +525,18 @@ defineExpose({
       // width: 108px;
       width: 100%;
       display: flex;
-      justify-content: center;
       align-items: center;
       font-size: 12px;
+      gap: 16px;
       min-height: 36px;
-      padding: 8px 0;
-      border: 1px solid #e1e4eb;
+      padding: 8px 16px;
       border-radius: 4px;
       cursor: pointer;
       @primary-color: #2d49d1;
+      background-color: #f4f6fc;
+      border: 1px solid #e9ecfa;
+      color: #22379d;
       &.is-dragging {
-        border: 2px dashed red;
         cursor: grabbing;
         box-shadow: 0px 6px 16px -8px rgba(0, 0, 0, 0.08);
         background-color: rgba(var(--umo-primary-color), 0.12);

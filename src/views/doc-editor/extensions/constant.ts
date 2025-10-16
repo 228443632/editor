@@ -97,7 +97,7 @@ export const COMP_SEAL_STYLE = {
  * 电子签章签署日期样式
  */
 export const COMP_SIGN_DATE_STYLE = {
-  width: 170,
+  width: 120,
   height: 28,
   limit: 1,
 }

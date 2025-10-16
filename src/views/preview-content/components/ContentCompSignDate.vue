@@ -46,7 +46,7 @@ defineExpose({
       height: COMP_SIGN_DATE_STYLE.height + 'px',
     }"
   >
-    <div class="flex-center text-14px h-full">xxxx年xx月xx日</div>
+    <div class="flex-center text-14px h-full">XXXX年XX月XX日</div>
   </div>
 </template>
 

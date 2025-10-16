@@ -401,16 +401,17 @@ watch(
   background: #fff;
 
   &.is-show {
+    width: var(--right-aside-width);
     //grid-template-columns: 1fr;
-    width: clamp(
-      var(--right-aside-width),
-      calc(
-        var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
-          var(--editor-width) - 8px
-      ),
-      // 修改宽度
-      240px
-    );
+    //width: clamp(
+    //  var(--right-aside-width),
+    //  calc(
+    //    var(--layout-width) - var(--left-aside-width) - var(--padding-left) * 2 -
+    //      var(--editor-width) - 8px
+    //  ),
+    //  // 修改宽度
+    //  var(--right-aside-width)
+    //);
   }
 }
 

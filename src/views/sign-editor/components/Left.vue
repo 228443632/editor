@@ -90,7 +90,7 @@ const dragMethod = {
       document.body.prepend(dragImage)
       dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SIGN_DATE_STYLE.width}px; height: ${COMP_SIGN_DATE_STYLE.height}px; border: 1px dashed #999;`
       // dragImage.innerHTML = dayjs().format('YYYY年MM月DD日')
-      dragImage.innerHTML = 'xxxx年xx月xx日'
+      dragImage.innerHTML = 'XXXX年XX月XX日'
       dragImage.classList.add('flex-center', 'text-14px')
       e.dataTransfer.setDragImage(dragImage, 0, 0)
       dragMethod.dragNodeDom.__nodeData.width = COMP_SIGN_DATE_STYLE.width

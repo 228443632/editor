@@ -191,7 +191,7 @@ const layoutSize = ref({
   leftAsideGap: 16,
 
   /** 右侧宽度 */
-  rightAsideWidth: 280,
+  rightAsideWidth: 313,
 
   /** 分页数据 */
   pagination: {
