@@ -66,7 +66,7 @@ const onChooseUseWidgetItem = (item) => {
   function scrollIntoView(target: HTMLElement) {
     if (target) {
       target.scrollIntoView({
-        behavior: 'smooth',
+        // behavior: 'smooth',
         block: 'start',
         // inline: 'center',
       })

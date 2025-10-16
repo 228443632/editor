@@ -15,7 +15,8 @@ import { deepClone, noop, uuid, throttle } from 'sf-utils2'
 import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
-import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts' // 头部
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts'
+import { type useVuePdfEmbed } from 'vue-pdf-embed' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -76,6 +77,8 @@ const {
 const signContext = ref({
   /** 缩小/放大比例*/
   scaleFactor: 1,
+
+  doc: shallowRef({}) as ReturnType<typeof useVuePdfEmbed>['doc'],
 
   /** 分页方法*/
   pageUtils,
@@ -367,7 +370,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './pdfs/3.pdf'
+    signContext.value.source = './pdfs/4.pdf'
     initial.value = true
     signContext.value.initParamsCompList(
       [

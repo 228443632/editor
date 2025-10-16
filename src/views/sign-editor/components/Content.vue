@@ -13,7 +13,7 @@ import {
   uuid,
   rafThrottle,
   toFixed,
-  debounce,
+  throttle,
 } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
@@ -70,6 +70,7 @@ const activeElement = useActiveElement()
 const { x, y } = usePointer()
 
 const a4 = pageUtils.a4
+const dpi = window.devicePixelRatio || 1
 
 const { doc } = useVuePdfEmbed({
   source: __signContext__.value.source,
@@ -78,6 +79,9 @@ const { doc } = useVuePdfEmbed({
     // console.log('c', progress, progress == '1')
   },
 })
+
+__signContext__.value.doc = doc
+
 console.log('doc', doc, doc.value)
 const { registerHotKeys } = useHotKeysV2({
   filter: () => {
@@ -241,7 +245,8 @@ function del() {
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    debounceUpdatePageVisibility(entries)
+    throttleUpdatePageVisibility(entries)
+    // debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
@@ -253,11 +258,26 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
     if (entry.isIntersecting) {
       const index = pageRefs.value.indexOf(entry.target)
       const pageNum = _pageNumsList.value[index]
-      pageVisibility.value[pageNum] = true
+
+      // 虚拟滚动显示
+      const willLoadPageNumMap = { [pageNum]: true }
+
+      const prevPageNum = pageNum - 1
+      if (prevPageNum > 0) {
+        willLoadPageNumMap[prevPageNum] = true
+      }
+
+      const nextPageNum = pageNum + 1
+      if (nextPageNum <= _pageNumsList.value.length) {
+        willLoadPageNumMap[nextPageNum] = true
+      }
+      pageVisibility.value = willLoadPageNumMap
     }
   })
 }
-const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
+// const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
+// const throttleUpdatePageVisibility = throttle(updatePageVisibility, 30)
+const throttleUpdatePageVisibility = throttle(updatePageVisibility, 20)
 
 /**
  * 一次性加载所有页面
@@ -298,12 +318,12 @@ __signContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
 const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
 
-  nextTick(() => {
-    __signContext__.value.scaleFactor = 1
-    // rootRef.value
-    //   .querySelector('.vue-pdf-embed__page')
-    //   .style.getPropertyValue('--scale-factor') || 1
-  })
+  // nextTick(() => {
+  //   __signContext__.value.scaleFactor = 1
+  //   // rootRef.value
+  //   //   .querySelector('.vue-pdf-embed__page')
+  //   //   .style.getPropertyValue('--scale-factor') || 1
+  // })
 
   const isRenderSuccess =
     _pageNumsList.value?.length &&
@@ -346,7 +366,7 @@ const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem) => {
   function scrollIntoView(target: HTMLElement) {
     if (target) {
       target.scrollIntoView({
-        behavior: 'smooth',
+        // behavior: 'smooth',
         block: 'start',
         // inline: 'center',
       })
@@ -569,7 +589,7 @@ defineExpose({
           <div
             ref="pageRefs"
             :class="[
-              'pdf-embed__item is-fade',
+              'pdf-embed__item relative',
               `page-num-${pageNum}`,
               _pageNumsList.length - 1 == index && `is-last`,
             ]"
@@ -579,7 +599,11 @@ defineExpose({
               v-if="pageVisibility[pageNum]"
               :source="doc"
               annotation-layer
+              :width="a4._basePx.w"
+              :height="a4._basePx.h"
+              :scale="dpi"
               text-layer
+              class="animation-fade"
               :page="pageNum"
               @rendered="onRendered(pageNum)"
             />
@@ -673,7 +697,7 @@ defineExpose({
   overflow: auto;
   height: 100%;
   padding: 16px 0;
-  scroll-behavior: smooth;
+  //scroll-behavior: smooth;
   position: relative;
   overflow-x: hidden;
   &.caret--is-dragging {
@@ -751,17 +775,6 @@ defineExpose({
   }
   &.is-last {
     break-after: auto;
-  }
-  &.is-fade {
-    animation: fade-animation 0.8s;
-    @keyframes fade-animation {
-      0% {
-        opacity: 0.2;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
   }
 }
 

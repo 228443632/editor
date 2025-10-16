@@ -5,8 +5,8 @@
  -->
 <!--default-->
 <script setup lang="ts">
-import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
-import { div, debounce, arrayToObj } from 'sf-utils2'
+import VuePdfEmbed from 'vue-pdf-embed'
+import { debounce, arrayToObj, rafThrottle } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
@@ -27,22 +27,24 @@ const __signContext__ = inject('__signContext__') // 预览上下文
 
 const pageRefs = ref([]) // 页面元素集合
 const pageVisibility = ref({}) // 页面可见性
+const rootRef = ref<HTMLElement>()
 let pageIntersectionObserver: IntersectionObserver
-const initialProgress = ref(0)
 const a4 = pageUtils.a4
 const { width: pageItemWidth } = useElementBounding(
   computed(() => pageRefs.value?.[0]),
 )
+const dpi = window.devicePixelRatio || 1
 
 const isWheeling = ref(false)
-
-const { doc } = useVuePdfEmbed({
-  source: __signContext__.value.source,
-  onProgress: (progressParams) => {
-    initialProgress.value = div(progressParams.loaded / progressParams.total)
-    // console.log('c', progress, progress == '1')
-  },
-})
+const { height: parentHeight } = useElementSize(
+  computed(() => rootRef.value?.parentElement),
+)
+/**
+ * 虚拟滚动可见nums
+ */
+// const _vsPageNums = computed(() => {
+//   return Math.ceil(parentHeight.value / ((210 / 120) * 297))
+// })
 
 /* 方法 */
 /**
@@ -51,6 +53,7 @@ const { doc } = useVuePdfEmbed({
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
+    // rafThrottleUpdatePageVisibility(entries)
     debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
@@ -67,6 +70,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
     }
   })
 }
+// const rafThrottleUpdatePageVisibility = rafThrottle(updatePageVisibility)
 const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
 
 /**
@@ -89,7 +93,7 @@ const pageScrollIntoView = (pageNum: number) => {
   if (pageDom) {
     if (isWheeling.value) return
     pageDom.scrollIntoView({
-      behavior: 'smooth', // instant
+      // behavior: 'smooth', // instant
       block: 'start',
     })
   }
@@ -126,14 +130,16 @@ const _paramsCompList$pageNum = computed(() => {
  * 是否加载结束
  */
 const _initial = computed(() => {
-  return initialProgress.value == 1
+  return __signContext__.value.contentInitial
 })
 
 /**
  * 分页数量
  */
 const _pageNumsList = computed(() =>
-  doc.value ? [...Array(doc.value.numPages + 1).keys()].slice(1) : [],
+  __signContext__.value.doc
+    ? [...Array(__signContext__.value.doc.numPages + 1).keys()].slice(1)
+    : [],
 )
 
 /**
@@ -166,10 +172,14 @@ watch(
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
 })
+
+const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
+  itemHeight: 182,
+})
 </script>
 
 <template>
-  <div class="preview-thumb" @wheel="onWheel">
+  <div class="preview-thumb" ref="rootRef" @wheel="onWheel">
     <template v-if="_initial">
       <div
         v-for="pageNum in _pageNumsList"
@@ -186,8 +196,10 @@ onBeforeUnmount(() => {
       >
         <vue-pdf-embed
           v-if="pageVisibility[pageNum]"
-          :source="doc"
+          :source="__signContext__.doc"
           :page="pageNum"
+          class="animation-fade"
+          :scale="dpi / 3"
         />
 
         <div class="embed__item-num">第 {{ pageNum }} 页</div>
@@ -257,6 +269,7 @@ onBeforeUnmount(() => {
 
 <style lang="less" scoped>
 @import '@/style/vars';
+@import '@/style/transition';
 
 .preview-thumb {
 }

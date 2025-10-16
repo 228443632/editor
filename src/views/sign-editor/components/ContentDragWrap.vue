@@ -9,6 +9,7 @@ import Drager from 'es-drager'
 import { rafThrottle, def } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import profile from '@/profile.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -181,6 +182,7 @@ function onDragEnd() {
 
   // 添加历史记录
   __signContext__.value.manalHistory.commit()
+  console.log('onDragEnd')
 }
 
 /**
@@ -282,7 +284,7 @@ defineExpose({
           </span>
         </t-tooltip>
         <slot></slot>
-        <div class="line-wrap__locate">
+        <div v-if="profile.IS_DEV" class="line-wrap__locate">
           <!--          <div class="locate__item">X: {{ ~~_nodeData.left }}</div>-->
           <!--          <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>-->
 
@@ -374,7 +376,7 @@ defineExpose({
   color: #fff;
   user-select: none;
   background-color: #595959;
-  opacity: 0;
+  opacity: 0.9;
   display: flex;
   gap: 16px;
   flex-direction: row;

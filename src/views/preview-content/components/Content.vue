@@ -124,7 +124,24 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
     if (entry.isIntersecting) {
       const index = pageRefs.value.indexOf(entry.target)
       const pageNum = _pageNumsList.value[index]
-      pageVisibility.value[pageNum] = true
+
+      if (props.model == 'preview') {
+        // 虚拟滚动显示
+        const willLoadPageNumMap = { [pageNum]: true }
+        const prevPageNum = pageNum - 1
+        if (prevPageNum > 0) {
+          willLoadPageNumMap[prevPageNum] = true
+        }
+
+        const nextPageNum = pageNum + 1
+        if (nextPageNum <= _pageNumsList.value.length) {
+          willLoadPageNumMap[nextPageNum] = true
+        }
+        pageVisibility.value = willLoadPageNumMap
+      } else {
+        // 下载
+        pageVisibility.value[pageNum] = true
+      }
     }
   })
 }
@@ -183,13 +200,6 @@ const onRendered = (pageNum: number) => {
   if (isRenderSuccess) {
     loadAllPdfPagesRaf['_resolve']?.()
   }
-}
-
-/**
- * 内部链接点击
- */
-const onInternalLinkClicked = (...args) => {
-  console.log('args', args)
 }
 
 /* 计算 */
@@ -279,10 +289,11 @@ defineExpose({
           :page="pageNum"
           annotation-layer
           text-layer
+          :width="pageUtils.a4._basePx.w"
+          :height="pageUtils.a4._basePx.h"
           :scale="dpr"
+          class="animation-fade"
           @rendered="onRendered(pageNum)"
-          @link-clicked="onInternalLinkClicked"
-          @internal-link-clicked="onInternalLinkClicked"
         />
 
         <template
@@ -331,6 +342,7 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 @import '@/style/vars';
+@import '@/style/transition';
 
 .pdf-embed__wrap {
   --per-page-gap: 12px;

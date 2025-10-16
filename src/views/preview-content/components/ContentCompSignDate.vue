@@ -7,7 +7,6 @@
 <script setup lang="ts">
 import { COMP_SIGN_DATE_STYLE } from '@/views/doc-editor/extensions/constant.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
-import testSignSvgRaw from '@/assets/images/test-sign.svg?raw'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -47,7 +46,7 @@ defineExpose({
       height: COMP_SIGN_DATE_STYLE.height + 'px',
     }"
   >
-    <div class="flex-center h-full">签署日期</div>
+    <div class="flex-center text-14px h-full">xxxx年xx月xx日</div>
   </div>
 </template>
 
