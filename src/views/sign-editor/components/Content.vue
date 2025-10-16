@@ -245,7 +245,7 @@ function del() {
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    throttleUpdatePageVisibility(entries)
+    rafThrottleUpdatePageVisibility(entries)
     // debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
@@ -277,7 +277,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
 }
 // const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
 // const throttleUpdatePageVisibility = throttle(updatePageVisibility, 30)
-const throttleUpdatePageVisibility = throttle(updatePageVisibility, 20)
+const rafThrottleUpdatePageVisibility = rafThrottle(updatePageVisibility)
 
 /**
  * 一次性加载所有页面

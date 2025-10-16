@@ -8,7 +8,7 @@
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
-import { arrayToObj, debounce, div } from 'sf-utils2'
+import { arrayToObj, div, rafThrottle, debounce } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
@@ -53,25 +53,25 @@ const updateKeyFlag = ref(0)
 const __previewContext__ = inject('__previewContext__', ref({}))
 const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
 const initialProgress = ref(0)
-// const scaleFactor = ref(1)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
-const { width: rootWidth } = useElementBounding(rootRef)
-const { width: pageItemWidth } = useElementBounding(
+const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
   computed(() => {
-    const dom = unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
-    if (dom) return dom.querySelector('canvas')
-    return null
+    return unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
   }),
 )
+// const canvasWidth = ref(undefined)
+// const canvasHeight = ref(undefined)
 
 const _scalePos = computed(() => {
   return pageItemWidth.value / pageUtils.a4._basePx.w
 })
 
-function winResize() {
+async function winResize() {
   if (props.model == 'preview') {
     updateKeyFlag.value++
+    await nextTick()
+    resetPageIntersectionObserver()
   }
 }
 const debounceWinResize = debounce(winResize, 500) as typeof winResize
@@ -114,7 +114,6 @@ const { doc } = useVuePdfEmbed({
   source: props.source,
   onProgress: (progressParams) => {
     initialProgress.value = div(progressParams.loaded / progressParams.total)
-    // console.log('initialProgress.value', initialProgress.value)
   },
 })
 
@@ -125,7 +124,7 @@ const { doc } = useVuePdfEmbed({
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    debounceUpdatePageVisibility(entries)
+    rafThrottleUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
@@ -150,6 +149,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
           willLoadPageNumMap[nextPageNum] = true
         }
         pageVisibility.value = willLoadPageNumMap
+        // console.log('pageNum', pageNum)
       } else {
         // 下载
         pageVisibility.value[pageNum] = true
@@ -157,7 +157,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
     }
   })
 }
-const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
+const rafThrottleUpdatePageVisibility = rafThrottle(updatePageVisibility)
 
 /**
  * 一次性加载所有页面
@@ -239,6 +239,15 @@ const _paramsCompList$pageNum = computed(() => {
   }) as Record<string, IParamsCompItem[]>
 })
 
+// const _canvasWidth = computed(() => {
+//   if (props.model == 'preview') return canvasWidth.value || undefined
+//   return undefined
+// })
+// const _canvasHeight = computed(() => {
+//   if (props.model == 'preview') return canvasHeight.value || undefined
+//   return undefined
+// })
+
 /* 监听 */
 watchEffect(() => {
   __previewContext__.value.contentInitial = _initial.value
@@ -257,6 +266,15 @@ watch(_pageNumsList, (newPageNums: number[]) => {
 
 watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
+})
+
+watch(_pageNumsList, (newVal) => {
+  if (newVal?.length) {
+    nextTick(() => {
+      canvasWidth.value = pageItemWidth.value || undefined
+      canvasHeight.value = pageItemHeight.value || undefined
+    })
+  }
 })
 
 /* 周期 */
