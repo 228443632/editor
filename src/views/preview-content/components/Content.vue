@@ -63,15 +63,7 @@ const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
 // const canvasWidth = ref(undefined)
 // const canvasHeight = ref(undefined)
 
-const _scalePos = computed(() => {
-  pageItemWidth.value
-  const canvasDOM = rootRef.value?.querySelector?.(
-    '.vue-pdf-embed__page > canvas',
-  )
-  // pageItemWidth.value
-  // const canvas = unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
-  return canvasDOM?.offsetWidth / pageUtils.a4._basePx.w
-})
+const scalePos = ref(1)
 
 async function winResize() {
   if (props.model == 'preview') {
@@ -201,7 +193,6 @@ __previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
  * 渲染完成
  */
 const onRendered = (pageNum: number) => {
-  console.log('onRendered', pageNum)
   pageRendered.value[pageNum] = true
 
   // nextTick(() => {
@@ -218,6 +209,23 @@ const onRendered = (pageNum: number) => {
   if (isRenderSuccess) {
     loadAllPdfPagesRaf['_resolve']?.()
   }
+
+  nextTick(() => {
+    updateScalePos()
+  })
+}
+
+/**
+ * 更新缩放比例
+ */
+const updateScalePos = () => {
+  if (props.model == 'download') return
+  const canvasDOMList = Array.from(
+    rootRef.value?.querySelectorAll?.('.vue-pdf-embed__page > canvas') || [],
+  ) as HTMLHtmlElement[]
+  const canvasDOM = canvasDOMList.find((item) => item?.offsetWidth)
+  if (canvasDOM)
+    scalePos.value = canvasDOM?.offsetWidth / pageUtils.a4._basePx.w
 }
 
 /* 计算 */
@@ -245,15 +253,6 @@ const _paramsCompList$pageNum = computed(() => {
   }) as Record<string, IParamsCompItem[]>
 })
 
-// const _canvasWidth = computed(() => {
-//   if (props.model == 'preview') return canvasWidth.value || undefined
-//   return undefined
-// })
-// const _canvasHeight = computed(() => {
-//   if (props.model == 'preview') return canvasHeight.value || undefined
-//   return undefined
-// })
-
 /* 监听 */
 watchEffect(() => {
   __previewContext__.value.contentInitial = _initial.value
@@ -274,17 +273,25 @@ watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
-// watch(_pageNumsList, (newVal) => {
-//   if (newVal?.length) {
-//     nextTick(() => {
-//       canvasWidth.value = pageItemWidth.value || undefined
-//       canvasHeight.value = pageItemHeight.value || undefined
-//     })
-//   }
-// })
+/**
+ * 页码
+ */
+watch([updateKeyFlag, pageItemWidth, pageRendered], () => {
+  nextTick(() => {
+    updateScalePos()
+  })
+})
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  window.requestAnimationFrame(() => {
+    updateScalePos()
+    setTimeout(() => {
+      // fix: 强制刷新一次，防止缩放比例计算错误
+      updateScalePos()
+    }, 20)
+  })
+})
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
@@ -321,7 +328,7 @@ defineExpose({
       <div
         ref="pageRefs"
         :class="[
-          'pdf-embed__item is-fade',
+          'pdf-embed__item',
           `page-num-${pageNum}`,
           _pageNumsList.length - 1 == index && `is-last`,
         ]"
@@ -334,7 +341,6 @@ defineExpose({
           annotation-layer
           text-layer
           :scale="dpr"
-          class="animation-fade"
           @rendered="onRendered(pageNum)"
         />
 
@@ -351,9 +357,9 @@ defineExpose({
             :style="{
               '--page-num': item.pageNum,
               // top: item.top - (item.pageNum - 1) * 12 + 'px',
-              top: item.offsetTop * +_scalePos + 'px',
-              left: item.offsetLeft * +_scalePos + 'px',
-              transform: `scale(${_scalePos})`,
+              top: item.offsetTop * +scalePos + 'px',
+              left: item.offsetLeft * +scalePos + 'px',
+              transform: `scale(${scalePos})`,
             }"
           >
             <!-- 印章 -->
@@ -406,21 +412,7 @@ defineExpose({
     }
   }
 
-  &.is-preview {
-    .pdf-embed__item {
-      &.is-fade {
-        animation: fade-animation 0.8s;
-        @keyframes fade-animation {
-          0% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-      }
-    }
-  }
+  &.is-preview {}
 }
 
 .pdf-embed__item {
@@ -429,9 +421,19 @@ defineExpose({
   scroll-margin-block-start: 12px;
   break-after: page;
   //break-inside: avoid;
-  background: white;
   position: relative;
   aspect-ratio: 210 / 297;
+  :deep {
+    .vue-pdf-embed {
+      background: white;
+      canvas {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        inset: 0;
+      }
+    }
+  }
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }

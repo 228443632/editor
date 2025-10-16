@@ -73,57 +73,11 @@ const rootBound = useElementBounding(rootRef)
 const umoPageContentBound = useElementBounding(_embedPdfWrapRef)
 const updateFlag = ref(0)
 
-const scrollViewRef = computed(() => __signContext__.value.contentElRef)
-
-useEventListener(scrollViewRef, 'keydown', onKeydown)
-
 /* 方法 */
 
 const update = () => {
   rootBound.update()
   umoPageContentBound.update()
-}
-
-/**
- * 监听键盘事件
- * @param e
- */
-function onKeydown(e: KeyboardEvent) {
-  const isCanScroll =
-    __signContext__.value.activeCompParam?.key == _nodeData.value?.key ||
-    _nodeData.value.isInRect
-  if (!isCanScroll) return
-  // keyCode: 40 下 38 上。39 右 37 左
-  switch (e.keyCode) {
-    case 40: {
-      // 下
-      e.preventDefault()
-      _nodeData.value.top = _nodeData.value.top + 1
-      break
-    }
-    case 38: {
-      // 上
-      _nodeData.value.top = _nodeData.value.top - 1
-      e.preventDefault()
-      break
-    }
-
-    case 37: {
-      // 左
-      _nodeData.value.left = _nodeData.value.left - 1
-      e.preventDefault()
-      break
-    }
-    case 39: {
-      // 右
-      _nodeData.value.left = _nodeData.value.left + 1
-      e.preventDefault()
-      break
-    }
-    default: {
-      break
-    }
-  }
 }
 
 /* 计算 */

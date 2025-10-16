@@ -91,12 +91,13 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    source.value = './pdfs/4.pdf'
+    source.value = './pdfs/5.pdf'
     // paramsCompList.value._isSkip = true
 
-    // initParamsCompList([
-    //   { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
-    // ], ['compSeal'])
+    initParamsCompList(
+      [{ type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 }],
+      ['compSeal'],
+    )
   }
 })
 

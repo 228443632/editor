@@ -60,7 +60,7 @@ export async function exportPDFWorker(
       a4Width, // 宽度严格匹配A4
       a4Height, // 高度自适应当前页内容
       undefined,
-      'SLOW', // 快速渲染模式（保证质量的同时提升速度）
+      'MEDIUM', // 快速渲染模式（保证质量的同时提升速度）
     )
   }
   pdf.save(filename || `${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.pdf`)

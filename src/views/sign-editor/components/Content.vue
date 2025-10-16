@@ -444,6 +444,72 @@ const _pdfEmbedWrapStyle = computed(() => {
   }
 })
 
+/**
+ * 监听键盘事件
+ * @param e
+ */
+function onKeydown(e: KeyboardEvent) {
+  const inRectCompList = []
+  if (__signContext__.value.activeCompParam?.key) {
+    inRectCompList.push(__signContext__.value.activeCompParam)
+  }
+  __signContext__.value.paramsCompList.forEach((item) => {
+    if (
+      item.key !== __signContext__.value.activeCompParam?.key &&
+      item.isInRect
+    ) {
+      inRectCompList.push(item)
+    }
+  })
+
+  if (!inRectCompList?.length) return
+  // keyCode: 40 下 38 上。39 右 37 左
+  switch (e.keyCode) {
+    case 40: {
+      // 下
+      e.preventDefault()
+      inRectCompList.forEach((item) => {
+        item.top = item.top + 1
+      })
+      break
+    }
+    case 38: {
+      // 上
+      inRectCompList.forEach((item) => {
+        item.top = item.top - 1
+      })
+      e.preventDefault()
+      break
+    }
+
+    case 37: {
+      // 左
+      inRectCompList.forEach((item) => {
+        item.left = item.left - 1
+      })
+      e.preventDefault()
+      break
+    }
+    case 39: {
+      // 右
+      inRectCompList.forEach((item) => {
+        item.left = item.left + 1
+      })
+      e.preventDefault()
+      break
+    }
+    default: {
+      break
+    }
+  }
+}
+
+useEventListener(
+  computed(() => __signContext__.value.contentElRef),
+  'keydown',
+  onKeydown,
+)
+
 /* 监听 */
 
 watchEffect(() => {

@@ -86,7 +86,7 @@ const options = $ref(
         extensions,
         toolbar: {
           defaultMode: 'ribbon',
-          menus: ['base', 'insert', 'table'],
+          menus: ['base', 'table'],
           disableMenuItems: [
             'video',
             'audio',
