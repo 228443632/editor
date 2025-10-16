@@ -64,7 +64,13 @@ const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
 // const canvasHeight = ref(undefined)
 
 const _scalePos = computed(() => {
-  return pageItemWidth.value / pageUtils.a4._basePx.w
+  pageItemWidth.value
+  const canvasDOM = rootRef.value?.querySelector?.(
+    '.vue-pdf-embed__page > canvas',
+  )
+  // pageItemWidth.value
+  // const canvas = unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
+  return canvasDOM?.offsetWidth / pageUtils.a4._basePx.w
 })
 
 async function winResize() {
@@ -268,14 +274,14 @@ watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
-watch(_pageNumsList, (newVal) => {
-  if (newVal?.length) {
-    nextTick(() => {
-      canvasWidth.value = pageItemWidth.value || undefined
-      canvasHeight.value = pageItemHeight.value || undefined
-    })
-  }
-})
+// watch(_pageNumsList, (newVal) => {
+//   if (newVal?.length) {
+//     nextTick(() => {
+//       canvasWidth.value = pageItemWidth.value || undefined
+//       canvasHeight.value = pageItemHeight.value || undefined
+//     })
+//   }
+// })
 
 /* 周期 */
 onMounted(() => {})

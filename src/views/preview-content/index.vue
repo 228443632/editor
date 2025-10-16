@@ -94,9 +94,9 @@ onMounted(() => {
     source.value = './pdfs/4.pdf'
     // paramsCompList.value._isSkip = true
 
-    initParamsCompList([
-      { type: 'compSeal', key: '1', offsetX: 717, offsetY: 1045, pageNum: 1 },
-    ])
+    // initParamsCompList([
+    //   { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
+    // ], ['compSeal'])
   }
 })
 

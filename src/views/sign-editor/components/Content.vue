@@ -13,7 +13,6 @@ import {
   uuid,
   rafThrottle,
   toFixed,
-  throttle,
 } from 'sf-utils2'
 import ContentCompSign from './ContentCompSign.vue'
 import ContentCompSeal from './ContentCompSeal.vue'
