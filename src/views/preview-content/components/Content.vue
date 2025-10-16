@@ -136,14 +136,18 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
         // 虚拟滚动显示
         const willLoadPageNumMap = { [pageNum]: true }
         const prevPageNum = pageNum - 1
-        if (prevPageNum > 0) {
-          willLoadPageNumMap[prevPageNum] = true
-        }
+        if (prevPageNum > 0) willLoadPageNumMap[prevPageNum] = true
+        const prevPageNum2 = pageNum - 2
+        if (prevPageNum2 > 0) willLoadPageNumMap[prevPageNum2] = true
 
         const nextPageNum = pageNum + 1
-        if (nextPageNum <= _pageNumsList.value.length) {
+        if (nextPageNum <= _pageNumsList.value.length)
           willLoadPageNumMap[nextPageNum] = true
-        }
+
+        const nextPageNum2 = pageNum + 2
+        if (nextPageNum2 <= _pageNumsList.value.length)
+          willLoadPageNumMap[nextPageNum2] = true
+
         pageVisibility.value = willLoadPageNumMap
         // console.log('pageNum', pageNum)
       } else {
@@ -207,16 +211,7 @@ const onRendered = (pageNum: number) => {
   if (isRenderSuccess) {
     loadAllPdfPagesRaf['_resolve']?.()
   }
-
-  nextTick(() => {
-    updateScalePos()
-  })
 }
-
-/**
- * 更新缩放比例
- */
-const updateScalePos = () => {}
 
 /* 计算 */
 
