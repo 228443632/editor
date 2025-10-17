@@ -65,7 +65,7 @@ const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
 
 async function winResize() {
   if (props.model == 'preview') {
-    updateKeyFlag.value++
+    // updateKeyFlag.value++
     await nextTick()
     resetPageIntersectionObserver()
   }

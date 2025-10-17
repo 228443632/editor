@@ -266,6 +266,7 @@ defineExpose({
         _nodeData.isInRect && 'line-wrap--in-rect',
       ]"
       v-bind="attrs"
+      disabled-key-event
       @dragend="onDragEnd"
       @drag="rafThrottleOnDrag"
       @mousedown.stop="onSelectNode"

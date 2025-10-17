@@ -280,7 +280,7 @@ function getPrintPageHtml(fillFieldData: object) {
   }
 
   // 10 移除选中的样式
-  const selectNodeList = document.querySelectorAll('.ProseMirror-selectednode, .umo-node-focused')
+  const selectNodeList = doc.querySelectorAll('.ProseMirror-selectednode, .umo-node-focused')
   if (selectNodeList?.length) {
     selectNodeList.forEach((selectNode) => {
       selectNode.classList.remove('ProseMirror-selectednode')

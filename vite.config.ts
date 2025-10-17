@@ -19,6 +19,7 @@ const IS_PRO = process.env.NODE_ENV === 'production'
 
 export default defineConfig(({ mode }) => {
   const isLib = mode === 'lib'
+  const timestamp = new Date().getTime()
 
   // Plugin configurations
   const vuePlugins = {
@@ -139,11 +140,26 @@ export default defineConfig(({ mode }) => {
           }),
         ],
     css: cssConfig,
-    build: isLib
-      ? buildConfig
-      : {
-          cssMinify: true,
+    build: {
+      cssMinify: true,
+      rollupOptions: {
+        output: {
+          // 为入口文件添加时间戳
+          entryFileNames: `js/[name].${timestamp}.js`,
+          // 为chunk文件添加时间戳
+          chunkFileNames: `js/[name].${timestamp}.js`,
+          // 为静态资源添加时间戳
+          assetFileNames: (assetInfo) => {
+            // // 根据文件类型分别处理
+            // if (assetInfo.name.endsWith('.css')) {
+            //   return `css/[name].${timestamp}.css`
+            // }
+            // 处理图片等其他资源
+            return `assets/[name].${timestamp}[extname]`
+          },
         },
+      },
+    },
     resolve: {
       // conditions: ['node'],
       // preserveSymlinks: true,
