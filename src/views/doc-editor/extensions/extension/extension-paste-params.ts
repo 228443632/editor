@@ -29,9 +29,10 @@ export const ExtensionPasteParams = Extension.create({
      */
     const handlePaste = (view: EditorView, e: ClipboardEvent, slice) => {
       const { clipboardData } = e
-      const html = clipboardData.getData('text/html') // html
+      let html = clipboardData.getData('text/html') // html
       if (html) {
         //   console.log('复制的html', html)
+        html = html.replace(/[\n\s]$/, '').replace(/^[\n\s]/, '')
 
         // 加粗 b strong font-weight: bold
         // 斜体 em i font-style: italic
@@ -41,7 +42,7 @@ export const ExtensionPasteParams = Extension.create({
         const fragmentDom = new DOMParser().parseFromString(html, 'text/html')
         const walker = document.createTreeWalker(
           fragmentDom.body,
-          NodeFilter.SHOW_ALL,
+          NodeFilter.SHOW_ELEMENT,
           null,
         )
 
@@ -49,43 +50,54 @@ export const ExtensionPasteParams = Extension.create({
         // 遍历所有文本节点
         // @ts-expect-error
         while ((currentNode = walker.nextNode())) {
-          if (currentNode?.nodeType == Node.ELEMENT_NODE) {
-            if (currentNode.getAttribute('data-id')) {
-              const compName = currentNode.getAttribute('compname')
-              if (compName) {
-                currentNode.setAttribute('data-id', simpleUUID())
-              }
+          if (currentNode.getAttribute('data-id')) {
+            const compName = currentNode.getAttribute('compname')
+            if (compName) {
+              currentNode.setAttribute('data-id', simpleUUID())
             }
+          }
 
-            // 忽略空白文本节点
-            if (currentNode['style'].fontFamily) {
-              currentNode['style'].fontFamily = ''
-            }
-            // currentNode['style'].color = 'red'
+          // 忽略空白文本节点
+          if (currentNode['style'].fontFamily) {
+            currentNode['style'].fontFamily = ''
+          }
+          // currentNode['style'].color = 'red'
 
-            if (currentNode.tagName === 'IMG') {
-              if (/^file:/.test(currentNode.getAttribute('src'))) {
-                debounceUseMessage('error', {
-                  content:
-                    '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
-                })
-                currentNode.remove()
-              }
+          if (currentNode.tagName === 'IMG') {
+            if (/^file:/.test(currentNode.getAttribute('src'))) {
+              debounceUseMessage('error', {
+                content:
+                  '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
+              })
+              currentNode.remove()
             }
           }
         }
 
         const { schema } = view.state
         const parser = DOMParser2.fromSchema(schema)
-        const slice = parser.parseSlice(fragmentDom.body, {
+        let slice = parser.parseSlice(fragmentDom.body, {
           preserveWhitespace: true,
         })
 
-        view.dispatch(
-          view.state.tr.replaceSelection(
-            new Slice(Fragment.from([slice.content.content[1]]), 1, 1),
-          ),
-        )
+        // fix：slice问题
+        const contents = Array.from(slice.content.content)
+        if (contents.length >= 3) {
+          const content = contents.filter((nodeItem, index) => {
+            if (index == 0 || index == contents.length - 1) {
+              // 开始和结束
+              if (
+                nodeItem?.type?.name == 'text' &&
+                nodeItem.text.trim() == ''
+              ) {
+                return false
+              }
+            }
+            return true
+          })
+          slice = new Slice(Fragment.from(content), 1, 1)
+        }
+        view.dispatch(view.state.tr.replaceSelection(slice))
 
         //   const scheme = view.state.schema
         //   const slice = DOMParserAlias.fromSchema(scheme).parseSlice(fragmentDom)
