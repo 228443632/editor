@@ -11,6 +11,7 @@ import type { TPrettifyString } from 'sf-utils2/types/generic-helper'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
+import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util.ts'
 // import { NodeSelection } from '@tiptap/pm/state'
 
 export interface IDragNodeParamsNode {
@@ -78,6 +79,9 @@ export const ExtensionDragParams = Extension.create({
             })
             return true
           }
+          this.editor.commands.setTextSelection(coordinates.pos)
+
+          nodeData.attrs.cssText = tiptapUtil.getStyleBySelection(this.editor)
 
           // 插入内容
           const editor = this.editor

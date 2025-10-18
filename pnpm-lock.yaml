@@ -143,6 +143,9 @@ importers:
       '@weiruo/tiptap-extension-background-color':
         specifier: 2.0.4-0
         version: 2.0.4-0(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/extension-text-style@2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5)))
+      '@zumer/snapdom':
+        specifier: 1.9.14
+        version: 1.9.14
       browserify-fs:
         specifier: 1.0.0
         version: 1.0.0
@@ -158,9 +161,6 @@ importers:
       dayjs:
         specifier: 1.11.7
         version: 1.11.7
-      dom-to-image-more:
-        specifier: 3.7.1
-        version: 3.7.1
       es-drager:
         specifier: 1.2.11
         version: 1.2.11(vue@3.3.13(typescript@5.5.4))
@@ -2865,6 +2865,9 @@ packages:
 
   '@xtuc/long@4.2.2':
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
+
+  '@zumer/snapdom@1.9.14':
+    resolution: {integrity: sha512-kQARFS/jf+fsIFv9qxfNp8YMeun5tTyhFDk3iv47Lywk5YRldhINWicEZI15fP3FDUCeo8ok+BP0CtnDRFMFRg==}
 
   abbrev@2.0.0:
     resolution: {integrity: sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==}
@@ -10224,6 +10227,8 @@ snapshots:
   '@xtuc/ieee754@1.2.0': {}
 
   '@xtuc/long@4.2.2': {}
+
+  '@zumer/snapdom@1.9.14': {}
 
   abbrev@2.0.0: {}
 

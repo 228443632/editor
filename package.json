@@ -115,6 +115,7 @@
     "@vueuse/core": "11.0.1",
     "@vueuse/shared": "11.0.1",
     "@weiruo/tiptap-extension-background-color": "2.0.4-0",
+    "@zumer/snapdom": "1.9.14",
     "browserify-fs": "1.0.0",
     "buffer-image-size": "0.6.4",
     "core-js": "3.45.1",

@@ -328,12 +328,21 @@ export const tiptapUtil = {
     const fontWeight = editor.isActive('bold') ? 'bold' : 'normal'
     const textStyle = editor.getAttributes('textStyle') || {}
     const backgroundColor = editor.getAttributes('highlight').color
+    const fontStyle =
+      (editor.isActive('italic') && 'italic') || textStyle?.fontStyle
+
+    const textDecoration =
+      (editor.isActive('strike') && 'line-through') ||
+      (editor.isActive('underline') && 'underline') ||
+      textStyle?.textDecoration
 
     const cssText = {
       fontWeight,
       backgroundColor,
       fontSize: undefined,
       ...textStyle,
+      fontStyle,
+      textDecoration,
     }
 
     selection ||= editor.state.selection
