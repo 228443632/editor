@@ -8,9 +8,12 @@ import { Extension } from '@tiptap/core'
 import { Plugin, PluginKey } from 'prosemirror-state'
 // import type { Editor } from '@tiptap/vue-3'
 import type { EditorView } from 'prosemirror-view'
-import { DOMParser as DOMParser2 } from 'prosemirror-model'
+import { DOMParser as DOMParser2, Slice } from 'prosemirror-model'
 import { debounce } from 'sf-utils2'
 import { simpleUUID } from '@/utils/short-id'
+import { isIos } from 'sf-utils2'
+
+console.log('isIos', isIos())
 
 import { Fragment } from 'prosemirror-model'
 import { useMessage } from '@/composables/dialog'
@@ -37,8 +40,8 @@ export const ExtensionPasteParams = Extension.create({
         // 上标 sup
         const fragmentDom = new DOMParser().parseFromString(html, 'text/html')
         const walker = document.createTreeWalker(
-          fragmentDom.documentElement,
-          NodeFilter.SHOW_ELEMENT,
+          fragmentDom.body,
+          NodeFilter.SHOW_ALL,
           null,
         )
 
@@ -46,38 +49,43 @@ export const ExtensionPasteParams = Extension.create({
         // 遍历所有文本节点
         // @ts-expect-error
         while ((currentNode = walker.nextNode())) {
-          if (currentNode.getAttribute('data-id')) {
-            const compName = currentNode.getAttribute('compname')
-            if (compName) {
-              currentNode.setAttribute('data-id', simpleUUID())
+          if (currentNode?.nodeType == Node.ELEMENT_NODE) {
+            if (currentNode.getAttribute('data-id')) {
+              const compName = currentNode.getAttribute('compname')
+              if (compName) {
+                currentNode.setAttribute('data-id', simpleUUID())
+              }
             }
-          }
 
-          // 忽略空白文本节点
-          if (currentNode['style'].fontFamily) {
-            currentNode['style'].fontFamily = ''
-          }
-          // currentNode['style'].color = 'red'
+            // 忽略空白文本节点
+            if (currentNode['style'].fontFamily) {
+              currentNode['style'].fontFamily = ''
+            }
+            // currentNode['style'].color = 'red'
 
-          if (currentNode.tagName === 'IMG') {
-            if (/^file:/.test(currentNode.getAttribute('src'))) {
-              debounceUseMessage('error', {
-                content:
-                  '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
-              })
-              currentNode.remove()
+            if (currentNode.tagName === 'IMG') {
+              if (/^file:/.test(currentNode.getAttribute('src'))) {
+                debounceUseMessage('error', {
+                  content:
+                    '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
+                })
+                currentNode.remove()
+              }
             }
           }
         }
 
         const { schema } = view.state
         const parser = DOMParser2.fromSchema(schema)
-        const slice = parser.parseSlice(fragmentDom, {
+        const slice = parser.parseSlice(fragmentDom.body, {
           preserveWhitespace: true,
         })
-        console.log('fragmentDom.documentElement', fragmentDom.documentElement)
 
-        view.dispatch(view.state.tr.replaceSelection(slice))
+        view.dispatch(
+          view.state.tr.replaceSelection(
+            new Slice(Fragment.from([slice.content.content[1]]), 1, 1),
+          ),
+        )
 
         //   const scheme = view.state.schema
         //   const slice = DOMParserAlias.fromSchema(scheme).parseSlice(fragmentDom)
