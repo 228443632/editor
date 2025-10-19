@@ -271,6 +271,38 @@ watch(umoEditorRef, () => {
 
   editorRef.value.commands.focus = () => true
 
+  // const originIsActive = editorRef.value.isActive
+  // const activeNamePropertiesMap = {
+  //   bold: (node: ProseMirrorNode) => node.attrs.cssText?.fontWeight == 'bold',
+  //   italic: (node: ProseMirrorNode) =>
+  //     node.attrs.cssText?.fontStyle == 'italic',
+  //   strike: (node: ProseMirrorNode) =>
+  //     node.attrs.cssText?.textDecoration == 'line-through',
+  //   underline: (node: ProseMirrorNode) =>
+  //     node.attrs.cssText?.textDecoration == 'underline',
+  // }
+  // 重写 isActive 方法
+  // editorRef.value.isActive = function (...args) {
+  //   const [activeName] = args
+  //   const { selection } = editorRef.value.state || {}
+  //
+  //   let node: ProseMirrorNode
+  //
+  //   // 1. 检查是否为节点选区（如点击选中图片节点）
+  //   if (selection instanceof NodeSelection) {
+  //     node = selection.node
+  //   } else {
+  //     const $pos = editorRef.value.$pos(selection.from + 1)
+  //     if ($pos?.node) node = $pos.node
+  //     console.log('$pos.node', $pos.node?.type?.name)
+  //   }
+  //   if (node && node?.type?.name == COMP_PARAMS_NAME_MAP.compText) {
+  //     const activeNameFunc = activeNamePropertiesMap[activeName]
+  //     if (activeNameFunc) return activeNameFunc(node)
+  //   }
+  //   return originIsActive.apply(this, args)
+  // }
+
   if (!isInIframe()) {
     rightTpFields.value = [
       {

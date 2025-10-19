@@ -126,7 +126,6 @@ provide('NODE_PROPS', props)
     :data-id="_attributes['data-id']"
     :data-placeholder="`【${node?.attrs?.placeholder}】`"
     compname="comp-text"
-    :style="_rootStyle"
     :bordertype="node?.attrs?.borderType"
     @click="onSelectNode"
   >

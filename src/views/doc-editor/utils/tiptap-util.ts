@@ -8,6 +8,8 @@ import { type Node, type Fragment, type ResolvedPos } from 'prosemirror-model'
 import { isArray } from 'sf-utils2'
 import { cssUtil } from '@/views/doc-editor/utils/css-util'
 import { type EditorState, NodeSelection } from '@tiptap/pm/state' // 表单数据填充
+import { type CSSProperties } from 'vue'
+// import { Node as ProseMirrorNode } from '@tiptap/pm/model'
 
 type TPosAtNodeOption = { key: string }
 
@@ -381,5 +383,101 @@ export const tiptapUtil = {
       node = editor.state.doc.nodeAt(selection.from)
     }
     return node
+  },
+
+  /**
+   * 获取当前选中的节点信息
+   */
+  wrapCompTextNodeStyle(editor: Editor, cssText: CSSProperties) {
+    // 执行多个样式命令，均不记录历史
+    // 获取编辑器核心对象
+    const { state, view } = editor
+    const { tr, schema, selection } = state
+    const { from, to } = selection // 样式应用的选区范围（当前选区）
+
+    // 1. 处理加粗（bold）
+    if (cssText?.fontWeight === 'bold') {
+      const boldMark = schema.marks.bold
+      // 先清除选区已有 bold 标记（避免重复叠加），再添加
+      tr.removeMark(from, to, boldMark).addMark(from, to, boldMark.create())
+    }
+
+    // 2. 处理下划线（underline）
+    if (cssText?.textDecoration === 'underline') {
+      const underlineMark = schema.marks.underline
+      tr.removeMark(from, to, underlineMark).addMark(
+        from,
+        to,
+        underlineMark.create(),
+      )
+    }
+
+    // 3. 处理删除线（strike）
+    if (cssText?.textDecoration === 'line-through') {
+      const strikeMark = schema.marks.strike
+      tr.removeMark(from, to, strikeMark).addMark(from, to, strikeMark.create())
+    }
+
+    // 4. 处理斜体（italic）
+    if (cssText?.fontStyle === 'italic') {
+      const italicMark = schema.marks.italic
+      tr.removeMark(from, to, italicMark).addMark(from, to, italicMark.create())
+    }
+
+    // 5. 处理字体大小（依赖 textStyle 标记）
+    if (cssText?.fontSize) {
+      const textStyleMark = schema.marks.textStyle
+      // 先清除原有 fontSize 属性，再添加新值
+      tr.removeMark(from, to, textStyleMark).addMark(
+        from,
+        to,
+        textStyleMark.create({
+          fontSize: cssText.fontSize,
+        }),
+      )
+    }
+
+    // 6. 处理文字颜色（依赖 textStyle 标记）
+    if (cssText?.color) {
+      const textStyleMark = schema.marks.textStyle
+      tr.removeMark(from, to, textStyleMark).addMark(
+        from,
+        to,
+        textStyleMark.create({ color: cssText.color }),
+      )
+    }
+
+    // 7. 处理背景高亮（依赖 highlight 标记）
+    if (cssText?.backgroundColor) {
+      const highlightMark = schema.marks.highlight
+      // @ts-expect-error
+      tr.removeMark(from, to, highlightMark, {
+        color: undefined,
+      }).addMark(
+        from,
+        to,
+        highlightMark.create({
+          color: cssText.backgroundColor,
+        }),
+      )
+    }
+
+    // 8. 处理字体（依赖 textStyle 标记）
+    if (cssText?.fontFamily) {
+      const textStyleMark = schema.marks.textStyle
+      tr.removeMark(from, to, textStyleMark).addMark(
+        from,
+        to,
+        textStyleMark.create({
+          fontFamily: cssText.fontFamily,
+        }),
+      )
+    }
+
+    // 关键：统一控制是否添加到历史记录（true 记录，false 不记录）
+    tr.setMeta('addToHistory', false) // 若需要阻止历史，设为 false
+
+    // 提交事务（应用所有样式）
+    view.dispatch(tr)
   },
 }

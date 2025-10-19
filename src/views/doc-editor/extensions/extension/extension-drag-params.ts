@@ -93,6 +93,22 @@ export const ExtensionDragParams = Extension.create({
               attrs: nodeData.attrs,
             })
             .run()
+
+          const attrs = nodeData.attrs
+          const dataId = attrs?.['data-id']
+          const targetDom = document.querySelector(
+            `[data-id="${dataId}"]`,
+          ) as HTMLHtmlElement
+          targetDom && targetDom?.click?.()
+
+          // console.log('node@1', nodeData.attrs.cssText)
+
+          window.requestAnimationFrame(() => {
+            tiptapUtil.wrapCompTextNodeStyle(
+              this.editor,
+              nodeData.attrs.cssText,
+            )
+          })
           break
         }
 

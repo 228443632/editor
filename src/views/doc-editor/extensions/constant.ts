@@ -49,7 +49,7 @@ export const COMP_PARAMS_NAME_MAP = {
 export const COMP_PARAMS_CONFIG_MAP = {
   compText: {
     name: 'compText',
-    ...DEFAULT_STYLE_CONFIG,
+    // ...DEFAULT_STYLE_CONFIG,
     // link: true,
   },
   compTextDrag: {

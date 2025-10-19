@@ -222,6 +222,16 @@ const _tpFields = computed(() => {
                   .deleteSelection()
                   .setCompText(attrs)
                   .run()
+
+                const dataId = attrs?.['data-id']
+                const targetDom = document.querySelector(
+                  `[data-id="${dataId}"]`,
+                ) as HTMLHtmlElement
+                targetDom && targetDom?.click?.()
+
+                window.requestAnimationFrame(() => {
+                  tiptapUtil.wrapCompTextNodeStyle(editor.value, attrs.cssText)
+                })
               } else {
                 useMessage('warning', { content: `支持类型${cItem.value}控件` })
               }
