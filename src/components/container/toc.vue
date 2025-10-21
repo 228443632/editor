@@ -294,7 +294,7 @@ const _tabOptions = computed(() => {
   padding-left: 10px;
   //left: var(--left-aside-left);
   //background-color: var(--umo-color-white);
-  background: transparent;
+  background: #fff;
   border-right: solid 1px var(--umo-border-color);
   width: var(--left-aside-width);
   box-sizing: border-box;

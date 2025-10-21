@@ -33,7 +33,9 @@ const editor = inject('editor')
 // tocActive.value = 'dir'
 const { addListenerEvent } = useEditorEvent(editor)
 const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
-const __globalBizState__ = inject('__globalBizState__') as Ref<{}>
+const __globalBizState__ = inject('__globalBizState__') as Ref<
+  Record<string, any>
+>
 const rootRef = ref<HTMLHtmlElement>()
 const vueDraggableRef = ref<UseDraggableReturn>()
 
@@ -244,13 +246,22 @@ defineExpose({
           class="text-[#000] umo-toc-params__handle"
           size="16px"
         ></icon>
-        <icon :name="item.icon" class="text-[#999] ml-6px" size="14px"></icon>
+        <icon
+          :name="item.icon"
+          :class="[
+            'text-[#999] ml-6px toc-params-icon__prefix',
+            _nodeActiveNodeId &&
+              _nodeActiveNodeId == item.node.attrs?.['data-id'] &&
+              '!text-[#fff]',
+          ]"
+          size="14px"
+        ></icon>
         <span class="flex flex-1 items-center ml-4px umo-toc-params__text">{{
           item.node.attrs?.placeholder
         }}</span>
         <icon
           name="close-circle-filled"
-          class="flex-none invisible umo-toc-params__close-icon text-[#9398A6]"
+          class="flex-none invisible umo-toc-params__close-icon text-[#fff]"
           @click.stop="onDelItem(item)"
         ></icon>
       </li>
@@ -264,6 +275,8 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
+@import '@/style/vars';
+
 .umo-toc-params {
   padding: 10px 0;
   ul {
@@ -276,6 +289,7 @@ defineExpose({
       min-height: 28px;
       padding: 4px 10px 4px 4px;
       text-align: left;
+      border: 1px solid transparent;
       width: 100%;
       & + li {
         margin-top: 4px;
@@ -286,23 +300,27 @@ defineExpose({
         border-radius: 4px 4px 0 0;
         //opacity: 0.5;
       }
-      &.is-active {
-        background: #d4d3d4;
-      }
+      &.is-active,
       &:hover {
-        //background-color: #f8f8f8;
-        background: #d4d3d4;
-        .umo-toc-params__close-icon {
-          visibility: visible;
+        background-color: @primary-color;
+        color: #fff;
+        font-weight: bold;
+        :deep {
+          .umo-toc-params__handle {
+            color: #fff;
+          }
+          .toc-params-icon__prefix {
+            color: #fff;
+          }
         }
       }
       .umo-toc-params__text {
         position: relative;
         &:after {
-          content: '*';
-          color: var(--umo-error-color);
-          font-size: 13px;
-          margin-left: 2px;
+          //content: '*';
+          //color: var(--umo-error-color);
+          //font-size: 13px;
+          //margin-left: 2px;
         }
       }
     }

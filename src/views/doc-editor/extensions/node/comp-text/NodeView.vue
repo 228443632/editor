@@ -151,6 +151,7 @@ provide('NODE_PROPS', props)
   text-indent: 0;
   //border-bottom: 1px solid var(--umo-node-text-border-color);
   cursor: pointer;
+  scroll-margin-top: 8px;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode {
     outline: 2px solid var(--umo-primary-color) !important;

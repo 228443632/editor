@@ -389,11 +389,18 @@ export const tiptapUtil = {
    * 获取当前选中的节点信息
    */
   wrapCompTextNodeStyle(editor: Editor, cssText: CSSProperties) {
+    // console.log('cssText', cssText)
     // 执行多个样式命令，均不记录历史
     // 获取编辑器核心对象
     const { state, view } = editor
     const { tr, schema, selection } = state
     const { from, to } = selection // 样式应用的选区范围（当前选区）
+    Object.keys(cssText).forEach((key) => {
+      const value = cssText[key]
+      if (value == 'null' || value == 'undefined') {
+        cssText[key] = null
+      }
+    })
 
     // 1. 处理加粗（bold）
     if (cssText?.fontWeight === 'bold') {
@@ -450,10 +457,7 @@ export const tiptapUtil = {
     // 7. 处理背景高亮（依赖 highlight 标记）
     if (cssText?.backgroundColor) {
       const highlightMark = schema.marks.highlight
-      // @ts-expect-error
-      tr.removeMark(from, to, highlightMark, {
-        color: undefined,
-      }).addMark(
+      tr.removeMark(from, to, highlightMark).addMark(
         from,
         to,
         highlightMark.create({

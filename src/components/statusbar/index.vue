@@ -31,26 +31,26 @@
           <icon name="spellcheck" color="red" />
         </t-button>
       </tooltip>
-      <tooltip :content="t('shortcut.title')">
-        <t-button
-          class="umo-status-bar-button"
-          variant="text"
-          size="small"
-          @click="showShortcut = true"
-        >
-          <icon name="shortcut" />
-        </t-button>
-      </tooltip>
-      <tooltip :content="t('resetAll.title')">
-        <t-button
-          class="umo-status-bar-button"
-          variant="text"
-          size="small"
-          @click="reset(false)"
-        >
-          <icon name="clear-cache" />
-        </t-button>
-      </tooltip>
+      <!--      <tooltip :content="t('shortcut.title')">-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          @click="showShortcut = true"-->
+      <!--        >-->
+      <!--          <icon name="shortcut" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
+      <!--      <tooltip :content="t('resetAll.title')">-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--          @click="reset(false)"-->
+      <!--        >-->
+      <!--          <icon name="clear-cache" />-->
+      <!--        </t-button>-->
+      <!--      </tooltip>-->
       <div class="bar-split"></div>
       <!--      <tooltip :content="t('poweredBy')">-->
       <!--        <t-button-->
@@ -74,57 +74,57 @@
       <!--          <icon name="message" />-->
       <!--        </t-button>-->
       <!--      </tooltip>-->
-      <div class="umo-status-bar-split"></div>
-      <t-popup
-        v-if="editor"
-        v-model="showWordCount"
-        trigger="click"
-        placement="top-left"
-      >
-        <t-button
-          class="umo-status-bar-button auto-width word-count"
-          variant="text"
-          size="small"
-        >
-          <span v-if="selectionCharacters > 0">
-            {{ selectionCharacters }}/
-          </span>
-          <span class="umo-word-count">
-            {{ editor.storage.characterCount.characters() }}</span
-          >
-          {{ t('wordCount.characters') }}
-          <icon
-            name="arrow-down"
-            :style="{ transform: `rotate(${showWordCount ? '180deg' : 0})` }"
-          />
-        </t-button>
-        <template #content>
-          <div v-if="showWordCount" class="umo-word-count-detail">
-            <div class="umo-word-count-title">{{ t('wordCount.title') }}</div>
-            <ul>
-              <li>
-                {{ t('wordCount.input') }}
-                <span>
-                  {{ editor.storage.characterCount.characters() }}
-                </span>
-              </li>
-              <li>
-                {{ t('wordCount.selection') }}
-                <span>{{ selectionCharacters }}</span>
-              </li>
-              <li v-if="options.document?.characterLimit > 0">
-                {{ t('wordCount.limit') }}
-                <span>
-                  {{ options.document?.characterLimit }}
-                </span>
-              </li>
-            </ul>
-          </div>
-        </template>
-      </t-popup>
-      <span class="text-12px"
-        >总页数：{{ __layoutSize__?.pagination?.total }}</span
-      >
+      <!--      <div class="umo-status-bar-split"></div>-->
+      <!--      <t-popup-->
+      <!--        v-if="editor"-->
+      <!--        v-model="showWordCount"-->
+      <!--        trigger="click"-->
+      <!--        placement="top-left"-->
+      <!--      >-->
+      <!--        <t-button-->
+      <!--          class="umo-status-bar-button auto-width word-count"-->
+      <!--          variant="text"-->
+      <!--          size="small"-->
+      <!--        >-->
+      <!--          <span v-if="selectionCharacters > 0">-->
+      <!--            {{ selectionCharacters }}/-->
+      <!--          </span>-->
+      <!--          <span class="umo-word-count">-->
+      <!--            {{ editor.storage.characterCount.characters() }}</span-->
+      <!--          >-->
+      <!--          {{ t('wordCount.characters') }}-->
+      <!--          <icon-->
+      <!--            name="arrow-down"-->
+      <!--            :style="{ transform: `rotate(${showWordCount ? '180deg' : 0})` }"-->
+      <!--          />-->
+      <!--        </t-button>-->
+      <!--        <template #content>-->
+      <!--          <div v-if="showWordCount" class="umo-word-count-detail">-->
+      <!--            <div class="umo-word-count-title">{{ t('wordCount.title') }}</div>-->
+      <!--            <ul>-->
+      <!--              <li>-->
+      <!--                {{ t('wordCount.input') }}-->
+      <!--                <span>-->
+      <!--                  {{ editor.storage.characterCount.characters() }}-->
+      <!--                </span>-->
+      <!--              </li>-->
+      <!--              <li>-->
+      <!--                {{ t('wordCount.selection') }}-->
+      <!--                <span>{{ selectionCharacters }}</span>-->
+      <!--              </li>-->
+      <!--              <li v-if="options.document?.characterLimit > 0">-->
+      <!--                {{ t('wordCount.limit') }}-->
+      <!--                <span>-->
+      <!--                  {{ options.document?.characterLimit }}-->
+      <!--                </span>-->
+      <!--              </li>-->
+      <!--            </ul>-->
+      <!--          </div>-->
+      <!--        </template>-->
+      <!--      </t-popup>-->
+      <!--      <span class="text-12px"-->
+      <!--        >总页数：{{ __layoutSize__?.pagination?.total }}</span-->
+      <!--      >-->
     </div>
 
     <!-- 右侧  -->
