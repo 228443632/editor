@@ -8,12 +8,13 @@
 import VuePdfEmbed, { useVuePdfEmbed } from 'vue-pdf-embed'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
-import { arrayToObj, div, rafThrottle, debounce } from 'sf-utils2'
+import { arrayToObj, div, rafThrottle, debounce, deepClone } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import { useSearchPDF } from '../../sign-editor/hooks/use-search-pdf.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -32,14 +33,6 @@ const props = defineProps({
     type: Object,
     default: () => {},
   },
-
-  /**
-   * 组件参数列表
-   */
-  paramsCompList: {
-    type: Array,
-    default: () => [],
-  },
 })
 const emit = defineEmits([])
 
@@ -52,14 +45,34 @@ const updateKeyFlag = ref(0)
 
 const __previewContext__ = inject('__previewContext__', ref({}))
 const __previewPdfStyle__ = inject('__previewPdfStyle__', ref({}))
+const __paramsCompList__ = inject('__paramsCompList__')
+const __keywordsParamsCompList__ = inject('__keywordsParamsCompList__')
+
 const initialProgress = ref(0)
 const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
+const scaleFactor = ref(0) // 缩放因子 1.33
+
 const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
   computed(() => {
     return unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
   }),
 )
+
+const { doc } = useVuePdfEmbed({
+  source: props.source,
+  onProgress: (progressParams) => {
+    initialProgress.value = div(progressParams.loaded / progressParams.total)
+  },
+})
+const { keywordsPosList, search: pdfSearch } = useSearchPDF(doc, {
+  dpr,
+  scaleFactor,
+})
+
+__previewContext__.value.pdfSearch = pdfSearch
+__previewContext__.value.keywordsPosList = keywordsPosList
+
 // const canvasWidth = ref(undefined)
 // const canvasHeight = ref(undefined)
 
@@ -104,13 +117,6 @@ const _rootStyle = computed(() => {
     //   pageUtils.perPageGap * (doc.value.numPages - 1)
     // }px`,
   }
-})
-
-const { doc } = useVuePdfEmbed({
-  source: props.source,
-  onProgress: (progressParams) => {
-    initialProgress.value = div(progressParams.loaded / progressParams.total)
-  },
 })
 
 /* 方法 */
@@ -197,12 +203,10 @@ __previewContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
 const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
 
-  // nextTick(() => {
-  //   scaleFactor.value =
-  //     rootRef.value
-  //       .querySelector('.vue-pdf-embed__page')
-  //       .style.getPropertyValue('--scale-factor') || 1
-  // })
+  scaleFactor.value =
+    rootRef.value
+      .querySelector('.vue-pdf-embed__page')
+      .style.getPropertyValue('--scale-factor') || 1.33
 
   const isRenderSuccess =
     _pageNumsList.value?.length &&
@@ -212,6 +216,8 @@ const onRendered = (pageNum: number) => {
     loadAllPdfPagesRaf['_resolve']?.()
   }
 }
+
+window.$searchMethod = pdfSearch
 
 /* 计算 */
 
@@ -241,14 +247,15 @@ const _initial = computed(() => {
  * 参数组件列表
  */
 const _paramsCompList$pageNum = computed(() => {
-  return arrayToObj(props.paramsCompList, 'pageNum', {
+  return arrayToObj(__paramsCompList__.value, 'pageNum', {
     valueType: 'array',
   }) as Record<string, IParamsCompItem[]>
 })
 
 /* 监听 */
 watchEffect(() => {
-  __previewContext__.value.contentInitial = _initial.value
+  __previewContext__.value.contentInitial =
+    _initial.value && scaleFactor.value > 0
   if (_initial.value) {
     nextTick(() => {
       window.removeEventListener('resize', debounceWinResize)
@@ -265,6 +272,45 @@ watch(_pageNumsList, (newPageNums: number[]) => {
 watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
+
+/**
+ * 参数组件列表监听
+ */
+watch(
+  [
+    () => __keywordsParamsCompList__.value,
+    () => __previewContext__.value.contentInitial,
+  ],
+  async ([newValue]) => {
+    newValue ||= []
+    if (newValue.length && __previewContext__.value.contentInitial) {
+      // 初始化结束
+      const paramsCompListKeywords = newValue
+      for (const item of paramsCompListKeywords) {
+        const resultList = await pdfSearch(item.keywords, { matchRule: 'last' })
+        if (resultList?.length) {
+          const [keywordRect] = resultList || []
+          const keywordRectClone = deepClone(keywordRect) as IParamsCompItem
+          keywordRectClone.type = item.type
+          keywordRectClone.translateX = item.translateX
+          keywordRectClone.translateY = item.translateY
+          pageUtils.updateItemOffsetXY(keywordRectClone)
+          keywordRectClone.translateX = 0
+          keywordRectClone.translateY = 0
+          console.log('paramsCompListKeywords-resultList', keywordRectClone)
+          __paramsCompList__.value.push(keywordRectClone)
+        }
+      }
+      __keywordsParamsCompList__.value = []
+
+      // 关键字 渲染成功
+      __previewContext__.value.keywordsRenderSuccess = true
+    }
+  },
+  {
+    immediate: true,
+  },
+)
 
 /* 周期 */
 onMounted(() => {})
@@ -322,43 +368,51 @@ defineExpose({
           @rendered="onRendered(pageNum)"
         />
 
+        <!-- 绝对坐标定位  -->
         <template
           v-if="
             _paramsCompList$pageNum[pageNum]?.length && pageVisibility[pageNum]
           "
         >
-          <div
+          <template
             v-for="item in _paramsCompList$pageNum[pageNum]"
             :key="item.key"
-            :data-id="'id-' + item.key"
-            class="content-comp__item"
-            :style="{
-              '--page-num': item.pageNum,
-              // top: item.top - (item.pageNum - 1) * 12 + 'px',
-              top: item.offsetTop * +_scalePos + 'px',
-              left: item.offsetLeft * +_scalePos + 'px',
-              transform: `scale(${_scalePos})`,
-            }"
           >
-            <!-- 印章 -->
-            <ContentCompSeal
-              v-if="item.type == 'compSeal'"
-              :node-data="item"
-            ></ContentCompSeal>
-
-            <!-- 签名 -->
-            <ContentCompSign
-              v-else-if="item.type == 'compSign'"
-              :node-data="item"
+            <template
+              v-if="(item.keywords && item.list?.length) || !item.keywords"
             >
-            </ContentCompSign>
+              <div
+                :data-id="'id-' + item.key"
+                class="content-comp__item"
+                :style="{
+                  '--page-num': item.pageNum,
+                  // top: item.top - (item.pageNum - 1) * 12 + 'px',
+                  top: item.offsetTop * +_scalePos + 'px',
+                  left: item.offsetLeft * +_scalePos + 'px',
+                  transform: `scale(${_scalePos})`,
+                }"
+              >
+                <!-- 印章 -->
+                <ContentCompSeal
+                  v-if="item.type == 'compSeal'"
+                  :node-data="item"
+                ></ContentCompSeal>
 
-            <!-- 签署日期 -->
-            <ContentCompSignDate
-              v-else-if="item.type == 'compSignDate'"
-              :node-data="item"
-            ></ContentCompSignDate>
-          </div>
+                <!-- 签名 -->
+                <ContentCompSign
+                  v-else-if="item.type == 'compSign'"
+                  :node-data="item"
+                >
+                </ContentCompSign>
+
+                <!-- 签署日期 -->
+                <ContentCompSignDate
+                  v-else-if="item.type == 'compSignDate'"
+                  :node-data="item"
+                ></ContentCompSignDate>
+              </div>
+            </template>
+          </template>
         </template>
       </div>
     </template>

@@ -12,6 +12,8 @@ import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 // import { saveAs } from 'file-saver'
 import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
+import type { useSearchPDF } from '@/views/sign-editor/hooks/use-search-pdf.ts'
+// import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const props = defineProps({
   /**
@@ -29,14 +31,6 @@ const props = defineProps({
     type: String,
     default: () => '',
   },
-
-  /**
-   * 参数组件列表
-   */
-  paramsCompList: {
-    type: Array,
-    default: () => [],
-  },
 })
 const emit = defineEmits({})
 
@@ -44,12 +38,19 @@ const emit = defineEmits({})
 const rootRef = ref<HTMLElement>()
 const contentRef = ref<InstanceType<typeof Content>>()
 console.log('props.source', props.source)
+
+const __paramsCompList__ = inject('__paramsCompList__')
+const __keywordsParamsCompList__ = inject('__keywordsParamsCompList__')
+
 const previewContext = ref({
   /** 文件来源 */
   source: props.source,
 
   /** 加载 */
   loading: 0,
+
+  /** 关键是否渲染成功 */
+  keywordsRenderSuccess: false,
 
   /** 是否处于打印中*/
   isExporting: false,
@@ -62,6 +63,12 @@ const previewContext = ref({
 
   /** 一次性加载所有pdf页面，主要是为了导出功能*/
   loadAllPdfPagesRaf: noop,
+
+  /** 关键字位置 */
+  keywordsPosList: [] as ReturnType<typeof useSearchPDF>['keywordsPosList'],
+
+  /** pdf搜索方法 */
+  pdfSearch: undefined as ReturnType<typeof useSearchPDF>['search'],
 })
 const a4 = cssUtil.getPaperSize('A4')
 
@@ -114,8 +121,7 @@ const exportPdf = async (filename?: string) => {
  * 获取参数组件列表
  */
 const _paramsCompList = computed(() => {
-  return pageUtils.expandCompParams(props.paramsCompList as any)
-  // return props.paramsCompList
+  return pageUtils.enhanceCompParams(__paramsCompList__.value as any)
 })
 
 /* 计算 */
@@ -124,7 +130,9 @@ const _paramsCompList = computed(() => {
  */
 const _loading = computed(() => {
   return (
-    previewContext.value.loading > 0 || !previewContext.value.contentInitial
+    previewContext.value.loading > 0 ||
+    !previewContext.value.contentInitial ||
+    !previewContext.value.keywordsRenderSuccess
   )
 })
 
@@ -141,7 +149,10 @@ watch(
 )
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  if (!__keywordsParamsCompList__.value?.length)
+    previewContext.value.keywordsRenderSuccess = true
+})
 
 /* 暴露 */
 defineExpose({
@@ -176,7 +187,6 @@ provide('__previewContext__', previewContext)
       <Content
         ref="contentRef"
         :source="previewContext.source"
-        :params-comp-list="_paramsCompList"
         :model="model"
       ></Content>
 

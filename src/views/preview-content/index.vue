@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import Preview from './components/Preview.vue'
 import { useRoute } from 'vue-router'
-import { deepClone, to } from 'sf-utils2'
+import { deepClone, to, uuid } from 'sf-utils2'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
@@ -26,6 +26,7 @@ const model = ref(route.query.model as 'preview' | 'download')
 model.value ||= 'preview'
 const source = ref(route.query.source as string)
 const paramsCompList = ref([])
+const keywordsParamsCompList = ref([])
 
 const downloadPreviewRef = ref<InstanceType<typeof Preview>>()
 const previewRef = ref<InstanceType<typeof Preview>>()
@@ -41,19 +42,29 @@ const exportPdf = (filename?: string) => {
     isShowDownload.value = true
     await nextTick()
 
-    if (downloadPreviewRef.value.previewContext?.contentInitial) {
+    const contentInitial =
+      downloadPreviewRef.value.previewContext?.contentInitial
+    const keywordsRenderSuccess =
+      downloadPreviewRef.value.previewContext?.keywordsRenderSuccess
+    if (contentInitial && keywordsRenderSuccess) {
       await to(downloadPreviewRef.value.exportPdf(filename))
       return resolve(true)
     }
 
     const watcher = watch(
-      () => downloadPreviewRef.value.previewContext?.contentInitial,
-      async (newVal) => {
-        if (newVal) {
+      [
+        () => downloadPreviewRef.value.previewContext?.contentInitial,
+        () => downloadPreviewRef.value.previewContext?.keywordsRenderSuccess,
+      ],
+      async ([contentInitial, keywordsRenderSuccess]) => {
+        if (contentInitial && keywordsRenderSuccess) {
           await to(downloadPreviewRef.value.exportPdf(filename))
           watcher()
           resolve(true)
         }
+      },
+      {
+        immediate: true,
       },
     )
   })
@@ -70,11 +81,22 @@ function initParamsCompList(
   paramsCompListArg: IParamsCompItem[],
   retainField?: IParamsCompItem['type'][],
 ) {
-  paramsCompList.value = pageUtils.reverseExpandCompParams(
-    deepClone(paramsCompListArg || []),
+  paramsCompListArg = deepClone(paramsCompListArg)
+  const paramsCompListKeywords = [] // 关键字list
+  const paramsCompListNoKeywords = [] // 绝对坐标
+  paramsCompListArg.forEach((item) => {
+    if (item.keywords) {
+      paramsCompListKeywords.push(item)
+    } else {
+      paramsCompListNoKeywords.push(item)
+    }
+  })
+  paramsCompList.value = pageUtils.reverseEnhanceCompParams(
+    paramsCompListNoKeywords,
     retainField,
     // Object.values(COMP_PARAMS_NAME_MAP),
   )
+  keywordsParamsCompList.value = paramsCompListKeywords
 }
 
 /* 计算 */
@@ -95,9 +117,19 @@ onMounted(() => {
     // paramsCompList.value._isSkip = true
 
     initParamsCompList(
-      [{ type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 }],
-      ['compSeal'],
+      [
+        { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
+        {
+          type: 'compSign',
+          translateX: 0,
+          translateY: 0,
+          keywords: '说明书',
+          key: uuid(),
+        },
+      ],
+      ['compSeal', 'compSign'],
     )
+    console.log('__', paramsCompList.value)
   }
 })
 
@@ -108,6 +140,12 @@ defineExpose({
 
 /** 预览的pdf 样式*/
 provide('__previewPdfStyle__', previewPdfStyle)
+
+/** 参数组件list */
+provide('__paramsCompList__', paramsCompList)
+
+/** 关键字参数组件list */
+provide('__keywordsParamsCompList__', keywordsParamsCompList)
 
 window['pagePreviewContent'] = {
   /** 导出 */
@@ -149,7 +187,6 @@ window['pagePreviewContent'] = {
       ref="previewRef"
       :source="source"
       model="preview"
-      :params-comp-list="paramsCompList"
     ></Preview>
 
     <!-- 下载  -->
@@ -158,7 +195,6 @@ window['pagePreviewContent'] = {
       ref="downloadPreviewRef"
       model="download"
       :source="source"
-      :params-comp-list="paramsCompList"
       class="absolute -z-1 opacity-0"
     ></Preview>
   </div>
