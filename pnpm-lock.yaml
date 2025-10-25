@@ -222,8 +222,8 @@ importers:
         specifier: 1.1.0
         version: 1.1.0
       sf-utils2:
-        specifier: 3.3.4
-        version: 3.3.4
+        specifier: 3.3.5
+        version: 3.3.5
       sign-canvas-plus:
         specifier: 2.0.3
         version: 2.0.3(typescript@5.5.4)
@@ -6338,8 +6338,8 @@ packages:
   setimmediate@1.0.5:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
 
-  sf-utils2@3.3.4:
-    resolution: {integrity: sha512-ahGe/dpnUhyxRZajTYdBvEzV3b8rezCfFVy+sDHw7S0yuuVBZjPWYYosH1YsiMVrye3PSmatvozMEVEUGT97dQ==}
+  sf-utils2@3.3.5:
+    resolution: {integrity: sha512-qHwqT1HOaAsn1ixrDFjNMo0HToPgEA/zwekq9vs3Fe85sZrCNhAqmqTFHq3i0PlgXcQZzX3pNFz+MBoyNwXEXg==}
 
   sha.js@2.4.12:
     resolution: {integrity: sha512-8LzC5+bvI45BjpfXU8V5fdU2mfeKiQe1D1gIMn7XUlF3OTUrpdJpPPH4EMAnF0DsHHdSZqCdSss5qCmJKuiO3w==}
@@ -14209,7 +14209,7 @@ snapshots:
 
   setimmediate@1.0.5: {}
 
-  sf-utils2@3.3.4:
+  sf-utils2@3.3.5:
     dependencies:
       clipboard: 2.0.11
       dayjs: 1.10.7

@@ -58,29 +58,9 @@ const { width: dragerWidth, height: dragerHeight } =
  * @param top
  */
 const onDrag = ({ left, top }: { left: number; top: number }) => {
-  updateTopLeft(_nodeData.value, top, left)
+  pageUtils.setItemTopLeft(_nodeData.value, top, left)
 }
 const rafThrottleOnDrag = rafThrottle(onDrag)
-
-/**
- * 更新位置
- * @param target
- * @param top
- * @param left
- */
-function updateTopLeft(target: IParamsCompItem, top: number, left?: number) {
-  target ||= _nodeData.value
-  // console.log('debug02', top, left, target)
-  if (target.keywords) {
-    // 是关键字
-    if (isNoNullable(left) && !Number.isNaN(left))
-      target.offsetLeft = target.left = left
-    target.offsetTop = target.top = top
-  } else {
-    if (isNoNullable(left) && !Number.isNaN(left)) target.left = left
-    target.top = top
-  }
-}
 
 /**
  * 选择节点
@@ -139,7 +119,7 @@ const onSelectNode = (startE: MouseEvent) => {
     inRectList.forEach((item) => {
       const left = item._snapshotLeft + diffX
       const top = item._snapshotTop + diffY
-      updateTopLeft(item, top, left)
+      pageUtils.setItemTopLeft(item, top, left)
     })
   }
 }
@@ -195,7 +175,7 @@ function onDragStart() {
  */
 function onDragEnd() {
   const top = _nodeData.value.top + _nodeData.value.scrollOffsetY
-  updateTopLeft(null, top, null)
+  pageUtils.setItemTopLeft(_nodeData.value, top, null)
   _nodeData.value.scrollOffsetY = 0
   removeScrollListener()
 

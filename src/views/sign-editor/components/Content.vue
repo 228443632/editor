@@ -102,8 +102,6 @@ const { keywordsPosList, search: pdfSearch } = useSearchPDF(doc, {
 __signContext__.value.pdfSearch = pdfSearch
 __signContext__.value.keywordsPosList = keywordsPosList
 
-window.$pdfSearch = pdfSearch
-
 // 全选
 registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
   const paramsCompList = __signContext__.value.paramsCompList
@@ -473,7 +471,6 @@ function onKeydown(e: KeyboardEvent) {
       inRectCompList.push(item)
     }
   })
-
   if (!inRectCompList?.length) return
   // keyCode: 40 下 38 上。39 右 37 左
   switch (e.keyCode) {
@@ -481,14 +478,14 @@ function onKeydown(e: KeyboardEvent) {
       // 下
       e.preventDefault()
       inRectCompList.forEach((item) => {
-        item.top = item.top + 1
+        pageUtils.setItemTopLeft(item, item.top + 1, undefined)
       })
       break
     }
     case 38: {
       // 上
       inRectCompList.forEach((item) => {
-        item.top = item.top - 1
+        pageUtils.setItemTopLeft(item, item.top - 1, undefined)
       })
       e.preventDefault()
       break
@@ -497,7 +494,7 @@ function onKeydown(e: KeyboardEvent) {
     case 37: {
       // 左
       inRectCompList.forEach((item) => {
-        item.left = item.left - 1
+        pageUtils.setItemTopLeft(item, undefined, item.left - 1)
       })
       e.preventDefault()
       break
@@ -505,7 +502,7 @@ function onKeydown(e: KeyboardEvent) {
     case 39: {
       // 右
       inRectCompList.forEach((item) => {
-        item.left = item.left + 1
+        pageUtils.setItemTopLeft(item, undefined, item.left + 1)
       })
       e.preventDefault()
       break

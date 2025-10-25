@@ -4,7 +4,7 @@
  * @create 02/10/25 PM10:20
  */
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
-import { arrayToObj, deepClone, uuid } from 'sf-utils2'
+import { arrayToObj, deepClone, uuid, isNoNullable } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import {
   COMP_PARAMS_NAME_MAP,
@@ -113,8 +113,12 @@ export const pageUtils = {
         item.offsetY = +Number(
           originKeywordRect.top + originKeywordRect.height / 2 + translateY,
         ).toFixed(0)
-        item.top = +Number(item.offsetY - item.height / 2).toFixed(0)
-        item.left = +Number(item.offsetX - item.width / 2).toFixed(0)
+        item.offsetTop = item.top = +Number(
+          item.offsetY - item.height / 2,
+        ).toFixed(0)
+        item.offsetLeft = item.left = +Number(
+          item.offsetX - item.width / 2,
+        ).toFixed(0)
       }
     } else {
       // 绝对定位
@@ -201,7 +205,7 @@ export const pageUtils = {
     const retainFieldObj = arrayToObj(retainField)
     console.log('retainFieldObj', retainFieldObj)
     return deepClone(paramsCompList || [])
-      .map((item) => {
+      .map((item: IParamsCompItem) => {
         pageUtils.safeItem(item)
         pageUtils.fillItemWH(item)
 
@@ -296,5 +300,27 @@ export const pageUtils = {
     item.offsetY = +Number(item.offsetTop + item.height / 2).toFixed(0)
 
     return item
+  },
+
+  /**
+   * 更新位置
+   * @param target
+   * @param top
+   * @param left
+   */
+  setItemTopLeft(target: IParamsCompItem, top?: number, left?: number) {
+    // console.log('debug02', top, left, target)
+    if (target.keywords) {
+      if (target.list?.length) {
+        // 是关键字
+        if (isNoNullable(left) && !Number.isNaN(left))
+          target.offsetLeft = target.left = left
+        if (isNoNullable(top) && !Number.isNaN(top))
+          target.offsetTop = target.top = top
+      }
+    } else {
+      if (isNoNullable(left) && !Number.isNaN(left)) target.left = left
+      if (isNoNullable(top) && !Number.isNaN(top)) target.top = top
+    }
   },
 }
