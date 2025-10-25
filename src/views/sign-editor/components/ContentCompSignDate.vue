@@ -101,7 +101,14 @@ defineExpose({
       v-model:node-data="_nodeData"
       :show-line="_isActive"
     >
-      <div class="e-drager-top__tag">签署日期</div>
+      <div class="e-drager-top__tag">
+        <span>签署日期</span>
+
+        <!-- 关键字 -->
+        <span v-if="_nodeData?.keywords" class="e-drager-top__tag-kwds">
+          - {{ _nodeData?.keywords }}
+        </span>
+      </div>
       <div
         ref="divRef"
         :style="{

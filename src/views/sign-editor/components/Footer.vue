@@ -51,26 +51,9 @@ const onNext = () => {
  */
 const onChooseUseWidgetItem = (item) => {
   __signContext__.value.selectParamsComp(item)
-  const contentEl = __signContext__.value.contentElRef
-  const target = contentEl.querySelector(`[data-id="id-${item.key}"]`)
-  if (target) {
-    console.log('target', target)
-    const esDragerDom = target.querySelector('.es-drager')
-    if (esDragerDom) {
-      scrollIntoView(esDragerDom)
-    } else {
-      scrollIntoView(esDragerDom.children[0])
-    }
-  }
 
-  function scrollIntoView(target: HTMLElement) {
-    if (target) {
-      target.scrollIntoView({
-        // behavior: 'smooth',
-        block: 'start',
-        // inline: 'center',
-      })
-    }
+  if (__signContext__.value.scrollIntoViewByParamsComp) {
+    __signContext__.value.scrollIntoViewByParamsComp(item)
   }
 }
 
@@ -104,7 +87,7 @@ const _useWidgetList = computed(() => {
         icon: 'icon-seal',
       },
       compSignDate: {
-        name: '签署时间',
+        name: '签署日期',
         icon: 'icon-sign-date',
       },
     }

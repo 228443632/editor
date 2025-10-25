@@ -55,6 +55,7 @@ defineExpose({
 
 <!--style-->
 <style scoped lang="less">
+@import './content-comp-style.less';
 .sign-editor__right {
   //width: clamp(
   //  var(--right-aside-width),

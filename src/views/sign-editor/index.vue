@@ -16,7 +16,8 @@ import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant.ts'
-import { type useVuePdfEmbed } from 'vue-pdf-embed' // 头部
+import { type useVuePdfEmbed } from 'vue-pdf-embed'
+import { type useSearchPDF } from '@/views/sign-editor/hooks/use-search-pdf.ts' // 头部
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -147,7 +148,7 @@ const signContext = ref({
    */
   _paramsCompList: computed(() => {
     const paramsCompList = signContext.value.paramsCompList || []
-    return pageUtils.expandCompParams(paramsCompList)
+    return pageUtils.enhanceCompParams(paramsCompList)
   }),
 
   /**
@@ -251,22 +252,71 @@ const signContext = ref({
    */
   getPageNumByTop: pageUtils.getPageNumByTop,
 
-  /** 组件类型集合 */
+  /** 允许组件类型集合 */
   compTypeList: [] as string[],
 
   /**
    * 反转参数组件, 初始化
+   * @pāram {IParamsCompItem[]} paramsCompList 控件属性
+   * @pāram {string[]} retainField 保留的空间类型 集合
+   * paramsCompList 传入 type pageNum offsetTop offsetLeft
    */
   initParamsCompList: (
     paramsCompList: IParamsCompItem[],
     retainField?: IParamsCompItem['type'][],
   ) => {
     signContext.value.compTypeList = deepClone(retainField)
-    signContext.value.paramsCompList = pageUtils.reverseExpandCompParams(
-      paramsCompList,
+    const paramsCompListKeywords = [] // 关键字list
+    const paramsCompListNoKeywords = [] // 绝对坐标
+    paramsCompList.forEach((item) => {
+      if (item.keywords) {
+        paramsCompListKeywords.push(item)
+      } else {
+        paramsCompListNoKeywords.push(item)
+      }
+    })
+    signContext.value.paramsCompList = pageUtils.reverseEnhanceCompParams(
+      paramsCompListNoKeywords,
       retainField,
     )
     initial.value = true
+
+    // 有关键字list
+    if (paramsCompListKeywords?.length) {
+      const w = watch(
+        () => signContext.value.contentInitial,
+        async (newVal) => {
+          if (newVal) {
+            console.log('paramsCompListKeywords', paramsCompListKeywords)
+            for (const item of paramsCompListKeywords) {
+              const resultList = await signContext.value.pdfSearch(
+                item.keywords,
+                { matchRule: 'last' },
+              )
+              if (resultList?.length) {
+                const [keywordRect] = resultList || []
+                const keywordRectClone = deepClone(
+                  keywordRect,
+                ) as IParamsCompItem
+                keywordRectClone.type = item.type
+                keywordRectClone.translateX = item.translateX
+                keywordRectClone.translateY = item.translateY
+                pageUtils.updateItemOffsetXY(keywordRectClone)
+                keywordRectClone.translateX = 0
+                keywordRectClone.translateY = 0
+                console.log(
+                  'paramsCompListKeywords-resultList',
+                  keywordRectClone,
+                )
+                signContext.value.paramsCompList.push(keywordRectClone)
+              }
+            }
+            w()
+          }
+        },
+        { immediate: true },
+      )
+    }
   },
 
   /** 是否在拖拽中 */
@@ -289,6 +339,9 @@ const signContext = ref({
 
   /** 一次性加载所有pdf页面，主要是为了导出功能*/
   loadAllPdfPagesRaf: noop,
+
+  /** 模版名称list */
+  templateNameList: [] as string[],
 
   /**
    * 手动控制历史记录
@@ -315,6 +368,17 @@ const signContext = ref({
     last,
     ...manualRefHistoryRest,
   },
+
+  /** 关键字位置 */
+  keywordsPosList: [] as ReturnType<typeof useSearchPDF>['keywordsPosList'],
+
+  /** pdf搜索方法 */
+  pdfSearch: undefined as ReturnType<typeof useSearchPDF>['search'],
+
+  /** 滚动到指定的组件参数位置*/
+  scrollIntoViewByParamsComp: noop as (
+    compParam: IParamsCompItem | string,
+  ) => void,
 })
 
 /* 方法 */
@@ -370,19 +434,22 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './pdfs/4.pdf'
+    signContext.value.source = './pdfs/2.pdf'
     initial.value = true
     signContext.value.initParamsCompList(
       [
         {
           type: 'compSign',
-          offsetX: 100,
-          offsetY: 100,
+          translateX: 100,
+          translateY: 100,
+          keywords: '简历',
           key: uuid(),
         },
       ],
+      // ['compSign', 'compSignDate', 'compSeal'],
       ['compSign', 'compSignDate', 'compSeal'],
     )
+    signContext.value.templateNameList = []
   }
 })
 

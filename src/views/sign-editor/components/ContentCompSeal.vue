@@ -124,7 +124,14 @@ defineExpose({
       v-model:node-data="_nodeData"
       :show-line="_isActive"
     >
-      <div class="e-drager-top__tag">印章</div>
+      <div class="e-drager-top__tag">
+        <span>印章</span>
+
+        <!-- 关键字 -->
+        <span v-if="_nodeData?.keywords" class="e-drager-top__tag-kwds">
+          - {{ _nodeData?.keywords }}
+        </span>
+      </div>
       <t-tooltip
         v-if="_isActive"
         theme="light"

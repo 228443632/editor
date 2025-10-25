@@ -5,8 +5,6 @@
  -->
 <!--setup-->
 <script setup>
-import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf'
-
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
 const emit = defineEmits([])
@@ -16,28 +14,6 @@ const isExporting = ref(false)
 const __signContext__ = inject('__signContext__') // 预览上下文
 
 /* 方法 */
-
-const onExport = async () => {
-  try {
-    isExporting.value = true
-    await __signContext__.value.loadAllPdfPagesRaf()
-    const contentDom = unrefElement(__signContext__.value.embedPdfWrapRef)
-    const pagesDomList = Array.from(
-      contentDom.querySelectorAll('.pdf-embed__item'),
-    )
-    await exportPDFWorker(pagesDomList)
-    console.log('导出成功')
-    useMessage('success', { content: '导出成功' })
-  } catch (err) {
-    console.error('导出失败:', err)
-    useMessage('error', { content: '导出失败' })
-  } finally {
-    window.requestIdleCallback(() => {
-      isExporting.value = false
-    })
-  }
-}
-
 const onLoadAllPdf = async () => {
   await __signContext__.value.loadAllPdfPagesRaf()
   console.log('加载结束')
@@ -69,9 +45,6 @@ defineExpose({
 <!--render-->
 <template>
   <div class="sign-editor__header">
-    <t-button :loading="isExporting" type="button" @click="onExport"
-      >导出pdf</t-button
-    >
     <t-button @click="onLoadAllPdf">一次性加载所有</t-button>
   </div>
 </template>

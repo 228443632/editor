@@ -13,13 +13,11 @@ import {
   uuid,
   rafThrottle,
   toFixed,
+  debounce,
 } from 'sf-utils2'
-import ContentCompSign from './ContentCompSign.vue'
-import ContentCompSeal from './ContentCompSeal.vue'
 import { PREVIEW_AUX_LINE_CTOR } from './ContentLineWrap.vue'
 import { useMouseDragLine } from '../hooks/use-mouse-drag-line.ts'
 import useAnchor from '@/views/sign-editor/hooks/use-anchor'
-import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignDate.vue'
 import { useHotKeysV2 } from '@/composables/hotkeys.ts'
 import 'vue-pdf-embed/dist/styles/annotationLayer.css'
 import 'vue-pdf-embed/dist/styles/textLayer.css'
@@ -31,6 +29,10 @@ import {
   COMP_SIGN_DATE_STYLE,
   COMP_SIGN_STYLE,
 } from '@/views/doc-editor/extensions/constant.ts'
+import { useSearchPDF } from '../hooks/use-search-pdf.ts'
+import ContentKeywordCompPos from './ContentKeywordCompPos.vue' // 内容区域关键字组件定位
+import ContentTpNamesPos from './ContentTpNamesPos.vue' // 内容区域模版参数关键字定位
+import ContentAbsCompPos from './ContentAbsCompPos.vue' // 内容区域控件绝对定位
 
 /* 状态 */
 const props = defineProps({})
@@ -62,8 +64,9 @@ const paramsCompPatchKey = ref(0)
 const scrollViewPercent = ref(0)
 const scrollViewTop = ref(0)
 const { height: rootHeight } = useElementBounding(rootRef)
+const scaleFactor = ref(0) // 缩放因子 1.33
 
-const copyContentInfo = ref([])
+const copyContentInfo = ref([]) // 复制的内容
 
 const activeElement = useActiveElement()
 const { x, y } = usePointer()
@@ -89,6 +92,17 @@ const { registerHotKeys } = useHotKeysV2({
     return false
   },
 })
+const { keywordsPosList: highlightTpNamesPosList, search: pdfSearchByTpNames } =
+  useSearchPDF(doc, { dpr, scaleFactor })
+const { keywordsPosList, search: pdfSearch } = useSearchPDF(doc, {
+  dpr,
+  scaleFactor,
+})
+
+__signContext__.value.pdfSearch = pdfSearch
+__signContext__.value.keywordsPosList = keywordsPosList
+
+window.$pdfSearch = pdfSearch
 
 // 全选
 registerHotKeys('ctrl+a, command+a', (e: KeyboardEvent) => {
@@ -317,12 +331,10 @@ __signContext__.value.loadAllPdfPagesRaf = loadAllPdfPagesRaf
 const onRendered = (pageNum: number) => {
   pageRendered.value[pageNum] = true
 
-  // nextTick(() => {
-  //   __signContext__.value.scaleFactor = 1
-  //   // rootRef.value
-  //   //   .querySelector('.vue-pdf-embed__page')
-  //   //   .style.getPropertyValue('--scale-factor') || 1
-  // })
+  scaleFactor.value =
+    rootRef.value
+      .querySelector('.vue-pdf-embed__page')
+      .style.getPropertyValue('--scale-factor') || 1.33
 
   const isRenderSuccess =
     _pageNumsList.value?.length &&
@@ -350,10 +362,11 @@ const onKeyDownRoot = (e: KeyboardEvent) => {
 /**
  * 滚动到指定参数组件
  */
-const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem) => {
-  if (!paramsComp?.key) return
+const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem | string) => {
+  const key = typeof paramsComp === 'string' ? paramsComp : paramsComp.key
+  if (!key) return
   const contentEl = __signContext__.value.contentElRef
-  const target = contentEl.querySelector(`[data-id="id-${paramsComp.key}"]`)
+  const target = contentEl.querySelector(`[data-id="id-${key}"]`)
   if (target) {
     const esDragerDom = target.querySelector('.es-drager')
     if (esDragerDom) {
@@ -372,6 +385,7 @@ const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem) => {
     }
   }
 }
+__signContext__.value.scrollIntoViewByParamsComp = scrollIntoViewByParamsComp
 
 /**
  * 滚动
@@ -394,15 +408,6 @@ useEventListener(rootRef, 'scroll', throttleScroll)
 /* 计算 */
 
 /**
- * 参数组件列表
- */
-// const _paramsCompList$pageNum = computed(() => {
-//   return arrayToObj(props.paramsCompList, 'pageNum', {
-//     valueType: 'array',
-//   }) as Record<string, IParamsCompItem[]>
-// })
-
-/**
  * 分页数量
  */
 const _pageNumsList = computed(() =>
@@ -421,6 +426,13 @@ const _embedItemStyle = computed(() => {
     // margin: `${a4._basePx.mt}px ${a4._basePx.ml}px ${a4._basePx.mb}px ${a4._basePx.mr}px`,
     // padding: `${a4._basePx.pt}px ${a4._basePx.pl}px ${a4._basePx.pb}px ${a4._basePx.pr}px`,
   }
+})
+
+/**
+ * 高亮组件 关键字
+ */
+const _highlightCompKeywordsPosList = computed(() => {
+  return __signContext__.value._paramsCompList.filter((item) => item.keywords)
 })
 
 /**
@@ -502,6 +514,10 @@ function onKeydown(e: KeyboardEvent) {
       break
     }
   }
+
+  inRectCompList.forEach((item) => {
+    pageUtils.correctPos(item, __signContext__.value.contentPageNums)
+  })
 }
 
 useEventListener(
@@ -511,13 +527,40 @@ useEventListener(
 )
 
 /* 监听 */
+const debouncePdfSearchByTpNamesFn = debounce(async () => {
+  if (debouncePdfSearchByTpNamesFn['_loading']) return
+  debouncePdfSearchByTpNamesFn['_loading'] = true
+  highlightTpNamesPosList.value = []
+  for (const templateName of __signContext__.value.templateNameList) {
+    if (templateName) {
+      await pdfSearchByTpNames(templateName, { matchRule: 'all' })
+    }
+  }
+  debouncePdfSearchByTpNamesFn['_loading'] = false
+}, 100)
+/**
+ * 初始化完成，监听模板列表变化
+ * 更新模版字段高亮
+ * TODO 待完善
+ */
+watch(
+  [() => __signContext__.value.templateNameList, _initial, scaleFactor],
+  ([templateNameList, tempInitial]) => {
+    if (tempInitial) {
+      // debouncePdfSearchByTpNamesFn()
+    }
+  },
+  {
+    immediate: true,
+  },
+)
 
 watchEffect(() => {
   __signContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
 watchEffect(() => {
-  __signContext__.value.contentInitial = _initial.value
+  __signContext__.value.contentInitial = _initial.value && scaleFactor.value > 0
 })
 
 /**
@@ -555,6 +598,9 @@ watch(__activePageNum__, (newVal: number) => {
   }
 })
 
+/**
+ * 监听参数组件列表变化
+ */
 watchEffect(() => {
   void _dragAreaWidth.value
   void _dragAreaHeight.value
@@ -578,11 +624,14 @@ watch(_pageNumsList, (newPageNums: number[]) => {
   nextTick(resetPageIntersectionObserver)
 })
 
-onMounted(() => {
-  nextTick(() => {
-    // paramsCompPatchKey.value++
-  })
+/**
+ * 监听缩放因子变化，设置全局 缩放因子
+ */
+watchEffect(() => {
+  // __signContext__.value.scaleFactor = scaleFactor.value
 })
+
+onMounted(() => {})
 
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
@@ -672,49 +721,35 @@ defineExpose({
               :page="pageNum"
               @rendered="onRendered(pageNum)"
             />
+
+            <!-- 关键字 模版字段 定位  -->
+            <ContentTpNamesPos
+              v-if="highlightTpNamesPosList?.length"
+              :page-num="pageNum"
+              :highlight-tp-names-pos-list="highlightTpNamesPosList"
+            >
+            </ContentTpNamesPos>
+
+            <!-- 关键字 控件 高亮定位  -->
+            <ContentTpNamesPos
+              v-if="_highlightCompKeywordsPosList?.length"
+              :page-num="pageNum"
+              :keywords-type="'compKeywords'"
+              :highlight-tp-names-pos-list="_highlightCompKeywordsPosList"
+            >
+            </ContentTpNamesPos>
+            <!-- 关键字 控件 定位 ✨ -->
+            <ContentKeywordCompPos
+              v-if="__signContext__._paramsCompList?.length"
+              :page-num="pageNum"
+            ></ContentKeywordCompPos>
           </div>
         </template>
 
-        <!-- 参数悬浮 -->
-        <div :key="paramsCompPatchKey" class="contents">
-          <div
-            v-for="(item, index) in __signContext__._paramsCompList"
-            :key="item.key"
-            :data-id="'id-' + item.key"
-            :class="[
-              'content-comp__item',
-              (item.isInRect ||
-                item.key == __signContext__?.activeCompParam?.key) &&
-                'content-comp__item-active',
-            ]"
-            :style="{
-              '--page-num': item.pageNum,
-              '--mt': -((item.pageNum - 1) * __layoutSize__.perPageGap) + 'px',
-            }"
-          >
-            <!-- 印章 -->
-            <template v-if="item.type == 'compSeal'">
-              <ContentCompSeal
-                v-model:node-data="__signContext__.paramsCompList[index]"
-              ></ContentCompSeal>
-            </template>
+        <!-- 内容区域控件绝对定位 -->
+        <ContentAbsCompPos :key="paramsCompPatchKey"></ContentAbsCompPos>
 
-            <!-- 签名 -->
-            <template v-else-if="item.type == 'compSign'">
-              <ContentCompSign
-                v-model:node-data="__signContext__.paramsCompList[index]"
-              ></ContentCompSign>
-            </template>
-
-            <!-- 签署日期 -->
-            <template v-else-if="item.type == 'compSignDate'">
-              <ContentCompSignDate
-                v-model:node-data="__signContext__.paramsCompList[index]"
-              ></ContentCompSignDate>
-            </template>
-          </div>
-        </div>
-
+        <!-- 回到顶部 -->
         <t-back-top
           :visible-height="800"
           :container="() => __signContext__.contentElRef"
@@ -756,6 +791,7 @@ defineExpose({
 <style lang="less" scoped>
 @import '@/style/vars';
 @import '@/style/transition';
+
 .pdf-preview__content {
   flex: 1;
   width: 0;
@@ -806,17 +842,6 @@ defineExpose({
   //}
 }
 
-.content-comp__item-active {
-  .e-drager-wrap {
-    z-index: 100;
-  }
-  :deep {
-    .es-drager {
-      z-index: 100 !important;
-    }
-  }
-}
-
 .pdf-embed__wrap {
   width: fit-content;
   margin: 0 auto;
@@ -833,8 +858,8 @@ defineExpose({
   box-shadow: 0 0 4px 2px rgba(154, 161, 177, 0.15);
   scroll-margin-block-start: 12px;
   break-after: avoid;
-  content-visibility: auto;
-  contain-intrinsic-size: 210mm 297mm;
+  //content-visibility: auto;
+  //contain-intrinsic-size: 210mm 297mm;
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }

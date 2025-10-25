@@ -69,35 +69,6 @@ export const pageUtils = {
   },
 
   /**
-   * 解析参数组件
-   * @param paramsCompList
-   */
-  expandCompParams(paramsCompList: IParamsCompItem[] & { _isSkip?: boolean }) {
-    const paramsCompListClone = deepClone(paramsCompList || [])
-    if (paramsCompList?._isSkip) {
-      delete paramsCompListClone._isSkip
-      return paramsCompListClone
-    }
-    return paramsCompListClone.map((item) => {
-      pageUtils.safeItem(item)
-      item.translateY = 0
-      item.isInRect = false
-      item.key ||= uuid()
-
-      pageUtils.fillItemWH(item)
-
-      const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
-      item.offsetLeft = item.left ?? 0
-      item.offsetTop = offsetTop
-
-      item.offsetX = ~~(item.offsetLeft + item.width / 2)
-      item.offsetY = ~~(item.offsetTop + item.height / 2)
-      item.pageNum = pageNum
-      return item
-    }) as IParamsCompItem[]
-  },
-
-  /**
    * 填充宽高
    */
   fillItemWH(item: IParamsCompItem) {
@@ -125,6 +96,39 @@ export const pageUtils = {
   },
 
   /**
+   * 更新每一项 偏移x y位置
+   * @param item
+   */
+  updateItemOffsetXY(item: IParamsCompItem) {
+    pageUtils.fillItemWH(item)
+    const translateX = item.translateX || 0
+    const translateY = item.translateY || 0
+    if (item.keywords) {
+      if (item.list?.length) {
+        const originKeywordRect = item.list[0]
+        // 如果有关键字，说明是关键字定位, 以 offsetTop 和 offsetLeft 计算
+        item.offsetX = +Number(
+          originKeywordRect.left + originKeywordRect.width / 2 + translateX,
+        ).toFixed(0)
+        item.offsetY = +Number(
+          originKeywordRect.top + originKeywordRect.height / 2 + translateY,
+        ).toFixed(0)
+        item.top = +Number(item.offsetY - item.height / 2).toFixed(0)
+        item.left = +Number(item.offsetX - item.width / 2).toFixed(0)
+      }
+    } else {
+      // 绝对定位
+      const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
+      item.offsetLeft = item.left ?? 0
+      item.offsetTop = offsetTop
+
+      item.offsetX = +Number(item.offsetLeft + item.width / 2).toFixed(0)
+      item.offsetY = +Number(item.offsetTop + item.height / 2).toFixed(0)
+      item.pageNum = pageNum
+    }
+  },
+
+  /**
    * 默认安全 值
    * @param item
    */
@@ -142,11 +146,53 @@ export const pageUtils = {
   },
 
   /**
+   * 解析参数组件
+   * @param paramsCompList
+   */
+  enhanceCompParams(paramsCompList: IParamsCompItem[] & { _isSkip?: boolean }) {
+    const paramsCompListClone = deepClone(paramsCompList || [])
+    if (paramsCompList?._isSkip) {
+      delete paramsCompListClone._isSkip
+      return paramsCompListClone
+    }
+    return paramsCompListClone.map((item) => {
+      item.isInRect = false
+      item.key ||= uuid()
+
+      pageUtils.safeItem(item)
+      pageUtils.updateItemOffsetXY(item)
+
+      if (item.keywords) {
+        // 关键字
+        if (item.list?.length) {
+          // 获取偏移量
+          const [originKeywordRect] = item.list || []
+          if (!originKeywordRect) return
+          const originOffsetX = +Number(
+            originKeywordRect.left + originKeywordRect.width / 2,
+          ).toFixed(0)
+          const originOffsetY = +Number(
+            originKeywordRect.top + originKeywordRect.height / 2,
+          ).toFixed(0)
+
+          const offsetX = +Number(item.left + item.width / 2).toFixed(0)
+          const offsetY = +Number(item.top + item.height / 2).toFixed(0)
+
+          item._keywordsTranslateX = offsetX - originOffsetX
+          item._keywordsTranslateY = offsetY - originOffsetY
+        }
+      }
+
+      return item
+    }) as IParamsCompItem[]
+  },
+
+  /**
    * 逆向解析参数组件
    * @param paramsCompList
    * @param retainField
    */
-  reverseExpandCompParams(
+  reverseEnhanceCompParams(
     paramsCompList: IParamsCompItem[],
     retainField?: IParamsCompItem['type'][],
   ) {
@@ -157,25 +203,29 @@ export const pageUtils = {
     return deepClone(paramsCompList || [])
       .map((item) => {
         pageUtils.safeItem(item)
+        pageUtils.fillItemWH(item)
+
+        if (item.keywords) {
+          // 关键字
+          if (item.list?.length) {
+            pageUtils.updateItemOffsetXY(item)
+          }
+        } else {
+          // 非关键字
+          item.offsetLeft = +Number(item.offsetX - item.width / 2).toFixed(0)
+          item.offsetTop = +Number(item.offsetY - item.height / 2).toFixed(0)
+
+          item.top =
+            (item.pageNum - 1) * pageUtils.perPageGap +
+            (item.pageNum - 1) * a4._basePx.h +
+            item.offsetTop
+          item.left = item.offsetLeft ?? item.left
+        }
+
         item.translateY = 0
+        item.translateX = 0
         item.isInRect = false
         item.key = uuid()
-
-        pageUtils.fillItemWH(item)
-        item.offsetX ??= 0
-        item.offsetY ??= 0
-
-        item.offsetLeft = ~~(item.offsetX - item.width / 2)
-        item.offsetTop = ~~(item.offsetY - item.height / 2)
-
-        item.top =
-          (item.pageNum - 1) * pageUtils.perPageGap +
-          (item.pageNum - 1) * a4._basePx.h +
-          item.offsetTop
-        item.left = item.offsetLeft ?? item.left
-
-        console.log('item', item)
-
         return item
       })
       .filter((item) => retainFieldObj[item.type])
@@ -187,43 +237,63 @@ export const pageUtils = {
    * @param maxPageNum
    */
   correctPos(item: IParamsCompItem, maxPageNum: number) {
-    // const y = ~~(item.top + item.height / 2)
-    let { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
     const pageWidth = a4._basePx.w
     const pageHeight = a4._basePx.h
-    if (pageNum > maxPageNum) {
-      pageNum = maxPageNum
-      offsetTop = pageHeight + offsetTop
-    }
 
-    const right = item.left + item.width
-    const bottom = offsetTop + item.height
-    const left = item.left
-    const top = offsetTop
+    if (item.keywords) {
+      if (item.list?.length) {
+        const right = item.offsetLeft + item.width
+        const bottom = item.offsetTop + item.height
+        const left = item.offsetLeft
+        const top = item.offsetTop
 
-    if (left < 0) item.left = 0
-    if (top < 0) item.top = pageUtils.getAbsoluteTopByPageNum(pageNum)
-    if (right > pageWidth) item.left = pageWidth - item.width
-    if (bottom > pageHeight) {
-      const centerY = offsetTop + item.height / 2
-      if (centerY > pageHeight) {
-        if (pageNum >= maxPageNum) {
-          // 大于等于最大页码
-          item.top =
-            pageUtils.getAbsoluteTopByPageNum(maxPageNum) +
-            pageHeight -
-            item.height
+        if (left < 0) item.offsetLeft = 0
+        if (top < 0) item.offsetTop = 0
+        if (right > pageWidth) item.offsetLeft = pageWidth - item.width
+        if (bottom > pageHeight) item.offsetTop = pageHeight - item.height
+
+        item.top = item.offsetTop
+        item.left = item.offsetLeft
+      }
+    } else {
+      // 绝对定位
+      let { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(item.top)
+      if (pageNum > maxPageNum) {
+        pageNum = maxPageNum
+        offsetTop = pageHeight + offsetTop
+      }
+
+      const right = item.left + item.width
+      const bottom = offsetTop + item.height
+      const left = item.left
+      const top = offsetTop
+
+      if (left < 0) item.left = 0
+      if (top < 0) item.top = pageUtils.getAbsoluteTopByPageNum(pageNum)
+      if (right > pageWidth) item.left = pageWidth - item.width
+      if (bottom > pageHeight) {
+        const centerY = offsetTop + item.height / 2
+        if (centerY > pageHeight) {
+          if (pageNum >= maxPageNum) {
+            // 大于等于最大页码
+            item.top =
+              pageUtils.getAbsoluteTopByPageNum(maxPageNum) +
+              pageHeight -
+              item.height
+          } else {
+            item.top = pageUtils.getAbsoluteTopByPageNum(pageNum + 1)
+          }
         } else {
-          item.top = pageUtils.getAbsoluteTopByPageNum(pageNum + 1)
+          item.top =
+            pageHeight -
+            item.height +
+            pageUtils.getAbsoluteTopByPageNum(pageNum)
         }
-      } else {
-        item.top =
-          pageHeight - item.height + pageUtils.getAbsoluteTopByPageNum(pageNum)
       }
     }
 
-    item.offsetX = ~~(item.offsetLeft + item.width / 2)
-    item.offsetY = ~~(item.offsetTop + item.height / 2)
+    item.offsetX = +Number(item.offsetLeft + item.width / 2).toFixed(0)
+    item.offsetY = +Number(item.offsetTop + item.height / 2).toFixed(0)
 
     return item
   },

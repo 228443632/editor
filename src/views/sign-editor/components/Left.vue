@@ -18,7 +18,10 @@ import {
 import { useEventListener } from '@vueuse/core'
 import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
-import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+// import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
+import LeftAddKeywordPosAE from './LeftAddKeywordPosAE.vue' // 左侧关键字定位
+import TDialogV2 from './t-dialog-v2/index.vue'
+import profile from '@/profile.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -27,6 +30,11 @@ const emit = defineEmits([])
 /* 状态 */
 const __signContext__ = inject('__signContext__') // 预览上下文
 const isDragging = ref(false)
+
+const visible = reactive({
+  addKeyword: false, // 添加关键字字段
+})
+const leftAddDialogRef = ref<InstanceType<typeof TDialogV2>>()
 
 const dragMethod = {
   /**
@@ -169,6 +177,24 @@ useEventListener(_embedPdfWrapRef, 'drop', dragMethod.drop)
 useEventListener(_embedPdfWrapRef, 'dragover', dragMethod.dragover)
 
 /* 方法 */
+/**
+ * 展示-添加关键字定位
+ */
+const onShowCreateKwdPos = () => {
+  // visible.addKeyword = true
+  leftAddDialogRef.value.open()
+}
+
+/**
+ * 添加关键字定位
+ */
+const onCreateKwdPos = async () => {
+  const componentRef = leftAddDialogRef.value.componentRef
+  const valid = await componentRef.submit()
+  if (valid === true) {
+    leftAddDialogRef.value.close()
+  }
+}
 
 /**
  * 校验组件
@@ -223,7 +249,7 @@ const getPos = (x: number, y: number) => {
  * 组件类型映射
  */
 const _compTypeListMap = computed(() => {
-  if (!isInIframe()) {
+  if (profile.IS_DEV) {
     // 不是嵌入iframe中，展示全部
     return COMP_PARAMS_NAME_MAP
   }
@@ -231,6 +257,24 @@ const _compTypeListMap = computed(() => {
     string,
     string
   >
+})
+
+/**
+ * 是否展示绝对定位菜单
+ */
+const _isShowAbsMenu = computed(() => {
+  return (
+    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSeal] ||
+    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSignDate] ||
+    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSign]
+  )
+})
+
+/**
+ * 是否展示关键字菜单
+ */
+const _isShowKwdsMenu = computed(() => {
+  return _compTypeListMap.value[COMP_PARAMS_NAME_MAP.keywords]
 })
 
 /* 监听 */
@@ -255,76 +299,106 @@ defineExpose({
 
     <!-- 内容区 -->
     <div class="left__content umo-scrollbar">
-      <!-- 印章 -->
-      <div
-        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSeal]"
-        class="left__content-item"
-        :draggable="__signContext__.contentInitial"
-        @dragstart="dragMethod.dragStart({ type: 'compSeal' }, $event)"
-        @dragend="dragMethod.dragend"
-      >
-        <div class="w-140px w-140px rounded-full" v-html="testSealImgRaw" />
-      </div>
+      <!-- 关键字定位 -->
+      <section v-if="_isShowKwdsMenu" class="mb-6">
+        <div class="group-tab-slide left__sub-title mb-6">关键字定位</div>
+        <div>
+          <t-button block variant="outline" @click="onShowCreateKwdPos"
+            >添加关键字定位</t-button
+          >
+        </div>
+      </section>
 
-      <!-- 签名 -->
-      <div
-        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSign]"
-        class="left__content-item"
-        :draggable="__signContext__.contentInitial"
-        @dragstart="dragMethod.dragStart({ type: 'compSign' }, $event)"
-        @dragend="dragMethod.dragend"
-      >
-        <t-tooltip
-          v-if="__signContext__._compSignList?.length >= COMP_SIGN_STYLE.limit"
-          theme="light"
-          placement="top"
-          :show-arrow="false"
-          destroy-on-close
-          :content="`签署控件最多只有 ${COMP_SIGN_STYLE.limit} 个`"
+      <!-- 坐标定位 -->
+      <section v-if="_isShowAbsMenu" class="mb-6">
+        <div class="group-tab-slide left__sub-title">坐标定位</div>
+        <!-- 印章 -->
+        <div
+          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSeal]"
+          class="left__content-item"
+          :draggable="__signContext__.contentInitial"
+          @dragstart="dragMethod.dragStart({ type: 'compSeal' }, $event)"
+          @dragend="dragMethod.dragend"
         >
-          <t-icon
-            name="error-circle"
-            class="text-warning absolute left-2 z-1 cursor-help"
-          ></t-icon>
-        </t-tooltip>
+          <div class="w-140px w-140px rounded-full" v-html="testSealImgRaw" />
+        </div>
 
-        <!--        <info-circle-icon :fill-color='"transparent"' :stroke-color='"currentColor"' :stroke-width="2"/>-->
-        <div class="w-88px h-23px rounded-full" v-html="testSignImgRaw" />
-      </div>
-
-      <!-- 签署日期 -->
-      <div
-        v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSignDate]"
-        class="left__content-item"
-        :draggable="__signContext__.contentInitial"
-        @dragstart="dragMethod.dragStart({ type: 'compSignDate' }, $event)"
-        @dragend="dragMethod.dragend"
-      >
-        <t-tooltip
-          v-if="
-            __signContext__._compSignDateList?.length >=
-            COMP_SIGN_DATE_STYLE.limit
-          "
-          theme="light"
-          placement="top"
-          :content="`签署日期控件最多只有 ${COMP_SIGN_DATE_STYLE.limit} 个`"
-          :show-arrow="false"
-          destroy-on-close
+        <!-- 签名 -->
+        <div
+          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSign]"
+          class="left__content-item"
+          :draggable="__signContext__.contentInitial"
+          @dragstart="dragMethod.dragStart({ type: 'compSign' }, $event)"
+          @dragend="dragMethod.dragend"
         >
-          <t-icon
-            name="error-circle"
-            class="text-warning absolute left-2 z-1 cursor-help"
-          ></t-icon>
-        </t-tooltip>
+          <t-tooltip
+            v-if="
+              __signContext__._compSignList?.length >= COMP_SIGN_STYLE.limit
+            "
+            theme="light"
+            placement="top"
+            :show-arrow="false"
+            destroy-on-close
+            :content="`签署控件最多只有 ${COMP_SIGN_STYLE.limit} 个`"
+          >
+            <t-icon
+              name="error-circle"
+              class="text-warning absolute left-2 z-1 cursor-help"
+            ></t-icon>
+          </t-tooltip>
 
-        <div class="h-23px flex-center">签署日期</div>
-      </div>
+          <!--        <info-circle-icon :fill-color='"transparent"' :stroke-color='"currentColor"' :stroke-width="2"/>-->
+          <div class="w-88px h-23px rounded-full" v-html="testSignImgRaw" />
+        </div>
+
+        <!-- 签署日期 -->
+        <div
+          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSignDate]"
+          class="left__content-item"
+          :draggable="__signContext__.contentInitial"
+          @dragstart="dragMethod.dragStart({ type: 'compSignDate' }, $event)"
+          @dragend="dragMethod.dragend"
+        >
+          <t-tooltip
+            v-if="
+              __signContext__._compSignDateList?.length >=
+              COMP_SIGN_DATE_STYLE.limit
+            "
+            theme="light"
+            placement="top"
+            :content="`签署日期控件最多只有 ${COMP_SIGN_DATE_STYLE.limit} 个`"
+            :show-arrow="false"
+            destroy-on-close
+          >
+            <t-icon
+              name="error-circle"
+              class="text-warning absolute left-2 z-1 cursor-help"
+            ></t-icon>
+          </t-tooltip>
+
+          <div class="h-23px flex-center">签署日期</div>
+        </div>
+      </section>
     </div>
+
+    <!-- 新增内容 -->
+    <TDialogV2
+      ref="leftAddDialogRef"
+      v-model:visible="visible.addKeyword"
+      header="添加关键字定位"
+      :body-component="LeftAddKeywordPosAE"
+      :body-component-attrs="{
+        validateComp,
+      }"
+      @ok="onCreateKwdPos"
+    >
+    </TDialogV2>
   </div>
 </template>
 
 <!--style-->
 <style scoped lang="less">
+@import '@/style/vars.less';
 .sign-editor__left {
   background: #fff;
   border-right: solid 1px var(--umo-border-color);
@@ -379,5 +453,34 @@ defineExpose({
 }
 
 .sign-date {
+}
+
+.left__sub-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.group-tab-slide {
+  --slide-h: 6px;
+  --slide-radius: 1px;
+  position: relative;
+  width: fit-content;
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: calc(0px - (var(--slide-h) / 2));
+    width: 100%;
+    height: var(--slide-h);
+    border-radius: var(--slide-radius);
+    z-index: 10;
+    background-image: linear-gradient(
+      to right,
+      rgba(@primary-color, 1),
+      rgba(@primary-color, 0.1)
+    );
+  }
 }
 </style>

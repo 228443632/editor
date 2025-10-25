@@ -3,6 +3,8 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 09/10/25 PM5:07
  */
+@import '@/style/vars.less';
+
 .e-drager-top__handle {
   white-space: nowrap;
   transform: translate3d(-2px, calc(var(--y) + -100% - 8px), 0);
@@ -38,7 +40,47 @@
   font-size: 13px;
   transform: translate3d(0, -100%, 0);
   padding: 2px 8px;
-  background: var(--umo-primary-color);
+  //background: rgba(@primary-color, 0.9);
+  background: @primary-color;
   color: #fff;
   pointer-events: none;
+}
+.e-drager-top__tag-kwds {
+
+}
+
+.e-drager-wrap {
+  &.is-keywords {
+    //@primary-color: @warning-color;
+    --umo-primary-color: @primary-color;
+    :deep {
+      //.e-drager-top__tag {
+      //  background: @primary-color;
+      //}
+      //.line-wrap__locate {
+      //  background: @primary-color;
+      //}
+      //
+      //.es-drager.es-drager.inline-wrap--active,
+      //.es-drager.line-wrap--in-rect {
+      //  outline: 2px solid var(--umo-primary-color);
+      //  box-shadow: 0 0 10px rgba(@primary-color, 0.6);
+      //}
+      //
+      //.es-drager.line-wrap--inactive.line-wrap--inactive {
+      //  outline: 1px dashed @primary-color;
+      //  background-color: rgba(@primary-color, 0.04);
+      //}
+      //.line-wrap--in-rect,
+      //.inline-wrap--active {
+      //  .line-wrap__locate {
+      //    color: @error-color;
+      //  }
+      //}
+    }
+  }
+}
+
+.is-keywords  {
+
 }

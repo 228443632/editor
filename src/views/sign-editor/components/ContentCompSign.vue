@@ -99,7 +99,14 @@ defineExpose({
       v-model:node-data="_nodeData"
       :show-line="_isActive"
     >
-      <div class="e-drager-top__tag">签名</div>
+      <div class="e-drager-top__tag">
+        <span>签名</span>
+
+        <!-- 关键字 -->
+        <span v-if="_nodeData?.keywords" class="e-drager-top__tag-kwds">
+          - {{ _nodeData?.keywords }}
+        </span>
+      </div>
       <div
         ref="divRef"
         :style="{

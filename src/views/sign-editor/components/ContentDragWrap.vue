@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import Drager from 'es-drager'
-import { rafThrottle, def } from 'sf-utils2'
+import { rafThrottle, def, isNoNullable } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import profile from '@/profile.ts'
@@ -41,8 +41,8 @@ const emit = defineEmits(['delete'])
 
 /* 状态 */
 const _nodeData = useVModel(props, 'nodeData', emit, { passive: true })
-_nodeData.value.translateX ??= 0
-_nodeData.value.translateY ??= 0
+_nodeData.value.scrollOffsetX ??= 0
+_nodeData.value.scrollOffsetY ??= 0
 const __signContext__ = inject('__signContext__') // 预览上下文
 const attrs = useAttrs()
 const scrollViewRef = computed(() => __signContext__.value.contentElRef)
@@ -58,10 +58,29 @@ const { width: dragerWidth, height: dragerHeight } =
  * @param top
  */
 const onDrag = ({ left, top }: { left: number; top: number }) => {
-  _nodeData.value.left = left
-  _nodeData.value.top = top
+  updateTopLeft(_nodeData.value, top, left)
 }
 const rafThrottleOnDrag = rafThrottle(onDrag)
+
+/**
+ * 更新位置
+ * @param target
+ * @param top
+ * @param left
+ */
+function updateTopLeft(target: IParamsCompItem, top: number, left?: number) {
+  target ||= _nodeData.value
+  // console.log('debug02', top, left, target)
+  if (target.keywords) {
+    // 是关键字
+    if (isNoNullable(left) && !Number.isNaN(left))
+      target.offsetLeft = target.left = left
+    target.offsetTop = target.top = top
+  } else {
+    if (isNoNullable(left) && !Number.isNaN(left)) target.left = left
+    target.top = top
+  }
+}
 
 /**
  * 选择节点
@@ -118,8 +137,9 @@ const onSelectNode = (startE: MouseEvent) => {
    */
   function updateInRectTopLeft(diffX: number, diffY: number) {
     inRectList.forEach((item) => {
-      item.left = item._snapshotLeft + diffX
-      item.top = item._snapshotTop + diffY
+      const left = item._snapshotLeft + diffX
+      const top = item._snapshotTop + diffY
+      updateTopLeft(item, top, left)
     })
   }
 }
@@ -134,10 +154,10 @@ function onScroll(event: Event) {
   const diffH = target.scrollTop - onScroll._oldScrollTop
 
   // update
-  _nodeData.value.translateY = _nodeData.value.translateY + diffH
+  _nodeData.value.scrollOffsetY = _nodeData.value.scrollOffsetY + diffH
   __signContext__.value.paramsCompList.forEach((item) => {
     if (item.isInRect && item.key != _nodeData.value.key) {
-      item.translateY = item.translateY + diffH
+      item.scrollOffsetY = item.scrollOffsetY + diffH
     }
   })
   onScroll._oldScrollTop = target.scrollTop
@@ -174,8 +194,9 @@ function onDragStart() {
  * 拖拽结束
  */
 function onDragEnd() {
-  _nodeData.value.top = _nodeData.value.top + _nodeData.value.translateY
-  _nodeData.value.translateY = 0
+  const top = _nodeData.value.top + _nodeData.value.scrollOffsetY
+  updateTopLeft(null, top, null)
+  _nodeData.value.scrollOffsetY = 0
   removeScrollListener()
 
   correctPosList()
@@ -215,6 +236,28 @@ const inRectParamsList = computed(() =>
   __signContext__.value.paramsCompList.filter((item) => item.isInRect),
 )
 
+/**
+ * 关键字位置偏移
+ */
+const _keywordsPosOffsetXY = computed(() => {
+  const item = _nodeData.value
+  const [originKeywordRect] = item.list || []
+  if (!originKeywordRect) return
+  const originOffsetX = +Number(
+    originKeywordRect.left + originKeywordRect.width / 2,
+  ).toFixed(0)
+  const originOffsetY = +Number(
+    originKeywordRect.top + originKeywordRect.height / 2,
+  ).toFixed(0)
+
+  const offsetX = +Number(item.left + dragerWidth.value / 2).toFixed(0)
+  const offsetY = +Number(item.top + dragerHeight.value / 2).toFixed(0)
+  return {
+    offsetX: offsetX - originOffsetX,
+    offsetY: offsetY - originOffsetY,
+  }
+})
+
 /* 监听 */
 
 watchEffect(() => {
@@ -223,6 +266,20 @@ watchEffect(() => {
 })
 
 /* 周期 */
+
+onBeforeMount(() => {
+  // console.log('debug03', _nodeData.value)
+  // if (_nodeData.value.keywords) {
+  //   // 关键字
+  //   if (isNullable(_nodeData.value.left))
+  //     _nodeData.value.left = _nodeData.value.offsetLeft
+  //   if (isNullable(_nodeData.value.top))
+  //     _nodeData.value.top = _nodeData.value.offsetTop
+  // }
+  // _nodeData.value.left ??= 0
+  // _nodeData.value.top ??= 0
+})
+
 onMounted(() => {})
 
 /* 暴露 */
@@ -240,9 +297,9 @@ defineExpose({
 <!--render-->
 <template>
   <span
-    :class="['e-drager-wrap']"
+    :class="['e-drager-wrap', _nodeData.keywords && 'is-keywords']"
     :style="{
-      '--y': _nodeData.translateY + 'px',
+      '--y': _nodeData.scrollOffsetY + 'px',
     }"
   >
     <Drager
@@ -285,16 +342,29 @@ defineExpose({
           </span>
         </t-tooltip>
         <slot></slot>
-        <div v-if="profile.IS_DEV" class="line-wrap__locate">
+        <div v-if="true || profile.IS_DEV" class="line-wrap__locate">
           <!--          <div class="locate__item">X: {{ ~~_nodeData.left }}</div>-->
           <!--          <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>-->
 
-          <div class="locate__item">
-            X: {{ ~~_nodeData.left + ~~(dragerWidth / 2) }}
-          </div>
-          <div class="locate__item">
-            Y: {{ ~~_nodeData.top + ~~(dragerHeight / 2) }}
-          </div>
+          <!-- 关键字定位 偏移量 -->
+          <template v-if="_nodeData?.keywords">
+            <div class="locate__item">
+              <span>偏</span>X: {{ _keywordsPosOffsetXY?.offsetX }}
+            </div>
+            <div class="locate__item">
+              <span>偏</span>Y: {{ _keywordsPosOffsetXY?.offsetY }}
+            </div>
+          </template>
+
+          <!-- 绝对定位 -->
+          <template v-else>
+            <div class="locate__item">
+              X: {{ Number(_nodeData.left + dragerWidth / 2).toFixed(0) }}
+            </div>
+            <div class="locate__item">
+              Y: {{ Number(_nodeData.top + dragerHeight / 2).toFixed(0) }}
+            </div>
+          </template>
         </div>
       </template>
     </Drager>
@@ -351,7 +421,9 @@ defineExpose({
 .line-wrap--in-rect,
 .inline-wrap--active {
   .line-wrap__locate {
-    background-color: rgba(@primary-color, 1);
+    color: @error-color;
+    background: #fff;
+    outline: 1px solid @primary-color;
   }
 }
 
@@ -368,16 +440,17 @@ defineExpose({
   white-space: nowrap;
   position: absolute;
   top: calc(100% + 1px);
-  left: -1px;
+  left: 0;
   box-sizing: border-box;
   min-width: calc(100% + 2px);
   padding: 2px 6px;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: bold;
   line-height: 20px;
-  color: #fff;
+  //color: @primary-color;
+  color: @error-color;
   user-select: none;
-  background-color: #595959;
-  opacity: 0.9;
+  //background-color: #595959;
   display: flex;
   gap: 16px;
   flex-direction: row;

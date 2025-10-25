@@ -6,7 +6,7 @@
 <!--default-->
 <script setup lang="ts">
 import VuePdfEmbed from 'vue-pdf-embed'
-import { debounce, arrayToObj, rafThrottle } from 'sf-utils2'
+import { debounce, arrayToObj } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
@@ -40,17 +40,7 @@ const { width: pageItemWidth } = useElementBounding(
 )
 
 const dpr = ref(window.devicePixelRatio || 1)
-
 const isWheeling = ref(false)
-const { height: parentHeight } = useElementSize(
-  computed(() => rootRef.value?.parentElement),
-)
-/**
- * 虚拟滚动可见nums
- */
-// const _vsPageNums = computed(() => {
-//   return Math.ceil(parentHeight.value / ((210 / 120) * 297))
-// })
 
 /* 方法 */
 /**
@@ -59,7 +49,6 @@ const { height: parentHeight } = useElementSize(
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    // rafThrottleUpdatePageVisibility(entries)
     debounceUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
@@ -163,7 +152,7 @@ watchEffect(() => {
   __signContext__.value.rightInitial = _initial.value
 })
 
-watch(_pageNumsList, (newPageNums: number[]) => {
+watch([_pageNumsList, _initial], ([newPageNums]) => {
   pageVisibility.value = { [newPageNums[0]]: true }
   nextTick(resetPageIntersectionObserver)
 })
@@ -178,14 +167,10 @@ watch(
 onBeforeUnmount(() => {
   pageIntersectionObserver?.disconnect()
 })
-
-const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
-  itemHeight: 182,
-})
 </script>
 
 <template>
-  <div class="preview-thumb" ref="rootRef" @wheel="onWheel">
+  <div ref="rootRef" class="preview-thumb" @wheel="onWheel">
     <template v-if="_initial">
       <div
         v-for="pageNum in _pageNumsList"
@@ -205,7 +190,7 @@ const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
           :source="__signContext__.doc"
           :page="pageNum"
           class="animation-fade"
-          :scale="dpr / 3"
+          :scale="dpr / 4"
         />
 
         <div class="embed__item-num">第 {{ pageNum }} 页</div>
@@ -215,38 +200,41 @@ const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
             _paramsCompList$pageNum[pageNum]?.length && pageVisibility[pageNum]
           "
         >
-          <div
+          <template
             v-for="item in _paramsCompList$pageNum[pageNum]"
             :key="item.key"
-            :data-id="'id-' + item.key"
-            class="content-comp__item"
-            :style="{
-              '--page-num': item.pageNum,
-              // top: item.top - (item.pageNum - 1) * 12 + 'px',
-              top: item.offsetTop * +_scalePos + 'px',
-              left: item.offsetLeft * +_scalePos + 'px',
-              transform: `scale(${_scalePos})`,
-            }"
           >
-            <!-- 印章 -->
-            <ContentCompSeal
-              v-if="item.type == 'compSeal'"
-              :node-data="item"
-            ></ContentCompSeal>
-
-            <!-- 签名 -->
-            <ContentCompSign
-              v-else-if="item.type == 'compSign'"
-              :node-data="item"
+            <div
+              :data-id="'id-' + item.key"
+              :class="['content-comp__item', item.keywords && 'is-keywords']"
+              :style="{
+                '--page-num': item.pageNum,
+                // top: item.top - (item.pageNum - 1) * 12 + 'px',
+                top: item.offsetTop * +_scalePos + 'px',
+                left: item.offsetLeft * +_scalePos + 'px',
+                transform: `scale(${_scalePos})`,
+              }"
             >
-            </ContentCompSign>
+              <!-- 印章 -->
+              <ContentCompSeal
+                v-if="item.type == 'compSeal'"
+                :node-data="item"
+              ></ContentCompSeal>
 
-            <!-- 签署日期 -->
-            <ContentCompSignDate
-              v-else-if="item.type == 'compSignDate'"
-              :node-data="item"
-            ></ContentCompSignDate>
-          </div>
+              <!-- 签名 -->
+              <ContentCompSign
+                v-else-if="item.type == 'compSign'"
+                :node-data="item"
+              >
+              </ContentCompSign>
+
+              <!-- 签署日期 -->
+              <ContentCompSignDate
+                v-else-if="item.type == 'compSignDate'"
+                :node-data="item"
+              ></ContentCompSignDate>
+            </div>
+          </template>
         </template>
       </div>
     </template>
@@ -301,6 +289,11 @@ const { list, containerProps, wrapperProps } = useVirtualList(_pageNumsList, {
     outline: 1px dashed @primary-color;
     background-color: rgba(@primary-color, 0.06);
     transform-origin: 0 0;
+    //&.is-keywords {
+    //  @primary-color: @warning-color;
+    //  outline: 1px dashed @primary-color;
+    //  background-color: rgba(@primary-color, 0.06);
+    //}
   }
 
   & + .pdf-embed__item {
