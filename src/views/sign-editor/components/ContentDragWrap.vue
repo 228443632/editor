@@ -221,21 +221,32 @@ const inRectParamsList = computed(() =>
  */
 const _keywordsPosOffsetXY = computed(() => {
   const item = _nodeData.value
-  const [originKeywordRect] = item.list || []
-  if (!originKeywordRect) return
-  const originOffsetX = +Number(
-    originKeywordRect.left + originKeywordRect.width / 2,
-  ).toFixed(0)
-  const originOffsetY = +Number(
-    originKeywordRect.top + originKeywordRect.height / 2,
-  ).toFixed(0)
+  if (item.list?.length) {
+    const originKeywordRect = item.list?.[0]
+    if (!originKeywordRect) return
 
-  const offsetX = +Number(item.left + dragerWidth.value / 2).toFixed(0)
-  const offsetY = +Number(item.top + dragerHeight.value / 2).toFixed(0)
-  return {
-    offsetX: offsetX - originOffsetX,
-    offsetY: offsetY - originOffsetY,
+    const firstLineRects = item.list.filter(
+      (item) => item.top == originKeywordRect.top,
+    )
+    let keywordWidth = 0
+    firstLineRects.forEach((item) => {
+      keywordWidth += item.width
+    })
+    const originOffsetX = +Number(
+      originKeywordRect.left + keywordWidth / 2,
+    ).toFixed(0)
+    const originOffsetY = +Number(
+      originKeywordRect.top + originKeywordRect.height / 2,
+    ).toFixed(0)
+
+    const offsetX = +Number(item.left + dragerWidth.value / 2).toFixed(0)
+    const offsetY = +Number(item.top + dragerHeight.value / 2).toFixed(0)
+    return {
+      offsetX: offsetX - originOffsetX,
+      offsetY: offsetY - originOffsetY,
+    }
   }
+  return undefined
 })
 
 /* 监听 */

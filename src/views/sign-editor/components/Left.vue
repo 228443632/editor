@@ -464,7 +464,7 @@ defineExpose({
 
 .group-tab-slide {
   --slide-h: 6px;
-  --slide-radius: 1px;
+  --slide-radius: 2px;
   position: relative;
   width: fit-content;
   &:after {
