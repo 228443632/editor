@@ -6,13 +6,14 @@
 <!--setup-->
 <script setup lang="ts">
 import Content from './Content.vue'
-import { noop } from 'sf-utils2'
+import { div, noop } from 'sf-utils2'
 // import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 // import { saveAs } from 'file-saver'
 import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
 import type { useSearchPDF } from '@/views/sign-editor/hooks/use-search-pdf.ts'
+import { useVuePdfEmbed } from 'vue-pdf-embed'
 // import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 
 const props = defineProps({
@@ -45,6 +46,8 @@ const __keywordsParamsCompList__ = inject('__keywordsParamsCompList__')
 const previewContext = ref({
   /** 文件来源 */
   source: props.source,
+
+  doc: shallowRef() as ReturnType<typeof useVuePdfEmbed>['doc'],
 
   /** 加载 */
   loading: 0,
@@ -138,6 +141,9 @@ const _loading = computed(() => {
 
 /* 监听 */
 
+/**
+ * 内容初始化完成，回调
+ */
 watch(
   () => previewContext.value.contentInitial,
   (newVal) => {

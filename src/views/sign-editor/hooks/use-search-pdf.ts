@@ -81,11 +81,12 @@ export function useSearchPDF(doc: PDFDocumentProxy, options?: TOptions) {
         const resultList = await searchKeywordByPage(page, pageNum, keyword, {
           matchRule,
         })
-        if (resultList?.length == 1) {
-          resultList.forEach((item) => {
-            if (matchRule == 'first') item.list = item.list.slice(0, 1)
-            if (matchRule == 'last') item.list = item.list.slice(-1)
-          })
+        if (resultList?.length) {
+          // resultList.forEach((item) => {
+          //   if (matchRule == 'first') item.list = item.list.slice(0, 1)
+          //   if (matchRule == 'last') item.list = item.list.slice(-1)
+          // })
+          console.log('debug05-resultList', resultList)
           result.push(...Array.from(resultList || []))
           break
         }
@@ -110,7 +111,6 @@ export function useSearchPDF(doc: PDFDocumentProxy, options?: TOptions) {
     if (asyncTaskList?.length) {
       await Promise.all(asyncTaskList)
     }
-    console.log('result', result)
     return result
   }
 
@@ -138,20 +138,23 @@ export function useSearchPDF(doc: PDFDocumentProxy, options?: TOptions) {
 
     const radioScale = pageUtils.a4._basePx.w / pageWidth
 
-    const indexesList = searchIndexes2(items, keyword)
+    let indexesList = searchIndexes2(items, keyword) || []
     // console.log('indeexes2', indexesList)
     // const posList = indexes2.startEndRange.map(item => {
     //   const target = items[item]
     // })
-    const resultList = []
+    if (matchRule == 'first') indexesList = indexesList.slice(0, 1)
+    if (matchRule == 'last') indexesList = indexesList.slice(-1)
+
+    const matchList = []
     const result = []
 
     indexesList.forEach((indexes) => {
+      // console.log('indexes', indexes)
       for (let i = indexes.startIndex; i <= indexes.endIndex; i++) {
         const target = items[i]
         let { transform, width, height } = target
 
-        // height += highlightKeywordOffsetHeight
         const x = transform[4] // PDF 坐标系 x 坐标
         const y = pageHeight - transform[5] - height // 转换为浏览器坐标系（原点在左上角）
 
@@ -201,26 +204,26 @@ export function useSearchPDF(doc: PDFDocumentProxy, options?: TOptions) {
         } else {
           // 中间
         }
-        resultList.push(resultItem)
+        matchList.push(resultItem)
       }
 
-      if (resultList.length) {
+      if (matchList.length) {
         const targetItem = {
           keywords: keyword,
           key: uuid(),
           pageNum,
-          offsetTop: resultList[0]?.top,
-          offsetLeft: resultList[0]?.left,
-          list: resultList,
+          offsetTop: matchList[0]?.top,
+          offsetLeft: matchList[0]?.left,
+          list: matchList,
           radio: radioScale,
         }
         result.push(targetItem)
       }
       // console.log('resultList', keywordsPosList.value)
     })
+
     keywordsPosList.value.push(...result)
-    if (matchRule == 'first') return result.slice(0, 1)
-    if (matchRule == 'last') return result.slice(-1)
+
     return result as IParamsCompItem[]
 
     // textContent.items.forEach((item) => {

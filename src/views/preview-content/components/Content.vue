@@ -59,17 +59,23 @@ const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
   }),
 )
 
-const { doc } = useVuePdfEmbed({
-  source: props.source,
-  onProgress: (progressParams) => {
-    initialProgress.value = div(progressParams.loaded / progressParams.total)
-  },
-})
+if (!__previewContext__.value.doc) {
+  const { doc } = useVuePdfEmbed({
+    source: props.source,
+    onProgress: (progressParams) => {
+      initialProgress.value = div(progressParams.loaded / progressParams.total)
+    },
+  })
+  __previewContext__.value.doc ||= doc
+} else {
+  initialProgress.value = 1
+}
+const doc = computed(() => __previewContext__.value.doc) // 为了兼容
+
 const { keywordsPosList, search: pdfSearch } = useSearchPDF(doc, {
   dpr,
   scaleFactor,
 })
-
 __previewContext__.value.pdfSearch = pdfSearch
 __previewContext__.value.keywordsPosList = keywordsPosList
 
@@ -216,8 +222,6 @@ const onRendered = (pageNum: number) => {
     loadAllPdfPagesRaf['_resolve']?.()
   }
 }
-
-window.$searchMethod = pdfSearch
 
 /* 计算 */
 

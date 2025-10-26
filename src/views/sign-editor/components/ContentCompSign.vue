@@ -110,8 +110,8 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SIGN_STYLE.width * __signContext__.scaleFactor + 'px',
-          height: COMP_SIGN_STYLE.height * __signContext__.scaleFactor + 'px',
+          width: COMP_SIGN_STYLE.width * __signContext__.compScaleFactor + 'px',
+          height: COMP_SIGN_STYLE.height * __signContext__.compScaleFactor + 'px',
         }"
         v-html="testSignSvgRaw"
       ></div>

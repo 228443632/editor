@@ -113,7 +113,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    source.value = './pdfs/4.pdf'
+    source.value = './pdfs/3.pdf'
     // paramsCompList.value._isSkip = true
 
     initParamsCompList(
@@ -123,7 +123,7 @@ onMounted(() => {
           type: 'compSign',
           translateX: 0,
           translateY: 0,
-          keywords: '说明书',
+          keywords: '最新版',
           key: uuid(),
         },
       ],

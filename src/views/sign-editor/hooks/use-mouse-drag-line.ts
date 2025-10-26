@@ -13,7 +13,8 @@ type ICompRectPos = Partial<{
 }>
 
 type TUseMouseDragLineOptions = {
-  mouseEventContainerRef: Ref
+  /** 鼠标事件 容器对象 */
+  mouseEventContainerRef: Ref<HTMLElement>
 }
 
 const MIN_MOVE_DISTANCE = 4
@@ -34,7 +35,7 @@ export function useMouseDragLine(
   const isMoving = ref<boolean>(false)
 
   const mousemove = (e: MouseEvent) => {
-    if (!_containerEl.value) return
+    if (!_containerDOM.value) return
     endX.value = e.clientX - containerBound.left.value
     endY.value = e.clientY - containerBound.top.value
 
@@ -57,8 +58,8 @@ export function useMouseDragLine(
   const throttleMousemove = rafThrottle(mousemove) as typeof mousemove
 
   const mouseup = (e: MouseEvent) => {
-    if (!_containerEl.value) return
-    _mouseEventContainerEl.value.removeEventListener(
+    if (!_containerDOM.value) return
+    _mouseEventContainerDOM.value.removeEventListener(
       'mousemove',
       throttleMousemove,
     )
@@ -76,7 +77,7 @@ export function useMouseDragLine(
   }
 
   const mousedown = (e: MouseEvent) => {
-    if (!_containerEl.value) return
+    if (!_containerDOM.value) return
     startX.value = e.clientX - containerBound.left.value
     startY.value = e.clientY - containerBound.top.value
     mouseEventContainerRef.value.addEventListener(
@@ -86,14 +87,14 @@ export function useMouseDragLine(
     document.body.addEventListener('mouseup', mouseup)
   }
 
-  const click = (e: MouseEvent) => {
-    if (e.target !== _containerEl.value) return
-    _mouseEventContainerEl.value.removeEventListener(
-      'mousemove',
-      throttleMousemove,
-    )
-    document.body.removeEventListener('mouseup', mouseup)
-  }
+  // const click = (e: MouseEvent) => {
+  //   if (e.target !== _containerDOM.value) return
+  //   _mouseEventContainerDOM.value.removeEventListener(
+  //     'mousemove',
+  //     throttleMousemove,
+  //   )
+  //   document.body.removeEventListener('mouseup', mouseup)
+  // }
 
   watch([containerRef, mouseEventContainerRef], () => {
     initEvent()
@@ -102,8 +103,8 @@ export function useMouseDragLine(
   const _width = computed<number>(() => endX.value - startX.value)
   const _height = computed<number>(() => endY.value - startY.value)
 
-  const _containerEl = computed(() => unrefElement(containerRef))
-  const _mouseEventContainerEl = computed(() =>
+  const _containerDOM = computed(() => unrefElement(containerRef))
+  const _mouseEventContainerDOM = computed(() =>
     unrefElement(mouseEventContainerRef),
   )
 
@@ -134,7 +135,7 @@ export function useMouseDragLine(
       mouseEventContainerRef,
     ) as HTMLElement
     if (el && mouseEventContainer) {
-      mouseEventContainer.removeEventListener('click', click)
+      // mouseEventContainer.removeEventListener('click', click)
       mouseEventContainer.removeEventListener('mousedown', mousedown)
       mouseEventContainer.removeEventListener('mousemove', throttleMousemove)
       document.body.removeEventListener('mouseup', mouseup)
@@ -169,6 +170,7 @@ export function useMouseDragLine(
     endX,
     endY,
     isMoving,
+    /** 是否在选择区域*/
     isInRect,
     _fromX,
     _fromY,

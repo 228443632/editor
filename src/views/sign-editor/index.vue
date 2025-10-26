@@ -76,8 +76,11 @@ const {
 } = useManualRefHistory(paramsCompListHistory, { clone: deepClone })
 
 const signContext = ref({
-  /** 缩小/放大比例*/
-  scaleFactor: 1,
+  /** 组件缩放比例 */
+  compScaleFactor: 1,
+
+  /** pdf canvas缩放因子*/
+  pdfScaleFactor: 0,
 
   doc: shallowRef({}) as ReturnType<typeof useVuePdfEmbed>['doc'],
 
@@ -434,20 +437,20 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './pdfs/2.pdf'
+    signContext.value.source = './pdfs/3.pdf'
     initial.value = true
     signContext.value.initParamsCompList(
       [
+        { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
         {
           type: 'compSign',
-          translateX: 100,
-          translateY: 100,
-          keywords: '简历',
+          translateX: 0,
+          translateY: 0,
+          keywords: '版本',
           key: uuid(),
         },
       ],
-      // ['compSign', 'compSignDate', 'compSeal'],
-      ['compSign', 'compSignDate', 'compSeal'],
+      ['compSeal', 'compSign'],
     )
     signContext.value.templateNameList = []
   }

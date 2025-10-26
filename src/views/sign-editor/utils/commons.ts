@@ -106,9 +106,17 @@ export const pageUtils = {
     if (item.keywords) {
       if (item.list?.length) {
         const originKeywordRect = item.list[0]
+        const firstLineRects = item.list.filter(
+          (item) => item.top == originKeywordRect.top,
+        )
+        let keywordWidth = 0
+        firstLineRects.forEach((item) => {
+          keywordWidth += item.width
+        })
+
         // 如果有关键字，说明是关键字定位, 以 offsetTop 和 offsetLeft 计算
         item.offsetX = +Number(
-          originKeywordRect.left + originKeywordRect.width / 2 + translateX,
+          originKeywordRect.left + keywordWidth / 2 + translateX,
         ).toFixed(0)
         item.offsetY = +Number(
           originKeywordRect.top + originKeywordRect.height / 2 + translateY,

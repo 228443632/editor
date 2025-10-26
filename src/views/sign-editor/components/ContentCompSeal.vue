@@ -154,8 +154,9 @@ defineExpose({
       <div
         ref="divRef"
         :style="{
-          width: COMP_SEAL_STYLE.width * __signContext__.scaleFactor + 'px',
-          height: COMP_SEAL_STYLE.height * __signContext__.scaleFactor + 'px',
+          width: COMP_SEAL_STYLE.width * __signContext__.compScaleFactor + 'px',
+          height:
+            COMP_SEAL_STYLE.height * __signContext__.compScaleFactor + 'px',
         }"
         v-html="testSealSvgRaw"
       ></div>

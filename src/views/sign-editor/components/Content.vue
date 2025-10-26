@@ -625,7 +625,7 @@ watch(_pageNumsList, (newPageNums: number[]) => {
  * 监听缩放因子变化，设置全局 缩放因子
  */
 watchEffect(() => {
-  // __signContext__.value.scaleFactor = scaleFactor.value
+  __signContext__.value.pdfScaleFactor = scaleFactor.value
 })
 
 onMounted(() => {})
@@ -847,7 +847,7 @@ defineExpose({
 
 .pdf-embed__item {
   margin: 0 auto;
-  user-select: none;
+  //user-select: none;
   position: relative;
   //width: 100vw;
   background: white;
@@ -857,6 +857,11 @@ defineExpose({
   break-after: avoid;
   //content-visibility: auto;
   //contain-intrinsic-size: 210mm 297mm;
+
+  ::selection {
+    background: transparent;
+  }
+
   & + .pdf-embed__item {
     margin-top: var(--per-page-gap);
   }

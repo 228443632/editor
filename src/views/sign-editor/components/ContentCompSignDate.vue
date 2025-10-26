@@ -113,9 +113,9 @@ defineExpose({
         ref="divRef"
         :style="{
           width:
-            COMP_SIGN_DATE_STYLE.width * __signContext__.scaleFactor + 'px',
+            COMP_SIGN_DATE_STYLE.width * __signContext__.compScaleFactor + 'px',
           height:
-            COMP_SIGN_DATE_STYLE.height * __signContext__.scaleFactor + 'px',
+            COMP_SIGN_DATE_STYLE.height * __signContext__.compScaleFactor + 'px',
         }"
       >
         <div class="flex-center text-14px h-full">XXXX年XX月XX日</div>
