@@ -439,7 +439,7 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './pdfs/6.pdf'
+    signContext.value.source = './pdfs/7.pdf'
     initial.value = true
     signContext.value.initParamsCompList(
       [
@@ -500,7 +500,7 @@ window['pageSignEditor'] = {
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>
-      <Right></Right>
+      <Right ref=""></Right>
     </div>
 
     <Footer class="sign-editor__footer"></Footer>

@@ -115,7 +115,7 @@ defineExpose({
 <!--render-->
 <template>
   <div class="comp__footer">
-    <div class="flex items-center w-full justify-between gap-4">
+    <div class="flex items-center w-full justify-center gap-4">
       <t-popup
         trigger="click"
         placement="top-left"
@@ -228,13 +228,13 @@ defineExpose({
   font-size: 12px;
   color: #333;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
 .use-widget__wrap {
   .use-widget__title {
-    display: flex;
+    //display: flex;
     display: none;
     align-items: center;
     height: 28px;

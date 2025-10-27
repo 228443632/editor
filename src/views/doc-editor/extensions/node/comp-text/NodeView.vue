@@ -142,6 +142,7 @@ provide('NODE_PROPS', props)
 
 <!--style-->
 <style lang="less">
+@import '@/style/vars';
 .umo-node-view2[compname='comp-text'] {
   position: relative;
   box-sizing: border-box;
@@ -154,13 +155,20 @@ provide('NODE_PROPS', props)
   scroll-margin-top: 8px;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode {
-    outline: 2px solid var(--umo-primary-color) !important;
+    outline: 2px solid @error-color !important;
+    &:after {
+      background: @error-color;
+      color: #fff;
+    }
   }
   &:hover {
     background-color: #f0f2f7;
   }
   &:after {
-    color: #9ba3b0;
+    //color: #9ba3b0;
+    color: #000;
+    background: #f7ff30;
+    outline: 2px solid @error-color;
     content: attr(data-placeholder);
   }
 
