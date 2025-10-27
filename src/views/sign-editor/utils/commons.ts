@@ -96,6 +96,56 @@ export const pageUtils = {
   },
 
   /**
+   * 获取组件的 origin xy
+   * @param item
+   */
+  getItemOriginXY(item: IParamsCompItem) {
+    const itemClone = deepClone(item)
+    if (itemClone.keywords) {
+      if (itemClone.list?.length) {
+        const originKeywordRect = itemClone.list[0]
+        const firstLineRects = itemClone.list.filter(
+          (cItem) => cItem.top == originKeywordRect.top,
+        )
+        let keywordWidth = 0
+        firstLineRects.forEach((cItem) => {
+          keywordWidth += cItem.width
+        })
+
+        // 如果有关键字，说明是关键字定位, 以 offsetTop 和 offsetLeft 计算
+        itemClone.offsetX = +Number(
+          originKeywordRect.left + keywordWidth / 2,
+        ).toFixed(0)
+        itemClone.offsetY = +Number(
+          originKeywordRect.top + originKeywordRect.height / 2,
+        ).toFixed(0)
+        itemClone.offsetTop = itemClone.top = +Number(
+          itemClone.offsetY - itemClone.height / 2,
+        ).toFixed(0)
+        itemClone.offsetLeft = itemClone.left = +Number(
+          itemClone.offsetX - itemClone.width / 2,
+        ).toFixed(0)
+      }
+    } else {
+      // 绝对定位
+      const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(
+        itemClone.top,
+      )
+      itemClone.offsetLeft = itemClone.left ?? 0
+      itemClone.offsetTop = offsetTop
+
+      itemClone.offsetX = +Number(
+        itemClone.offsetLeft + itemClone.width / 2,
+      ).toFixed(0)
+      itemClone.offsetY = +Number(
+        itemClone.offsetTop + itemClone.height / 2,
+      ).toFixed(0)
+      itemClone.pageNum = pageNum
+    }
+    return itemClone
+  },
+
+  /**
    * 更新每一项 偏移x y位置
    * @param item
    */
@@ -107,11 +157,11 @@ export const pageUtils = {
       if (item.list?.length) {
         const originKeywordRect = item.list[0]
         const firstLineRects = item.list.filter(
-          (item) => item.top == originKeywordRect.top,
+          (cItem) => cItem.top == originKeywordRect.top,
         )
         let keywordWidth = 0
-        firstLineRects.forEach((item) => {
-          keywordWidth += item.width
+        firstLineRects.forEach((cItem) => {
+          keywordWidth += cItem.width
         })
 
         // 如果有关键字，说明是关键字定位, 以 offsetTop 和 offsetLeft 计算
@@ -121,12 +171,16 @@ export const pageUtils = {
         item.offsetY = +Number(
           originKeywordRect.top + originKeywordRect.height / 2 + translateY,
         ).toFixed(0)
-        item.offsetTop = item.top = +Number(
-          item.offsetY - item.height / 2,
-        ).toFixed(0)
-        item.offsetLeft = item.left = +Number(
-          item.offsetX - item.width / 2,
-        ).toFixed(0)
+        if (!item.offsetTop) {
+          item.offsetTop = item.top = +Number(
+            item.offsetY - item.height / 2,
+          ).toFixed(0)
+        }
+        if (!item.offsetLeft) {
+          item.offsetLeft = item.left = +Number(
+            item.offsetX - item.width / 2,
+          ).toFixed(0)
+        }
       }
     } else {
       // 绝对定位

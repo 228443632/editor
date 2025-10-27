@@ -8,18 +8,12 @@
 import { shortId } from '@/utils/short-id'
 import ParamsLib from './toolbar/base/ParamsLib.vue'
 import RightParamsLib from './components/RightParamsLib.vue'
-import LeftTocParams from './components/LeftTocParams.vue'
-
+import LeftParamsToc from './components/LeftParamsToc.vue'
 import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/views/doc-editor/utils/object-util'
-
-// extension
 import extensions from './extensions'
 import { debounce, hasOwn, to, deepMerge } from 'sf-utils2'
-
-// types
 import type { Editor } from '@tiptap/vue-3'
-// import { template01 } from '@/views/doc-editor/template/demo01'
 import { testEditor } from '@/views/doc-editor/utils/test'
 import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
 import { tiptapUtil } from '@/views/doc-editor/utils/tiptap-util'
@@ -27,6 +21,8 @@ import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import Print from '@/components/container/print.vue'
 import { blobToBase64, fileToBase64 } from 'file64'
+import profile from '@/profile'
+import template01 from './template/template01.html?raw'
 
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
@@ -44,7 +40,6 @@ import { blobToBase64, fileToBase64 } from 'file64'
 //   paragraph: {...} //<p>
 //   text: {...} //文本
 // }
-// const IS_DEV = process.env.NODE_ENV === 'development'
 
 const umoEditorRef = ref(null)
 const editorRef = ref<Editor>()
@@ -131,7 +126,7 @@ const options = $ref(
         },
         document: {
           title: '合同低码平台',
-          content: undefined,
+          content: profile.IS_DEV ? template01 : undefined,
           // content: '<p><strong>AB<span style="color: red;">C</span></strong></p>',
           // content: '<p><strong>ABC</strong></p><p>，</p>',
           /** 传递给proseMirror https://prosemirror.net/docs/ref/#view.EditorProps */
@@ -312,6 +307,10 @@ watch(umoEditorRef, () => {
             label: '身份证',
             value: 'compText',
           },
+          ...Array.from({ length: 20 }).map((_, index) => ({
+            label: '身份证' + index,
+            value: 'compText',
+          })),
         ],
       },
     ]
@@ -331,8 +330,6 @@ watch(umoEditorRef, () => {
   // editorRef.value.on('create', ({ editor }) => {
   //   console.log('create', editor)
   //   const positionList = editor.view.dom.__pageNumPosList as Array
-  //
-  //
   // })
 })
 
@@ -361,30 +358,33 @@ provide('__printRef__', printRef)
 <!-- render -->
 <template>
   <div class="doc-editor">
-    <!--    <div v-if="IS_DEV" class="flex flex-col gap-2 p-4px max-w-5em">-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo002')"-->
-    <!--        >点击demo002</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"-->
-    <!--        >光标字大小</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('demo004')"-->
-    <!--        >设置属性不在选区</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('demoInTable')"-->
-    <!--        >在表格中</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"-->
-    <!--        >删除行</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('wrapTrTable')"-->
-    <!--        >手动添加包裹</t-button-->
-    <!--      >-->
-    <!--      <t-button size="small" @click="testEditorFunc('truncate001')"-->
-    <!--        >截取</t-button-->
-    <!--      >-->
-    <!--    </div>-->
+    <div
+      v-if="false && profile.IS_DEV"
+      class="flex flex-col gap-2 p-4px max-w-5em"
+    >
+      <t-button size="small" @click="testEditorFunc('demo001')">获取</t-button>
+      <t-button size="small" @click="testEditorFunc('demo002')"
+        >点击demo002</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('getCurrentFontSize')"
+        >光标字大小</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('demo004')"
+        >设置属性不在选区</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('demoInTable')"
+        >在表格中</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('deleteRowInTable')"
+        >删除行</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('wrapTrTable')"
+        >手动添加包裹</t-button
+      >
+      <t-button size="small" @click="testEditorFunc('truncate001')"
+        >截取</t-button
+      >
+    </div>
     <umo-editor ref="umoEditorRef" v-bind="options">
       <template #hidden>
         <Print ref="printRef"></Print>
@@ -397,7 +397,7 @@ provide('__printRef__', printRef)
 
       <!--  TOC 内容  -->
       <template #toc-content-params>
-        <LeftTocParams></LeftTocParams>
+        <LeftParamsToc></LeftParamsToc>
       </template>
 
       <!--  内容右侧  -->

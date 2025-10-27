@@ -3,13 +3,15 @@
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 05/07/25 PM1:24
  */
+
+// @ts-nocheck
+
 import type { Editor } from '@tiptap/vue-3'
 import { type EditorState, NodeSelection } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 
 //
 import type { Node as Node2, ResolvedPos } from 'prosemirror-model'
-import { PageBreak } from '@/views/doc-editor/utils/page-break'
 // import { setSelectionText } from '@/extensions/selection'
 
 declare global {
@@ -67,8 +69,6 @@ export function testEditor(editorRef: Editor) {
     // 公式：pageNum * (页眉高度 + 页内容高度 + 页脚高度) + (pageNum - 1) * 每页间距
 
     console.log('[funcName]', funcName)
-
-    const pageBreak = new PageBreak(editor)
 
     switch (funcName) {
       case 'truncate001': {

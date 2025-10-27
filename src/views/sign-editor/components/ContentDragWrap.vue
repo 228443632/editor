@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 import Drager from 'es-drager'
-import { rafThrottle, def, isNoNullable } from 'sf-utils2'
+import { rafThrottle, def } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import profile from '@/profile.ts'
@@ -187,13 +187,24 @@ function onDragEnd() {
 }
 
 /**
+ * 重置
+ */
+function onReset() {
+  const itemClone = pageUtils.getItemOriginXY(_nodeData.value)
+  _nodeData.value.offsetTop = itemClone.offsetTop
+  _nodeData.value.offsetLeft = itemClone.offsetLeft
+  _nodeData.value.top = itemClone.top
+  _nodeData.value.left = itemClone.left
+}
+
+/**
  * 调整正确位置
  */
 function correctPosList() {
   // 更正位置
   if (props.isCorrectPos) {
     pageUtils.correctPos(_nodeData.value, __signContext__.value.contentPageNums)
-    inRectParamsList.value.forEach((item) => {
+    _inRectParamsList.value.forEach((item) => {
       if (item.key != _nodeData.value.key) {
         pageUtils.correctPos(item, __signContext__.value.contentPageNums)
       }
@@ -212,7 +223,7 @@ const _isActive = computed(() => {
 /**
  * 处于rect内
  */
-const inRectParamsList = computed(() =>
+const _inRectParamsList = computed(() =>
   __signContext__.value.paramsCompList.filter((item) => item.isInRect),
 )
 
@@ -247,6 +258,14 @@ const _keywordsPosOffsetXY = computed(() => {
     }
   }
   return undefined
+})
+
+/**
+ * 是否展示重置按钮
+ */
+const _isShowReset = computed(() => {
+  if (_nodeData.value.keywords && _nodeData.value.list?.length) return true
+  return false
 })
 
 /* 监听 */
@@ -332,8 +351,25 @@ defineExpose({
             <t-icon name="delete" size="13px" class="text-white"></t-icon>
           </span>
         </t-tooltip>
+
+        <t-tooltip
+          v-if="_isShowReset"
+          theme="light"
+          placement="top"
+          :show-arrow="false"
+          destroy-on-close
+          content="重置位置"
+        >
+          <span
+            :class="['line-wrap__reset', _isActive && '!z-100 !opacity-100']"
+            @click="onReset"
+          >
+            <t-icon name="file-restore" size="13px" class="text-white"></t-icon>
+          </span>
+        </t-tooltip>
+
         <slot></slot>
-        <div v-if="true || profile.IS_DEV" class="line-wrap__locate">
+        <div class="line-wrap__locate">
           <!--          <div class="locate__item">X: {{ ~~_nodeData.left }}</div>-->
           <!--          <div class="locate__item">Y: {{ ~~_nodeData.top }}</div>-->
 
@@ -425,6 +461,14 @@ defineExpose({
   z-index: 100;
   transition: all 0.3s ease-in-out;
   opacity: 1;
+}
+
+.line-wrap__reset {
+  @apply bg-primary flex items-center justify-center p-1 rounded-full absolute -right-24px top-0;
+  transform: translate(50%, -50%);
+  cursor: pointer;
+  z-index: -1;
+  opacity: 0;
 }
 
 .line-wrap__locate {

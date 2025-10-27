@@ -86,6 +86,8 @@ function initParamsCompList(
   const paramsCompListNoKeywords = [] // 绝对坐标
   paramsCompListArg.forEach((item) => {
     if (item.keywords) {
+      item.offsetTop = item.top = undefined
+      item.offsetLeft = item.left = undefined
       paramsCompListKeywords.push(item)
     } else {
       paramsCompListNoKeywords.push(item)

@@ -59,8 +59,7 @@ const getItemStyle = (
   index: number,
   list = [],
 ) => {
-  const scaleFactor = +__signContext__.value.scaleFactor
-
+  const scaleFactor = 1
   const left = item.left * scaleFactor
   const top = item.top * scaleFactor - 1
   const width = item.width * scaleFactor

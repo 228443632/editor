@@ -41,6 +41,7 @@ export const COMP_PARAMS_NAME_MAP = {
   compSign: 'compSign',
   compSeal: 'compSeal',
   compSignDate: 'compSignDate',
+  keywords: 'keywords',
 } as const
 
 /**
@@ -112,7 +113,3 @@ export const COMP_SIGN_STYLE = {
   height: 59,
   limit: 1,
 }
-
-// export type COMP_BOLD_PARAMS = {
-//   imageParagraph: 'imageParagraph',
-// }

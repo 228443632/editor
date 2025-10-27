@@ -29,8 +29,9 @@ const emit = defineEmits(['ok'])
 const __signContext__ = inject('__signContext__')
 
 const formData = ref({
-  keywords: '简介',
-  compType: COMP_PARAMS_NAME_MAP.compSign,
+  keywords: undefined,
+  // compType: COMP_PARAMS_NAME_MAP.compSign,
+  compType: undefined,
 })
 const formRef = ref<InstanceType<typeof Form>>()
 const options = reactive({
@@ -69,9 +70,8 @@ const rules = {
  * 提交
  */
 const submit = async () => {
-  const [valid, err] = await to(formRef.value.validate())
-  if (err || !valid)
-    return useMessage('error', { content: '请检查表单是否填写完整' })
+  const [valid] = await to(formRef.value.validate())
+  if (valid !== true)  return useMessage('error', { content: '请检查表单是否填写完整' })
 
   const resultList = await __signContext__.value.pdfSearch(
     formData.value.keywords,
@@ -144,7 +144,7 @@ defineExpose({
         clearable
         placeholder="请输入（不少于2个字符）"
         class="w-full"
-        maxlength="20"
+        maxlength="15"
         show-limit-number
         autofocus
       >

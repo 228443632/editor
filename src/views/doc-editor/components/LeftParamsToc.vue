@@ -261,7 +261,7 @@ defineExpose({
         }}</span>
         <icon
           name="close-circle-filled"
-          class="flex-none invisible umo-toc-params__close-icon text-[#fff]"
+          class="flex-none umo-toc-params__close-icon text-[#fff]"
           @click.stop="onDelItem(item)"
         ></icon>
       </li>

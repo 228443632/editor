@@ -273,6 +273,8 @@ const signContext = ref({
     const paramsCompListNoKeywords = [] // 绝对坐标
     paramsCompList.forEach((item) => {
       if (item.keywords) {
+        item.offsetTop = item.top = undefined
+        item.offsetLeft = item.left = undefined
         paramsCompListKeywords.push(item)
       } else {
         paramsCompListNoKeywords.push(item)
@@ -437,16 +439,16 @@ onMounted(() => {
   })
 
   if (!isInIframe()) {
-    signContext.value.source = './pdfs/3.pdf'
+    signContext.value.source = './pdfs/6.pdf'
     initial.value = true
     signContext.value.initParamsCompList(
       [
-        { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
+        // { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
         {
           type: 'compSign',
           translateX: 0,
           translateY: 0,
-          keywords: '版本',
+          keywords: '22',
           key: uuid(),
         },
       ],

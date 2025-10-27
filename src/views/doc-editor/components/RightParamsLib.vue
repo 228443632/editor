@@ -440,7 +440,11 @@ defineExpose({
 
     <div class="umo-pr-content umo-scrollbar">
       <section v-for="item in _tpFields" :key="item.uid" class="umo-pr-group">
-        <div class="umo-pr-group__title">{{ item.label }}</div>
+        <div class="umo-pr-group__title">
+          <section class="group-tab-slide">
+            {{ item.label }}
+          </section>
+        </div>
 
         <ul class="grid container grid-cols-2 gap-12px !mt-8px">
           <li
@@ -467,7 +471,18 @@ defineExpose({
             <template v-else>
               <span class="inline-flex" v-html="textFillIconRaw"></span>
               <!--              <icon size="16" :name="cItem.icon"></icon>-->
-              <span class="truncate">{{ cItem.label }}</span>
+              <t-tooltip
+                v-if="cItem.label?.length > 4"
+                theme="light"
+                placement="top"
+                :show-arrow="false"
+                destroy-on-close
+                :content="cItem.label"
+              >
+                <span class="truncate">{{ cItem.label }}</span>
+              </t-tooltip>
+
+              <span v-else class="truncate">{{ cItem.label }}</span>
             </template>
           </li>
         </ul>
@@ -482,6 +497,8 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 @import '@/style/vars';
+@import '@/style/common-lazy';
+
 .umo-pr-container {
   padding-top: var(--padding-top);
   background: transparent;
@@ -529,6 +546,10 @@ defineExpose({
       color: #666;
       line-height: 22px;
       font-size: 12px;
+      position: sticky;
+      top: -12px;
+      z-index: 10;
+      background-color: #fff;
     }
 
     .umo-pr-group__item {

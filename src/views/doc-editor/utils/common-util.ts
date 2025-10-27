@@ -7,6 +7,7 @@
 import type { ITreeItem } from '@/types/tree'
 import { isArray, isNullable, isNullableString, isObject } from 'sf-utils2'
 import { isString } from '@tool-belt/type-predicates'
+import { camelCase, merge } from 'sf-utils2'
 
 /**
  * 生成UUId
@@ -258,3 +259,47 @@ export const commonUtil = {
 export function isInIframe() {
   return window.self !== window.top
 }
+
+/**
+ * 将对象里面的key 键名转成小驼峰方式
+ * @param object
+ * @return {any}
+ * @example
+ * ```js
+ * const obj = {
+ *   id: 1,
+ *   user_name: 'tanghongjuan',
+ *   'user-name': '1234'
+ * }
+ * camelCasePlainObject(obj)
+ * =>
+ * {
+ *   id: 1,
+ *   userName: 'tanghongjuan',
+ *   userName: '1234'
+ * }
+ * ```
+ */
+export const camelCasePlainObject = function (object) {
+  return Object.entries(object).reduce((pre, [k, v]) => {
+    const key = camelCase(k)
+    pre[key] = v
+    return pre
+  }, {})
+}
+
+/**
+ * 合并默认的 vue attrs属性
+ * @param {any} [args]
+ * @return {{}}
+ * @example
+ *
+ * const attrs = useAttrs()
+ * mergeAttrs({'type': 'primary', 'disable-transitions': true}, attrs)
+ *
+ * => {
+ *   type: 'primary',
+ *   disableTransitions: true
+ * }
+ */
+export const mergeAttrs = (...args) => camelCasePlainObject(merge({}, ...args))

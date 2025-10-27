@@ -1,0 +1,27 @@
+/**
+ * @Description:
+ * @Author 卞鹏飞 <228443632@qq.com>
+ * @create 27/10/25 AM10:27
+ */
+@import './vars.less';
+.group-tab-slide {
+  --slide-h: 6px; // 6px
+  --slide-radius: 2px;
+  position: relative;
+  width: fit-content;
+  &:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: calc(0px - (var(--slide-h) / 2));
+    width: 100%;
+    height: var(--slide-h);
+    border-radius: var(--slide-radius);
+    z-index: 10;
+    background-image: linear-gradient(
+      to right,
+      rgba(@primary-color, 1),
+      rgba(@primary-color, 0.1)
+    );
+  }
+}

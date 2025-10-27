@@ -133,7 +133,7 @@ defineExpose({
         </span>
       </div>
       <t-tooltip
-        v-if="_isActive"
+        v-if="_isActive && !_nodeData?.keywords"
         theme="light"
         placement="top"
         :show-arrow="false"

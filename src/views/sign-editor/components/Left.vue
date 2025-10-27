@@ -21,7 +21,8 @@ import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 // import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import LeftAddKeywordPosAE from './LeftAddKeywordPosAE.vue' // 左侧关键字定位
 import TDialogV2 from './t-dialog-v2/index.vue'
-import profile from '@/profile.ts'
+// import profile from '@/profile.ts'
+import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
@@ -249,7 +250,7 @@ const getPos = (x: number, y: number) => {
  * 组件类型映射
  */
 const _compTypeListMap = computed(() => {
-  if (profile.IS_DEV) {
+  if (!isInIframe()) {
     // 不是嵌入iframe中，展示全部
     return COMP_PARAMS_NAME_MAP
   }
@@ -399,6 +400,8 @@ defineExpose({
 <!--style-->
 <style scoped lang="less">
 @import '@/style/vars.less';
+@import '@/style/common-lazy';
+
 .sign-editor__left {
   background: #fff;
   border-right: solid 1px var(--umo-border-color);
@@ -460,27 +463,5 @@ defineExpose({
   font-weight: bold;
   margin-bottom: 16px;
   color: #333;
-}
-
-.group-tab-slide {
-  --slide-h: 6px;
-  --slide-radius: 2px;
-  position: relative;
-  width: fit-content;
-  &:after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: calc(0px - (var(--slide-h) / 2));
-    width: 100%;
-    height: var(--slide-h);
-    border-radius: var(--slide-radius);
-    z-index: 10;
-    background-image: linear-gradient(
-      to right,
-      rgba(@primary-color, 1),
-      rgba(@primary-color, 0.1)
-    );
-  }
 }
 </style>

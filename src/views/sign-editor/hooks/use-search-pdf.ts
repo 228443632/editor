@@ -212,8 +212,8 @@ export function useSearchPDF(doc: PDFDocumentProxy, options?: TOptions) {
           keywords: keyword,
           key: uuid(),
           pageNum,
-          offsetTop: matchList[0]?.top,
-          offsetLeft: matchList[0]?.left,
+          offsetTop: undefined,
+          offsetLeft: undefined,
           list: matchList,
           radio: radioScale,
         }
