@@ -134,12 +134,8 @@ export const pageUtils = {
       itemClone.offsetLeft = itemClone.left ?? 0
       itemClone.offsetTop = offsetTop
 
-      itemClone.offsetX = +Number(
-        itemClone.offsetLeft + itemClone.width / 2,
-      ).toFixed(0)
-      itemClone.offsetY = +Number(
-        itemClone.offsetTop + itemClone.height / 2,
-      ).toFixed(0)
+      itemClone.offsetX = Math.floor(itemClone.offsetLeft + itemClone.width / 2)
+      itemClone.offsetY = Math.floor(itemClone.offsetTop + itemClone.height / 2)
       itemClone.pageNum = pageNum
     }
     return itemClone
@@ -172,14 +168,12 @@ export const pageUtils = {
           originKeywordRect.top + originKeywordRect.height / 2 + translateY,
         ).toFixed(0)
         if (!item.offsetTop) {
-          item.offsetTop = item.top = +Number(
-            item.offsetY - item.height / 2,
-          ).toFixed(0)
+          item.offsetTop = item.top = Math.floor(item.offsetY - item.height / 2)
         }
         if (!item.offsetLeft) {
-          item.offsetLeft = item.left = +Number(
+          item.offsetLeft = item.left = Math.floor(
             item.offsetX - item.width / 2,
-          ).toFixed(0)
+          )
         }
       }
     } else {

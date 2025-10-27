@@ -264,18 +264,19 @@ const _compTypeListMap = computed(() => {
  * 是否展示绝对定位菜单
  */
 const _isShowAbsMenu = computed(() => {
-  return (
-    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSeal] ||
-    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSignDate] ||
-    _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSign]
-  )
+  return _compTypeListMap.value[COMP_PARAMS_NAME_MAP.groupAbsPos]
+  // return (
+  //   _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSeal] ||
+  //   _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSignDate] ||
+  //   _compTypeListMap.value[COMP_PARAMS_NAME_MAP.compSign]
+  // )
 })
 
 /**
  * 是否展示关键字菜单
  */
 const _isShowKwdsMenu = computed(() => {
-  return _compTypeListMap.value[COMP_PARAMS_NAME_MAP.keywords]
+  return _compTypeListMap.value[COMP_PARAMS_NAME_MAP.groupKeywords]
 })
 
 /* 监听 */
@@ -303,7 +304,7 @@ defineExpose({
       <!-- 关键字定位 -->
       <section v-if="_isShowKwdsMenu" class="mb-6">
         <div class="group-tab-slide left__sub-title mb-6">关键字定位</div>
-        <div>
+        <div v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.keywords]">
           <t-button block variant="outline" @click="onShowCreateKwdPos"
             >添加关键字定位</t-button
           >

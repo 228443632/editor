@@ -42,6 +42,10 @@ export const COMP_PARAMS_NAME_MAP = {
   compSeal: 'compSeal',
   compSignDate: 'compSignDate',
   keywords: 'keywords',
+  /** 绝对定位分组 */
+  groupAbsPos: 'groupAbsPos',
+  /** 关键字定位分组 */
+  groupKeywords: 'groupKeywords',
 } as const
 
 /**
