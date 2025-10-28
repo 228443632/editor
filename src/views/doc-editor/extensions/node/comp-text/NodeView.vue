@@ -155,10 +155,13 @@ provide('NODE_PROPS', props)
   scroll-margin-top: 8px;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode {
+    @error-color: @primary-color;
     outline: 2px solid @error-color !important;
     &:after {
-      background: @error-color;
-      color: #fff;
+      background: rgba(@error-color, 0.2);
+      color: @error-color;
+      //box-shadow: 4px 4px 0px 2px rgba(@error-color, 0.15);
+      @apply: shadow-xl;
     }
   }
   &:hover {

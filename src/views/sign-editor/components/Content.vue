@@ -795,7 +795,7 @@ defineExpose({
   overflow: auto;
   height: 100%;
   padding: 16px 0;
-  //scroll-behavior: smooth;
+  scroll-behavior: smooth;
   position: relative;
   overflow-x: hidden;
   &.caret--is-dragging {

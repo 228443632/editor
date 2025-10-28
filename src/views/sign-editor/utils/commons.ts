@@ -99,47 +99,7 @@ export const pageUtils = {
    * 获取组件的 origin xy
    * @param item
    */
-  getItemOriginXY(item: IParamsCompItem) {
-    const itemClone = deepClone(item)
-    if (itemClone.keywords) {
-      if (itemClone.list?.length) {
-        const originKeywordRect = itemClone.list[0]
-        const firstLineRects = itemClone.list.filter(
-          (cItem) => cItem.top == originKeywordRect.top,
-        )
-        let keywordWidth = 0
-        firstLineRects.forEach((cItem) => {
-          keywordWidth += cItem.width
-        })
-
-        // 如果有关键字，说明是关键字定位, 以 offsetTop 和 offsetLeft 计算
-        itemClone.offsetX = +Number(
-          originKeywordRect.left + keywordWidth / 2,
-        ).toFixed(0)
-        itemClone.offsetY = +Number(
-          originKeywordRect.top + originKeywordRect.height / 2,
-        ).toFixed(0)
-        itemClone.offsetTop = itemClone.top = +Number(
-          itemClone.offsetY - itemClone.height / 2,
-        ).toFixed(0)
-        itemClone.offsetLeft = itemClone.left = +Number(
-          itemClone.offsetX - itemClone.width / 2,
-        ).toFixed(0)
-      }
-    } else {
-      // 绝对定位
-      const { offsetTop, pageNum } = pageUtils.getPageOffsetTopByTop(
-        itemClone.top,
-      )
-      itemClone.offsetLeft = itemClone.left ?? 0
-      itemClone.offsetTop = offsetTop
-
-      itemClone.offsetX = Math.floor(itemClone.offsetLeft + itemClone.width / 2)
-      itemClone.offsetY = Math.floor(itemClone.offsetTop + itemClone.height / 2)
-      itemClone.pageNum = pageNum
-    }
-    return itemClone
-  },
+  getItemOriginXY(item: IParamsCompItem) {},
 
   /**
    * 更新每一项 偏移x y位置
@@ -167,14 +127,21 @@ export const pageUtils = {
         item.offsetY = +Number(
           originKeywordRect.top + originKeywordRect.height / 2 + translateY,
         ).toFixed(0)
+
+        const originOffsetTop = Math.floor(item.offsetY - item.height / 2)
+        const originOffsetLeft = Math.floor(item.offsetX - item.width / 2)
+
         if (!item.offsetTop) {
-          item.offsetTop = item.top = Math.floor(item.offsetY - item.height / 2)
+          item.top = item.offsetTop = originOffsetTop
         }
         if (!item.offsetLeft) {
-          item.offsetLeft = item.left = Math.floor(
-            item.offsetX - item.width / 2,
-          )
+          item.left = item.offsetLeft = originOffsetLeft
         }
+
+        item._keywordsTranslateX = Math.floor(item.offsetTop - originOffsetTop)
+        item._keywordsTranslateY = Math.floor(
+          item.offsetLeft - originOffsetLeft,
+        )
       }
     } else {
       // 绝对定位
@@ -182,10 +149,11 @@ export const pageUtils = {
       item.offsetLeft = item.left ?? 0
       item.offsetTop = offsetTop
 
-      item.offsetX = +Number(item.offsetLeft + item.width / 2).toFixed(0)
-      item.offsetY = +Number(item.offsetTop + item.height / 2).toFixed(0)
+      item.offsetX = Math.floor(item.offsetLeft + item.width / 2)
+      item.offsetY = Math.floor(item.offsetTop + item.height / 2)
       item.pageNum = pageNum
     }
+    return item
   },
 
   /**
@@ -226,20 +194,6 @@ export const pageUtils = {
         // 关键字
         if (item.list?.length) {
           // 获取偏移量
-          const [originKeywordRect] = item.list || []
-          if (!originKeywordRect) return
-          const originOffsetX = +Number(
-            originKeywordRect.left + originKeywordRect.width / 2,
-          ).toFixed(0)
-          const originOffsetY = +Number(
-            originKeywordRect.top + originKeywordRect.height / 2,
-          ).toFixed(0)
-
-          const offsetX = +Number(item.left + item.width / 2).toFixed(0)
-          const offsetY = +Number(item.top + item.height / 2).toFixed(0)
-
-          item._keywordsTranslateX = offsetX - originOffsetX
-          item._keywordsTranslateY = offsetY - originOffsetY
         }
       }
 

@@ -11,7 +11,7 @@ import Left from '@/views/sign-editor/components/Left.vue'
 import Right from './components/Right.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import Footer from './components/Footer.vue'
-import { deepClone, noop, uuid, throttle } from 'sf-utils2'
+import { deepClone, noop, uuid, throttle, arrayToObj } from 'sf-utils2'
 import Header from './components/Header.vue'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
@@ -152,6 +152,16 @@ const signContext = ref({
   _paramsCompList: computed(() => {
     const paramsCompList = signContext.value.paramsCompList || []
     return pageUtils.enhanceCompParams(paramsCompList)
+  }),
+
+  /**
+   * 参数数据对象 通过key value
+   */
+  _paramsCompListObj$key: computed(() => {
+    return arrayToObj(signContext.value._paramsCompList, 'key') as Record<
+      string,
+      IParamsCompItem
+    >
   }),
 
   /**
@@ -500,7 +510,7 @@ window['pageSignEditor'] = {
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>
-      <Right ref=""></Right>
+      <Right></Right>
     </div>
 
     <Footer class="sign-editor__footer"></Footer>
@@ -527,7 +537,7 @@ window['pageSignEditor'] = {
 }
 
 .sign-editor__footer {
-  height: 31px;
+  height: 32px;
   flex: none;
   width: 100%;
   background: white;

@@ -587,6 +587,17 @@ defineExpose({
     }
   }
 }
+
+.group-tab-slide {
+  @primary-color: #2d49d1;
+  &:after {
+    background-image: linear-gradient(
+      to right,
+      rgba(@primary-color, 1),
+      rgba(@primary-color, 0)
+    );
+  }
+}
 </style>
 <style lang="less">
 .umo-page-content--dragging {

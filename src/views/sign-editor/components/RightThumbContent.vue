@@ -6,7 +6,7 @@
 <!--default-->
 <script setup lang="ts">
 import VuePdfEmbed from 'vue-pdf-embed'
-import { debounce, arrayToObj } from 'sf-utils2'
+import { debounce, arrayToObj, rafThrottle } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
@@ -49,7 +49,7 @@ const isWheeling = ref(false)
 const resetPageIntersectionObserver = () => {
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
-    debounceUpdatePageVisibility(entries)
+    rafThrottleUpdatePageVisibility(entries)
   })
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
@@ -65,8 +65,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
     }
   })
 }
-// const rafThrottleUpdatePageVisibility = rafThrottle(updatePageVisibility)
-const debounceUpdatePageVisibility = debounce(updatePageVisibility, 200)
+const rafThrottleUpdatePageVisibility = rafThrottle(updatePageVisibility)
 
 /**
  * 选择pdf一项

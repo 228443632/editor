@@ -5,6 +5,8 @@
  -->
 <!--setup-->
 <script setup lang="ts">
+import FooterUseWidgetList from './FooterUseWidgetList.vue'
+
 const { proxy } = getCurrentInstance()
 const props = defineProps({})
 const emit = defineEmits([])
@@ -46,60 +48,13 @@ const onNext = () => {
 }
 
 /**
- * 选择使用控件
- * @param item
- */
-const onChooseUseWidgetItem = (item) => {
-  __signContext__.value.selectParamsComp(item)
-
-  if (__signContext__.value.scrollIntoViewByParamsComp) {
-    __signContext__.value.scrollIntoViewByParamsComp(item)
-  }
-}
-
-/**
  * 显示隐藏
  */
 const onVisibleChange = (visible) => {
-  console.log('visible', visible)
+  // console.log('visible', visible)
 }
 
 /* 计算 */
-
-/**
- * 使用控件集合
- * @private
- */
-const _useWidgetList = computed(() => {
-  const paramsCompList = __signContext__.value.paramsCompList || []
-  return paramsCompList.map((item) => {
-    const { offsetTop, pageNum } = __signContext__.value.getPageOffsetTopByTop(
-      item.top,
-    )
-    //  <icon name="image-failed" class="error-icon" />
-    const compNameMap = {
-      compSign: {
-        name: '签名',
-        icon: 'icon-sign',
-      },
-      compSeal: {
-        name: '印章',
-        icon: 'icon-seal',
-      },
-      compSignDate: {
-        name: '签署日期',
-        icon: 'icon-sign-date',
-      },
-    }
-    return {
-      ...item,
-      pageNum,
-      offsetTop,
-      icon: compNameMap[item.type]?.icon,
-      compName: compNameMap[item.type]?.name,
-    }
-  })
-})
 
 /* 监听 */
 
@@ -117,9 +72,10 @@ defineExpose({
   <div class="comp__footer">
     <div class="flex items-center w-full justify-center gap-4">
       <t-popup
-        trigger="click"
+        trigger="hover"
         placement="top-left"
         @visible-change="onVisibleChange"
+        hide-empty-popup
       >
         <span
           class="inline-flex gap-1 items-center cursor-pointer hover:text-[var(--umo-primary-color)]"
@@ -130,52 +86,22 @@ defineExpose({
             title="已使用签署控件集合"
             class="cursor-pointer hover:text-[var(--umo-primary-color)]"
           ></t-icon>
-          <span>签署元素：{{ _useWidgetList?.length }}个</span>
+          <span>签署元素：{{ __signContext__.paramsCompList?.length }}个</span>
         </span>
         <template #content>
-          <div class="use-widget__wrap min-w-200px">
-            <div class="use-widget__title">已使用签署控件集合</div>
-            <div class="umo-scrollbar max-h-250px overflow-y-auto py-1">
-              <template v-if="_useWidgetList?.length">
-                <div
-                  v-for="(item, index) in _useWidgetList"
-                  :key="item.key"
-                  :class="[
-                    'use-widget__item',
-                    __signContext__.activeCompParam?.key == item.key &&
-                      'is-active',
-                  ]"
-                  @click="onChooseUseWidgetItem(item)"
-                >
-                  <span>{{ index + 1 }}.第{{ item.pageNum }}页-</span>
-                  <span>
-                    {{ item.compName }}
-                  </span>
-                  <icon class="text-[#333] ml-1" :name="item.icon" size="12" />
-                </div>
-              </template>
-              <div v-else class="min-h-100px flex-center text-12px">
-                <t-empty image-style="color: #999">
-                  <template #title
-                    ><span class="text-12px">暂无数据</span></template
-                  >
-                </t-empty>
-              </div>
-            </div>
+          <div class="use-widget__wrap p-4 min-w-200px max-w-750px">
+            <FooterUseWidgetList></FooterUseWidgetList>
           </div>
         </template>
       </t-popup>
       <div class="flex items-center gap-3 comp__footer__rt">
         <span
-          >当前页：<span class="font-bold">{{
+          >当前页：<text class="font-bold">{{
             __signContext__?.anchorInfo?.active
-          }}</span></span
-        >
-        <span
-          >总页数：<span class="font-bold">{{
-            __signContext__.contentPageNums
-          }}</span></span
-        >
+          }}</text>
+          <text class="px-1">/</text>
+          <text class="font-bold">{{ __signContext__.contentPageNums }}</text>
+        </span>
         <t-button
           type="button"
           size="small"
@@ -233,35 +159,6 @@ defineExpose({
 }
 
 .use-widget__wrap {
-  .use-widget__title {
-    //display: flex;
-    display: none;
-    align-items: center;
-    height: 28px;
-    font-size: 12px;
-    //font-weight: bold;
-    border-bottom: 1px solid var(--umo-border-color);
-  }
-
-  .use-widget__item {
-    height: 28px;
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    font-size: 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    &:hover {
-      background: #f3f3f3;
-    }
-    & + .use-widget__item {
-      margin-top: 2px;
-    }
-    &.is-active {
-      background: #f2f3fe;
-      color: var(--umo-primary-color);
-    }
-  }
 }
 
 .comp__footer__rt {

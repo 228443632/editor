@@ -6,10 +6,10 @@
 <!--setup-->
 <script setup lang="ts">
 import Drager from 'es-drager'
-import { rafThrottle, def } from 'sf-utils2'
+import { rafThrottle, def, deepClone } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.js'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
-import profile from '@/profile.ts'
+// import profile from '@/profile.ts'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -190,11 +190,24 @@ function onDragEnd() {
  * 重置
  */
 function onReset() {
-  const itemClone = pageUtils.getItemOriginXY(_nodeData.value)
-  _nodeData.value.offsetTop = itemClone.offsetTop
-  _nodeData.value.offsetLeft = itemClone.offsetLeft
-  _nodeData.value.top = itemClone.top
-  _nodeData.value.left = itemClone.left
+  // updateItemOffsetXY
+  const paramsComp =
+    __signContext__.value._paramsCompListObj$key[_nodeData.value.key]
+  if (paramsComp) {
+    const paramsCompClone = deepClone(paramsComp)
+    Object.assign(paramsCompClone, {
+      translateX: 0,
+      translateY: 0,
+      offsetTop: undefined,
+      offsetLeft: undefined,
+    })
+    pageUtils.updateItemOffsetXY(paramsCompClone)
+
+    _nodeData.value.offsetTop = paramsCompClone.offsetTop
+    _nodeData.value.offsetLeft = paramsCompClone.offsetLeft
+    _nodeData.value.top = paramsCompClone.top
+    _nodeData.value.left = paramsCompClone.left
+  }
 }
 
 /**
@@ -231,33 +244,14 @@ const _inRectParamsList = computed(() =>
  * 关键字位置偏移
  */
 const _keywordsPosOffsetXY = computed(() => {
-  const item = _nodeData.value
-  if (item.list?.length) {
-    const originKeywordRect = item.list?.[0]
-    if (!originKeywordRect) return
+  return __signContext__.value._paramsCompListObj$key[_nodeData.value.key]
+})
 
-    const firstLineRects = item.list.filter(
-      (item) => item.top == originKeywordRect.top,
-    )
-    let keywordWidth = 0
-    firstLineRects.forEach((item) => {
-      keywordWidth += item.width
-    })
-    const originOffsetX = +Number(
-      originKeywordRect.left + keywordWidth / 2,
-    ).toFixed(0)
-    const originOffsetY = +Number(
-      originKeywordRect.top + originKeywordRect.height / 2,
-    ).toFixed(0)
-
-    const offsetX = +Number(item.left + dragerWidth.value / 2).toFixed(0)
-    const offsetY = +Number(item.top + dragerHeight.value / 2).toFixed(0)
-    return {
-      offsetX: offsetX - originOffsetX,
-      offsetY: offsetY - originOffsetY,
-    }
-  }
-  return undefined
+/**
+ * 绝对定位位置偏移
+ */
+const _absPosOffsetXY = computed(() => {
+  return __signContext__.value._paramsCompListObj$key[_nodeData.value.key]
 })
 
 /**
@@ -376,21 +370,17 @@ defineExpose({
           <!-- 关键字定位 偏移量 -->
           <template v-if="_nodeData?.keywords">
             <div class="locate__item">
-              <span>偏</span>X: {{ _keywordsPosOffsetXY?.offsetX }}
+              <span>偏</span>X: {{ _keywordsPosOffsetXY?._keywordsTranslateX }}
             </div>
             <div class="locate__item">
-              <span>偏</span>Y: {{ _keywordsPosOffsetXY?.offsetY }}
+              <span>偏</span>Y: {{ _keywordsPosOffsetXY?._keywordsTranslateY }}
             </div>
           </template>
 
           <!-- 绝对定位 -->
           <template v-else>
-            <div class="locate__item">
-              X: {{ Number(_nodeData.left + dragerWidth / 2).toFixed(0) }}
-            </div>
-            <div class="locate__item">
-              Y: {{ Number(_nodeData.top + dragerHeight / 2).toFixed(0) }}
-            </div>
+            <div class="locate__item">X: {{ _absPosOffsetXY?.offsetX }}</div>
+            <div class="locate__item">Y: {{ _absPosOffsetXY?.offsetY }}</div>
           </template>
         </div>
       </template>

@@ -116,11 +116,11 @@ export interface IParamsCompItem {
   /** 关键字，关键字用到 */
   keywords?: string
 
-  /** 关键字：偏移量 x, 只读*/
-  readonly _keywordsTranslateX?: number
+  /** 关键字：偏移量 x, 只读 @Readonly*/
+  _keywordsTranslateX?: number
 
-  /** 关键字：偏移量 y，只读*/
-  readonly _keywordsTranslateY?: number
+  /** 关键字：偏移量 y，只读 @Readonly*/
+  _keywordsTranslateY?: number
 
   /** 列表数据 关键字用到 */
   list?: TParamsCompKeywordItem[]
