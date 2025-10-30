@@ -60,8 +60,8 @@
     font-family: var(--umo-font-family);
 
     & > p {
-      white-space: pre-wrap;
-      word-break: break-all;
+      //white-space: pre-wrap;
+      word-break: keep-all;
       overflow-wrap: break-word;
       margin-bottom: var(--umo-content-node-bottom);
     }
@@ -223,7 +223,7 @@
     counter-reset: section;
     list-style-type: none;
     li {
-      word-break: break-all;
+      word-break: keep-all;
       list-style-type: none;
       padding: 0.25em 0;
       > p:before {
