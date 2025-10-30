@@ -187,6 +187,8 @@ provide('NODE_PROPS', props)
     //--umo-node-text-border-color: red;
     &:after {
       content: '';
+      background: transparent;
+      outline: none;
     }
     &[bordertype='none'] {
       border-bottom: none;

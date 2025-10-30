@@ -51,7 +51,7 @@ export const defaultOptions = {
       alpha: 0.2,
       fontColor: '#000',
       fontSize: 16,
-      fontFamily: 'SimSun',
+      fontFamily: 'simsun',
       fontWeight: 'normal',
       text: '',
     },

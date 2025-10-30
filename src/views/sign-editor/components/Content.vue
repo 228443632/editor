@@ -33,6 +33,7 @@ import { useSearchPDF } from '../hooks/use-search-pdf.ts'
 import ContentKeywordCompPos from './ContentKeywordCompPos.vue' // 内容区域关键字组件定位
 import ContentTpNamesPos from './ContentTpNamesPos.vue' // 内容区域模版参数关键字定位
 import ContentAbsCompPos from './ContentAbsCompPos.vue' // 内容区域控件绝对定位
+import ContentZoom from './ContentZoom.vue'  // 内容缩放组件
 
 /* 状态 */
 const props = defineProps({})
@@ -654,6 +655,8 @@ defineExpose({
     ]"
     tabindex="10"
   >
+<!--    <ContentZoom></ContentZoom>-->
+
     <div
       class="pdf-embed__item-pagenum"
       :style="{

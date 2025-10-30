@@ -5,14 +5,15 @@
  -->
 <!--setup-->
 <script setup lang="ts">
-import type { Dialog, DialogProps } from 'tdesign-vue-next'
+import type { Dialog } from 'tdesign-vue-next'
 import { mergeAttrs } from '@/views/doc-editor/utils/common-util.ts'
+import type { TdDialogProps } from '@/views/components/t-dialog-v2/types.ts'
 // import type { ExtractPropTypes } from 'vue'
 
 const { proxy } = getCurrentInstance()
 const props = withDefaults(
   defineProps<
-    DialogProps & {
+    TdDialogProps & {
       bodyComponent: Component
       bodyComponentAttrs?: Record<string, any>
     }

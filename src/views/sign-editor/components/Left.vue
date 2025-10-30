@@ -20,7 +20,7 @@ import { arrayToObj, uuid } from 'sf-utils2'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 // import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import LeftAddKeywordPosAE from './LeftAddKeywordPosAE.vue' // 左侧关键字定位
-import TDialogV2 from './t-dialog-v2/index.vue'
+import TDialogV2 from '@/views/components/t-dialog-v2/index.vue'
 // import profile from '@/profile.ts'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 

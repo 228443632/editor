@@ -1181,7 +1181,7 @@ defineExpose({
   display: flex;
   flex-direction: column;
   color: var(--umo-text-color);
-  font-family: var(--umo-font-family);
+  //font-family: var(--umo-font-family);
   position: relative !important;
   background-color: var(--umo-page-bg-color);
   font-size: var(--umo-font-size);

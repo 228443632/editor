@@ -506,7 +506,7 @@ window['pageSignEditor'] = {
     @mousedown="onClickPreviewEditor"
     @contextmenu.prevent.stop
   >
-    <Header v-if="!isInIframe()" class="sign-editor__header"></Header>
+    <Header v-if="!isInIframe() && false" class="sign-editor__header"></Header>
     <div class="flex-1 h-0 flex">
       <Left></Left>
       <Content ref="contentRef"></Content>

@@ -15,7 +15,7 @@ export const ExtensionDecorationTest = Extension.create({
       0,
       this.editor.state.doc.content.size,
       {
-        class: 'umo-text-selection111',
+        class: '',
       },
     )
 
