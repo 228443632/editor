@@ -138,10 +138,10 @@ export const pageUtils = {
           item.left = item.offsetLeft = originOffsetLeft
         }
 
-        item._keywordsTranslateX = Math.floor(item.offsetTop - originOffsetTop)
-        item._keywordsTranslateY = Math.floor(
+        item._keywordsTranslateX = Math.floor(
           item.offsetLeft - originOffsetLeft,
         )
+        item._keywordsTranslateY = Math.floor(item.offsetTop - originOffsetTop)
       }
     } else {
       // 绝对定位

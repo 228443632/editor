@@ -17,6 +17,7 @@
       :key="index"
       :label="group.label"
       :divider="false"
+      class="max-w-220px min-w-full"
     >
       <t-option
         v-for="item in group.children"
@@ -29,12 +30,29 @@
           :style="{ fontFamily: item.value ?? undefined }"
           v-text="l(item.label)"
         ></span>
-        <span
+        <tooltip
           v-if="!fontDetect(item.value ?? '')"
-          class="umo-font-family-unsupport"
-          :title="t('base.fontFamily.unsupport')"
-          >!</span
+          :content="t('base.fontFamily.unsupport')"
         >
+          <span class="umo-font-family-unsupport ml-1">!</span>
+        </tooltip>
+
+        <tooltip
+          v-if="!fontDetect(item.value ?? '') && downloadFontMap[item.value]"
+          :content="'下载字体'"
+        >
+          <t-button
+            :loading="item.loading"
+            variant="text"
+            size="small"
+            theme="primary"
+            class="text-12px ml-1 !px-0 flex-none"
+            :loading-props="{ size: 'small' }"
+            :disabled="item.loading"
+            @click.stop="onDownLoadFont(item)"
+            >下载</t-button
+          >
+        </tooltip>
       </t-option>
     </t-option-group>
   </menus-button>
@@ -42,11 +60,22 @@
 
 <script setup lang="ts">
 import { isString } from '@tool-belt/type-predicates'
+import { downloadFile, to } from 'sf-utils2'
 
 const editor = inject('editor')
 const options = inject('options')
 const $toolbar = useState('toolbar', options)
 const $recent = useState('recent', options)
+
+const downloadFontMap = ref({
+  ['"Microsoft Yahei"']: 'msyh.ttf',
+  ['"SimHei"']: 'msyh.ttf', // 黑体
+  ['"SimSun"']: 'simsun.ttc', // 宋体
+
+  [`'Microsoft Yahei'`]: 'msyh.ttf',
+  [`'SimHei'`]: 'msyh.ttf', // 黑体
+  [`'SimSun'`]: 'simsun.ttc', // 宋体
+})
 
 import { getTypewriterRunState } from '@/extensions/type-writer'
 let isTypeRunning = $ref(false)
@@ -121,16 +150,18 @@ const allFonts = computed(() => {
     )
   }
   if ($recent.value.fonts.length > 0) {
-    all.unshift({
-      label: t('base.fontFamily.recent'),
-      children: getFontsByValues($recent.value.fonts) as any,
-    })
+    // 隐藏最近使用
+    // all.unshift({
+    //   label: t('base.fontFamily.recent'),
+    //   children: getFontsByValues($recent.value.fonts) as any,
+    // })
   }
   if (usedFonts.length > 0) {
-    all.unshift({
-      label: t('base.fontFamily.used'),
-      children: getFontsByValues(usedFonts) as any,
-    })
+    // 隐藏已使用的字体
+    // all.unshift({
+    //   label: t('base.fontFamily.used'),
+    //   children: getFontsByValues(usedFonts) as any,
+    // })
   }
   return all
 })
@@ -163,6 +194,34 @@ const setFontFamily = (fontFamily: string) => {
   }
   editor.value?.chain().focus().setFontFamily(fontFamily).run()
   getUsedFonts()
+}
+
+/**
+ * 下载字体
+ */
+const onDownLoadFont = async (item) => {
+  // const fontName = item.value.replace(/["|']/g, '')
+  const filename = downloadFontMap.value[item.value]
+  const filePath = `/lowcode-tp-fonts/${filename}`
+  item.loading = true
+  const [res, err] = await to(
+    downloadFile({
+      url: filePath,
+      filename,
+    }),
+  )
+  item.loading = false
+  if (err) return useMessage('error', { content: '下载字体失败' })
+  useMessage('success', { content: '下载字体成功' })
+
+  /**
+   * 获取文件名称
+   * @param filePath
+   */
+  // function getFileName(filePath: string) {
+  //   const name = filePath.split('?').filter(Boolean).at(0).split('/').filter(Boolean).pop()
+  //   return name.includes('.') ? name : ''
+  // }
 }
 
 watch(
