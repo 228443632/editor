@@ -54,6 +54,9 @@ const __compNodeList__ = inject('__compNodeList__') as Ref<[]>
 const isDragging = ref(false)
 const fillFormParamsAERef = ref<InstanceType<typeof FillFormParamsAE>>()
 
+const isFoldingPanels = ref(false) // 是否折叠面板
+const foldingPanelsValue = ref([])
+
 const defaultTpFields = ref(
   [
     // {
@@ -405,9 +408,27 @@ const getCntrctField = () => {
   return __compNodeList__.value
 }
 
+/**
+ * 折叠面板切换
+ */
+const handlePanelChange = (value) => {
+  console.log('value', value)
+}
+
 /* 计算 */
 
 /* 监听 */
+
+watchEffect(() => {
+  isFoldingPanels.value
+  if (isFoldingPanels.value) {
+    // 折叠面板
+    foldingPanelsValue.value = []
+  } else {
+    // 展开面板
+    foldingPanelsValue.value = _tpFields.value.map((item) => item.uid)
+  }
+})
 
 /* 周期 */
 onMounted(() => {
@@ -431,7 +452,16 @@ defineExpose({
 <template>
   <div class="umo-pr-container">
     <div class="umo-pr-title">
-      模版字段
+      <span class="flex flex-1 w-0 justify-between items-center pr-9">
+        <span>模版字段</span>
+        <span id="folding-panels-001" class="font-normal text-12px text-[#666]"
+          >折叠面板
+          <t-switch
+            v-model="isFoldingPanels"
+            size="small"
+            :label="isFoldingPanels ? '开启' : '关闭'"
+        /></span>
+      </span>
 
       <div class="umo-dialog__close" @click="onClose">
         <icon name="close" size="20" />
@@ -439,54 +469,70 @@ defineExpose({
     </div>
 
     <div class="umo-pr-content umo-scrollbar">
-      <section v-for="item in _tpFields" :key="item.uid" class="umo-pr-group">
-        <div class="umo-pr-group__title">
-          <section class="group-tab-slide">
-            {{ item.label }}
-          </section>
-        </div>
+      <t-collapse
+        v-model="foldingPanelsValue"
+        :expand-icon="isFoldingPanels"
+        :borderless="true"
+        :expand-icon-placement="'right'"
+        :disabled="!isFoldingPanels"
+        @change="handlePanelChange"
+      >
+        <t-collapse-panel
+          v-for="item in _tpFields"
+          :key="item.uid"
+          class="umo-pr-group"
+          :value="item.uid"
+        >
+          <template #header>
+            <div class="umo-pr-group__title">
+              <section class="group-tab-slide">
+                {{ item.label }}
+              </section>
+            </div>
+          </template>
 
-        <ul class="grid container grid-cols-2 gap-12px !mt-8px">
-          <li
-            v-for="cItem in item.children"
-            :key="cItem.uid"
-            :class="[
-              'umo-pr-group__item',
-              cItem.class,
-              cItem.type && `is-${cItem.type}`,
-            ]"
-            v-bind="cItem"
-            @click="onClickTpField(cItem)"
-            @dragstart="dragMethod.dragStart(cItem, $event)"
-            @dragend="dragMethod.dragend"
-          >
-            <template v-if="cItem.type == 'seal'">
-              <img :src="testSealImg" class="w-64px h-64px rounded-full" />
-            </template>
+          <ul class="grid container grid-cols-2 gap-12px !mt-8px">
+            <li
+              v-for="cItem in item.children"
+              :key="cItem.uid"
+              :class="[
+                'umo-pr-group__item',
+                cItem.class,
+                cItem.type && `is-${cItem.type}`,
+              ]"
+              v-bind="cItem"
+              @click="onClickTpField(cItem)"
+              @dragstart="dragMethod.dragStart(cItem, $event)"
+              @dragend="dragMethod.dragend"
+            >
+              <template v-if="cItem.type == 'seal'">
+                <img :src="testSealImg" class="w-64px h-64px rounded-full" />
+              </template>
 
-            <template v-else-if="cItem.type == 'sign'">
-              <img :src="testSignImg" class="w-88px h-23px rounded-full" />
-            </template>
+              <template v-else-if="cItem.type == 'sign'">
+                <img :src="testSignImg" class="w-88px h-23px rounded-full" />
+              </template>
 
-            <template v-else>
-              <span class="inline-flex" v-html="textFillIconRaw"></span>
-              <!--              <icon size="16" :name="cItem.icon"></icon>-->
-              <t-tooltip
-                v-if="cItem.label?.length > 4"
-                theme="light"
-                placement="top"
-                :show-arrow="false"
-                destroy-on-close
-                :content="cItem.label"
-              >
-                <span class="truncate">{{ cItem.label }}</span>
-              </t-tooltip>
+              <template v-else>
+                <span class="inline-flex" v-html="textFillIconRaw"></span>
+                <!--              <icon size="16" :name="cItem.icon"></icon>-->
+                <t-tooltip
+                  v-if="cItem.label?.length > 4"
+                  theme="light"
+                  placement="top"
+                  :show-arrow="false"
+                  destroy-on-close
+                  :content="cItem.label"
+                >
+                  <span class="truncate">{{ cItem.label }}</span>
+                </t-tooltip>
 
-              <span v-else class="truncate">{{ cItem.label }}</span>
-            </template>
-          </li>
-        </ul>
-      </section>
+                <span v-else class="truncate">{{ cItem.label }}</span>
+              </template>
+            </li>
+          </ul>
+        </t-collapse-panel>
+      </t-collapse>
     </div>
 
     <!-- 元素表单填充 -->
@@ -543,8 +589,9 @@ defineExpose({
       margin-top: 20px;
     }
     .umo-pr-group__title {
-      color: #666;
+      color: #333;
       line-height: 22px;
+      font-weight: bold;
       font-size: 12px;
       position: sticky;
       top: -12px;
@@ -596,6 +643,21 @@ defineExpose({
       rgba(@primary-color, 1),
       rgba(@primary-color, 0)
     );
+  }
+}
+
+:deep {
+  .umo-collapse-panel {
+    --td-comp-paddingTB-m: 0;
+    --td-comp-paddingLR-l: 0;
+    --td-bg-color-secondarycontainer: #fff;
+    --td-bg-color-component-disabled: #fff;
+    .umo-pr-group + .umo-pr-group {
+      margin-top: 20px;
+    }
+  }
+  .umo-collapse-panel__wrapper {
+    overflow: visible;
   }
 }
 </style>

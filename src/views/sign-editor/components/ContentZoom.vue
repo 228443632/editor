@@ -6,14 +6,31 @@
 <!--setup-->
 <script setup lang="ts">
 import redoSvgRaw from '@/assets/images/sign-editor/redo.svg?raw' // 恢复
-import undoSvgRaw from '@/assets/images/sign-editor/undo.svg?raw' // 撤回
+import undoSvgRaw from '@/assets/images/sign-editor/undo.svg?raw'
+import { getShortcut } from '@/utils/shortcut.ts' // 撤回
 
 const props = defineProps({})
 const emit = defineEmits([])
 
 /* 状态 */
+const __signContext__ = inject('__signContext__') // 预览上下文
 
 /* 方法 */
+
+/**
+ * 撤回
+ */
+const onUndo = () => {
+  console.log('onUndo')
+  __signContext__.value.manalHistory.undo()
+}
+
+/**
+ * 恢复
+ */
+const onRedo = () => {
+  __signContext__.value.manalHistory.redo()
+}
 
 /* 计算 */
 
@@ -28,32 +45,56 @@ defineExpose({})
 
 <!--render-->
 <template>
-  <div class="fixed top-8px z-10 flex ml-16px">
-    <div class="content-zoom__container">
-      <!--  缩小  -->
-      <t-tooltip theme="light" placement="top" destroy-on-close content="缩小">
-        <t-button type="button" variant="text" size="small">
-          <t-icon name="zoom-out" size="16px"></t-icon>
-        </t-button>
-      </t-tooltip>
+  <div class="fixed bottom-40px z-10 flex ml-16px">
+    <!--    <div class="content-zoom__container">-->
+    <!--      &lt;!&ndash;  缩小  &ndash;&gt;-->
+    <!--      <t-tooltip theme="light" placement="top" destroy-on-close content="缩小">-->
+    <!--        <t-button type="button" variant="text" size="small">-->
+    <!--          <t-icon name="zoom-out" size="16px"></t-icon>-->
+    <!--        </t-button>-->
+    <!--      </t-tooltip>-->
 
-      <!--  放大  -->
-      <t-tooltip theme="light" placement="top" destroy-on-close content="放大">
-        <t-button type="button" variant="text" size="small">
-          <t-icon name="zoom-in" size="16px"></t-icon>
-        </t-button>
-      </t-tooltip>
-    </div>
-    <div class="content-zoom__container is-history">
+    <!--      &lt;!&ndash;  放大  &ndash;&gt;-->
+    <!--      <t-tooltip theme="light" placement="top" destroy-on-close content="放大">-->
+    <!--        <t-button type="button" variant="text" size="small">-->
+    <!--          <t-icon name="zoom-in" size="16px"></t-icon>-->
+    <!--        </t-button>-->
+    <!--      </t-tooltip>-->
+    <!--    </div>-->
+    <div class="content-zoom__container is-history" @click.stop @mousedown.stop>
       <!--  撤回 -->
-      <t-tooltip theme="light" placement="top" destroy-on-close content="撤回">
-        <t-button type="button" variant="text" v-html="undoSvgRaw" size="small">
+      <t-tooltip
+        theme="light"
+        placement="top"
+        destroy-on-close
+        :content="`撤回 (${getShortcut('Ctrl+Z')})`"
+      >
+        <t-button
+          type="button"
+          :disabled="!__signContext__.manalHistory?.canUndo"
+          variant="text"
+          size="small"
+          @click="onUndo"
+          v-html="undoSvgRaw"
+        >
         </t-button>
       </t-tooltip>
 
       <!--  恢复 -->
-      <t-tooltip theme="light" placement="top" destroy-on-close content="恢复">
-        <t-button type="button" variant="text" v-html="redoSvgRaw" size="small">
+      <t-tooltip
+        theme="light"
+        placement="top"
+        destroy-on-close
+        :content="`恢复 (${getShortcut('Ctrl+Y')})`"
+      >
+        <t-button
+          type="button"
+          :disabled="!__signContext__.manalHistory?.canRedo"
+          variant="text"
+          size="small"
+          @click="onRedo"
+          v-html="redoSvgRaw"
+        >
         </t-button>
       </t-tooltip>
     </div>

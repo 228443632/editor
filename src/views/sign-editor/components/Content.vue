@@ -33,7 +33,7 @@ import { useSearchPDF } from '../hooks/use-search-pdf.ts'
 import ContentKeywordCompPos from './ContentKeywordCompPos.vue' // 内容区域关键字组件定位
 import ContentTpNamesPos from './ContentTpNamesPos.vue' // 内容区域模版参数关键字定位
 import ContentAbsCompPos from './ContentAbsCompPos.vue' // 内容区域控件绝对定位
-import ContentZoom from './ContentZoom.vue'  // 内容缩放组件
+import ContentZoom from './ContentZoom.vue' // 内容缩放组件
 
 /* 状态 */
 const props = defineProps({})
@@ -234,6 +234,11 @@ registerHotKeys('ctrl+z, command+z', () => {
   // useMessage('warning', { content: '暂不支持撤回操作' })
   // 撤回
   __signContext__.value.manalHistory.undo()
+})
+
+// 恢复
+registerHotKeys('ctrl+y, command+y', () => {
+  __signContext__.value.manalHistory.redo()
 })
 
 // 删除
@@ -655,7 +660,8 @@ defineExpose({
     ]"
     tabindex="10"
   >
-<!--    <ContentZoom></ContentZoom>-->
+    <!-- 内容缩放/放大  -->
+    <ContentZoom></ContentZoom>
 
     <div
       class="pdf-embed__item-pagenum"

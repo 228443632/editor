@@ -741,6 +741,8 @@
 .Tiptap-invisible-character {
   &.Tiptap-invisible-character--paragraph,
   &.Tiptap-invisible-character--break {
+    width: 0;
+    display: inline-block;
     &:before {
       pointer-events: none;
       content: '↵'; // ↵ ↩︎ ↩

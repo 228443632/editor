@@ -87,6 +87,7 @@ defineExpose({
             class="cursor-pointer hover:text-[var(--umo-primary-color)]"
           ></t-icon>
           <span>签署元素：{{ __signContext__.paramsCompList?.length }}个</span>
+          <t-icon name="arrow-right" class="arrow-animation"></t-icon>
         </span>
         <template #content>
           <div class="use-widget__wrap p-4 min-w-200px max-w-750px">
@@ -95,8 +96,8 @@ defineExpose({
         </template>
       </t-popup>
       <div class="flex items-center gap-3 comp__footer__rt">
-        <span
-          >当前页：<text class="font-bold">{{
+        <span class="flex items-center"
+          >当前页：<text class="font-bold text-4 text-primary">{{
             __signContext__?.anchorInfo?.active
           }}</text>
           <text class="px-1">/</text>
@@ -164,6 +165,22 @@ defineExpose({
 .comp__footer__rt {
   & > * {
     padding: 0 4px;
+  }
+}
+
+.arrow-animation {
+  animation: arrowSlide 0.9s infinite alternate ease-in-out;
+}
+
+@keyframes arrowSlide {
+  0% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0px);
   }
 }
 </style>

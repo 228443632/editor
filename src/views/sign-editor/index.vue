@@ -370,12 +370,14 @@ const signContext = ref({
       paramsCompListHistory.value.scrollTop = scrollViewDom?.scrollTop ?? 0
       commit()
     }, 50),
+    /** 撤回 */
     undo: () => {
       const scrollViewDom = unrefElement(contentRef)
       if (scrollViewDom)
         scrollViewDom.scrollTop = paramsCompListHistory.value.scrollTop
       undo()
     },
+    /** 恢复 */
     redo,
     canRedo,
     canUndo,

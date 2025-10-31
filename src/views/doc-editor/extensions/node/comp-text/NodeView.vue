@@ -150,6 +150,7 @@ provide('NODE_PROPS', props)
   min-height: 1em;
   text-align: left;
   text-indent: 0;
+  margin: 0 2.5px;
   //border-bottom: 1px solid var(--umo-node-text-border-color);
   cursor: pointer;
   scroll-margin-top: 8px;
@@ -184,6 +185,7 @@ provide('NODE_PROPS', props)
 :root[mode='print'] {
   .umo-node-view2[compname='comp-text'] {
     --umo-node-text-border-color: currentColor;
+    margin: 0;
     //--umo-node-text-border-color: red;
     &:after {
       content: '';
