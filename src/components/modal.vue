@@ -9,8 +9,8 @@
     v-bind="$attrs"
     :draggable="_draggable"
     :dialog-style="{
-      left: `${dialogLeft}px`,
-      top: `${dialogTop}px`,
+      // left: `${dialogLeft}px`,
+      // top: `${dialogTop}px`,
     }"
     @mousedown="startDrag"
   >

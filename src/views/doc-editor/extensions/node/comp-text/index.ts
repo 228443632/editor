@@ -76,6 +76,11 @@ export default Node.create({
 
       ...tiptapUtil.addAttributes(),
 
+      /** 组件名称 label */
+      compNameLabel: {
+        default: '',
+      },
+
       /** 占位 */
       placeholder: {
         default: '',

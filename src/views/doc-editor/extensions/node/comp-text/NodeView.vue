@@ -6,8 +6,8 @@
 <!--setup-->
 <script setup lang="ts">
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
-import { deepClone } from 'sf-utils2'
-// import NodeEdit from './components/NodeEdit.vue'
+import { deepClone, to } from 'sf-utils2'
+import NodeEdit from './components/NodeEdit.vue'
 
 import type { Editor } from '@tiptap/core'
 import { generateFieldName } from '@/views/doc-editor/utils/common-util'
@@ -27,7 +27,7 @@ const options = inject('options') as Ref<Record<string, any>>
 const { updateAttributes } = props
 /* 状态 */
 const rootRef = ref<InstanceType<typeof NodeViewWrapper>>()
-// const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
+const nodeEditRef = ref<InstanceType<typeof NodeEdit>>()
 const formData = ref({})
 const visible = reactive({
   dialog: false,
@@ -52,29 +52,23 @@ function onSelectNode() {
   visible.dialog = true
 }
 
+/**
+ * 确认
+ */
 async function onConfirm() {
-  // const [valid, err] = await to(nodeEditRef.value.formRef.validate())
-  // if (err || !valid)
-  //   return useMessage('error', { content: '请检查表单是否填写完整' })
-  // const cloneFormData = deepClone(formData.value)
-  // console.log('cloneFormData', cloneFormData)
-  // updateAttributes(cloneFormData)
-  // onClose()
+  console.log('nodeEditRef.value', nodeEditRef.value)
+  const [valid, err] = await to(nodeEditRef.value.formRef.validate())
+  if (err || !valid)
+    return useMessage('error', { content: '请检查表单是否填写完整' })
+  const cloneFormData = deepClone(formData.value)
+  console.log('cloneFormData', cloneFormData)
+  updateAttributes(cloneFormData)
+  onClose()
 }
 
 function onClose() {
   visible.dialog = false
   setBubbleMenuShow(true)
-}
-
-/**
- * 弹窗显隐
- * @param popupVisible
- */
-function onVisibleChange(popupVisible: boolean) {
-  if (!popupVisible) {
-    void onConfirm()
-  }
 }
 
 /**
@@ -95,15 +89,28 @@ const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
 /**
  * 根节点样式
  */
-const _rootStyle = computed(() => {
-  return _attributes.value.cssText || {}
+// const _rootStyle = computed(() => {
+//   return _attributes.value.cssText || {}
+// })
+
+/**
+ * 占位名称
+ */
+const _placeholder = computed(() => {
+  return props.node?.attrs?.placeholderAlias || props.node?.attrs?.placeholder
 })
 
 /* 监听 */
 
 /* 周期 */
 onMounted(() => {
-  // console.log('props', props, props.getPos(), props.updateAttributes)
+  nextTick(() => {
+    if (!props.node?.attrs?.compNameLabel) {
+      updateAttributes({
+        compNameLabel: props.node?.attrs?.placeholder,
+      })
+    }
+  })
 })
 
 /* 暴露 */
@@ -124,19 +131,21 @@ provide('NODE_PROPS', props)
       `umo-node-border--${node?.attrs?.borderType}`,
     ]"
     :data-id="_attributes['data-id']"
-    :data-placeholder="`【${node?.attrs?.placeholder}】`"
+    :data-placeholder="`【${_placeholder}】`"
     compname="comp-text"
     :bordertype="node?.attrs?.borderType"
     @click="onSelectNode"
   >
-    <text class="hidden">{{ _text }}</text>
-    <!--    <NodeEdit-->
-    <!--      ref="nodeEditRef"-->
-    <!--      v-model:visible="visible.dialog"-->
-    <!--      v-model:form-data="formData"-->
-    <!--      @visible-change="onVisibleChange"-->
-    <!--    ></NodeEdit>-->
-    <!--    &ZeroWidthSpace;-->
+    <span contenteditable="false">
+      <text class="hidden">{{ _text }}</text>
+      <NodeEdit
+        v-if="false"
+        ref="nodeEditRef"
+        v-model:visible="visible.dialog"
+        v-model:form-data="formData"
+        @confirm="onConfirm"
+      ></NodeEdit>
+    </span>
   </node-view-wrapper>
 </template>
 

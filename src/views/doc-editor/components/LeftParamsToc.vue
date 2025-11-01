@@ -257,7 +257,7 @@ defineExpose({
           size="14px"
         ></icon>
         <span class="flex flex-1 items-center ml-4px umo-toc-params__text">{{
-          item.node.attrs?.placeholder
+          item.node.attrs?.compNameLabel || item.node.attrs?.placeholder
         }}</span>
         <icon
           name="close-circle-filled"

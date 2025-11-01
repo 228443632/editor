@@ -210,6 +210,7 @@ const _tpFields = computed(() => {
                 'data-id': uid,
                 // fieldName: innerAttrs?.fieldName,
                 placeholder: cItem.label,
+                compNameLabel: cItem.label,
                 cssText,
                 ...(innerAttrs || {}),
                 uid,
@@ -592,7 +593,7 @@ defineExpose({
       color: #333;
       line-height: 22px;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 13px;
       position: sticky;
       top: -12px;
       z-index: 10;
