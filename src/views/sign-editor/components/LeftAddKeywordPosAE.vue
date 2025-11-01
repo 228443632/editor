@@ -71,7 +71,8 @@ const rules = {
  */
 const submit = async () => {
   const [valid] = await to(formRef.value.validate())
-  if (valid !== true)  return useMessage('error', { content: '请检查表单是否填写完整' })
+  if (valid !== true)
+    return useMessage('error', { content: '请检查表单是否填写完整' })
 
   const resultList = await __signContext__.value.pdfSearch(
     formData.value.keywords,
@@ -121,7 +122,9 @@ const submit = async () => {
 /* 监听 */
 
 /* 周期 */
-onMounted(() => {})
+onMounted(() => {
+  formData.value.compType = options.compType[0]?.key
+})
 
 /* 暴露 */
 defineExpose({

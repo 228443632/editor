@@ -8,6 +8,7 @@
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
 import NodeEdit from './components/NodeEdit.vue'
+import profile from '@/profile.ts'
 
 import type { Editor } from '@tiptap/core'
 import { generateFieldName } from '@/views/doc-editor/utils/common-util'
@@ -139,7 +140,7 @@ provide('NODE_PROPS', props)
     <span contenteditable="false">
       <text class="hidden">{{ _text }}</text>
       <NodeEdit
-        v-if="false"
+        v-if="['dev', 'localDev', 'localSit'].includes(profile.APP_MODE)"
         ref="nodeEditRef"
         v-model:visible="visible.dialog"
         v-model:form-data="formData"

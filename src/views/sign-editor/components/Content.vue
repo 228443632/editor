@@ -760,7 +760,7 @@ defineExpose({
           :visible-height="800"
           :container="() => __signContext__.contentElRef"
           size="small"
-          :offset="['300px', '48px']"
+          :offset="['218px', '40px']"
         />
       </template>
 

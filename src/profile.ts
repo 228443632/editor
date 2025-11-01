@@ -9,5 +9,9 @@
  */
 export const profile = {
   IS_DEV: process.env.NODE_ENV === 'development',
+  APP_MODE: undefined as 'dev' | 'prod' | 'test' | 'pre' | 'uat' | 'sits',
+  ...(window['$profile'] || {}),
 }
 export default profile
+
+window['$profile'] = profile

@@ -119,7 +119,7 @@
       :container="`${container} .umo-zoomable-container`"
       :visible-height="800"
       size="small"
-      :offset="['25px', '30px']"
+      :offset="[layoutSize.rightAsideWidth + 25 + 'px', '50px']"
     />
     <!-- 搜索 -->
     <container-search-replace />

@@ -58,7 +58,7 @@ const extensions: any[] = getDefaultExtensions({
   container,
   options,
   uploadFileMap,
-  layoutSize
+  layoutSize,
 })
 
 const editorInstance: Editor = new Editor({
