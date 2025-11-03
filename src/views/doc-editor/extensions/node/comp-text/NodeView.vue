@@ -160,29 +160,28 @@ provide('NODE_PROPS', props)
   min-height: 1em;
   text-align: left;
   text-indent: 0;
-  margin: 0 2.5px;
-  //border-bottom: 1px solid var(--umo-node-text-border-color);
+
+  //
+  margin: 0 0.5px;
+  //padding: 1px 0;
+  border: 2px solid @error-color;
+  background: #f7ff30;
+  //
+
   cursor: pointer;
   scroll-margin-top: 8px;
   &.umo-node-focused.umo-node-focused.umo-node-focused,
   &.ProseMirror-selectednode {
     @error-color: @primary-color;
-    outline: 2px solid @error-color !important;
+    outline: none !important;
+    border-color: @error-color !important;
+    background: rgba(@error-color, 0.2);
     &:after {
-      background: rgba(@error-color, 0.2);
       color: @error-color;
-      //box-shadow: 4px 4px 0px 2px rgba(@error-color, 0.15);
-      @apply: shadow-xl;
     }
   }
-  &:hover {
-    background-color: #f0f2f7;
-  }
   &:after {
-    //color: #9ba3b0;
     color: #000;
-    background: #f7ff30;
-    outline: 2px solid @error-color;
     content: attr(data-placeholder);
   }
 
@@ -195,7 +194,12 @@ provide('NODE_PROPS', props)
 :root[mode='print'] {
   .umo-node-view2[compname='comp-text'] {
     --umo-node-text-border-color: currentColor;
+    //
     margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    //
     //--umo-node-text-border-color: red;
     &:after {
       content: '';

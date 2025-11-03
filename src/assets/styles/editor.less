@@ -58,11 +58,12 @@
     float: left;
     caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
     font-family: var(--umo-font-family);
-    word-break: keep-all;
+    word-break: break-all;
 
     & > p {
       //white-space: pre-wrap;
-      word-break: keep-all;
+      font-family: var(--umo-font-family);
+      word-break: break-all;
       overflow-wrap: break-word;
       margin-bottom: var(--umo-content-node-bottom);
     }
@@ -224,7 +225,7 @@
     counter-reset: section;
     list-style-type: none;
     li {
-      word-break: keep-all;
+      word-break: break-all;
       list-style-type: none;
       padding: 0.25em 0;
       > p:before {

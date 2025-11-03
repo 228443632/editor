@@ -72,7 +72,7 @@ const defaultOptions: UmoEditorOptions = {
       alpha: 0.2,
       fontColor: '#000',
       fontSize: 16,
-      fontFamily: 'simsun',
+      fontFamily: 'SimSun',
       fontWeight: 'normal',
       text: '',
     },

@@ -6,7 +6,7 @@
     :select-value="
       isTypeRunning
         ? null
-        : editor?.getAttributes('textStyle').fontFamily || null
+        : editor?.getAttributes('textStyle').fontFamily || getDefaultFontFamily() || null
     "
     :style="{ width: $toolbar.mode !== 'classic' ? '144px' : '90px' }"
     filterable
@@ -78,6 +78,7 @@ const downloadFontMap = ref({
 })
 
 import { getTypewriterRunState } from '@/extensions/type-writer'
+// import { NotifyPlugin } from 'tdesign-vue-next'
 let isTypeRunning = $ref(false)
 watch(
   () => getTypewriterRunState(),
@@ -194,6 +195,28 @@ const setFontFamily = (fontFamily: string) => {
   }
   editor.value?.chain().focus().setFontFamily(fontFamily).run()
   getUsedFonts()
+  validateSupportFontFamily(fontFamily)
+}
+
+/**
+ * 验证字体是否支持
+ * @param fontFamily
+ */
+const validateSupportFontFamily = (fontFamily: string) => {
+  const children = allFonts.value.map((item) => item.children).flat(Infinity)
+  const currentFontItem = children.find((item) => item.value === fontFamily)
+  console.log('currentFontItem', currentFontItem, allFonts.value)
+  if (currentFontItem && !fontDetect(currentFontItem.value ?? '')) {
+    // NotifyPlugin('warning', {
+    //   title: '提示',
+    //   content: '当前可能正常显示该字体，可能是本机未安装该字体！',
+    // })
+    useMessage('warning', {
+      content: `当前可能正常显示该字体（${l(currentFontItem.label)}），可能是本机未安装该字体！`,
+    })
+    return false
+  }
+  return true
 }
 
 /**
@@ -224,6 +247,14 @@ const onDownLoadFont = async (item) => {
   // }
 }
 
+const getDefaultFontFamily = () => {
+  const dom = editor.value?.view?.dom as HTMLElement
+  if (!dom) return
+  const fontFamily = window.getComputedStyle(dom)?.fontFamily
+  // return window.getComputedStyle(dom)?.fontFamily
+  return fontFamily ? `"${fontFamily}"` : null
+}
+
 watch(
   () => editor.value,
   (val: any) => {
@@ -232,6 +263,10 @@ watch(
     }
   },
 )
+
+onMounted(() => {
+  validateSupportFontFamily('SimSun')
+})
 </script>
 
 <style lang="less">

@@ -6,7 +6,7 @@ export const defaultDicts = {
     },
     {
       label: { en_US: 'Songti', zh_CN: '宋体', ru_RU: 'Songti' },
-      value: 'simsun',
+      value: 'SimSun',
     },
     {
       label: { en_US: 'Heiti', zh_CN: '黑体', ru_RU: 'Heiti' },
