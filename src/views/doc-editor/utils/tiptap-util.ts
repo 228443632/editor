@@ -432,25 +432,18 @@ export const tiptapUtil = {
     }
 
     // 5. 处理字体大小（依赖 textStyle 标记）
-    if (cssText?.fontSize) {
+    if (cssText?.fontSize || cssText?.fontFamily || cssText?.color) {
       const textStyleMark = schema.marks.textStyle
+
       // 先清除原有 fontSize 属性，再添加新值
       tr.removeMark(from, to, textStyleMark).addMark(
         from,
         to,
         textStyleMark.create({
+          color: cssText.color,
           fontSize: cssText.fontSize,
+          fontFamily: cssText.fontFamily,
         }),
-      )
-    }
-
-    // 6. 处理文字颜色（依赖 textStyle 标记）
-    if (cssText?.color) {
-      const textStyleMark = schema.marks.textStyle
-      tr.removeMark(from, to, textStyleMark).addMark(
-        from,
-        to,
-        textStyleMark.create({ color: cssText.color }),
       )
     }
 
@@ -462,18 +455,6 @@ export const tiptapUtil = {
         to,
         highlightMark.create({
           color: cssText.backgroundColor,
-        }),
-      )
-    }
-
-    // 8. 处理字体（依赖 textStyle 标记）
-    if (cssText?.fontFamily) {
-      const textStyleMark = schema.marks.textStyle
-      tr.removeMark(from, to, textStyleMark).addMark(
-        from,
-        to,
-        textStyleMark.create({
-          fontFamily: cssText.fontFamily,
         }),
       )
     }

@@ -265,7 +265,7 @@ watch(
 )
 
 onMounted(() => {
-  validateSupportFontFamily('SimSun')
+  validateSupportFontFamily('SimHei')
 })
 </script>
 
