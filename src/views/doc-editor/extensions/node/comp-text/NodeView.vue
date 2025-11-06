@@ -137,16 +137,14 @@ provide('NODE_PROPS', props)
     :bordertype="node?.attrs?.borderType"
     @click="onSelectNode"
   >
-    <span contenteditable="false">
-      <text class="hidden">{{ _text }}</text>
-      <NodeEdit
-        v-if="['dev', 'localDev', 'localSit'].includes(profile.APP_MODE)"
-        ref="nodeEditRef"
-        v-model:visible="visible.dialog"
-        v-model:form-data="formData"
-        @confirm="onConfirm"
-      ></NodeEdit>
-    </span>
+    <text class="hidden">{{ _text }}</text>
+    <NodeEdit
+      v-if="['dev', 'localDev', 'localSit'].includes(profile.APP_MODE)"
+      ref="nodeEditRef"
+      v-model:visible="visible.dialog"
+      v-model:form-data="formData"
+      @confirm="onConfirm"
+    ></NodeEdit>
   </node-view-wrapper>
 </template>
 
