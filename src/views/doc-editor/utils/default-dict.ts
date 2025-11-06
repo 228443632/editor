@@ -7,12 +7,12 @@
 export const defaultDict = {
   fonts: [
     {
-      label: { en_US: 'Heiti', zh_CN: '黑体', ru_RU: 'Heiti' },
-      value: 'SimHei',
-    },
-    {
       label: { en_US: 'Songti', zh_CN: '宋体', ru_RU: 'Songti' },
       value: 'SimSun',
+    },
+    {
+      label: { en_US: 'Heiti', zh_CN: '黑体', ru_RU: 'Heiti' },
+      value: 'SimHei',
     },
     // {
     //   label: { en_US: 'XinSongti', zh_CN: '新宋体', ru_RU: 'XinSongti' },

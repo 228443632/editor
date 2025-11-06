@@ -347,7 +347,7 @@ function getPrintPageHtml(fillFieldData: object) {
           ${doc.body.innerHTML}
         </div>
       </div>
-      ${scriptListString}
+      ${isFrontPagination ? scriptListString : ''}
     </body>
     </html>
    `
