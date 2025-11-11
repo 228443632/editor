@@ -42,7 +42,7 @@ export const ExtensionPasteParams = Extension.create({
         const fragmentDom = new DOMParser().parseFromString(html, 'text/html')
         const walker = document.createTreeWalker(
           fragmentDom.body,
-          NodeFilter.SHOW_ELEMENT,
+          NodeFilter.SHOW_ALL,
           null,
         )
 
@@ -50,27 +50,40 @@ export const ExtensionPasteParams = Extension.create({
         // 遍历所有文本节点
         // @ts-expect-error
         while ((currentNode = walker.nextNode())) {
-          if (currentNode.getAttribute('data-id')) {
-            const compName = currentNode.getAttribute('compname')
-            if (compName) {
-              currentNode.setAttribute('data-id', simpleUUID())
+          switch (currentNode.nodeType) {
+            case Node.ELEMENT_NODE: {
+              // 元素节点
+              if (currentNode.getAttribute('data-id')) {
+                const compName = currentNode.getAttribute('compname')
+                if (compName) {
+                  currentNode.setAttribute('data-id', simpleUUID())
+                }
+              }
+              // 忽略空白文本节点
+              if (currentNode['style'].fontFamily) {
+                currentNode['style'].fontFamily = ''
+              }
+              if (currentNode.tagName === 'IMG') {
+                if (/^file:/.test(currentNode.getAttribute('src'))) {
+                  debounceUseMessage('error', {
+                    content:
+                      '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
+                  })
+                  currentNode.remove()
+                }
+              }
+              break
             }
-          }
-
-          // 忽略空白文本节点
-          if (currentNode['style'].fontFamily) {
-            currentNode['style'].fontFamily = ''
-          }
-          // currentNode['style'].color = 'red'
-
-          if (currentNode.tagName === 'IMG') {
-            if (/^file:/.test(currentNode.getAttribute('src'))) {
-              debounceUseMessage('error', {
-                content:
-                  '图片粘贴失败，请打开原图「复制」后粘贴，或用「插入图片」的方式',
-              })
-              currentNode.remove()
+            case Node.TEXT_NODE: {
+              // 文本节点
+              currentNode.textContent = currentNode.textContent.replace(
+                /\u00A0/g,
+                ' ',
+              )
+              break
             }
+            default:
+              break
           }
         }
 

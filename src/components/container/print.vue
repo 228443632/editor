@@ -256,7 +256,7 @@ function getPrintPageHtml(fillFieldData: object) {
   // 8、移除注释节点
   const walker = document.createTreeWalker(
     doc.documentElement,
-    NodeFilter.SHOW_COMMENT,
+    NodeFilter.SHOW_ALL,
     null,
   )
 
@@ -264,8 +264,26 @@ function getPrintPageHtml(fillFieldData: object) {
   // 遍历所有文本节点
   // @ts-expect-error
   while ((currentNode = walker.nextNode())) {
-    if (currentNode.nodeType == Node.COMMENT_NODE) {
-      currentNode.remove()
+    switch (currentNode.nodeType) {
+      case Node.ELEMENT_NODE: {
+        break
+      }
+      case Node.TEXT_NODE: {
+        // 文本节点
+        currentNode.textContent = currentNode.textContent.replace(
+          /\u00A0/g,
+          ' ',
+        )
+        break
+      }
+      case Node.COMMENT_NODE: {
+        currentNode.remove()
+        break
+      }
+      default: {
+        // 其他节点
+        break
+      }
     }
   }
 
@@ -280,7 +298,9 @@ function getPrintPageHtml(fillFieldData: object) {
   }
 
   // 10 移除选中的样式
-  const selectNodeList = doc.querySelectorAll('.ProseMirror-selectednode, .umo-node-focused')
+  const selectNodeList = doc.querySelectorAll(
+    '.ProseMirror-selectednode, .umo-node-focused',
+  )
   if (selectNodeList?.length) {
     selectNodeList.forEach((selectNode) => {
       selectNode.classList.remove('ProseMirror-selectednode')
@@ -491,7 +511,7 @@ defineExpose({
    * 获取
    */
   getPrintPageHtml,
-  getTemplateHtml: getPrintPageHtml
+  getTemplateHtml: getPrintPageHtml,
 })
 </script>
 
