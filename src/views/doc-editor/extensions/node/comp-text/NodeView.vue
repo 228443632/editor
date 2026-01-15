@@ -172,29 +172,27 @@ provide('NODE_PROPS', props)
   >
     <text class="hidden">{{ _text }}</text>
 
-    <!--  内容预览 分案订单-图片  -->
+    <!--  纯内容预览 分案订单-图片  -->
     <template v-if="_serverRenderComp">
-      <server-component
+      <view
         v-if="
           _serverRenderComp ==
           $enums.serverRenderComponent.ORDER_PARTY_B_SERVICE_PAYABLE.key
         "
-        :dataset-compid="
-          $enums.serverRenderComponent.ORDER_PARTY_B_SERVICE_PAYABLE.key
-        "
+        class="no-print"
       >
         <OrderPartyBServicePayable></OrderPartyBServicePayable>
-      </server-component>
+      </view>
 
-      <server-component
-        v-if="
+      <view
+        v-else-if="
           _serverRenderComp ==
           $enums.serverRenderComponent.ORDER_SUBJECT_CLAIM.key
         "
-        :dataset-compid="$enums.serverRenderComponent.ORDER_SUBJECT_CLAIM.key"
+        class="no-print"
       >
         <OrderSubjectClaim></OrderSubjectClaim>
-      </server-component>
+      </view>
     </template>
 
     <t-image-viewer
@@ -262,8 +260,6 @@ provide('NODE_PROPS', props)
     padding: 0;
     border: none;
     background: transparent;
-    //
-    //--umo-node-text-border-color: red;
     &:after {
       content: '';
       background: transparent;
@@ -271,10 +267,6 @@ provide('NODE_PROPS', props)
     }
     &[bordertype='none'] {
       border-bottom: none;
-    }
-
-    server-component > * {
-      display: none !important;
     }
   }
 }

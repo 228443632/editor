@@ -359,7 +359,8 @@ function getPrintPageHtml(fillFieldData: object, printOptions?: IPrintOptions) {
         img {
           page-break-inside: avoid;
         }
-        [mode='print'] span text.hidden, [compname="comp-text"] text.hidden {
+        [mode='print'] span text.hidden,
+        [mode='print'] [compname="comp-text"] text.hidden {
           display: inline;
         }
         [mode='print'] .no-print {
