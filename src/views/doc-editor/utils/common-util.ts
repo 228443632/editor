@@ -8,6 +8,7 @@ import type { ITreeItem } from '@/types/tree'
 import { isArray, isNullable, isNullableString, isObject } from 'sf-utils2'
 import { isString } from '@tool-belt/type-predicates'
 import { camelCase, merge } from 'sf-utils2'
+import numeral from 'numeral'
 
 /**
  * 生成UUId
@@ -303,3 +304,18 @@ export const camelCasePlainObject = function (object) {
  * }
  */
 export const mergeAttrs = (...args) => camelCasePlainObject(merge({}, ...args))
+
+
+/**
+ * 格式化金钱
+ * @param {string} money
+ * @param {string} format
+ * @return {*|string}
+ */
+export function formatMoney(money, format = '0,00.00') {
+  return (money || 0) === 0
+    ? '0.00'
+    : money
+      ? numeral(money).format(format)
+      : ''
+}

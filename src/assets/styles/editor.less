@@ -11,6 +11,23 @@
   }
 }
 
+table {
+  print-color-adjust: exact; /* 标准属性，兼容更多浏览器 */
+}
+
+/** 换行*/
+.break-new-page {
+  page-break-after: always;
+}
+
+.umo-node--paragraph {
+  // 是段落，隐藏换行符
+  & + span.ProseMirror-widget.ProseMirror-widget {
+    //  + .ProseMirror-trailingBreak + br.ProseMirror-trailingBreak
+    display: none!important;
+  }
+}
+
 .umo-editor-content {
   accent-color: var(--umo-primary-color);
   &.show-line-number {
@@ -59,6 +76,14 @@
     caret-color: var(--umo-primary-color); /* 设置光标颜色为绿色 */
     font-family: var(--umo-font-family);
     word-break: break-all;
+
+    p {
+      min-height: 1em;
+      &:empty {
+        display: none!important;
+      }
+    }
+
 
     & > p {
       //white-space: pre-wrap;
@@ -296,7 +321,7 @@
     margin-left: auto;
     margin-right: auto;
     tr {
-      page-break-inside: avoid;
+      //page-break-inside: avoid;
       page-break-after: auto;
     }
 

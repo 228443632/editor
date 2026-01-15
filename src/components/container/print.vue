@@ -16,6 +16,11 @@ const iframeRef = ref<HTMLIFrameElement>()
 const iframeCode = ref('')
 const isShowIframe = ref(false)
 
+interface IPrintOptions {
+  /** 打印模式 */
+  mode: 'preview' | 'print'
+}
+
 /**
  * 获取svg html
  */
@@ -116,9 +121,11 @@ const defaultLineHeight = computed(
 /**
  * 获取html代码，用于打印
  * @param fillFieldData
+ * @param printOptions
  */
-function getPrintPageHtml(fillFieldData: object) {
+function getPrintPageHtml(fillFieldData: object, printOptions?: IPrintOptions) {
   const { orientation, size, margin, background } = page.value
+  const mode = printOptions?.mode ?? 'print'
 
   console.log('page@', margin.top)
 
@@ -182,26 +189,27 @@ function getPrintPageHtml(fillFieldData: object) {
   }
 
   // 4、删除所有不可见字符
-  const spanCharacterList = Array.from(
-    doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
-  ) as unknown as HTMLHtmlElement[]
-  if (spanCharacterList) {
-    spanCharacterList.forEach((item) => {
-      item.remove()
-    })
-    spanCharacterList.length = 0
-  }
+  // const spanCharacterList = Array.from(
+  //   doc.querySelectorAll('span.Tiptap-invisible-character--paragraph'),
+  // ) as unknown as HTMLHtmlElement[]
+  // if (spanCharacterList) {
+  //   spanCharacterList.forEach((item) => {
+  //     item.remove()
+  //   })
+  //   spanCharacterList.length = 0
+  // }
 
   // 删除所有换行节点
-  // const brBreakList = Array.from(
-  //   doc.querySelectorAll('br.ProseMirror-trailingBreak'),
-  // )
-  // if (brBreakList) {
-  //   brBreakList.forEach((item) => {
-  //     item.classList.remove('ProseMirror-trailingBreak')
-  //   })
-  //   brBreakList.length = 0
-  // }
+  const brBreakList = Array.from(
+    doc.querySelectorAll('br.ProseMirror-trailingBreak'),
+  )
+  if (brBreakList) {
+    brBreakList.forEach((item) => {
+      // item.classList.remove('ProseMirror-trailingBreak')
+      item.remove()
+    })
+    brBreakList.length = 0
+  }
 
   // 5、是否存在分页，分页处理逻辑
   const isFrontPagination =
@@ -266,6 +274,10 @@ function getPrintPageHtml(fillFieldData: object) {
   while ((currentNode = walker.nextNode())) {
     switch (currentNode.nodeType) {
       case Node.ELEMENT_NODE: {
+        // if (currentNode.tagName == 'TD') {
+        //   const children = currentNode.children
+        //
+        // }
         break
       }
       case Node.TEXT_NODE: {
@@ -310,7 +322,7 @@ function getPrintPageHtml(fillFieldData: object) {
 
   return `
     <!DOCTYPE html>
-    <html lang="zh-CN" theme-mode="${options.value.theme}" mode="print">
+    <html lang="zh-CN" theme-mode="${options.value.theme}" mode="${mode}">
     <head>
       <title></title>
       <meta charset="UTF-8">
@@ -344,19 +356,19 @@ function getPrintPageHtml(fillFieldData: object) {
           padding-bottom: 0;
           page-break-after: avoid;
         }
-        tr, td, img {
+        img {
           page-break-inside: avoid;
         }
-        ${styleListString}
-      </style>
-      <style>
-        [mode='print'] span text.hidden {
+        [mode='print'] span text.hidden, [compname="comp-text"] text.hidden {
           display: inline;
         }
-
         [mode='print'] .no-print {
           display: none;
         }
+        * {
+          -webkit-print-color-adjust: exact;
+        }
+        ${styleListString}
       </style>
     </head>
     <body class="is-print preview">
@@ -371,6 +383,82 @@ function getPrintPageHtml(fillFieldData: object) {
     </body>
     </html>
    `
+}
+
+function adjustTableLine() {
+  // 1122 - 96 - 96
+  // 930 + 96 = 1026
+
+  // 794 - 96 - 96 =
+
+  const page = {
+    height: 1123,
+    width: 794,
+    pl: 120,
+    pt: 96,
+    getSafeBottom(pageNum) {
+      return page.height - page.pt + (pageNum - 1) * page.height
+    },
+
+    getSafePageByHeight(height) {
+      const pageNum = Math.floor(
+        (height - (page.height - page.pt)) / page.height + 1,
+      )
+      return Math.max(pageNum, 1)
+    },
+  }
+
+  const style = document.createElement('style')
+  style.innerHTML = `
+  .break-line-manul {
+    /*width: 554px;*/
+    margin: 0 auto;
+    position: absolute;
+    height: 1px;
+    background: #000;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .table-split-line-wrap {
+    height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+`
+  document.body.appendChild(style)
+
+  const tables = document.querySelectorAll('table')
+  console.log(tables)
+  const absoluteTableSplitLineWrapDOM = document.createElement('div')
+  absoluteTableSplitLineWrapDOM.classList.add('.table-split-line-wrap')
+  document.body.appendChild(absoluteTableSplitLineWrapDOM)
+
+  tables.forEach((table) => {
+    const rect = table.getBoundingClientRect()
+    const bottom = rect.bottom
+    console.log('bottom', bottom)
+
+    console.log(page.getSafePageByHeight(bottom))
+
+    const tablePageNum = page.getSafePageByHeight(bottom)
+    for (let i = 1; i <= tablePageNum; i++) {
+      const safeBottom = page.getSafeBottom(i)
+
+      const breakLine1 = document.createElement('div')
+      breakLine1.classList.add('break-line-manul')
+      breakLine1.style.top = safeBottom + 'px'
+      breakLine1.style.width = rect.width + 'px'
+      absoluteTableSplitLineWrapDOM.append(breakLine1)
+
+      const breakLine2 = document.createElement('div')
+      breakLine2.classList.add('break-line-manul')
+      breakLine2.style.top = safeBottom + 2 + 'px'
+      breakLine2.style.width = rect.width + 'px'
+      absoluteTableSplitLineWrapDOM.append(breakLine2)
+    }
+  })
 }
 
 /**
@@ -466,11 +554,12 @@ function printScript() {
 /**
  * 获取打印代码
  * @param fillFieldData
+ * @param printOptions
  */
-const printPage = async (fillFieldData = {}) => {
+const printPage = async (fillFieldData = {}, printOptions?: IPrintOptions) => {
   editor.value?.commands.blur()
   await nextTick()
-  iframeCode.value = getPrintPageHtml(fillFieldData)
+  iframeCode.value = getPrintPageHtml(fillFieldData, printOptions)
   isShowIframe.value = true
   await nextTick()
   iframeRef.value.onload = () => {

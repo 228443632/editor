@@ -23,6 +23,7 @@ import Print from '@/components/container/print.vue'
 import { blobToBase64, fileToBase64 } from 'file64'
 import profile from '@/profile'
 import template01 from './template/template01.html?raw'
+// import { imgMap, loadImgToBase64 } from '@/views/doc-editor/extensions/node/comp-text/utils.ts'
 
 // import type { Editor } from '@tiptap/core'
 // import { type EditorView } from 'prosemirror-view'
@@ -299,16 +300,37 @@ watch(umoEditorRef, () => {
   // }
 
   if (!isInIframe()) {
+    window.requestAnimationFrame(async () => {
+      const targetUrl = '/lowcode-tp-editor/template/division-order-tp.scheme.txt'
+      const [res] = await to(fetch(targetUrl))
+      if (res.ok) {
+        const content = await res.text()
+        editorRef.value?.chain().setContent(content, true).focus().run()
+      }
+    })
+
     rightTpFields.value = [
       {
         label: '文本',
         children: [
           {
-            label: '身份证',
+            label: '应支付乙方的委托服务报酬',
             value: 'compText',
+            attrs: {
+              serverRenderComp: 'orderPartyBServicePayable',
+              fieldName: 'orderPartyBServicePayable',
+            },
           },
-          ...Array.from({ length: 20 }).map((_, index) => ({
-            label: '身份证' + index,
+          {
+            label: '标的债权',
+            value: 'compText',
+            attrs: {
+              serverRenderComp: 'orderSubjectClaim',
+              fieldName: 'orderSubjectClaim',
+            },
+          },
+          ...Array.from({ length: 2 }).map((_, index) => ({
+            label: `身份证${index}`,
             value: 'compText',
           })),
         ],
@@ -335,6 +357,9 @@ watch(umoEditorRef, () => {
 
 console.log('编辑器【options】', options)
 const testEditorFunc = testEditor(window.editor)
+
+// 加载图片
+// loadImgToBase64()
 
 window['pageDocEditor'] = {
   editorRef,

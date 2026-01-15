@@ -152,7 +152,8 @@
     "vue-i18n": "10.0.0",
     "vue-router": "4.3.3",
     "y-prosemirror": "1.2.15",
-    "y-protocols": "1.0.6"
+    "y-protocols": "1.0.6",
+    "numeral": "2.0.6"
   },
   "devDependencies": {
     "@codemirror/autocomplete": "6.18.1",
@@ -205,7 +206,6 @@
     "less-loader": "12.2.0",
     "lint-staged": "15.2.10",
     "mx-private-utils": "1.0.11",
-    "numeral": "2.0.6",
     "postcss": "8.3.3",
     "postcss-html": "1.7.0",
     "prettier": "3.3.3",

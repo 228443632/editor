@@ -192,6 +192,7 @@ const _tpFields = computed(() => {
       if (Array.isArray(item.children)) {
         item.children = item.children.map((cItem) => {
           const innerAttrs = cItem.attrs
+          console.log('innerAttrs', cItem, innerAttrs)
           return {
             uid: item.uid,
             label: cItem.label,
@@ -433,6 +434,7 @@ watchEffect(() => {
 
 /* 周期 */
 onMounted(() => {
+  // 加载图片到base64
   const target = ref<HTMLHtmlElement>(editor.value.view.dom)
 
   useEventListener(target, 'dragover', dragMethod.dragover)

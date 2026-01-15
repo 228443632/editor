@@ -1,5 +1,5 @@
 <!--
- * @Description:
+ * @Description: ding
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 22/04/25 PM3:37
  -->
@@ -8,10 +8,17 @@
 import { nodeViewProps, NodeViewWrapper } from '@tiptap/vue-3'
 import { deepClone, to } from 'sf-utils2'
 import NodeEdit from './components/NodeEdit.vue'
-import profile from '@/profile.ts'
+// import profile from '@/profile.ts'
 
 import type { Editor } from '@tiptap/core'
 import { generateFieldName } from '@/views/doc-editor/utils/common-util'
+// import { imgMap } from '@/views/doc-editor/extensions/node/comp-text/utils.ts'
+
+// 订单-应支付乙方的委托服务报酬
+import OrderPartyBServicePayable from './components/order/PartyBServicePayable.vue'
+// 订单- 新增委托处置债权(标的债权)
+import OrderSubjectClaim from './components/order/SubjectClaim.vue'
+import { $enums } from '@/utils/enums.ts'
 
 const { proxy } = getCurrentInstance()
 
@@ -33,6 +40,9 @@ const formData = ref({})
 const visible = reactive({
   dialog: false,
 })
+// const { width: rootWidth, height: rootHeight } = useElementBounding(rootRef)
+const previewImgSrc = ref() // 当前预览的图片地址
+const previewImgVisible = ref(false) // 图片预览是否可见
 
 /* 方法 */
 
@@ -81,6 +91,14 @@ function setBubbleMenuShow(isShow = true) {
   options.value.document.enableBubbleMenu = isShow
 }
 
+/**
+ * 图片预览
+ */
+function onPreviewImg(src: string) {
+  previewImgSrc.value = src
+  previewImgVisible.value = true
+}
+
 /* 计算 */
 
 const _attributes = computed(() => props.node?.attrs)
@@ -93,6 +111,20 @@ const _text = computed(() => generateFieldName(props.node?.attrs?.fieldName))
 // const _rootStyle = computed(() => {
 //   return _attributes.value.cssText || {}
 // })
+
+/**
+ * 服务端渲染组件名
+ */
+const _serverRenderComp = computed(() => {
+  return props.node?.attrs?.serverRenderComp
+})
+
+/**
+ * 根节点标签
+ */
+const _wrapperTag = computed(() => {
+  return _serverRenderComp.value ? 'div' : 'span'
+})
 
 /**
  * 占位名称
@@ -126,10 +158,11 @@ provide('NODE_PROPS', props)
 <template>
   <node-view-wrapper
     ref="rootRef"
-    as="span"
+    :as="_wrapperTag"
     :class="[
       `is-inline-block umo-node-view2`,
       `umo-node-border--${node?.attrs?.borderType}`,
+      _serverRenderComp && '!flex items-center flex-col umo-node--paragraph',
     ]"
     :data-id="_attributes['data-id']"
     :data-placeholder="`【${_placeholder}】`"
@@ -138,8 +171,41 @@ provide('NODE_PROPS', props)
     @click="onSelectNode"
   >
     <text class="hidden">{{ _text }}</text>
+
+    <!--  内容预览 分案订单-图片  -->
+    <template v-if="_serverRenderComp">
+      <server-component
+        v-if="
+          _serverRenderComp ==
+          $enums.serverRenderComponent.ORDER_PARTY_B_SERVICE_PAYABLE.key
+        "
+        :dataset-compid="
+          $enums.serverRenderComponent.ORDER_PARTY_B_SERVICE_PAYABLE.key
+        "
+      >
+        <OrderPartyBServicePayable></OrderPartyBServicePayable>
+      </server-component>
+
+      <server-component
+        v-if="
+          _serverRenderComp ==
+          $enums.serverRenderComponent.ORDER_SUBJECT_CLAIM.key
+        "
+        :dataset-compid="$enums.serverRenderComponent.ORDER_SUBJECT_CLAIM.key"
+      >
+        <OrderSubjectClaim></OrderSubjectClaim>
+      </server-component>
+    </template>
+
+    <t-image-viewer
+      v-model:visible="previewImgVisible"
+      :images="[previewImgSrc]"
+      :z-index="10000"
+    ></t-image-viewer>
+
+    <!--    v-if="['dev', 'localDev', 'localSit'].includes(profile.APP_MODE)"-->
     <NodeEdit
-      v-if="['dev', 'localDev', 'localSit'].includes(profile.APP_MODE)"
+      v-if="false"
       ref="nodeEditRef"
       v-model:visible="visible.dialog"
       v-model:form-data="formData"
@@ -154,12 +220,11 @@ provide('NODE_PROPS', props)
 .umo-node-view2[compname='comp-text'] {
   position: relative;
   box-sizing: border-box;
-  min-width: 140px;
+  min-width: 84px;
   min-height: 1em;
   text-align: left;
   text-indent: 0;
 
-  //
   margin: 0 0.5px;
   //padding: 1px 0;
   border: 2px solid @error-color;
@@ -206,6 +271,10 @@ provide('NODE_PROPS', props)
     }
     &[bordertype='none'] {
       border-bottom: none;
+    }
+
+    server-component > * {
+      display: none !important;
     }
   }
 }

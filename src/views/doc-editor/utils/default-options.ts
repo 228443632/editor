@@ -41,7 +41,7 @@ export const defaultOptions = {
     },
     defaultOrientation: 'portrait',
     defaultBackground: '#fff',
-    showBreakMarks: true,
+    showBreakMarks: true, // 是否显示换行
     showBookmark: true,
     showToc: true,
     showRightSlot: false, // 是否展示右侧

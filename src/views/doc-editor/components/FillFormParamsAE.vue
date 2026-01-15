@@ -51,7 +51,7 @@ function onPreview() {
     fillFieldData = eval(`(${formData.value.configValue})`)
   } catch (e) {
     useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
-    return
+    // return
   }
   console.log(`s`, fillFieldData)
   __printRef__.value.printPage(fillFieldData)
@@ -66,9 +66,9 @@ function onDownHasFillHtml() {
     fillFieldData = eval(`(${formData.value.configValue})`)
   } catch (e) {
     useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
-    return
+    // return
   }
-  const html = __printRef__.value.getPrintPageHtml(fillFieldData)
+  const html = __printRef__.value.getPrintPageHtml()
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -80,7 +80,9 @@ function onDownHasFillHtml() {
  * 导出html
  */
 function onDownNoFillHtml() {
-  const html = __printRef__.value.getPrintPageHtml()
+  const html = __printRef__.value
+    .getPrintPageHtml()
+    .replace('mode="print"', 'mode="preview"')
   const blob = new Blob([html], {
     type: 'text/html;charset=utf-8',
   })
@@ -147,9 +149,11 @@ defineExpose({
       <div class="flex items-center justify-end">
         <t-button theme="default" @click="onClose">取消</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
-        <t-button theme="primary" @click="onDownHasFillHtml">导出已填充html</t-button>
+        <t-button theme="primary" @click="onDownHasFillHtml"
+          >导出真实html</t-button
+        >
         <t-button theme="primary" @click="onDownNoFillHtml"
-          >导出未填充html</t-button
+          >导出预览html</t-button
         >
       </div>
     </template>

@@ -76,6 +76,11 @@ export default Node.create({
 
       ...tiptapUtil.addAttributes(),
 
+      /** 服务渲染组件 */
+      serverRenderComp: {
+        default: undefined,
+      },
+
       /** 组件名称 label */
       compNameLabel: {
         default: '',
