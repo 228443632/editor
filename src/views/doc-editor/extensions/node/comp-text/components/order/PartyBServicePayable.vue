@@ -68,10 +68,7 @@ const rootRef = ref()
 const rootStyle = ref()
 const isInCell = ref(false)
 
-// 需要合并的列
-const needMergeCellKeys = ['prjName']
-
-console.log('props.compData', props.compData)
+// console.log('props.compData', props.compData)
 
 const _columns = computed(() => {
   const columns = deepClone(props.compData?.columns || [])
@@ -94,17 +91,47 @@ const _columns = computed(() => {
 
 const _dataList = computed(() => {
   const dataList = deepClone(props.compData?.data || [])
-  return dataList.map((item) => {
+  const result = []
+  dataList.forEach((item) => {
     item.children = item.commissionPlanList
+    if (Array.isArray(item.children)) {
+      item.children.forEach((child, childIndex) => {
+        const tempRow = {
+          prjName: item.prjName,
+          ...child,
+        }
+        if (childIndex === 0) {
+          tempRow.prjNameColspan = 1
+          tempRow.prjNameRowspan = item.children?.length
+        }
+        result.push(tempRow)
+      })
+    }
     return item
   })
+  return result
 })
 
 function getColRowspan({ row, rowIndex, col, colIndex }) {
   // if (colIndex == 0) {
   //   return row.list?.length || 1
   // }
-  return 1
+  if (col.prop == 'prjName') {
+    if (row.prjNameColspan) {
+      return {
+        colspan: row.prjNameColspan,
+        rowspan: row.prjNameRowspan,
+      }
+    }
+    return {
+      colspan: 0,
+      rowspan: 0,
+    }
+  }
+  return {
+    colspan: 1,
+    rowspan: 1,
+  }
 }
 
 onMounted(() => {
@@ -190,7 +217,7 @@ defineExpose({
             :key="colIndex"
             :class="[`align-${col.align}`]"
           >
-            {{ col.label }}
+            <div>{{ col.label }}</div>
           </td>
         </tr>
         <tr
@@ -202,31 +229,18 @@ defineExpose({
             rowIndex == _dataList.length - 1 && 'is-last',
           ]"
         >
-          <td
-            v-for="(col, colIndex) in _columns"
-            :key="col.prop"
-            :class="[`align-${col.align}`]"
-            :colspan="1"
-            :rowspan="getColRowspan({ row, rowIndex, col, colIndex })"
-          >
-            <template
-              v-if="
-                row.children?.length && !needMergeCellKeys.includes(col.prop)
+          <template v-for="(col, colIndex) in _columns" :key="col.prop">
+            <td
+              v-if="getColRowspan({ row, rowIndex, col, colIndex })?.rowspan"
+              :class="[`align-${col.align}`]"
+              :colspan="1"
+              :rowspan="
+                getColRowspan({ row, rowIndex, col, colIndex })?.rowspan
               "
             >
-              <div
-                v-for="(childItem, childIndex) in row.children"
-                :key="childIndex"
-                class="cell-div"
-              >
-                {{ childItem[col.prop] ?? '-' }}
-              </div>
-            </template>
-
-            <template v-else>
-              {{ row[col.prop] ?? '-' }}
-            </template>
-          </td>
+              <div>{{ row[col.prop] ?? '-' }}</div>
+            </td>
+          </template>
         </tr>
       </tbody>
     </table>

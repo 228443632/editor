@@ -109,6 +109,42 @@ function prepareEchartsForPrint(htmlContent: string) {
 }
 
 /**
+ * 判断 DOM 元素是否为块级元素（基于最终生效的 display 属性）
+ * @param {HTMLElement} element - 要判断的 DOM 元素
+ * @returns {boolean} - true=块级，false=非块级
+ */
+function isBlockElement(element: HTMLElement) {
+  // 边界校验：确保传入的是有效 DOM 元素
+  if (!element || !(element instanceof HTMLElement)) {
+    throw new Error('参数必须是有效的 HTMLElement')
+  }
+
+  // 获取元素最终生效的 CSS 样式（computed style）
+  const computedStyle = window.getComputedStyle(element)
+  const displayValue = computedStyle.display
+
+  // 所有属于“块级布局”的 display 值列表（覆盖常见场景）
+  const blockDisplayValues = new Set([
+    'block', // 标准块级（div/p/h1 等默认值）
+    'flex', // Flex 容器（块级 flex）
+    'grid', // Grid 容器（块级 grid）
+    'table', // 表格（整体是块级）
+    'list-item', // 列表项（li 默认值）
+    'block-flow', // 新布局模式（块级流）
+    'table-row-group',
+    'table-header-group',
+    'table-footer-group',
+    'table-column-group',
+    'table-cell',
+    'table-caption', // 表格相关块级
+  ])
+
+  // 特殊处理：display: inline-block 是“行内块”，是否算块级可按需调整
+  // 若需要把 inline-block 归为块级，可添加到 blockDisplayValues 中
+  return blockDisplayValues.has(displayValue)
+}
+
+/**
  * 默认lineHeight
  */
 const defaultLineHeight = computed(
@@ -276,8 +312,29 @@ function getPrintPageHtml(fillFieldData: object, printOptions?: IPrintOptions) {
       case Node.ELEMENT_NODE: {
         // if (currentNode.tagName == 'TD') {
         //   const children = currentNode.children
-        //
         // }
+
+        if (isBlockElement(currentNode)) {
+          // 是块级元素
+          const nextElement = currentNode.nextElementSibling as HTMLElement
+          if (
+            nextElement &&
+            nextElement?.nodeName == 'BR' &&
+            nextElement.classList.contains('ProseMirror-trailingBreak')
+          ) {
+            nextElement.remove()
+          }
+
+          const nextElement2 = currentNode.nextElementSibling
+            ?.nextElementSibling as HTMLElement
+          if (
+            nextElement2 &&
+            nextElement2?.nodeName == 'BR' &&
+            nextElement2.classList.contains('ProseMirror-trailingBreak')
+          ) {
+            nextElement2.remove()
+          }
+        }
         break
       }
       case Node.TEXT_NODE: {
