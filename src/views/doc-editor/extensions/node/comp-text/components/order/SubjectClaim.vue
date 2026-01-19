@@ -17,16 +17,16 @@ const props = defineProps({
     default: () => {
       return {
         columns: [
-          { label: '批次号', prop: 'batchNo', width: null, align: 'center' },
+          { label: '批次号', prop: 'batchNo', width: 170, align: 'center' },
           {
             label: '债务人数量',
             prop: 'debtorNum',
-            width: null,
+            width: 90,
             align: 'center',
           },
-          { label: '债券笔数', prop: 'bondNum', width: null, align: 'center' },
+          { label: '债权笔数', prop: 'bondNum', width: 90, align: 'center' },
           {
-            label: '债券金额',
+            label: '债权金额',
             prop: 'bondAmount',
             width: null,
             align: 'center',

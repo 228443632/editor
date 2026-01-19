@@ -116,7 +116,7 @@ function prepareEchartsForPrint(htmlContent: string) {
 function isBlockElement(element: HTMLElement) {
   // 边界校验：确保传入的是有效 DOM 元素
   if (!element || !(element instanceof HTMLElement)) {
-    throw new Error('参数必须是有效的 HTMLElement')
+    return false
   }
 
   // 获取元素最终生效的 CSS 样式（computed style）
