@@ -26,7 +26,7 @@ const props = defineProps({
           },
           { label: '债权笔数', prop: 'bondNum', width: 90, align: 'center' },
           {
-            label: '债权金额',
+            label: '债权本金',
             prop: 'bondAmount',
             width: null,
             align: 'center',
