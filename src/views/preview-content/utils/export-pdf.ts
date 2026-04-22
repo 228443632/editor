@@ -4,11 +4,119 @@
  * @create 06/10/25 PM3:13
  */
 import dayjs from 'dayjs'
-// import { PDFDocument } from 'pdf-lib'
+import { saveAs } from 'file-saver'
+import { chunk } from 'sf-utils2'
+import { snapdom } from '@zumer/snapdom'
+
+export async function exportPDFPuppeteer(
+  pagesDomList: HTMLElement[],
+  filename?: string,
+) {
+  const a4Width = 210 // A4宽度(mm)
+  const a4Height = 297 // A4高度(mm)
+  const margin = 0 // 页边距(mm)
+  const concurrency = 4
+  const highScale = Math.max(window.devicePixelRatio || 1, 2) // 至少2倍，推荐4倍
+
+  console.time('开始')
+
+  // 1. 并发生成所有页面的图片
+  const imageDoms = await Promise.all(
+    chunk(pagesDomList, concurrency).map(async (chunkItem) => {
+      return await Promise.all(
+        chunkItem.map(async (pageDom) => {
+          // 确保当前页元素可见（避免隐藏元素渲染异常）
+          pageDom.style.width = `${a4Width - margin * 2}mm` // 匹配A4宽度
+          const svg = await snapdom.toSvg(pageDom, {
+            dpr: window.devicePixelRatio,
+          })
+          return svg
+        }),
+      )
+    }),
+  ).then((chunkItem) => chunkItem.flat())
+
+  console.timeEnd('开始')
+
+  const doc = document.createElement('html')
+  const body = document.createElement('body')
+  doc.appendChild(body)
+  imageDoms.forEach((dom, index) => {
+    // const img = document.createElement('img')
+    // img.style.width = `${a4Width}mm`
+    // img.style.height = `${a4Height}mm`
+    // img.src = imageDataUrl
+    // console.log('imageDataUrl', dom)
+    body.appendChild(dom)
+  })
+
+  // 通过fetch调用远程接口传入html内容并下载
+  try {
+    const response = await fetch(
+      'http://localhost:3000/tools/htmlStringToPdf',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          html: doc.outerHTML,
+        }),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    const pdfBlob = await response.blob()
+    saveAs(
+      pdfBlob,
+      filename || `低码合同测试_${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.pdf`,
+    )
+  } catch (error) {
+    console.error('PDF导出失败:', error)
+    // 如果远程接口调用失败，回退到本地HTML保存方式
+    const blob = new Blob([doc.outerHTML], {
+      type: 'text/html;charset=utf-8',
+    })
+    saveAs(blob, `低码合同测试.html`)
+  }
+  // const blob = new Blob([doc.outerHTML], {
+  //   type: 'text/html;charset=utf-8',
+  // })
+  // saveAs(blob, `低码合同测试.html`)
+
+  // const body = document.createElement('body')
+
+  // const doc = document.createElement('html')
+  // const head = document.createElement('head')
+  // doc.appendChild(head)
+  // doc.appendChild(body)
+
+  // const parentElement = pagesDomList[0]?.parentElement as HTMLElement
+  // body.appendChild(parentElement.cloneNode(true))
+
+  //   const styles = document.querySelectorAll('style')
+  // // const styleSheets = document.styleSheets
+  // styles.forEach(style => {
+  //   const clone = style.cloneNode(true)
+  //   head.appendChild(clone)
+  // })
+
+  // console.log('doc', doc.outerHTML)
+
+  // const blob = new Blob([doc.outerHTML], {
+  //   type: 'text/html;charset=utf-8',
+  // })
+  // saveAs(blob, `低码合同测试.html`)
+}
+
 /**
  * 导出pdf
  * @param pagesDomList
  * @param filename
+ * @param concurrency 控制并发数量，默认为CPU核心数
  */
 export async function exportPDFWorker(
   pagesDomList: HTMLElement[],
@@ -22,9 +130,13 @@ export async function exportPDFWorker(
   const a4Width = 210 // A4宽度(mm)
   const a4Height = 297 // A4高度(mm)
   const margin = 0 // 页边距(mm)
-  const pdf = new jsPDF('p', 'mm', 'a4')
-  const scale = Math.max(window.devicePixelRatio || 1) // 确保最低2倍缩放
-  const { default: modernScreenshot } = await import('modern-screenshot')
+  const pdf = new jsPDF({
+    compress: true,
+    orientation: 'p',
+    unit: 'mm', // 与图片单位一致，减少尺寸转换计算
+    format: 'A4',
+  })
+  console.time('开始')
   // 2. 循环处理每个页面，单独生成图片并添加到PDF
   for (let i = 0; i < pagesDomList.length; i++) {
     const pageDom = pagesDomList[i]
@@ -32,13 +144,11 @@ export async function exportPDFWorker(
     pageDom.style.width = `${a4Width - margin * 2}mm` // 匹配A4宽度
 
     // 3. 为当前页生成高清图片（单独渲染）
-    const dataUrl = await modernScreenshot.domToPng(pageDom, {
-      type: 'image/png', // 优先用PNG保证文字清晰度
-      quality: 1, // 高质量参数（PNG接近无损）
-      scale, // 应用设备像素比缩放
-      workerNumber: navigator.hardwareConcurrency || 2, // 利用CPU核心数
-      backgroundColor: '#ffffff',
-      debug: false, // 生产环境关闭调试
+    const jpg = await snapdom.toJpg(pageDom, {
+      dpr: window.devicePixelRatio * 2,
+      debug: true,
+      fast: true,
+      quality: 0.8,
     })
 
     // 4. 计算当前页尺寸映射（px → mm）
@@ -53,14 +163,14 @@ export async function exportPDFWorker(
 
     // 6. 精准添加当前页到PDF（位置居中对齐）
     pdf.addImage(
-      dataUrl,
+      jpg,
       'PNG', // 明确指定格式
       0, // x坐标（左对齐，留边距）
       0, // y坐标（上对齐，留边距）
       a4Width, // 宽度严格匹配A4
       a4Height, // 高度自适应当前页内容
       undefined,
-      'MEDIUM', // 快速渲染模式（保证质量的同时提升速度）
+      'FAST', // 快速渲染模式（保证质量的同时提升速度）
     )
   }
   pdf.save(filename || `${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.pdf`)

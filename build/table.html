@@ -1,65 +1,107 @@
-<!--
- * @Description:
- * @Author 卞鹏飞 <228443632@qq.com>
- * @create 29/07/25 PM8:25
- -->
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Title</title>
-    <style>
-      table {
-        table-layout: fixed;
-        width: 100%;
-        border-collapse: collapse;
-        tr {
-          td,
-          th {
-            border: 1px solid #333;
-          }
-        }
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>A4 分页展示（仿 Word 高还原度）</title>
+  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+  <style>
+    /* 全局样式 */
+    body {
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    /* 核心：Paged.js 分页配置（仿 Word A4） */
+    @page {
+      size: A4 portrait; /* A4 纵向 */
+      margin: 2cm;       /* 页边距 */
+
+      /* 页眉（仿 Word 页眉） */
+      @top-left {
+        content: "文档标题";
+        font-size: 10pt;
+        color: #666;
       }
 
-      .contents {
-        display: contents;
+      /* 页码（仿 Word 页脚页码） */
+      @bottom-center {
+        content: "第 " counter(page) " 页，共 " counter(pages) " 页";
+        font-size: 10pt;
+        color: #666;
       }
-    </style>
-  </head>
-  <body>
-    <table>
-      <tbody>
-        <tr>
-          <th scope="row">Donuts</th>
-          <td>3,000</td>
-        </tr>
-        <tr>
-          <th scope="row">Stationery</th>
-          <td>18,000</td>
-        </tr>
-      </tbody>
-    </table>
-  </body>
+    }
+
+    /* A4 页面样式（Paged.js 自动生成） */
+    .pagedjs_page {
+      background: white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin: 10px auto;
+    }
+
+    /* 模拟 Word 文本样式 */
+    #content p {
+      margin: 1em 0;
+      line-height: 1.5;
+      font-size: 12pt;
+    }
+
+    #content h1 {
+      font-size: 16pt;
+      margin: 2em 0 1em;
+    }
+
+    /* 跨页保护：表格/图片不截断 */
+    #content table, #content img {
+      page-break-inside: avoid;
+    }
+
+    /* 手动分页符（可选） */
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+<!-- 要分页的 HTML 内容（任意长度，无需手动拆分） -->
+<div id="content">
+  <h1>复杂富文本文档标题</h1>
+  <p>这是第一段内容，Paged.js 会自动计算长度，超出 A4 高度的部分自动分到下一页。Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+  <!-- 超长文本示例（模拟 Word 多页内容） -->
+  <p id="long-text"></p>
+
+  <table>
+    <tr><th>表头1</th><th>表头2</th><th>表头3</th></tr>
+    <!-- 模拟长表格 -->
+    <tbody id="long-table"></tbody>
+  </table>
+
+  <p>表格下方的内容，会自动适配分页...</p>
+</div>
 
 <script>
-  const string = ` <table>
-      <tbody2>
-        <tr>
-          <th scope="row">Donuts</th>
-          <td>3,000</td>
-        </tr>
-        <tr>
-          <th scope="row">Stationery</th>
-          <td>18,000</td>
-        </tr>
-      </tbody>
-    </table>`
+  // 生成超长文本（测试分页效果）
+  const longText = document.getElementById('long-text');
+  let text = '';
+  for (let i = 0; i < 50; i++) {
+    text += `第 ${i+1} 段：Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. `;
+  }
+  longText.textContent = text;
 
-  // const fragment = document.createRange().createContextualFragment(string)
+  // 生成长表格（测试跨页）
+  const longTable = document.getElementById('long-table');
+  for (let i = 0; i < 30; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>表格内容 ${i+1}</td><td>表格内容 ${i+1}</td><td>表格内容 ${i+1}</td>`;
+    longTable.appendChild(tr);
+  }
 
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(string, 'text/html')
-  console.log('fragment', doc)
-
+  // 初始化 Paged.js（自动分页）
+  window.addEventListener('DOMContentLoaded', async () => {
+    const paged = new PagedJS.PagedProcessor();
+    await paged.render(document.getElementById('content'));
+    console.log('分页完成，总页数：', paged.document.pages.length);
+  });
 </script>
+</body>
 </html>

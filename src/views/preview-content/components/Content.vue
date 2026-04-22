@@ -137,8 +137,19 @@ const resetPageIntersectionObserver = () => {
   pageRefs.value.forEach((element: HTMLDivElement) => {
     pageIntersectionObserver.observe(element)
   })
+  // @ts-expect-error
+  rafThrottleUpdatePageVisibility([{ isIntersecting: true }])
 }
 const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
+  // (n - 1) * 12 + height * n
+
+  // n * 12 + n * height - 12 = totalHeight
+  // => n = (totalHeight + 12) / (height + 12)
+  const totalHeight = document.body.offsetHeight
+  const visibleMaxPages = Math.ceil(
+    (totalHeight + 12) / (pageItemHeight.value + 12),
+  )
+
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
       const index = pageRefs.value.indexOf(entry.target)
@@ -147,18 +158,27 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
       if (props.model == 'preview') {
         // 虚拟滚动显示
         const willLoadPageNumMap = { [pageNum]: true }
-        const prevPageNum = pageNum - 1
-        if (prevPageNum > 0) willLoadPageNumMap[prevPageNum] = true
-        const prevPageNum2 = pageNum - 2
-        if (prevPageNum2 > 0) willLoadPageNumMap[prevPageNum2] = true
 
-        const nextPageNum = pageNum + 1
-        if (nextPageNum <= _pageNumsList.value.length)
-          willLoadPageNumMap[nextPageNum] = true
+        for (let i = 1; i <= visibleMaxPages; i++) {
+          const prevPageNum = pageNum - i
+          if (prevPageNum > 0) willLoadPageNumMap[prevPageNum] = true
+          const nextPageNum = pageNum + i
+          if (nextPageNum <= _pageNumsList.value.length)
+            willLoadPageNumMap[nextPageNum] = true
+        }
 
-        const nextPageNum2 = pageNum + 2
-        if (nextPageNum2 <= _pageNumsList.value.length)
-          willLoadPageNumMap[nextPageNum2] = true
+        // const prevPageNum = pageNum - 1
+        // if (prevPageNum > 0) willLoadPageNumMap[prevPageNum] = true
+        // const prevPageNum2 = pageNum - 2
+        // if (prevPageNum2 > 0) willLoadPageNumMap[prevPageNum2] = true
+
+        // const nextPageNum = pageNum + 1
+        // if (nextPageNum <= _pageNumsList.value.length)
+        //   willLoadPageNumMap[nextPageNum] = true
+
+        // const nextPageNum2 = pageNum + 2
+        // if (nextPageNum2 <= _pageNumsList.value.length)
+        //   willLoadPageNumMap[nextPageNum2] = true
 
         pageVisibility.value = willLoadPageNumMap
         // console.log('pageNum', pageNum)

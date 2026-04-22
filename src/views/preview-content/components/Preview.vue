@@ -6,12 +6,12 @@
 <!--setup-->
 <script setup lang="ts">
 import Content from './Content.vue'
-import { div, noop } from 'sf-utils2'
+import { noop } from 'sf-utils2'
 // import paramsCompList from './mock.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 // import { saveAs } from 'file-saver'
-import { exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
+import { exportPDFPuppeteer, exportPDFWorker } from '@/views/preview-content/utils/export-pdf.ts'
 import type { useSearchPDF } from '@/views/sign-editor/hooks/use-search-pdf.ts'
 import { useVuePdfEmbed } from 'vue-pdf-embed'
 // import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
