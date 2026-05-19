@@ -15,9 +15,12 @@ import { generateFieldName } from '@/views/doc-editor/utils/common-util'
 // import { imgMap } from '@/views/doc-editor/extensions/node/comp-text/utils.ts'
 
 // 订单-应支付乙方的委托服务报酬
-import OrderPartyBServicePayable from './components/order/PartyBServicePayable.vue'
+import OrderPartyBServicePayable from './components/order/v1/PartyBServicePayable.vue'
 // 订单- 新增委托处置债权(标的债权)
-import OrderSubjectClaim from './components/order/SubjectClaim.vue'
+import OrderSubjectClaim from './components/order/v1/SubjectClaim.vue'
+// 订单- 留案债权
+import OrderRetentionClaim from './components/order/v1/SubjectClaim.vue'
+import PreviewWatermarkWrap from './components/PreviewWatermarkWrap.vue'
 import { $enums } from '@/utils/enums.ts'
 
 const { proxy } = getCurrentInstance()
@@ -181,7 +184,23 @@ provide('NODE_PROPS', props)
         "
         class="no-print"
       >
-        <OrderPartyBServicePayable></OrderPartyBServicePayable>
+        <PreviewWatermarkWrap>
+          <OrderPartyBServicePayable></OrderPartyBServicePayable>
+        </PreviewWatermarkWrap>
+      </view>
+
+
+      <!-- 留案债权 -->
+      <view
+        v-if="
+          _serverRenderComp ==
+          $enums.serverRenderComponent.RETENTION_CLAIM.key
+        "
+        class="no-print"
+      >
+        <PreviewWatermarkWrap>
+          <OrderRetentionClaim></OrderRetentionClaim>
+        </PreviewWatermarkWrap>
       </view>
 
       <view
@@ -191,7 +210,9 @@ provide('NODE_PROPS', props)
         "
         class="no-print"
       >
-        <OrderSubjectClaim></OrderSubjectClaim>
+        <PreviewWatermarkWrap>
+          <OrderSubjectClaim></OrderSubjectClaim>
+        </PreviewWatermarkWrap>
       </view>
     </template>
 

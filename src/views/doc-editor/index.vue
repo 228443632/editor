@@ -12,7 +12,7 @@ import LeftParamsToc from './components/LeftParamsToc.vue'
 import { defaultOptions } from './utils/default-options'
 import { shallowMergeWithArrayOverride } from '@/views/doc-editor/utils/object-util'
 import extensions from './extensions'
-import { debounce, hasOwn, to, deepMerge } from 'sf-utils2'
+import { debounce, hasOwn, to, deepMerge, parseJsonNoError } from 'sf-utils2'
 import type { Editor } from '@tiptap/vue-3'
 import { testEditor } from '@/views/doc-editor/utils/test'
 import { useZIndexManage } from '@/views/doc-editor/hooks/use-z-index-manage'
@@ -318,7 +318,7 @@ watch(umoEditorRef, () => {
             value: 'compText',
             attrs: {
               serverRenderComp: 'orderPartyBServicePayable',
-              fieldName: 'orderPartyBServicePayable',
+              fieldName: 'cf_commission_plan.orderPartyBServicePayable',
             },
           },
           {
@@ -326,7 +326,15 @@ watch(umoEditorRef, () => {
             value: 'compText',
             attrs: {
               serverRenderComp: 'orderSubjectClaim',
-              fieldName: 'orderSubjectClaim',
+              fieldName: 'cf_outsourcing_batch.orderSubjectClaim',
+            },
+          },
+          {
+            label: '留案债权',
+            value: 'compText',
+            attrs: {
+              serverRenderComp: 'orderRetentionClaim',
+              fieldName: 'cf_outsourcing_batch.orderRetentionClaim',
             },
           },
           ...Array.from({ length: 2 }).map((_, index) => ({

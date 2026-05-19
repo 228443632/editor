@@ -6,7 +6,7 @@
 <!--setup-->
 <script setup lang="ts">
 // import {useVModel} from '@vueuse/core'
-// import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
+import JSEditor from './codemirror-editor/JSEditor.vue' // CodeMirror编辑器
 import type { TableProps, TableRowData } from 'tdesign-vue-next'
 import type Print from '@/components/container/print.vue'
 import { saveAs } from 'file-saver'
@@ -34,6 +34,9 @@ const tableInfo = ref<TableProps>({
   size: 'small',
   data: [] as TableRowData,
 })
+const sourceCopyText = ref()
+const { copy } = useClipboard({ legacy: true, source: sourceCopyText})
+const editor = inject('editor')
 
 /* 方法 */
 
@@ -89,6 +92,33 @@ function onDownNoFillHtml() {
   const filename = '低码合同模版测试'
   saveAs(blob, `${filename}.html`)
 }
+
+/**
+ * 复制真实html
+ */
+function onCopyHasFillHtml() {
+  let fillFieldData = {}
+  try {
+    fillFieldData = eval(`(${formData.value.configValue})`)
+  } catch (e) {
+    useMessage('error', { content: '解析表单填充数据失败，请检查自己填写内容' })
+    // return
+  }
+  const html = __printRef__.value.getPrintPageHtml()
+  sourceCopyText.value = html
+  copy()
+  useMessage('success', { content: '复制成功' })
+}
+
+/**
+ * 复制真实scheme
+ */
+function onCopyHasFillScheme() {
+  sourceCopyText.value = editor.value.getHTML()
+  copy()
+  useMessage('success', { content: '复制成功' })
+}
+
 /* 计算 */
 
 /* 监听 */
@@ -138,16 +168,18 @@ defineExpose({
         required-mark
         :rules="[{ required: true, message: '必填', type: 'error' }]"
       >
-        <!--        <JSEditor-->
-        <!--          v-model="formData.configValue"-->
-        <!--          class="h-60 border-1 border-solid border-[var(&#45;&#45;td-component-border)] w-full overflow-hidden pr-3"-->
-        <!--        ></JSEditor>-->
+        <JSEditor
+          v-model="formData.configValue"
+          class="h-60 border-1 border-solid border-[var(--td-component-border)] w-full overflow-hidden pr-3"
+        ></JSEditor>
       </t-form-item>
     </t-form>
 
     <template #footer>
       <div class="flex items-center justify-end">
         <t-button theme="default" @click="onClose">取消</t-button>
+        <t-button theme="primary" @click="onCopyHasFillScheme">复制真实scheme</t-button>
+        <t-button theme="primary" @click="onCopyHasFillHtml">复制真实HTML</t-button>
         <t-button theme="primary" @click="onPreview">预览PDF</t-button>
         <t-button theme="primary" @click="onDownHasFillHtml"
           >导出真实html</t-button

@@ -20,6 +20,11 @@ export const $enums = {
       'orderSubjectClaim',
       '订单-新增委托处置债权(标的债权)',
     ),
+    /** 订单-留案债权 */
+    RETENTION_CLAIM: enumsWrap(
+      'orderRetentionClaim',
+      '订单-留案债权',
+    ),
   },
 } as const
 

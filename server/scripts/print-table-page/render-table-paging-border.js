@@ -20,7 +20,7 @@ export const renderTablePagingBorder = () => {
     // });
 
     // getPaperSize()
-    const a4 = getPaperSize('A4');
+    const a4 = getPaperSize('A4')
 
     const page = {
       // height: 1123,
@@ -37,129 +37,220 @@ export const renderTablePagingBorder = () => {
       contentWidth: Math.ceil(a4._basePx.w - a4._basePx.pl * 2),
 
       getSafeBottom(pageNum) {
-        return page.height - page.pt + (pageNum - 1) * page.height;
+        return page.height - page.pt + (pageNum - 1) * page.height
       },
 
       getSafePageByHeight(height) {
-        const pageNum = Math.floor((height - (page.height - page.pt)) / page.height + 1);
-        return Math.max(pageNum, 1);
+        const pageNum = Math.floor(
+          (height - (page.height - page.pt)) / page.height + 1,
+        )
+        return Math.max(pageNum, 1)
       },
-    };
+    }
 
     // const header = document.querySelector('.umo-page-node-header')
     // header.remove()
 
-    const tableList = [...new Set(Array.from(document.querySelectorAll('table:not(table table)')))];
-    const nestTableList = [...new Set(Array.from(document.querySelectorAll('table table')))];
-    console.log('tableList', tableList);
+    const tableList = [
+      ...new Set(
+        Array.from(document.querySelectorAll('table:not(table table)')),
+      ),
+    ]
+    const nestTableList = [
+      ...new Set(Array.from(document.querySelectorAll('table table'))),
+    ]
+    console.log('tableList', tableList)
 
     nestTableList.forEach((table) => {
-      table.__isNested = true;
-      tableList.push(table);
-    });
+      table.__isNested = true
+      tableList.push(table)
+    })
 
     // 最底 排在后面
     tableList.sort((a, b) => {
-      const aRect = a.getBoundingClientRect();
-      const bRect = b.getBoundingClientRect();
-      return aRect.bottom - bRect.bottom;
-    });
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
+      return aRect.bottom - bRect.bottom
+    })
 
     // const lastTable = tableList.at(-1)
     // tableList.length = 0
     // tableList[0] = lastTable
-    const totalPageObj = {};
+    const totalPageObj = {}
 
     // 最底 排在后面
     tableList.sort((a, b) => {
-      const aRect = a.getBoundingClientRect();
-      const bRect = b.getBoundingClientRect();
-      return aRect.bottom - bRect.bottom;
-    });
+      const aRect = a.getBoundingClientRect()
+      const bRect = b.getBoundingClientRect()
+      return aRect.bottom - bRect.bottom
+    })
 
     // const lastTable = tableList.at(-1)
     // tableList.length = 0
     // tableList[0] = lastTable
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
 
     tableList.forEach((table) => {
-      if (!table.clientHeight) return;
+      if (!table.clientHeight) return
+
 
       // 是内嵌的
-      let diffHeight = 0;
-      let isOverEnd = false; // 是否到底
-      let pageNum = 0; // 当前页码
+      let diffHeight = 0
+      let isOverEnd = false // 是否到底
+      let pageNum = 0 // 当前页码
 
-      const rows = Array.from(table.rows);
+      const rows = Array.from(table.rows)
 
-      const pageDiffHeight = {};
+      const rowsMore = [...rows]
+
+      if (table.__isNested) {
+        const container = table.closest('td > p, td > div')
+        if (container) {
+          console.log('container', container)
+          // diffHeight += container.offsetHeight - table.offsetHeight
+          console.log('diffHeight22', diffHeight, container.offsetHeight, table.offsetHeight)
+          // rowsMore.push(...Array.from(td.children))
+        }
+      }
+
+      console.log('rowsMore', rowsMore)
+
+      const pageDiffHeight = {}
 
       while (!isOverEnd) {
-        pageNum++;
+        pageNum++
 
         if (pageNum > 100) {
-          break;
+          break
         }
         if (isOverEnd) {
-          break;
+          break
         }
-        totalPageObj[pageNum] = true;
+        totalPageObj[pageNum] = true
 
-        const pageBottom = getPageBottom(pageNum);
+        const pageBottom = getPageBottom(pageNum)
 
-        rows.forEach((row, rowIndex) => {
-          const trRect = row.getBoundingClientRect();
-          const trTop = trRect.top + diffHeight;
-          const trBottom = trRect.bottom + diffHeight;
+        rowsMore.forEach((row, rowIndex) => {
+          const trRect = row.getBoundingClientRect()
+          const trTop = trRect.top + diffHeight
+          const trBottom = trRect.bottom + diffHeight
 
-          if (pageBottom > trTop && pageBottom < trBottom && page.contentHeight > trRect.height) {
+          if (
+            pageBottom > trTop &&
+            pageBottom < trBottom &&
+            page.contentHeight > trRect.height
+          ) {
             // diffHeight += pageBottom - prevTrRect.bottom + (table.__isNested ? -1 : 1);
-            pageDiffHeight[pageNum] = pageBottom - trTop + 2;
-            diffHeight += +pageDiffHeight[pageNum];
+            pageDiffHeight[pageNum] = pageBottom - trTop
+            diffHeight += +pageDiffHeight[pageNum]
             // console.log('diffHeight', pageNum, diffHeight, pageDiffHeight[pageNum], pageDiffHeight[pageNum - 1])
           }
 
           if (rowIndex == rows.length - 1) {
             // 最后一个
             if (pageBottom >= trBottom) {
-              isOverEnd = true;
+              isOverEnd = true
             }
           }
-        });
+        })
+
+        let originDiffHeight = 0
+        for (let i = 1; i <= pageNum; i++) {
+          originDiffHeight += pageDiffHeight[i] || 0
+        }
+
+        console.log('originDiffHeight', {
+          pageNum, originDiffHeight
+        })
+
+        rows.forEach((row, rowIndex) => {
+          const cells = Array.from(row.cells)
+
+          cells.forEach((cell) => {
+            const rowSpan = cell.rowSpan
+            if (rowSpan > 1) {
+              const styleComputed = window.getComputedStyle(cell)
+              if (
+                cell.children?.length == 1 &&
+                styleComputed.verticalAlign == 'middle' &&
+                cell.children[0]?.clientHeight < cell.clientHeight
+              ) {
+                const tdRect = cell.getBoundingClientRect()
+                const tdTop = tdRect.top + originDiffHeight
+                const tdBottom = tdRect.bottom + originDiffHeight
+                if (
+                  pageBottom > tdTop &&
+                  pageBottom < tdBottom &&
+                  page.contentHeight > tdRect.height
+                ) {
+                  const child = cell.children[0]
+                  const cellPaddingY =
+                    parseInt(styleComputed.paddingTop) +
+                    parseInt(styleComputed.paddingBottom)
+                  const childHeight = cell.clientHeight - cellPaddingY
+
+                  cell.style.verticalAlign = 'top'
+                  console.log('pageDiffHeight[pageNum]', {
+                    childHeight,
+                  })
+
+                  cell.style.background = 'blue'
+                  // 设置垂直居中
+                  const childRect = child.getBoundingClientRect()
+
+                  console.log('page', {
+                    pageNum: pageNum,
+                    height: pageBottom - childRect.bottom,
+                  })
+
+                  child.classList.add('cell-flex-center')
+
+                  const childStyle = window.getComputedStyle(child)
+
+                  if (childStyle.textAlign == 'center') {
+                    child.style.justifyContent = 'center'
+                  }
+                }
+              }
+            }
+          })
+        })
       }
 
       if (diffHeight > 0) {
         /**
          * @type {HTMLTableRowElement}
          */
-        const lastRow = rows.at(-1);
-        const trTmp = document.createElement('tr');
-        trTmp.style.height = `${diffHeight}px`;
-        trTmp.style.border = 'none';
-        trTmp.style.marginTop = '-1px';
-        lastRow.insertAdjacentElement('afterend', trTmp);
+        const lastRow = rows.at(-1)
+        const trTmp = document.createElement('tr')
+        trTmp.style.height = `${diffHeight}px`
+        trTmp.style.border = 'none'
+        trTmp.style.marginTop = '-1px'
+        lastRow.insertAdjacentElement('afterend', trTmp)
 
         if (!table.__isNested) {
-          trTmp.classList.add('tr-no-nested-001');
+          trTmp.classList.add('tr-no-nested-001')
         }
+
+        console.log('totalHeight', diffHeight)
       }
 
       // 非嵌套添加
-      const tHead = table.tHead;
+      const tHead = table.tHead
       if (!table.__isNested && !tHead) {
-        const tHead = document.createElement('thead');
-        tHead.innerHTML = '<tr style="height: 1px;"></tr>';
-        table.insertAdjacentElement('afterbegin', tHead);
+        const tHead = document.createElement('thead')
+        tHead.innerHTML = '<tr style="height: 1px;"></tr>'
+        table.insertAdjacentElement('afterbegin', tHead)
       }
 
-      const tfoot = table.tFoot;
+      const tfoot = table.tFoot
       if (!tfoot) {
-        const tfoot = document.createElement('tfoot');
-        tfoot.innerHTML = `<tr style="height: 2px; margin-top: -2px;"></tr>`;
-        table.insertAdjacentElement('beforeend', tfoot);
+        const tfoot = document.createElement('tfoot')
+        tfoot.innerHTML = `<tr style="height: 2px; margin-top: -2px;"></tr>`
+        table.insertAdjacentElement('beforeend', tfoot)
       }
-    });
+    })
 
     // 修复表格被截断fix
     // const compTextDomList = document.querySelectorAll(`[compname="comp-text"]`)
@@ -176,26 +267,26 @@ export const renderTablePagingBorder = () => {
     // })
 
     function getPageBottom(pageNum) {
-      return pageNum * page.contentHeight + page.pt;
+      return pageNum * page.contentHeight + page.pt
     }
     function getPageTop(pageNum) {
-      console.log('page.contentHeight', page.contentHeight);
-      return getPageBottom(pageNum) - page.contentHeight;
+      console.log('page.contentHeight', page.contentHeight)
+      return getPageBottom(pageNum) - page.contentHeight
     }
     // const totalPageNum = Math.max(...Object.keys(totalPageObj).map((pageNum) => +pageNum))
 
     // 删除所有 tr-no-nested-001
-    const trList = document.querySelectorAll('.tr-no-nested-001');
-    trList.forEach((tr) => tr.remove());
+    const trList = document.querySelectorAll('.tr-no-nested-001')
+    trList.forEach((tr) => tr.remove())
   }
-  load();
+  load()
 
   /**
    * 获取纸张尺寸
    * @param {String} type 可选值：A4、A5、A6
    */
   function getPaperSize(type) {
-    type ||= 'A4';
+    type ||= 'A4'
 
     const cssUtil = {
       /**
@@ -203,20 +294,20 @@ export const renderTablePagingBorder = () => {
        * @returns {*[]}
        */
       getDpi() {
-        const result = [];
+        const result = []
         if (window.screen['deviceXDPI'] != undefined) {
-          result[0] = window.screen['deviceXDPI'];
-          result[1] = window.screen['deviceYDPI'];
+          result[0] = window.screen['deviceXDPI']
+          result[1] = window.screen['deviceYDPI']
         } else {
-          const tmpNode = document.createElement('div');
+          const tmpNode = document.createElement('div')
           tmpNode.style.cssText =
-            'width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden';
-          document.body.appendChild(tmpNode);
-          result[0] = parseInt(`${tmpNode.offsetWidth}`);
-          result[1] = parseInt(`${tmpNode.offsetHeight}`);
-          tmpNode.parentNode.removeChild(tmpNode);
+            'width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden'
+          document.body.appendChild(tmpNode)
+          result[0] = parseInt(`${tmpNode.offsetWidth}`)
+          result[1] = parseInt(`${tmpNode.offsetHeight}`)
+          tmpNode.parentNode.removeChild(tmpNode)
         }
-        return result;
+        return result
       },
 
       /**
@@ -224,9 +315,9 @@ export const renderTablePagingBorder = () => {
        * @param mm 单位是毫米
        */
       mmToPx(mm) {
-        const DPI = cssUtil.getDpi();
-        if (typeof mm === 'string') mm = parseFloat(mm);
-        return +mm * (DPI[0] / 25.4);
+        const DPI = cssUtil.getDpi()
+        if (typeof mm === 'string') mm = parseFloat(mm)
+        return +mm * (DPI[0] / 25.4)
       },
 
       /**
@@ -234,11 +325,11 @@ export const renderTablePagingBorder = () => {
        * @param px
        */
       pxToMm(px) {
-        const DPI = cssUtil.getDpi()[0];
-        if (typeof px === 'string') px = parseFloat(px);
-        return (+px * 25.4) / DPI;
+        const DPI = cssUtil.getDpi()[0]
+        if (typeof px === 'string') px = parseFloat(px)
+        return (+px * 25.4) / DPI
       },
-    };
+    }
 
     const sizeConf = {
       A4: {
@@ -283,20 +374,62 @@ export const renderTablePagingBorder = () => {
         hh: 6.6, // 页眉
         fh: 14, // 页脚
       },
-    };
-    const size = sizeConf[type];
+    }
+    const size = sizeConf[type]
     // 1px= 0.75pt
     return {
       _base: size,
       _basePx: Object.entries(size).reduce((pre, [key, value]) => {
-        pre[key] = cssUtil.mmToPx(value);
-        return pre;
+        pre[key] = cssUtil.mmToPx(value)
+        return pre
       }, {}),
-    };
+    }
   }
-};
+}
 
+// TODO
+const theads = document.querySelectorAll('thead')
+theads.forEach((thead) => {
+  thead.remove()
+})
 
+const tfoots = document.querySelectorAll('tfoot')
+tfoots.forEach((tfoot) => {
+  tfoot.remove()
+})
+
+const trs = document.querySelectorAll('.tr-auto-fill-001')
+trs.forEach((tr) => tr.remove())
 
 // css
 
+const style = document.createElement('style')
+style.textContent = `
+tfoot {
+  position: relative;
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: blue;
+  }
+}
+
+td:has( > .cell-flex-center) {
+  position: relative;
+}
+.cell-flex-center {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+}
+`
+document.head.insertAdjacentElement('beforeend', style)

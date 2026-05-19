@@ -46,6 +46,7 @@ export const COMP_PARAMS_NAME_MAP = {
   groupAbsPos: 'groupAbsPos',
   /** 关键字定位分组 */
   groupKeywords: 'groupKeywords',
+  compInvisibleBlock: 'compInvisibleBlock',
 } as const
 
 /**

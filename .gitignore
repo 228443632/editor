@@ -46,3 +46,5 @@ Thumbs.db
 umo-editor-pure.js
 
 lowcode-tp-editor
+/server/scripts/template.html
+/server/scripts/output.html
