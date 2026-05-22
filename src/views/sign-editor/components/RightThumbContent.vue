@@ -88,7 +88,8 @@ const pageScrollIntoView = (pageNum: number) => {
     if (isWheeling.value) return
     pageDom.scrollIntoView({
       // behavior: 'smooth', // instant
-      block: 'start',
+      block: 'nearest',
+      // inline: 'start',
     })
   }
 }

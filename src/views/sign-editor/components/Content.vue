@@ -383,7 +383,8 @@ const scrollIntoViewByParamsComp = (paramsComp: IParamsCompItem | string) => {
     if (target) {
       target.scrollIntoView({
         // behavior: 'smooth',
-        block: 'start',
+        block: 'nearest',
+        // inline: 'start',
         // inline: 'center',
       })
     }
@@ -597,7 +598,11 @@ watch(__activePageNum__, (newVal: number) => {
   const idx = +newVal - 1
   const pageDom = pageRefs.value[idx]
   if (pageDom) {
-    pageDom.scrollIntoView()
+    pageDom.scrollIntoView({
+      block: 'nearest',
+      // behavior: 'smooth',
+      // inline: 'start',
+    })
   }
 })
 

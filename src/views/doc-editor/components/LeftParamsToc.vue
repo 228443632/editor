@@ -158,7 +158,6 @@ function onChooseItem(item: { node: Node; pos: number }) {
         floatDom.scrollIntoView({
           block: 'nearest',
           behavior: 'smooth',
-          inline: 'start',
         })
         return
       }
@@ -167,7 +166,6 @@ function onChooseItem(item: { node: Node; pos: number }) {
     dom.scrollIntoView({
       block: 'nearest',
       behavior: 'smooth',
-      inline: 'start',
     })
   }
 }
@@ -208,7 +206,6 @@ watch(_nodeActiveNodeId, () => {
       activeNodeDom.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
-        inline: 'start',
       })
   })
 })

@@ -222,7 +222,7 @@ const headingActive = (value: any) => {
   // })
 
   nodeElement.scrollIntoView({
-    block: 'start',
+    block: 'nearest',
     behavior: 'smooth',
   })
 
