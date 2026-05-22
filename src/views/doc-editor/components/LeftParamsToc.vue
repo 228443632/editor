@@ -155,12 +155,20 @@ function onChooseItem(item: { node: Node; pos: number }) {
       // 如果是悬浮的
       const floatDom = dom.querySelector(`.${FLOAT_REAL_CONTENT_CLASS_NAME}`)
       if (floatDom) {
-        floatDom.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        floatDom.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+          inline: 'start',
+        })
         return
       }
     }
 
-    dom.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    dom.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth',
+      inline: 'start',
+    })
   }
 }
 
@@ -199,6 +207,8 @@ watch(_nodeActiveNodeId, () => {
     if (activeNodeDom)
       activeNodeDom.scrollIntoView({
         behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
       })
   })
 })
