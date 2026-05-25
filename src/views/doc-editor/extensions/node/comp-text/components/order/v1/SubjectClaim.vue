@@ -40,16 +40,10 @@ const props = defineProps({
             bondAmount: formatMoney(90004481.86),
           },
           {
-            assetType: '信用开',
+            assetType: '信用卡',
             debtorNum: 6459,
             bondNum: 6459,
             bondAmount: formatMoney(90007556.11),
-          },
-          {
-            assetType: '个人消费',
-            debtorNum: 4257,
-            bondNum: 4312,
-            bondAmount: formatMoney(90024372.4),
           },
           {
             assetType: '企业经营贷',
@@ -59,9 +53,9 @@ const props = defineProps({
           },
           {
             assetType: '合计',
-            debtorNum: 17050,
-            bondNum: 17133,
-            bondAmount: formatMoney(285056128.53),
+            debtorNum: 12793,
+            bondNum: 12821,
+            bondAmount: formatMoney(195031756.13),
           },
         ],
       }

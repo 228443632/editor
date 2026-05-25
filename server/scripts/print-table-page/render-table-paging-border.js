@@ -6,7 +6,6 @@
 /**
  * 渲染表格分页边框
  */
-// @ts-nocheck
 export const renderTablePagingBorder = () => {
   function load() {
     // const theads = document.querySelectorAll('thead');
@@ -94,7 +93,6 @@ export const renderTablePagingBorder = () => {
     tableList.forEach((table) => {
       if (!table.clientHeight) return
 
-
       // 是内嵌的
       let diffHeight = 0
       let isOverEnd = false // 是否到底
@@ -109,7 +107,12 @@ export const renderTablePagingBorder = () => {
         if (container) {
           console.log('container', container)
           // diffHeight += container.offsetHeight - table.offsetHeight
-          console.log('diffHeight22', diffHeight, container.offsetHeight, table.offsetHeight)
+          console.log(
+            'diffHeight22',
+            diffHeight,
+            container.offsetHeight,
+            table.offsetHeight,
+          )
           // rowsMore.push(...Array.from(td.children))
         }
       }
@@ -160,62 +163,63 @@ export const renderTablePagingBorder = () => {
           originDiffHeight += pageDiffHeight[i] || 0
         }
 
-        console.log('originDiffHeight', {
-          pageNum, originDiffHeight
-        })
 
-        rows.forEach((row, rowIndex) => {
-          const cells = Array.from(row.cells)
-
-          cells.forEach((cell) => {
-            const rowSpan = cell.rowSpan
-            if (rowSpan > 1) {
-              const styleComputed = window.getComputedStyle(cell)
-              if (
-                cell.children?.length == 1 &&
-                styleComputed.verticalAlign == 'middle' &&
-                cell.children[0]?.clientHeight < cell.clientHeight
-              ) {
-                const tdRect = cell.getBoundingClientRect()
-                const tdTop = tdRect.top + originDiffHeight
-                const tdBottom = tdRect.bottom + originDiffHeight
-                if (
-                  pageBottom > tdTop &&
-                  pageBottom < tdBottom &&
-                  page.contentHeight > tdRect.height
-                ) {
-                  const child = cell.children[0]
-                  const cellPaddingY =
-                    parseInt(styleComputed.paddingTop) +
-                    parseInt(styleComputed.paddingBottom)
-                  const childHeight = cell.clientHeight - cellPaddingY
-
-                  cell.style.verticalAlign = 'top'
-                  console.log('pageDiffHeight[pageNum]', {
-                    childHeight,
-                  })
-
-                  cell.style.background = 'blue'
-                  // 设置垂直居中
-                  const childRect = child.getBoundingClientRect()
-
-                  console.log('page', {
-                    pageNum: pageNum,
-                    height: pageBottom - childRect.bottom,
-                  })
-
-                  child.classList.add('cell-flex-center')
-
-                  const childStyle = window.getComputedStyle(child)
-
-                  if (childStyle.textAlign == 'center') {
-                    child.style.justifyContent = 'center'
-                  }
-                }
-              }
-            }
-          })
-        })
+        // rows.forEach((row, rowIndex) => {
+        //   const cells = Array.from(row.cells)
+        //
+        //   cells.forEach((cell) => {
+        //     const rowSpan = cell.rowSpan
+        //     if (rowSpan > 1) {
+        //       const styleComputed = window.getComputedStyle(cell)
+        //       if (
+        //         cell.children?.length == 1 &&
+        //         styleComputed.verticalAlign == 'middle' &&
+        //         cell.children[0]?.clientHeight < cell.clientHeight
+        //       ) {
+        //         const tdRect = cell.getBoundingClientRect()
+        //         const tdTop = tdRect.top + originDiffHeight
+        //         const tdBottom = tdRect.bottom + originDiffHeight
+        //         if (
+        //           pageBottom > tdTop &&
+        //           pageBottom < tdBottom &&
+        //           page.contentHeight > tdRect.height
+        //         ) {
+        //           const child = cell.children[0]
+        //           const cellPaddingY =
+        //             parseInt(styleComputed.paddingTop) +
+        //             parseInt(styleComputed.paddingBottom)
+        //           const childHeight = cell.clientHeight - cellPaddingY
+        //
+        //           cell.style.verticalAlign = 'top'
+        //           console.log('pageDiffHeight[pageNum]', {
+        //             childHeight,
+        //           })
+        //
+        //           cell.style.background = 'pink'
+        //           // 设置垂直居中
+        //           const childRect = child.getBoundingClientRect()
+        //
+        //           console.log('page', {
+        //             pageNum: pageNum,
+        //             height: pageBottom - childRect.bottom,
+        //           })
+        //
+        //           const childWrap = document.createElement('div')
+        //           childWrap.append(child)
+        //           cell.append(childWrap)
+        //
+        //           childWrap.style.height = cell.clientHeight - cellPaddingY - 30 + 'px'
+        //           childWrap.classList.add('cell-flex-center')
+        //
+        //           const childStyle = window.getComputedStyle(child)
+        //           if (childStyle.textAlign == 'center') {
+        //             childWrap.style.justifyContent = 'center'
+        //           }
+        //         }
+        //       }
+        //     }
+        //   })
+        // })
       }
 
       if (diffHeight > 0) {
@@ -223,16 +227,19 @@ export const renderTablePagingBorder = () => {
          * @type {HTMLTableRowElement}
          */
         const lastRow = rows.at(-1)
-        const trTmp = document.createElement('tr')
+        const parentTd = lastRow.closest('td')
+        // const children = parentTd.children
+        const trTmp = document.createElement('div')
         trTmp.style.height = `${diffHeight}px`
         trTmp.style.border = 'none'
         trTmp.style.marginTop = '-1px'
-        lastRow.insertAdjacentElement('afterend', trTmp)
-
+        if (parentTd) {
+          parentTd.insertAdjacentElement('beforeend', trTmp)
+        }
         if (!table.__isNested) {
           trTmp.classList.add('tr-no-nested-001')
         }
-
+        // lastRow.insertAdjacentElement('afterend', trTmp.cloneNode(true))
         console.log('totalHeight', diffHeight)
       }
 
@@ -422,14 +429,14 @@ td:has( > .cell-flex-center) {
   position: relative;
 }
 .cell-flex-center {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 50%;
-  left: 0;
+  /*position: absolute;*/
+  /*width: 100%;*/
+  /*height: 100%;*/
+  /*top: 50%;*/
+  /*left: 0;*/
   display: flex;
   align-items: center;
-  transform: translateY(-50%);
+  /*transform: translateY(-50%);*/
 }
 `
 document.head.insertAdjacentElement('beforeend', style)
