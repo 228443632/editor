@@ -58,7 +58,6 @@ export const renderTablePagingBorder = () => {
     const nestTableList = [
       ...new Set(Array.from(document.querySelectorAll('table table'))),
     ]
-    console.log('tableList', tableList)
 
     nestTableList.forEach((table) => {
       table.__isNested = true
@@ -72,24 +71,13 @@ export const renderTablePagingBorder = () => {
       return aRect.bottom - bRect.bottom
     })
 
-    // const lastTable = tableList.at(-1)
-    // tableList.length = 0
-    // tableList[0] = lastTable
-    const totalPageObj = {}
+    const totalPageObj = {} // 所有页码映射，专门存放 页+页的bottom
 
-    // 最底 排在后面
-    tableList.sort((a, b) => {
-      const aRect = a.getBoundingClientRect()
-      const bRect = b.getBoundingClientRect()
-      return aRect.bottom - bRect.bottom
-    })
-
-    // const lastTable = tableList.at(-1)
-    // tableList.length = 0
-    // tableList[0] = lastTable
+    // 设置滚动到顶部
     document.documentElement.scrollTop = 0
     document.body.scrollTop = 0
 
+    // 遍历每个表格
     tableList.forEach((table) => {
       if (!table.clientHeight) return
 
@@ -101,23 +89,6 @@ export const renderTablePagingBorder = () => {
       const rows = Array.from(table.rows)
 
       const rowsMore = [...rows]
-
-      if (table.__isNested) {
-        const container = table.closest('td > p, td > div')
-        if (container) {
-          console.log('container', container)
-          // diffHeight += container.offsetHeight - table.offsetHeight
-          console.log(
-            'diffHeight22',
-            diffHeight,
-            container.offsetHeight,
-            table.offsetHeight,
-          )
-          // rowsMore.push(...Array.from(td.children))
-        }
-      }
-
-      console.log('rowsMore', rowsMore)
 
       const pageDiffHeight = {}
 
@@ -163,63 +134,50 @@ export const renderTablePagingBorder = () => {
           originDiffHeight += pageDiffHeight[i] || 0
         }
 
+        rows.forEach((row, rowIndex) => {
+          const cells = Array.from(row.cells)
 
-        // rows.forEach((row, rowIndex) => {
-        //   const cells = Array.from(row.cells)
-        //
-        //   cells.forEach((cell) => {
-        //     const rowSpan = cell.rowSpan
-        //     if (rowSpan > 1) {
-        //       const styleComputed = window.getComputedStyle(cell)
-        //       if (
-        //         cell.children?.length == 1 &&
-        //         styleComputed.verticalAlign == 'middle' &&
-        //         cell.children[0]?.clientHeight < cell.clientHeight
-        //       ) {
-        //         const tdRect = cell.getBoundingClientRect()
-        //         const tdTop = tdRect.top + originDiffHeight
-        //         const tdBottom = tdRect.bottom + originDiffHeight
-        //         if (
-        //           pageBottom > tdTop &&
-        //           pageBottom < tdBottom &&
-        //           page.contentHeight > tdRect.height
-        //         ) {
-        //           const child = cell.children[0]
-        //           const cellPaddingY =
-        //             parseInt(styleComputed.paddingTop) +
-        //             parseInt(styleComputed.paddingBottom)
-        //           const childHeight = cell.clientHeight - cellPaddingY
-        //
-        //           cell.style.verticalAlign = 'top'
-        //           console.log('pageDiffHeight[pageNum]', {
-        //             childHeight,
-        //           })
-        //
-        //           cell.style.background = 'pink'
-        //           // 设置垂直居中
-        //           const childRect = child.getBoundingClientRect()
-        //
-        //           console.log('page', {
-        //             pageNum: pageNum,
-        //             height: pageBottom - childRect.bottom,
-        //           })
-        //
-        //           const childWrap = document.createElement('div')
-        //           childWrap.append(child)
-        //           cell.append(childWrap)
-        //
-        //           childWrap.style.height = cell.clientHeight - cellPaddingY - 30 + 'px'
-        //           childWrap.classList.add('cell-flex-center')
-        //
-        //           const childStyle = window.getComputedStyle(child)
-        //           if (childStyle.textAlign == 'center') {
-        //             childWrap.style.justifyContent = 'center'
-        //           }
-        //         }
-        //       }
-        //     }
-        //   })
-        // })
+          // 处理跨行 居中的单元格
+          cells.forEach((cell) => {
+            const rowSpan = cell.rowSpan
+            if (rowSpan > 1) {
+              const styleComputed = window.getComputedStyle(cell)
+              if (
+                cell.children?.length == 1 &&
+                styleComputed.verticalAlign == 'middle'
+              ) {
+                const tdRect = cell.getBoundingClientRect()
+                const tdTop = tdRect.top + originDiffHeight
+                const tdBottom = tdRect.bottom + originDiffHeight
+                if (pageBottom > tdTop && pageBottom < tdBottom) {
+                  const cellPaddingY =
+                    parseInt(styleComputed.paddingTop) +
+                    parseInt(styleComputed.paddingBottom)
+                  cell.style.verticalAlign = 'auto'
+
+                  // TODO
+                  // cell.style.background = 'pink'
+                  // childWrap.style.background = 'red'
+
+                  const childWrap = document.createElement('div')
+
+                  childWrap.style.height =
+                    cell.clientHeight - cellPaddingY + 'px'
+                  childWrap.classList.add('cell-flex-center')
+
+                  const child = cell.children[0]
+                  const childStyle = window.getComputedStyle(child)
+                  if (childStyle.textAlign == 'center') {
+                    childWrap.style.justifyContent = 'center'
+                  }
+
+                  childWrap.append(child)
+                  cell.append(childWrap)
+                }
+              }
+            }
+          })
+        })
       }
 
       if (diffHeight > 0) {
@@ -240,7 +198,6 @@ export const renderTablePagingBorder = () => {
           trTmp.classList.add('tr-no-nested-001')
         }
         // lastRow.insertAdjacentElement('afterend', trTmp.cloneNode(true))
-        console.log('totalHeight', diffHeight)
       }
 
       // 非嵌套添加
@@ -436,7 +393,12 @@ td:has( > .cell-flex-center) {
   /*left: 0;*/
   display: flex;
   align-items: center;
+  flex-direction: column;
   /*transform: translateY(-50%);*/
 }
 `
 document.head.insertAdjacentElement('beforeend', style)
+
+window.requestIdleCallback(() => {
+  renderTablePagingBorder()
+})
