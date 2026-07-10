@@ -131,29 +131,3 @@ export function patch(win = window) {
 }
 
 patch(window);
-
-(function fixChrome133LayoutBug() {
-  if (!window) return;
-
-  // 1. 拦截 Element 原型的 scrollIntoView（因为 Chrome 底层是调用了这个方法）
-  const originalScrollIntoView = Element.prototype.scrollIntoView;
-  Element.prototype.scrollIntoView = function (options) {
-    // 如果是富文本编辑器内部触发的自动滚动，直接无视，拒绝执行
-    if (this.closest('[contenteditable]')) return;
-    return originalScrollIntoView.call(this, options);
-  };
-
-  // 2. 输入时强制恢复父页面高度和滚动位
-  document.addEventListener('beforeinput', () => {
-    const parentDocEl = window.parent.document.documentElement;
-    const savedScrollTop = parentDocEl.scrollTop;
-
-    requestAnimationFrame(() => {
-      // 强行把父页面拉回正确高度和位置，覆盖 Chrome 的错误计算
-      parentDocEl.style.height = '100vh';
-      parentDocEl.scrollTop = savedScrollTop;
-      // 触发一次隐式重绘，修正由于布局坍塌产生的白屏
-      void window.parent.document.body.offsetHeight;
-    });
-  }, { passive: true });
-})();

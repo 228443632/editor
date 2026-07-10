@@ -140,28 +140,25 @@ export const renderTablePagingBorder = () => {
           // 处理跨行 居中的单元格
           cells.forEach((cell) => {
             const rowSpan = cell.rowSpan
-            if (rowSpan > 1) {
+            if (rowSpan >= 1) {
               const styleComputed = window.getComputedStyle(cell)
-              if (
-                cell.children?.length == 1 &&
-                styleComputed.verticalAlign == 'middle'
-              ) {
+              if (styleComputed.verticalAlign == 'middle') {
                 const tdRect = cell.getBoundingClientRect()
                 const tdTop = tdRect.top + originDiffHeight
                 const tdBottom = tdRect.bottom + originDiffHeight
-                if (pageBottom > tdTop && pageBottom < tdBottom) {
+
+                if (pageBottom >= tdTop && pageBottom < tdBottom) {
                   const cellPaddingY =
                     parseInt(styleComputed.paddingTop) +
                     parseInt(styleComputed.paddingBottom)
                   cell.style.verticalAlign = 'auto'
 
-                  // TODO
-                  // cell.style.background = 'pink'
-                  // childWrap.style.background = 'red'
+                  // 跨页标识
+                  cell.dataset.crossPageFlag = '1'
 
                   const childWrap = document.createElement('div')
 
-                  childWrap.style.height =
+                  childWrap.style.minHeight =
                     cell.clientHeight - cellPaddingY + 'px'
                   childWrap.classList.add('cell-flex-center')
 
@@ -171,7 +168,14 @@ export const renderTablePagingBorder = () => {
                     childWrap.style.justifyContent = 'center'
                   }
 
-                  childWrap.append(child)
+                  // TODO
+                  // cell.style.background = 'pink'
+                  // childWrap.style.background = 'red'
+
+                  Array.from(cell.children).forEach((childItem) => {
+                    // if (childItem.dataset.fillBlank) return
+                    childWrap.append(childItem)
+                  })
                   cell.append(childWrap)
                 }
               }
@@ -188,6 +192,8 @@ export const renderTablePagingBorder = () => {
         const parentTd = lastRow.closest('td')
         // const children = parentTd.children
         const trTmp = document.createElement('div')
+        // 填充空白行
+        trTmp.dataset.fillBlank = '1'
         trTmp.style.height = `${diffHeight}px`
         trTmp.style.border = 'none'
         trTmp.style.marginTop = '-1px'
@@ -238,6 +244,21 @@ export const renderTablePagingBorder = () => {
       return getPageBottom(pageNum) - page.contentHeight
     }
     // const totalPageNum = Math.max(...Object.keys(totalPageObj).map((pageNum) => +pageNum))
+
+    // 重新更新高度
+    const middleCrossPageTdList = document.querySelectorAll(
+      'td[data-cross-page-flag]',
+    )
+    middleCrossPageTdList.forEach((cell) => {
+      const childWrap = cell.children[0]
+      if (childWrap && childWrap.classList.contains('cell-flex-center')) {
+        const styleComputed = window.getComputedStyle(cell)
+        const cellPaddingY =
+          parseInt(styleComputed.paddingTop)
+          parseInt(styleComputed.paddingBottom)
+        childWrap.style.minHeight = cell.clientHeight - cellPaddingY + 'px'
+      }
+    })
 
     // 删除所有 tr-no-nested-001
     const trList = document.querySelectorAll('.tr-no-nested-001')
@@ -392,8 +413,8 @@ td:has( > .cell-flex-center) {
   /*top: 50%;*/
   /*left: 0;*/
   display: flex;
-  align-items: center;
   flex-direction: column;
+  justify-content: center;
   /*transform: translateY(-50%);*/
 }
 `

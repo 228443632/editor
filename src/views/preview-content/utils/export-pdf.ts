@@ -145,10 +145,10 @@ export async function exportPDFWorker(
 
     // 3. 为当前页生成高清图片（单独渲染）
     const jpg = await snapdom.toJpg(pageDom, {
-      dpr: window.devicePixelRatio * 2,
+      dpr: Math.max(window.devicePixelRatio, 4),
       debug: true,
       fast: true,
-      quality: 0.8,
+      quality: 0.92,
     })
 
     // 4. 计算当前页尺寸映射（px → mm）

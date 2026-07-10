@@ -15,6 +15,14 @@ const props = defineProps({
   compData: {
     type: Object,
     default: () => {
+      const $dict = window.pageDocEditor?.$dict
+      const assetType = $dict('asset_type') || []
+      const assetTypeObj = assetType.reduce((acc, cur) => {
+        acc[cur.key] = cur.label
+        return acc
+      }, {})
+      console.log('assetType', assetTypeObj)
+
       return {
         columns: [
           { label: '资产类型', prop: 'assetType', width: 170, align: 'center' },
@@ -34,19 +42,19 @@ const props = defineProps({
         ],
         data: [
           {
-            assetType: '消费金融',
+            assetType: assetTypeObj['10'] || '-',
             debtorNum: 5569,
             bondNum: 5587,
             bondAmount: formatMoney(90004481.86),
           },
           {
-            assetType: '信用卡',
+            assetType: assetTypeObj['20'] || '-',
             debtorNum: 6459,
             bondNum: 6459,
             bondAmount: formatMoney(90007556.11),
           },
           {
-            assetType: '企业经营贷',
+            assetType: assetTypeObj['30'] || '-',
             debtorNum: 765,
             bondNum: 775,
             bondAmount: formatMoney(15019718.16),

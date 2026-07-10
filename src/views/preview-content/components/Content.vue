@@ -53,11 +53,15 @@ const rootRef = ref<HTMLDivElement>()
 const dpr = ref(window.devicePixelRatio)
 const scaleFactor = ref(0) // 缩放因子 1.33
 
-const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
-  computed(() => {
-    return unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
-  }),
-)
+// const { width: pageItemWidth, height: pageItemHeight } = useElementSize(
+//   computed(() => {
+//     return unrefElement(pageRefs.value?.filter?.(Boolean)?.[0])
+//   }),
+// )
+const realPageItemWidth = ref(0)
+const realPageItemHeight = ref(0)
+const scalePos = ref(1)
+const _pageRefFirst = computed(() => unrefElement(pageRefs.value?.filter?.(Boolean)?.[0]))
 
 if (!__previewContext__.value.doc) {
   const { doc } = useVuePdfEmbed({
@@ -82,11 +86,26 @@ __previewContext__.value.keywordsPosList = keywordsPosList
 // const canvasWidth = ref(undefined)
 // const canvasHeight = ref(undefined)
 
+let oldRootWidth = 0
 async function winResize() {
   if (props.model == 'preview') {
+    if (
+      rootRef.value.offsetWidth &&
+      rootRef.value.offsetWidth >= pageUtils.a4._basePx.w &&
+      oldRootWidth >= pageUtils.a4._basePx.w
+    )
+      return
+
     // updateKeyFlag.value++
     await nextTick()
     resetPageIntersectionObserver()
+    oldRootWidth = rootRef.value.offsetWidth
+  } else {
+    const pageItemHeight = _pageRefFirst.value?.offsetHeight
+    const pageItemWidth = _pageRefFirst.value?.offsetWidth
+
+    realPageItemWidth.value = pageItemWidth
+    realPageItemHeight.value = pageItemHeight
   }
 }
 const debounceWinResize = debounce(winResize, 500) as typeof winResize
@@ -130,6 +149,12 @@ const _rootStyle = computed(() => {
  * 重置页面交集观察者
  */
 const resetPageIntersectionObserver = () => {
+
+  const pageItemHeight = _pageRefFirst.value?.offsetHeight
+  const pageItemWidth = _pageRefFirst.value?.offsetWidth
+  realPageItemWidth.value = pageItemWidth
+  realPageItemHeight.value = pageItemHeight
+
   pageIntersectionObserver?.disconnect()
   pageIntersectionObserver = new IntersectionObserver((entries) => {
     rafThrottleUpdatePageVisibility(entries)
@@ -145,9 +170,13 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
 
   // n * 12 + n * height - 12 = totalHeight
   // => n = (totalHeight + 12) / (height + 12)
+
+  const pageItemHeight = _pageRefFirst.value?.offsetHeight
+  // const pageItemWidth = _pageRefFirst.value?.offsetWidth
+
   const totalHeight = document.body.offsetHeight
   const visibleMaxPages = Math.ceil(
-    (totalHeight + 12) / (pageItemHeight.value + 12),
+    (totalHeight + 12) / (pageItemHeight + 12),
   )
 
   entries.forEach((entry) => {
@@ -246,14 +275,6 @@ const onRendered = (pageNum: number) => {
 /* 计算 */
 
 /**
- * 缩放比例
- */
-const _scalePos = computed(() => {
-  updateKeyFlag.value
-  return pageItemWidth.value / pageUtils.a4._basePx.w
-})
-
-/**
  * 分页数量
  */
 const _pageNumsList = computed(() =>
@@ -296,6 +317,13 @@ watch(_pageNumsList, (newPageNums: number[]) => {
 watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
+
+
+watchEffect(() => {
+  updateKeyFlag.value
+  scalePos.value = realPageItemWidth.value / pageUtils.a4._basePx.w
+})
+
 
 /**
  * 参数组件列表监听
@@ -385,8 +413,8 @@ defineExpose({
           :source="doc"
           :page="pageNum"
           annotation-layer
-          :width="pageItemWidth"
-          :height="pageItemHeight"
+          :width="realPageItemWidth"
+          :height="realPageItemWidth"
           text-layer
           :scale="dpr"
           @rendered="onRendered(pageNum)"
@@ -411,9 +439,9 @@ defineExpose({
                 :style="{
                   '--page-num': item.pageNum,
                   // top: item.top - (item.pageNum - 1) * 12 + 'px',
-                  top: item.offsetTop * +_scalePos + 'px',
-                  left: item.offsetLeft * +_scalePos + 'px',
-                  transform: `scale(${_scalePos})`,
+                  top: item.offsetTop * +scalePos + 'px',
+                  left: item.offsetLeft * +scalePos + 'px',
+                  transform: `scale(${scalePos})`,
                 }"
               >
                 <!-- 印章 -->

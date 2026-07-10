@@ -14,6 +14,14 @@ const props = defineProps({
   compData: {
     type: Object,
     default: () => {
+      const $dict = window.pageDocEditor?.$dict
+      // console.log('$dict', $dict)
+      const assetType = $dict('asset_type') || []
+      const assetTypeObj = assetType.reduce((acc, cur) => {
+        acc[cur.key] = cur.label
+        return acc
+      }, {})
+
       return {
         columns: [
           { label: '资产类型', prop: 'assetType', width: 160, align: 'center' },
@@ -33,7 +41,7 @@ const props = defineProps({
 
         data: [
           {
-            assetType: '消费金融',
+            assetType: assetTypeObj['10'] || '-',
             commissionPlanList: [
               { clctRate: '10.00%', clctCommissionRate: '4%' },
               {
@@ -55,7 +63,7 @@ const props = defineProps({
             ],
           },
           {
-            assetType: '消费金融',
+            assetType: assetTypeObj['20'] || '-',
             commissionPlanList: [
               {
                 clctRate: '回款率',
@@ -133,9 +141,8 @@ const _dataList = computed(() => {
 })
 
 const _mergeField = computed(() => {
-  return props.compData?.columns?.[0]?.prop;
-});
-
+  return props.compData?.columns?.[0]?.prop
+})
 
 function getColRowspan({ row, rowIndex, col, colIndex }) {
   // if (colIndex == 0) {

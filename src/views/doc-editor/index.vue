@@ -301,7 +301,8 @@ watch(umoEditorRef, () => {
 
   if (!isInIframe()) {
     window.requestAnimationFrame(async () => {
-      const targetUrl = '/lowcode-tp-editor/template/division-order-tp.scheme.txt'
+      const targetUrl =
+        '/lowcode-tp-editor/template/division-order-tp.scheme.txt'
       const [res] = await to(fetch(targetUrl))
       if (res.ok) {
         const content = await res.text()
@@ -383,6 +384,16 @@ window['pageDocEditor'] = {
 
   /** 选项*/
   options,
+
+  /**
+   * 获取字典
+   */
+  $dict: (window['pageDocEditor']?.$dict || (() => [])) as CallableFunction,
+  // $dict: () => [
+  //   { key: '10', label: '消费金融22' },
+  //   { key: '20', label: '信用卡333' },
+  //   { key: '30', label: '企业经营贷444' },
+  // ],
 }
 
 provide('__printRef__', printRef)
