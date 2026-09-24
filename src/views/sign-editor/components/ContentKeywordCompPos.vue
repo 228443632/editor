@@ -8,6 +8,8 @@
 import ContentCompSign from '@/views/sign-editor/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/sign-editor/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/sign-editor/components/ContentCompSeal.vue'
+import ContentCompSealDate from '@/views/sign-editor/components/ContentCompSealDate.vue'
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 
 const props = defineProps({
   /**
@@ -59,21 +61,28 @@ defineExpose({})
         }"
       >
         <!-- 印章 -->
-        <template v-if="item.type == 'compSeal'">
+        <template v-if="item.type == COMP_PARAMS_NAME_MAP.compSeal">
           <ContentCompSeal
             v-model:node-data="__signContext__.paramsCompList[index]"
           ></ContentCompSeal>
         </template>
 
+        <!-- 用印时间 -->
+        <template v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSealDate">
+          <ContentCompSealDate
+            v-model:node-data="__signContext__.paramsCompList[index]"
+          ></ContentCompSealDate>
+        </template>
+
         <!-- 签名 -->
-        <template v-else-if="item.type == 'compSign'">
+        <template v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSign">
           <ContentCompSign
             v-model:node-data="__signContext__.paramsCompList[index]"
           ></ContentCompSign>
         </template>
 
         <!-- 签署日期 -->
-        <template v-else-if="item.type == 'compSignDate'">
+        <template v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSignDate">
           <ContentCompSignDate
             v-model:node-data="__signContext__.paramsCompList[index]"
           ></ContentCompSignDate>

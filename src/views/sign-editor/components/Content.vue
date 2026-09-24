@@ -24,10 +24,10 @@ import 'vue-pdf-embed/dist/styles/textLayer.css'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import {
-  COMP_PARAMS_NAME_MAP,
+  COMP_PARAMS_NAME_MAP, COMP_SEAL_DATE_STYLE,
   COMP_SEAL_STYLE,
   COMP_SIGN_DATE_STYLE,
-  COMP_SIGN_STYLE,
+  COMP_SIGN_STYLE
 } from '@/views/doc-editor/extensions/constant.ts'
 import { useSearchPDF } from '../hooks/use-search-pdf.ts'
 import ContentKeywordCompPos from './ContentKeywordCompPos.vue' // 内容区域关键字组件定位
@@ -152,6 +152,7 @@ function paste() {
   const isError = copyContentInfo.value.some((item) => {
     countMap[item.type] ||= 0
     if (item.type == COMP_PARAMS_NAME_MAP.compSeal) {
+      // 签章
       countMap[item.type]++
       if (countMap[item.type] >= COMP_SEAL_STYLE.limit) {
         useMessage('warning', {
@@ -159,7 +160,12 @@ function paste() {
         })
         return true
       }
-      // 签章
+    } else if (countMap[item.type] >= COMP_SEAL_DATE_STYLE.limit) {
+      // 用印时间
+      useMessage('warning', {
+        content: `用印时间数量不能超过${COMP_SEAL_DATE_STYLE.limit}个`,
+      })
+      return true
     } else if (item.type == COMP_PARAMS_NAME_MAP.compSign) {
       // 签名
       countMap[item.type]++

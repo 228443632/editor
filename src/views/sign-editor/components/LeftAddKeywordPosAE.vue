@@ -41,6 +41,7 @@ const options = reactive({
     return [
       { key: COMP_PARAMS_NAME_MAP.compSeal, label: '印章' },
       { key: COMP_PARAMS_NAME_MAP.compSign, label: '签名' },
+      { key: COMP_PARAMS_NAME_MAP.compSealDate, label: '用印时间' },
       { key: COMP_PARAMS_NAME_MAP.compSignDate, label: '签署日期' },
     ].filter((item) => {
       return compTypeListObj[item.key]
@@ -89,6 +90,8 @@ const submit = async () => {
   if (keywordRect) {
     const keywordRectClone = deepClone(keywordRect) as IParamsCompItem
     keywordRectClone.type = formData.value.compType
+
+    console.log('keywordRectClone', keywordRectClone)
 
     pageUtils.updateItemOffsetXY(keywordRectClone)
 

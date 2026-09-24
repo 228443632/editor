@@ -12,9 +12,11 @@ import { arrayToObj, div, rafThrottle, debounce, deepClone } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
+import ContentCompSealDate from '@/views/preview-content/components/ContentCompSealDate.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import { useSearchPDF } from '../../sign-editor/hooks/use-search-pdf.ts'
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
 
 const { proxy } = getCurrentInstance()
 const props = defineProps({
@@ -61,7 +63,9 @@ const scaleFactor = ref(0) // 缩放因子 1.33
 const realPageItemWidth = ref(0)
 const realPageItemHeight = ref(0)
 const scalePos = ref(1)
-const _pageRefFirst = computed(() => unrefElement(pageRefs.value?.filter?.(Boolean)?.[0]))
+const _pageRefFirst = computed(() =>
+  unrefElement(pageRefs.value?.filter?.(Boolean)?.[0]),
+)
 
 if (!__previewContext__.value.doc) {
   const { doc } = useVuePdfEmbed({
@@ -149,7 +153,6 @@ const _rootStyle = computed(() => {
  * 重置页面交集观察者
  */
 const resetPageIntersectionObserver = () => {
-
   const pageItemHeight = _pageRefFirst.value?.offsetHeight
   const pageItemWidth = _pageRefFirst.value?.offsetWidth
   realPageItemWidth.value = pageItemWidth
@@ -175,9 +178,7 @@ const updatePageVisibility = (entries: IntersectionObserverEntry[]) => {
   // const pageItemWidth = _pageRefFirst.value?.offsetWidth
 
   const totalHeight = document.body.offsetHeight
-  const visibleMaxPages = Math.ceil(
-    (totalHeight + 12) / (pageItemHeight + 12),
-  )
+  const visibleMaxPages = Math.ceil((totalHeight + 12) / (pageItemHeight + 12))
 
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
@@ -318,12 +319,10 @@ watchEffect(() => {
   __previewContext__.value.contentPageNums = _pageNumsList.value.at(-1)
 })
 
-
 watchEffect(() => {
   updateKeyFlag.value
   scalePos.value = realPageItemWidth.value / pageUtils.a4._basePx.w
 })
-
 
 /**
  * 参数组件列表监听
@@ -446,22 +445,28 @@ defineExpose({
               >
                 <!-- 印章 -->
                 <ContentCompSeal
-                  v-if="item.type == 'compSeal'"
+                  v-if="item.type == COMP_PARAMS_NAME_MAP.compSeal"
                   :node-data="item"
                 ></ContentCompSeal>
 
                 <!-- 签名 -->
                 <ContentCompSign
-                  v-else-if="item.type == 'compSign'"
+                  v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSign"
                   :node-data="item"
                 >
                 </ContentCompSign>
 
                 <!-- 签署日期 -->
                 <ContentCompSignDate
-                  v-else-if="item.type == 'compSignDate'"
+                  v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSignDate"
                   :node-data="item"
                 ></ContentCompSignDate>
+
+                <!-- 用印时间 -->
+                <ContentCompSealDate
+                  v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSealDate"
+                  :node-data="item"
+                ></ContentCompSealDate>
               </div>
             </template>
           </template>

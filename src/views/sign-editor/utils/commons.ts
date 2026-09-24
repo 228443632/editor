@@ -7,10 +7,10 @@ import { cssUtil } from '@/views/doc-editor/utils/css-util.ts'
 import { arrayToObj, deepClone, uuid, isNoNullable } from 'sf-utils2'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import {
-  COMP_PARAMS_NAME_MAP,
+  COMP_PARAMS_NAME_MAP, COMP_SEAL_DATE_STYLE,
   COMP_SEAL_STYLE,
   COMP_SIGN_DATE_STYLE,
-  COMP_SIGN_STYLE,
+  COMP_SIGN_STYLE
 } from '@/views/doc-editor/extensions/constant.ts'
 
 export const a4 = cssUtil.getPaperSize('A4')
@@ -88,7 +88,14 @@ export const pageUtils = {
         item.width ??= COMP_SIGN_DATE_STYLE.width
         item.height ??= COMP_SIGN_DATE_STYLE.height
         break
+      // 用印时间
+      case COMP_PARAMS_NAME_MAP.compSealDate:
+        item.width ??= COMP_SEAL_DATE_STYLE.width
+        item.height ??= COMP_SEAL_DATE_STYLE.height
+        break
       default:
+        item.width ??= COMP_SEAL_DATE_STYLE.width
+        item.height ??= COMP_SEAL_DATE_STYLE.height
         break
     }
     item.width ??= 0
@@ -306,6 +313,8 @@ export const pageUtils = {
       }
     }
 
+    item.offsetLeft ||= 0
+    item.offsetTop ||= 0
     item.offsetX = +Number(item.offsetLeft + item.width / 2).toFixed(0)
     item.offsetY = +Number(item.offsetTop + item.height / 2).toFixed(0)
 

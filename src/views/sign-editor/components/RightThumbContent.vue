@@ -1,5 +1,5 @@
 <!--
- * @Description: 内容区域
+ * @Description: 右侧缩略图内容展示
  * @Author 卞鹏飞 <228443632@qq.com>
  * @create 02/10/25 PM3:05
  -->
@@ -10,8 +10,11 @@ import { debounce, arrayToObj, rafThrottle } from 'sf-utils2'
 import ContentCompSign from '@/views/preview-content/components/ContentCompSign.vue'
 import ContentCompSeal from '@/views/preview-content/components/ContentCompSeal.vue'
 import ContentCompSignDate from '@/views/preview-content/components/ContentCompSignDate.vue'
+import ContentCompSealDate from '@/views/preview-content/components/ContentCompSealDate.vue'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
+import { COMP_PARAMS_NAME_MAP } from '@/views/doc-editor/extensions/constant'
+// import {} from ''
 
 const props = defineProps({})
 const emit = defineEmits<{
@@ -217,22 +220,29 @@ onBeforeUnmount(() => {
             >
               <!-- 印章 -->
               <ContentCompSeal
-                v-if="item.type == 'compSeal'"
+                v-if="item.type == COMP_PARAMS_NAME_MAP.compSeal"
                 :node-data="item"
               ></ContentCompSeal>
 
               <!-- 签名 -->
               <ContentCompSign
-                v-else-if="item.type == 'compSign'"
+                v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSign"
                 :node-data="item"
               >
               </ContentCompSign>
 
               <!-- 签署日期 -->
               <ContentCompSignDate
-                v-else-if="item.type == 'compSignDate'"
+                v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSignDate"
                 :node-data="item"
               ></ContentCompSignDate>
+
+              <!-- 用印时间  -->
+              <ContentCompSealDate
+                v-else-if="item.type == COMP_PARAMS_NAME_MAP.compSealDate"
+                :node-data="item"
+              >
+              </ContentCompSealDate>
             </div>
           </template>
         </template>

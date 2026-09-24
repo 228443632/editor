@@ -70,6 +70,10 @@ const tableAttrs = ref({
         name: '印章',
         icon: 'icon-seal',
       },
+      compSealDate: {
+        name: '用印时间',
+        icon: 'icon-sign-date',
+      },
       compSignDate: {
         name: '签署日期',
         icon: 'icon-sign-date',

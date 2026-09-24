@@ -38,9 +38,15 @@ export const COMP_PARAMS_NAME_MAP = {
   compTextDrag: 'compTextDrag',
   imageParagraph: 'imageParagraph',
   compTextareaDrag: 'compTextareaDrag',
+  /** 签名*/
   compSign: 'compSign',
+  /** 签章*/
   compSeal: 'compSeal',
+  /** 签署日期*/
   compSignDate: 'compSignDate',
+  /** 用印时间*/
+  compSealDate: 'compSealDate',
+  /** 关键字*/
   keywords: 'keywords',
   /** 绝对定位分组 */
   groupAbsPos: 'groupAbsPos',
@@ -96,6 +102,7 @@ export const FLOAT_NODE_TYPE_MAP = {
 export const COMP_SEAL_STYLE = {
   width: cssUtil.mmToPx(40), // 140
   height: cssUtil.mmToPx(40), // 140
+  /** 限制个数 */
   limit: 99999,
 }
 
@@ -106,6 +113,15 @@ export const COMP_SIGN_DATE_STYLE = {
   width: 120,
   height: 28,
   limit: 1,
+}
+
+/**
+ * 用印时间样式
+ */
+export const COMP_SEAL_DATE_STYLE = {
+  width: 120,
+  height: 28,
+  limit: 99999,
 }
 
 /**

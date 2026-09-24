@@ -192,6 +192,15 @@ const signContext = ref({
   ),
 
   /**
+   * 用印时间
+   */
+  _compSealDateList: computed(() =>
+    signContext.value.paramsCompList.filter(
+      (item) => item.type == COMP_PARAMS_NAME_MAP.compSealDate,
+    ),
+  ),
+
+  /**
    * 移除参数组件
    * @param nodeData
    */
@@ -464,7 +473,7 @@ onMounted(() => {
           key: uuid(),
         },
       ],
-      ['compSeal', 'compSign'],
+      ['compSeal', 'compSign', 'compSealDate'],
     )
     signContext.value.templateNameList = []
   }

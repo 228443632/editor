@@ -11,6 +11,7 @@ import type { IDragNodeParamsNode } from '@/views/doc-editor/extensions/extensio
 // import type { TObjectValueType } from 'sf-utils2/types/generic-helper.ts'
 import {
   COMP_PARAMS_NAME_MAP,
+  COMP_SEAL_DATE_STYLE,
   COMP_SEAL_STYLE,
   COMP_SIGN_DATE_STYLE,
   COMP_SIGN_STYLE,
@@ -104,6 +105,18 @@ const dragMethod = {
       e.dataTransfer.setDragImage(dragImage, 0, 0)
       dragMethod.dragNodeDom.__nodeData.width = COMP_SIGN_DATE_STYLE.width
       dragMethod.dragNodeDom.__nodeData.height = COMP_SIGN_DATE_STYLE.height
+      setTimeout(() => dragImage.remove())
+    } else if (cItem.type == COMP_PARAMS_NAME_MAP.compSealDate) {
+      // 签署日期
+      const dragImage = document.createElement('div')
+      document.body.prepend(dragImage)
+      dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SEAL_DATE_STYLE.width}px; height: ${COMP_SEAL_DATE_STYLE.height}px; border: 1px dashed #999;`
+      // dragImage.innerHTML = dayjs().format('YYYY年MM月DD日')
+      dragImage.innerHTML = 'XXXX-XX-XX'
+      dragImage.classList.add('flex-center', 'text-14px')
+      e.dataTransfer.setDragImage(dragImage, 0, 0)
+      dragMethod.dragNodeDom.__nodeData.width = COMP_SEAL_DATE_STYLE.width
+      dragMethod.dragNodeDom.__nodeData.height = COMP_SEAL_DATE_STYLE.height
       setTimeout(() => dragImage.remove())
     } else {
       // 设置透明度
@@ -219,6 +232,15 @@ const validateComp = (type: IDragNodeParamsNode['type']) => {
     if (compSignList?.length >= COMP_SIGN_STYLE.limit) {
       useMessage('error', {
         content: `只能添加 ${COMP_SIGN_STYLE.limit} 个签名`,
+      })
+      return false
+    }
+  } else if (type == COMP_PARAMS_NAME_MAP.compSealDate) {
+    // 用印日期
+    const compSealDateList = __signContext__.value._compSealDateList
+    if (compSealDateList?.length >= COMP_SEAL_DATE_STYLE.limit) {
+      useMessage('error', {
+        content: `只能添加 ${COMP_SEAL_DATE_STYLE.limit} 用印时间`,
       })
       return false
     }
@@ -379,6 +401,34 @@ defineExpose({
           </t-tooltip>
 
           <div class="h-23px flex-center">签署日期</div>
+        </div>
+
+        <!-- 签署日期 -->
+        <div
+          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSealDate]"
+          class="left__content-item"
+          :draggable="__signContext__.contentInitial"
+          @dragstart="dragMethod.dragStart({ type: 'compSealDate' }, $event)"
+          @dragend="dragMethod.dragend"
+        >
+          <t-tooltip
+            v-if="
+              __signContext__._compSignDateList?.length >=
+              COMP_SEAL_DATE_STYLE.limit
+            "
+            theme="light"
+            placement="top"
+            :content="`用印时间控件最多只有 ${COMP_SEAL_DATE_STYLE.limit} 个`"
+            :show-arrow="false"
+            destroy-on-close
+          >
+            <t-icon
+              name="error-circle"
+              class="text-warning absolute left-2 z-1 cursor-help"
+            ></t-icon>
+          </t-tooltip>
+
+          <div class="h-23px flex-center">用印时间</div>
         </div>
       </section>
     </div>
