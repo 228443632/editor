@@ -107,13 +107,13 @@ const dragMethod = {
       dragMethod.dragNodeDom.__nodeData.height = COMP_SIGN_DATE_STYLE.height
       setTimeout(() => dragImage.remove())
     } else if (cItem.type == COMP_PARAMS_NAME_MAP.compSealDate) {
-      // 签署日期
+      // 用印时间
       const dragImage = document.createElement('div')
       document.body.prepend(dragImage)
       dragImage.style.cssText = `position: fixed; left: 0px; top: 0; z-index: -1; width: ${COMP_SEAL_DATE_STYLE.width}px; height: ${COMP_SEAL_DATE_STYLE.height}px; border: 1px dashed #999;`
       // dragImage.innerHTML = dayjs().format('YYYY年MM月DD日')
-      dragImage.innerHTML = 'XXXX-XX-XX'
-      dragImage.classList.add('flex-center', 'text-14px')
+      dragImage.innerHTML = 'XXXX年XX月XX日'
+      dragImage.classList.add('flex-center', 'text-16px')
       e.dataTransfer.setDragImage(dragImage, 0, 0)
       dragMethod.dragNodeDom.__nodeData.width = COMP_SEAL_DATE_STYLE.width
       dragMethod.dragNodeDom.__nodeData.height = COMP_SEAL_DATE_STYLE.height

@@ -119,7 +119,7 @@ export const COMP_SIGN_DATE_STYLE = {
  * 用印时间样式
  */
 export const COMP_SEAL_DATE_STYLE = {
-  width: 120,
+  width: 140,
   height: 28,
   limit: 99999,
 }

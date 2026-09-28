@@ -99,6 +99,7 @@ function initParamsCompList(
     // Object.values(COMP_PARAMS_NAME_MAP),
   )
   keywordsParamsCompList.value = paramsCompListKeywords
+  console.log('initParamsCompList[方法]', { paramsCompListArg, retainField })
 }
 
 /* 计算 */
@@ -128,8 +129,17 @@ onMounted(() => {
           keywords: '最新版',
           key: uuid(),
         },
+        {
+          type: 'compSignDate',
+          key: '2',
+          offsetX: 100,
+          translateX: 0,
+          translateY: 0,
+          offsetY: 100,
+          pageNum: 1,
+        },
       ],
-      ['compSeal', 'compSign'],
+      ['compSeal', 'compSign', 'compSignDate'],
     )
     console.log('__', paramsCompList.value)
   }
