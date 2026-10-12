@@ -45,7 +45,7 @@ const { popupVisible, togglePopup } = usePopup()
 const editor = inject('editor')
 
 let currentColor = $ref<string | undefined>()
-const colorChange = (color: string) => {
+const colorChange = (color = 'transparent') => {
   currentColor = color || 'transparent'
   popupVisible.value = false
 
@@ -54,11 +54,12 @@ const colorChange = (color: string) => {
     return
   }
 
-  if (color === '') {
-    editor.value?.chain().focus().unsetColorV2().run()
-  } else {
-    editor.value?.chain().focus().setColorV2(color).run()
-  }
+  // if (!color) {
+  //   editor.value?.chain().focus().unsetColorV2().run()
+  // } else {
+  //   editor.value?.chain().focus().setColorV2(color).run()
+  // }
+  editor.value?.chain().focus().setColorV2(color).run()
 }
 
 /**

@@ -347,6 +347,34 @@ defineExpose({
           <div class="w-140px w-140px rounded-full" v-html="testSealImgRaw" />
         </div>
 
+        <!-- 签署日期 -->
+        <div
+          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSealDate]"
+          class="left__content-item"
+          :draggable="__signContext__.contentInitial"
+          @dragstart="dragMethod.dragStart({ type: 'compSealDate' }, $event)"
+          @dragend="dragMethod.dragend"
+        >
+          <t-tooltip
+            v-if="
+              __signContext__._compSignDateList?.length >=
+              COMP_SEAL_DATE_STYLE.limit
+            "
+            theme="light"
+            placement="top"
+            :content="`用印时间控件最多只有 ${COMP_SEAL_DATE_STYLE.limit} 个`"
+            :show-arrow="false"
+            destroy-on-close
+          >
+            <t-icon
+              name="error-circle"
+              class="text-warning absolute left-2 z-1 cursor-help"
+            ></t-icon>
+          </t-tooltip>
+
+          <div class="h-23px flex-center">用印时间</div>
+        </div>
+
         <!-- 签名 -->
         <div
           v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSign]"
@@ -401,34 +429,6 @@ defineExpose({
           </t-tooltip>
 
           <div class="h-23px flex-center">签署日期</div>
-        </div>
-
-        <!-- 签署日期 -->
-        <div
-          v-if="_compTypeListMap[COMP_PARAMS_NAME_MAP.compSealDate]"
-          class="left__content-item"
-          :draggable="__signContext__.contentInitial"
-          @dragstart="dragMethod.dragStart({ type: 'compSealDate' }, $event)"
-          @dragend="dragMethod.dragend"
-        >
-          <t-tooltip
-            v-if="
-              __signContext__._compSignDateList?.length >=
-              COMP_SEAL_DATE_STYLE.limit
-            "
-            theme="light"
-            placement="top"
-            :content="`用印时间控件最多只有 ${COMP_SEAL_DATE_STYLE.limit} 个`"
-            :show-arrow="false"
-            destroy-on-close
-          >
-            <t-icon
-              name="error-circle"
-              class="text-warning absolute left-2 z-1 cursor-help"
-            ></t-icon>
-          </t-tooltip>
-
-          <div class="h-23px flex-center">用印时间</div>
         </div>
       </section>
     </div>
