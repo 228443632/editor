@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import Preview from './components/Preview.vue'
 import { useRoute } from 'vue-router'
-import { deepClone, to, uuid } from 'sf-utils2'
+import { arrayToObj, deepClone, to, uuid } from 'sf-utils2'
 import { isInIframe } from '@/views/doc-editor/utils/common-util.ts'
 import { pageUtils } from '@/views/sign-editor/utils/commons.ts'
 import type { IParamsCompItem } from '@/views/sign-editor/types/types.ts'
@@ -84,7 +84,10 @@ function initParamsCompList(
   paramsCompListArg = deepClone(paramsCompListArg)
   const paramsCompListKeywords = [] // 关键字list
   const paramsCompListNoKeywords = [] // 绝对坐标
+
+  const retainFieldObj = arrayToObj(retainField)
   paramsCompListArg.forEach((item) => {
+    if (!retainFieldObj[item.type]) return
     if (item.keywords) {
       item.offsetTop = item.top = undefined
       item.offsetLeft = item.left = undefined
@@ -93,13 +96,19 @@ function initParamsCompList(
       paramsCompListNoKeywords.push(item)
     }
   })
+
   paramsCompList.value = pageUtils.reverseEnhanceCompParams(
     paramsCompListNoKeywords,
     retainField,
     // Object.values(COMP_PARAMS_NAME_MAP),
   )
   keywordsParamsCompList.value = paramsCompListKeywords
-  console.log('initParamsCompList[方法]', { paramsCompListArg, retainField })
+  console.log('initParamsCompList[方法]', {
+    paramsCompListArg,
+    retainField,
+    paramsCompListNoKeywords: paramsCompList.value,
+    paramsCompListKeywords: keywordsParamsCompList.value,
+  })
 }
 
 /* 计算 */
@@ -121,7 +130,8 @@ onMounted(() => {
 
     initParamsCompList(
       [
-        { type: 'compSeal', key: '1', offsetX: 100, offsetY: 100, pageNum: 1 },
+        { type: 'compSeal', key: uuid(), offsetX: 100, offsetY: 100, pageNum: 1 },
+        { type: 'compSealDate', keywords: '工程师', key: uuid(), offsetX: 0, offsetY: 0, pageNum: 1 },
         {
           type: 'compSign',
           translateX: 0,
@@ -131,7 +141,7 @@ onMounted(() => {
         },
         {
           type: 'compSignDate',
-          key: '2',
+          key: uuid(),
           offsetX: 100,
           translateX: 0,
           translateY: 0,
@@ -139,7 +149,7 @@ onMounted(() => {
           pageNum: 1,
         },
       ],
-      ['compSeal', 'compSign', 'compSignDate'],
+      ['compSeal', 'compSign', 'compSignDate', 'compSealDate'],
     )
     console.log('__', paramsCompList.value)
   }
