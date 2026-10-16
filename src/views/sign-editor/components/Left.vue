@@ -357,7 +357,7 @@ defineExpose({
         >
           <t-tooltip
             v-if="
-              __signContext__._compSignDateList?.length >=
+              __signContext__._compSealDateList?.length >=
               COMP_SEAL_DATE_STYLE.limit
             "
             theme="light"
